@@ -20,7 +20,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            color: #34495e;
+            color: #ffd900;
         }
         h1 {
             color: #2c3e50;
@@ -43,7 +43,7 @@
             border: 1px solid #ccc;
         }
         button {
-            background-color:#2c3e50; /* Golden yellow button */
+            background-color:#00065f; /* Golden yellow button */
             color: white;
             padding: 10px 15px;
             border: none;
@@ -95,7 +95,15 @@
             <label for="date">Date</label>
             <input type="date" id="date" name="date" required>
         </div>
-
+        <div class="form-group">
+            <label for="month">Month</label>
+            <select id="program" name="program" required>
+                <option value="little_leaner">Little Leaner</option>
+                <option value="kg">KG</option>
+                <option value="online_school">Online School</option>
+                <option value="horizon">Horizon</option>
+            </select>
+        </div>
         <div class="form-group">
             <label for="teacherName">Teacher's Name</label>
             <input type="text" id="teacherName" name="teacherName" required>
