@@ -96,7 +96,7 @@
       <button type="submit">Login</button>
       <div id="message" class="error-message"></div>
     </form>
-    <div class="footer-note">© 2025 Your Institution</div>
+    <div class="footer-note">© 2025 ALIF EDU</div>
   </div>
 
   <script>
@@ -124,11 +124,34 @@
       .then((res) => res.text())
       .then((text) => {
         if (text.trim() === "success") {
-          message.className = "success-message";
-          message.innerText = "Login successful!";
-          // Redirect if needed:
-          // window.location.href = "dashboard.html";
-        } else {
+  const selectedRole = role.toLowerCase();
+
+  let dashboardPage = "";
+  switch (selectedRole) {
+    case "admin":
+      dashboardPage = "admin-dashboard.html";
+      break;
+    case "principal":
+      dashboardPage = "principal-dashboard.html";
+      break;
+    case "teacher":
+      dashboardPage = "teacher-dashboard.html";
+      break;
+    case "mentor":
+      dashboardPage = "mentor-dashboard.html";
+      break;
+    default:
+      message.innerText = "Unknown role.";
+      return;
+  }
+
+  message.className = "success-message";
+  message.innerText = "Login successful! Redirecting...";
+  setTimeout(() => {
+    window.location.href = dashboardPage;
+  }, 1000);
+}
+ else {
           message.className = "error-message";
           message.innerText = "Invalid login credentials.";
         }
