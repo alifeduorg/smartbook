@@ -12,13 +12,20 @@
       --shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
 
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--white);
+    }
+
+    .dashboard-wrapper {
       display: flex;
       min-height: 100vh;
-      overflow-x: hidden;
+      transition: all 0.3s ease;
     }
 
     .sidebar {
@@ -68,10 +75,27 @@
       color: var(--gold);
     }
 
+    .logout {
+      background-color: var(--gold);
+      border: none;
+      color: var(--navy);
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      margin-top: 30px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .logout:hover {
+      background-color: #ffd633;
+    }
+
     .main-content {
       flex-grow: 1;
       padding: 20px;
       background-color: #f5f7fa;
+      transition: margin-left 0.3s ease;
     }
 
     .header {
@@ -114,44 +138,33 @@
       color: var(--navy);
     }
 
-    .logout {
-      background-color: var(--gold);
-      border: none;
-      color: var(--navy);
-      padding: 10px 20px;
-      font-weight: bold;
-      border-radius: 8px;
-      margin-top: 30px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .logout:hover {
-      background-color: #ffd633;
-    }
-
+    /* Responsive handling */
     @media (max-width: 768px) {
       .sidebar {
         position: fixed;
         top: 0;
-        left: 0;
+        left: -250px;
         height: 100%;
-        transform: translateX(-100%);
         z-index: 1000;
       }
 
       .sidebar.open {
-        transform: translateX(0);
+        left: 0;
       }
 
       .menu-toggle {
         display: block;
+      }
+
+      .main-content.open {
+        margin-left: 250px;
       }
     }
   </style>
 </head>
 <body>
 
+<div class="dashboard-wrapper">
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="logo">
@@ -173,7 +186,7 @@
   </aside>
 
   <!-- Main Content -->
-  <div class="main-content">
+  <div class="main-content" id="mainContent">
     <div class="header">
       <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
       <h2>Welcome Admin</h2>
@@ -203,21 +216,25 @@
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("open");
-    }
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    sidebar.classList.toggle("open");
+    mainContent.classList.toggle("open");
+  }
 
-    function goTo(page) {
-      window.location.href = page;
-    }
+  function goTo(page) {
+    window.location.href = page;
+  }
 
-    function logout() {
-      alert("Logging out...");
-      window.location.href = "index.html"; // or login.html
-    }
-  </script>
+  function logout() {
+    alert("Logging out...");
+    window.location.href = "index.html"; // Or your login page
+  }
+</script>
 
 </body>
 </html>
