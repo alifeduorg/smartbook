@@ -1,267 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logbook Entry</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logbook Entry</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    header {
+      background-color: #002B5B; /* Navy blue */
+      padding: 1rem;
+      text-align: center;
+      color: white;
+      font-size: 1.5rem;
+    }
 
-        .form-card {
-            background-color: white;
-            padding: 30px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            margin-bottom: 20px;
-            transform: translateY(0);
-            transition: all 0.3s ease-in-out;
-        }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
 
-        .form-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-        }
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
 
-        h2 {
-            text-align: center;
-            color: #2C3E50;
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
+    h2 {
+      text-align: center;
+      color: #002B5B;
+      margin-bottom: 1rem;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .form-group {
+      margin-bottom: 1rem;
+    }
 
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-            color: #2C3E50;
-        }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-        }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
 
-        button {
-            background-color: #f39c12; /* Golden Yellow */
-            color: white;
-            padding: 15px 30px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
+    textarea {
+      resize: vertical;
+    }
 
-        button:hover {
-            background-color: #e67e22;
-            transform: scale(1.05);
-        }
+    button {
+      background-color: #F5A623; /* Golden Yellow */
+      color: white;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s;
+      width: 100%;
+      margin-top: 1rem;
+    }
 
-        .back-btn {
-            text-align: center;
-            margin-top: 20px;
-        }
+    button:hover {
+      background-color: #e0961f;
+      transform: scale(1.03);
+    }
 
-        .back-btn a {
-            color: #2C3E50;
-            text-decoration: none;
-            font-size: 16px;
-        }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1rem;
+      color: #002B5B;
+      text-decoration: none;
+      font-weight: bold;
+    }
 
-        .back-btn a:hover {
-            text-decoration: underline;
-        }
+    .back-link:hover {
+      text-decoration: underline;
+    }
 
-        /* Navbar Styling */
-        .navbar {
-            background-color: #2C3E50; /* Navy Blue */
-            padding: 10px 20px;
-            text-align: center;
-            color: white;
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            padding: 10px 15px;
-        }
-
-        .navbar a:hover {
-            background-color: #f39c12; /* Golden Yellow */
-            color: white;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            button {
-                padding: 12px;
-            }
-        }
-
-    </style>
+    @media (max-width: 600px) {
+      .container {
+        margin: 1rem;
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <a href="teacher_dashboard.html">Back to Dashboard</a>
-    </div>
+  <header>Teacher Logbook</header>
 
-    <div class="container">
-        <div class="form-card">
-            <h2>Logbook Entry</h2>
-            <form id="logbook-form" onsubmit="submitForm(event)">
-                <!-- Teacher's Name & Staff ID -->
-                <div class="form-group">
-                    <label for="teacher-name">Teacher's Name</label>
-                    <input type="text" id="teacher-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="staff-id">Staff ID</label>
-                    <input type="text" id="staff-id" required>
-                </div>
+  <div class="container">
+    <h2>Fill Out Logbook</h2>
+    <form id="logbook-form" onsubmit="submitForm(event)">
+      <div class="form-group">
+        <label for="teacher-name">Teacher’s Name</label>
+        <input type="text" id="teacher-name" required />
+      </div>
 
-                <!-- Program -->
-                <div class="form-group">
-                    <label for="program">Program</label>
-                    <select id="program" required>
-                        <option value="Little Learner">Little Learner</option>
-                        <option value="KG">KG</option>
-                        <option value="Online School">Online School</option>
-                        <option value="Horizon">Horizon</option>
-                    </select>
-                </div>
+      <div class="form-group">
+        <label for="staff-id">Staff ID</label>
+        <input type="text" id="staff-id" required />
+      </div>
 
-                <!-- Class Time & Duration -->
-                <div class="form-group">
-                    <label for="class-in">Class In (Time)</label>
-                    <input type="time" id="class-in" required>
-                </div>
-                <div class="form-group">
-                    <label for="class-duration">Class Duration</label>
-                    <select id="class-duration" required>
-                        <option value="30 minutes">30 minutes</option>
-                        <option value="60 minutes">60 minutes</option>
-                        <option value="90 minutes">60+30 minutes</option>
-                        <option value="120 minutes">60+30+30 minutes</option>
-                    </select>
-                </div>
+      <div class="form-group">
+        <label for="program">Program</label>
+        <select id="program" required>
+          <option value="">Select</option>
+          <option>Little Learner</option>
+          <option>KG</option>
+          <option>Online School</option>
+          <option>Horizon</option>
+        </select>
+      </div>
 
-                <!-- Subject -->
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <select id="subject" required>
-                        <option value="Math">Math</option>
-                        <option value="Science">Science</option>
-                        <option value="English">English</option>
-                        <option value="History">History</option>
-                    </select>
-                </div>
+      <div class="form-group">
+        <label for="class-in">Class In</label>
+        <input type="time" id="class-in" required />
+      </div>
 
-                <!-- Student Name -->
-                <div class="form-group">
-                    <label for="student-name">Student Name</label>
-                    <input type="text" id="student-name" required>
-                </div>
+      <div class="form-group">
+        <label for="class-duration">Class Duration</label>
+        <select id="class-duration" required>
+          <option value="">Select</option>
+          <option>30 minutes</option>
+          <option>60 minutes</option>
+          <option>60+30 minutes</option>
+          <option>60+30+30 minutes</option>
+        </select>
+      </div>
 
-                <!-- Teaching Details -->
-                <div class="form-group">
-                    <label for="teaching">What did you teach today?</label>
-                    <textarea id="teaching" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="engagement">Student Engagement</label>
-                    <textarea id="engagement" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="homework">Homework or Tasks Given?</label>
-                    <textarea id="homework" required></textarea>
-                </div>
+      <div class="form-group">
+        <label for="subject">Subject</label>
+        <select id="subject" required>
+          <option value="">Select</option>
+          <option>Math</option>
+          <option>Science</option>
+          <option>English</option>
+          <option>General Knowledge</option>
+        </select>
+      </div>
 
-                <!-- Additional Information -->
-                <div class="form-group">
-                    <label for="work-type">What type of work?</label>
-                    <textarea id="work-type" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="class-notification">Class Notification</label>
-                    <textarea id="class-notification"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="share">Anything you'd like to share?</label>
-                    <textarea id="share"></textarea>
-                </div>
+      <div class="form-group">
+        <label for="student-name">Student Name</label>
+        <input type="text" id="student-name" required />
+      </div>
 
-                <!-- Submit Button -->
-                <button type="submit">Submit Logbook Entry</button>
-            </form>
-        </div>
-    </div>
+      <div class="form-group">
+        <label for="teaching">What did you teach today?</label>
+        <textarea id="teaching" rows="3" required></textarea>
+      </div>
 
-    <script>
-        function submitForm(event) {
-            event.preventDefault();
+      <div class="form-group">
+        <label for="engagement">Student Engagement</label>
+        <textarea id="engagement" rows="3" required></textarea>
+      </div>
 
-            const formData = {
-                teacherName: document.getElementById('teacher-name').value,
-                staffId: document.getElementById('staff-id').value,
-                program: document.getElementById('program').value,
-                classIn: document.getElementById('class-in').value,
-                classDuration: document.getElementById('class-duration').value,
-                subject: document.getElementById('subject').value,
-                studentName: document.getElementById('student-name').value,
-                teaching: document.getElementById('teaching').value,
-                engagement: document.getElementById('engagement').value,
-                homework: document.getElementById('homework').value,
-                workType: document.getElementById('work-type').value,
-                classNotification: document.getElementById('class-notification').value,
-                share: document.getElementById('share').value
-            };
+      <div class="form-group">
+        <label for="homework">Homework or Tasks Given?</label>
+        <textarea id="homework" rows="2" required></textarea>
+      </div>
 
-            const url = 'https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec'; // Replace with your actual Google Apps Script Web App URL
+      <div class="form-group">
+        <label for="work-type">What type of work?</label>
+        <textarea id="work-type" rows="2" required></textarea>
+      </div>
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Logbook entry submitted successfully!');
-                document.getElementById('logbook-form').reset();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while submitting the logbook entry.');
-            });
-        }
-    </script>
+      <div class="form-group">
+        <label for="class-notification">Class Notification Message</label>
+        <textarea id="class-notification" rows="2"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="share">Anything you'd like to share?</label>
+        <textarea id="share" rows="2"></textarea>
+      </div>
+
+      <button type="submit">Submit Logbook Entry</button>
+    </form>
+    <a class="back-link" href="dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <script>
+    function submitForm(event) {
+      event.preventDefault();
+
+      const formData = {
+        teacherName: document.getElementById("teacher-name").value,
+        staffId: document.getElementById("staff-id").value,
+        program: document.getElementById("program").value,
+        classIn: document.getElementById("class-in").value,
+        classDuration: document.getElementById("class-duration").value,
+        subject: document.getElementById("subject").value,
+        studentName: document.getElementById("student-name").value,
+        teaching: document.getElementById("teaching").value,
+        engagement: document.getElementById("engagement").value,
+        homework: document.getElementById("homework").value,
+        workType: document.getElementById("work-type").value,
+        classNotification: document.getElementById("class-notification").value,
+        share: document.getElementById("share").value,
+      };
+
+      const url = 'https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec'; // Replace this with your actual script URL
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert("Logbook entry submitted successfully!");
+          document.getElementById("logbook-form").reset();
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("An error occurred while submitting the logbook entry.");
+        });
+    }
+  </script>
 </body>
 </html>
