@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alif Edu Staff Login</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(to right, #001f3f, #003366);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .login-card {
+        background: white;
+        padding: 30px 25px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .login-card img {
+        width: 80px;
+        margin-bottom: 15px;
+      }
+
+      h2 {
+        color: #001f3f;
+        margin-bottom: 25px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        background-color: #ffd700;
+        color: #001f3f;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #e6c200;
+      }
+
+      .error {
+        color: red;
+        margin-top: 12px;
+        font-size: 14px;
+      }
+
+      @media (max-width: 500px) {
+        .login-card {
+          padding: 20px 15px;
+        }
+
+        h2 {
+          font-size: 20px;
+        }
+
+        input,
+        select,
+        button {
+          font-size: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-card">
+      <!-- Logo -->
+      <img src="https://via.placeholder.com/80x80.png?text=Logo" alt="Logo" />
+
+      <!-- Title -->
+      <h2>Alif Edu Staff Login</h2>
+
+      <!-- Input Fields -->
+      <input type="text" id="staffId" placeholder="Staff ID" />
+      <input type="password" id="password" placeholder="Password" />
+      <select id="role">
+        <option value="">Select Role</option>
+        <option value="admin">Admin</option>
+        <option value="principal">Principal</option>
+        <option value="teacher">Teacher</option>
+        <option value="mentor">Mentor</option>
+      </select>
+
+      <!-- Login Button -->
+      <button onclick="handleLogin()">Login</button>
+
+      <!-- Error Message -->
+      <div class="error" id="errorBox"></div>
+    </div>
+
+    <script>
+      // Replace this with your actual Web App URL
+      const scriptUrl = 'https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec';
+
+      function handleLogin() {
+        const id = document.getElementById("staffId").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const role = document.getElementById("role").value.trim();
+        const errorBox = document.getElementById("errorBox");
+
+        if (!id || !password || !role) {
+          errorBox.textContent = "Please fill in all fields.";
+          return;
+        }
+
+        // Call the Apps Script backend to verify the login
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result === "fail") {
+              errorBox.textContent = "Invalid credentials. Please try again.";
+            } else {
+              // Redirect based on role (admin, principal, teacher, mentor)
+              window.location.href = result + ".html";
+            }
+          })
+          .verifyLogin(id, password, role); // Call the backend Apps Script function
+      }
+    </script>
+  </body>
+</html>
