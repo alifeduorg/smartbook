@@ -70,13 +70,31 @@
       color: #002B5B;
       font-weight: bold;
     }
+    .dashboard-btn {
+      background-color: #FFD700;
+      color: #002B5B;
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-decoration: none;
+      transition: 0.3s;
+      margin-top: 1rem;
+    }
+    .dashboard-btn:hover {
+      background-color: #e6c200;
+    }
   </style>
 </head>
 <body>
 
 <header>
   <img src="1.png" alt="Logo">
-  <div class="back-btn"><a href="dashboard_teacher.html">← Back to Dashboard</a></div>
+  <div class="back-btn">
+    <a href="dashboard_teacher.html">← Back to Dashboard</a>
+  </div>
 </header>
 
 <div class="container">
@@ -144,6 +162,10 @@
 
     <button type="submit">Submit Logbook Entry</button>
   </form>
+
+  <div style="text-align: center; margin-top: 1rem;">
+    <a href="teacher_dashboard.html" class="dashboard-btn">Go to Dashboard</a>
+  </div>
 </div>
 
 <script>
