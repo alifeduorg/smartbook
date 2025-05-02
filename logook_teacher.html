@@ -12,38 +12,57 @@
             margin: 0;
             padding: 0;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
+
         .form-card {
             background-color: white;
             padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
             margin-bottom: 20px;
+            transform: translateY(0);
+            transition: all 0.3s ease-in-out;
         }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
         h2 {
             text-align: center;
             color: #2C3E50;
+            font-size: 24px;
+            margin-bottom: 30px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             font-weight: bold;
             display: block;
+            margin-bottom: 5px;
+            color: #2C3E50;
         }
+
         input, select, textarea {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            font-size: 14px;
         }
+
         button {
-            background-color: #f39c12;
+            background-color: #f39c12; /* Golden Yellow */
             color: white;
             padding: 15px 30px;
             font-size: 16px;
@@ -51,22 +70,50 @@
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
         }
+
         button:hover {
             background-color: #e67e22;
+            transform: scale(1.05);
         }
+
         .back-btn {
             text-align: center;
             margin-top: 20px;
         }
+
         .back-btn a {
             color: #2C3E50;
             text-decoration: none;
             font-size: 16px;
         }
+
         .back-btn a:hover {
             text-decoration: underline;
         }
+
+        /* Navbar Styling */
+        .navbar {
+            background-color: #2C3E50; /* Navy Blue */
+            padding: 10px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 15px;
+        }
+
+        .navbar a:hover {
+            background-color: #f39c12; /* Golden Yellow */
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -75,9 +122,15 @@
                 padding: 12px;
             }
         }
+
     </style>
 </head>
 <body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="teacher_dashboard.html">Back to Dashboard</a>
+    </div>
 
     <div class="container">
         <div class="form-card">
@@ -92,7 +145,7 @@
                     <label for="staff-id">Staff ID</label>
                     <input type="text" id="staff-id" required>
                 </div>
-                
+
                 <!-- Program -->
                 <div class="form-group">
                     <label for="program">Program</label>
@@ -103,7 +156,7 @@
                         <option value="Horizon">Horizon</option>
                     </select>
                 </div>
-                
+
                 <!-- Class Time & Duration -->
                 <div class="form-group">
                     <label for="class-in">Class In (Time)</label>
@@ -118,7 +171,7 @@
                         <option value="120 minutes">60+30+30 minutes</option>
                     </select>
                 </div>
-                
+
                 <!-- Subject -->
                 <div class="form-group">
                     <label for="subject">Subject</label>
@@ -167,10 +220,6 @@
                 <!-- Submit Button -->
                 <button type="submit">Submit Logbook Entry</button>
             </form>
-
-            <div class="back-btn">
-                <a href="dashboard.html">Back to Dashboard</a>
-            </div>
         </div>
     </div>
 
