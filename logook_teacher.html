@@ -1,249 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Logbook</title>
-  <style>
-    :root {
-      --navy: #0b1d3a;
-      --gold: #ffcc00;
-      --white: #ffffff;
-      --shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--white);
-    }
-
-    .dashboard-wrapper {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .form-wrapper {
-      background-color: var(--white);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      border-radius: 10px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      font-weight: bold;
-      color: var(--navy);
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    textarea {
-      height: 100px;
-    }
-
-    button {
-      background-color: var(--gold);
-      border: none;
-      color: var(--navy);
-      padding: 10px 20px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #ffd633;
-    }
-
-    .dropdown {
-      padding: 10px;
-    }
-
-    .date-picker, .time-picker {
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logbook Entry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-card {
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #2C3E50;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #f39c12;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #e67e22;
+        }
+        .back-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-btn a {
+            color: #2C3E50;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .back-btn a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            button {
+                padding: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="dashboard-wrapper">
-  <div class="header">
-    <h2>Teacher Logbook</h2>
-  </div>
+    <div class="container">
+        <div class="form-card">
+            <h2>Logbook Entry</h2>
+            <form id="logbook-form" onsubmit="submitForm(event)">
+                <!-- Teacher's Name & Staff ID -->
+                <div class="form-group">
+                    <label for="teacher-name">Teacher's Name</label>
+                    <input type="text" id="teacher-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="staff-id">Staff ID</label>
+                    <input type="text" id="staff-id" required>
+                </div>
+                
+                <!-- Program -->
+                <div class="form-group">
+                    <label for="program">Program</label>
+                    <select id="program" required>
+                        <option value="Little Learner">Little Learner</option>
+                        <option value="KG">KG</option>
+                        <option value="Online School">Online School</option>
+                        <option value="Horizon">Horizon</option>
+                    </select>
+                </div>
+                
+                <!-- Class Time & Duration -->
+                <div class="form-group">
+                    <label for="class-in">Class In (Time)</label>
+                    <input type="time" id="class-in" required>
+                </div>
+                <div class="form-group">
+                    <label for="class-duration">Class Duration</label>
+                    <select id="class-duration" required>
+                        <option value="30 minutes">30 minutes</option>
+                        <option value="60 minutes">60 minutes</option>
+                        <option value="90 minutes">60+30 minutes</option>
+                        <option value="120 minutes">60+30+30 minutes</option>
+                    </select>
+                </div>
+                
+                <!-- Subject -->
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject" required>
+                        <option value="Math">Math</option>
+                        <option value="Science">Science</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                    </select>
+                </div>
 
-  <div class="form-wrapper">
-    <form id="logbook-form" onsubmit="submitForm(event)">
-      <!-- Timestamp -->
-      <div class="form-group">
-        <label for="timestamp">Timestamp</label>
-        <input type="text" id="timestamp" value="" readonly>
-      </div>
+                <!-- Student Name -->
+                <div class="form-group">
+                    <label for="student-name">Student Name</label>
+                    <input type="text" id="student-name" required>
+                </div>
 
-      <!-- Date -->
-      <div class="form-group">
-        <label for="date">Date</label>
-        <input type="date" id="date" required>
-      </div>
+                <!-- Teaching Details -->
+                <div class="form-group">
+                    <label for="teaching">What did you teach today?</label>
+                    <textarea id="teaching" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="engagement">Student Engagement</label>
+                    <textarea id="engagement" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="homework">Homework or Tasks Given?</label>
+                    <textarea id="homework" required></textarea>
+                </div>
 
-      <!-- Teacher's Name & Staff ID (Fetched from Google Sheets) -->
-      <div class="form-group">
-        <label for="teacher-name">Teacher's Name</label>
-        <input type="text" id="teacher-name" value="" readonly required>
-      </div>
-      <div class="form-group">
-        <label for="staff-id">Staff ID</label>
-        <input type="text" id="staff-id" value="" readonly required>
-      </div>
+                <!-- Additional Information -->
+                <div class="form-group">
+                    <label for="work-type">What type of work?</label>
+                    <textarea id="work-type" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="class-notification">Class Notification</label>
+                    <textarea id="class-notification"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="share">Anything you'd like to share?</label>
+                    <textarea id="share"></textarea>
+                </div>
 
-      <!-- Program -->
-      <div class="form-group">
-        <label for="program">Program</label>
-        <select id="program">
-          <option value="little-learner">Little Learner</option>
-          <option value="kg">KG</option>
-          <option value="online-school">Online School</option>
-          <option value="horizon">Horizon</option>
-        </select>
-      </div>
+                <!-- Submit Button -->
+                <button type="submit">Submit Logbook Entry</button>
+            </form>
 
-      <!-- Class In (Time Picker) -->
-      <div class="form-group">
-        <label for="class-in">Class In</label>
-        <input type="time" id="class-in" required>
-      </div>
+            <div class="back-btn">
+                <a href="dashboard.html">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
 
-      <!-- Class Duration -->
-      <div class="form-group">
-        <label for="class-duration">Class Duration</label>
-        <select id="class-duration">
-          <option value="30">30 min</option>
-          <option value="60">60 min</option>
-          <option value="90">60 + 30 min</option>
-          <option value="120">60 + 30 + 30 min</option>
-        </select>
-      </div>
+    <script>
+        function submitForm(event) {
+            event.preventDefault();
 
-      <!-- Subject -->
-      <div class="form-group">
-        <label for="subject">Subject</label>
-        <select id="subject">
-          <option value="math">Math</option>
-          <option value="english">English</option>
-          <option value="science">Science</option>
-          <option value="history">History</option>
-        </select>
-      </div>
+            const formData = {
+                teacherName: document.getElementById('teacher-name').value,
+                staffId: document.getElementById('staff-id').value,
+                program: document.getElementById('program').value,
+                classIn: document.getElementById('class-in').value,
+                classDuration: document.getElementById('class-duration').value,
+                subject: document.getElementById('subject').value,
+                studentName: document.getElementById('student-name').value,
+                teaching: document.getElementById('teaching').value,
+                engagement: document.getElementById('engagement').value,
+                homework: document.getElementById('homework').value,
+                workType: document.getElementById('work-type').value,
+                classNotification: document.getElementById('class-notification').value,
+                share: document.getElementById('share').value
+            };
 
-      <!-- Class of Students (Auto-filled based on Teacher) -->
-      <div class="form-group">
-        <label for="student-class">Class of Students</label>
-        <select id="student-class">
-          <!-- This dropdown will be populated with students assigned to the teacher -->
-        </select>
-      </div>
+            const url = 'https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec'; // Replace with your actual Google Apps Script Web App URL
 
-      <!-- What did you teach today? -->
-      <div class="form-group">
-        <label for="teaching">What did you teach today?</label>
-        <textarea id="teaching" required></textarea>
-      </div>
-
-      <!-- Student Engagement -->
-      <div class="form-group">
-        <label for="engagement">Student Engagement</label>
-        <textarea id="engagement" required></textarea>
-      </div>
-
-      <!-- Homework or Tasks Given -->
-      <div class="form-group">
-        <label for="homework">Homework or Tasks Given</label>
-        <textarea id="homework" required></textarea>
-      </div>
-
-      <!-- Work Type -->
-      <div class="form-group">
-        <label for="work-type">What type of work</label>
-        <textarea id="work-type" required></textarea>
-      </div>
-
-      <!-- Class Notification -->
-      <div class="form-group">
-        <label for="class-notification">Upload Class Notification Message</label>
-        <input type="file" id="class-notification">
-      </div>
-
-      <!-- Anything you'd like to share -->
-      <div class="form-group">
-        <label for="share">Anything you'd like to share?</label>
-        <textarea id="share"></textarea>
-      </div>
-
-      <!-- Submit Button -->
-      <button type="submit">Submit Logbook</button>
-    </form>
-  </div>
-</div>
-
-<script>
-  function fetchTeacherData() {
-    // Assuming you have a function that fetches the teacher's data from Google Sheets using Google Sheets API
-    const teacherName = 'John Doe';  // Example: fetch from Sheets
-    const staffID = '12345';  // Example: fetch from Sheets
-    const students = ['Student 1', 'Student 2', 'Student 3'];  // Example: fetch assigned students
-
-    document.getElementById('teacher-name').value = teacherName;
-    document.getElementById('staff-id').value = staffID;
-
-    // Populate student dropdown
-    const studentClassSelect = document.getElementById('student-class');
-    students.forEach(student => {
-      const option = document.createElement('option');
-      option.value = student;
-      option.textContent = student;
-      studentClassSelect.appendChild(option);
-    });
-  }
-
-  function submitForm(event) {
-    event.preventDefault();
-    const formData = new FormData(document.getElementById('logbook-form'));
-    
-    // Logic for submitting the data to Google Sheets or your database
-    alert('Logbook submitted successfully!');
-  }
-
-  // Call function to fetch teacher data when the page loads
-  window.onload = fetchTeacherData;
-</script>
-
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Logbook entry submitted successfully!');
+                document.getElementById('logbook-form').reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting the logbook entry.');
+            });
+        }
+    </script>
 </body>
 </html>
