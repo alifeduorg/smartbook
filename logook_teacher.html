@@ -183,7 +183,7 @@
         </div>
     </form>
 
-    <button class="dashboard-btn" onclick="window.location.href='teacher_dashboard.html'">Go to Dashboard</button>
+    <button class="dashboard-btn" onclick="window.location.href='your-dashboard-url'">Go to Dashboard</button>
 </div>
 
 <script>
@@ -203,7 +203,9 @@
         .then(data => {
             if (data.result === "success") {
                 document.getElementById('successMessage').style.display = 'block';
-                form.reset(); // Reset the form
+                setTimeout(function() {
+                    window.location.reload(); // Refresh the page after 2 seconds
+                }, 2000); // Wait 2 seconds before refreshing
             }
         })
         .catch(error => {
