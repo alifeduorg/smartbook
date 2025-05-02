@@ -1,145 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alif Edu Staff Login</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(to right, #001f3f, #003366);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staff Login</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0b1d3a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-      .login-card {
-        background: white;
-        padding: 30px 25px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        max-width: 400px;
-        width: 100%;
-        text-align: center;
-      }
+    .login-card {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      width: 350px;
+      text-align: center;
+    }
 
-      .login-card img {
-        width: 80px;
-        margin-bottom: 15px;
-      }
+    .login-card img {
+      width: 80px;
+      margin-bottom: 20px;
+    }
 
-      h2 {
-        color: #001f3f;
-        margin-bottom: 25px;
-      }
+    .login-card h2 {
+      margin-bottom: 20px;
+      color: #0b1d3a;
+    }
 
-      input,
-      select {
-        width: 100%;
-        padding: 12px;
-        margin: 10px 0;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-      }
+    .login-card input,
+    .login-card select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
 
-      button {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        border: none;
-        border-radius: 10px;
-        background-color: #ffd700;
-        color: #001f3f;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-        transition: background-color 0.3s;
-      }
+    .login-card button {
+      background-color: #ffcc00;
+      color: #0b1d3a;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
 
-      button:hover {
-        background-color: #e6c200;
-      }
+    .login-card button:hover {
+      transform: scale(1.05);
+      background-color: #ffdb4d;
+    }
 
-      .error {
-        color: red;
-        margin-top: 12px;
-        font-size: 14px;
-      }
+    .footer-note {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #555;
+    }
 
-      @media (max-width: 500px) {
-        .login-card {
-          padding: 20px 15px;
-        }
+    .error-message {
+      color: red;
+      margin-top: 10px;
+    }
 
-        h2 {
-          font-size: 20px;
-        }
-
-        input,
-        select,
-        button {
-          font-size: 15px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-card">
-      <!-- Logo -->
-      <img src="1.png?text=Logo" alt="Logo" />
-
-      <!-- Title -->
-      <h2>Alif Edu Staff Login</h2>
-
-      <!-- Input Fields -->
-      <input type="text" id="staffId" placeholder="Staff ID" />
-      <input type="password" id="password" placeholder="Password" />
-      <select id="role">
+    .success-message {
+      color: green;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <img src="1.png" alt="Logo" />
+    <h2>Staff Login</h2>
+    <form id="loginForm">
+      <input type="text" id="staffId" placeholder="Staff ID" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <select id="role" required>
         <option value="">Select Role</option>
-        <option value="admin">Admin</option>
-        <option value="principal">Principal</option>
-        <option value="teacher">Teacher</option>
-        <option value="mentor">Mentor</option>
+        <option value="Admin">Admin</option>
+        <option value="Principal">Principal</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Mentor">Mentor</option>
       </select>
+      <button type="submit">Login</button>
+      <div id="message" class="error-message"></div>
+    </form>
+    <div class="footer-note">© 2025 Your Institution</div>
+  </div>
 
-      <!-- Login Button -->
-      <button onclick="handleLogin()">Login</button>
+  <script>
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
 
-      <!-- Error Message -->
-      <div class="error" id="errorBox"></div>
-    </div>
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-    <script>
-      // Replace this with your actual Web App URL
-      const scriptUrl = 'https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec';
+      const staffId = document.getElementById("staffId").value;
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
 
-      function handleLogin() {
-        const id = document.getElementById("staffId").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const role = document.getElementById("role").value.trim();
-        const errorBox = document.getElementById("errorBox");
+      // Replace with your Google Apps Script Web App URL
+      const url = "https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec";
 
-        if (!id || !password || !role) {
-          errorBox.textContent = "Please fill in all fields.";
-          return;
+      fetch(url, {
+        method: "POST",
+        body: new URLSearchParams({
+          staffId: staffId,
+          password: password,
+          role: role
+        }),
+      })
+      .then((res) => res.text())
+      .then((text) => {
+        if (text.trim() === "success") {
+          message.className = "success-message";
+          message.innerText = "Login successful!";
+          // Redirect if needed:
+          // window.location.href = "dashboard.html";
+        } else {
+          message.className = "error-message";
+          message.innerText = "Invalid login credentials.";
         }
-
-        // Call the Apps Script backend to verify the login
-        google.script.run
-          .withSuccessHandler(function(result) {
-            if (result === "fail") {
-              errorBox.textContent = "Invalid credentials. Please try again.";
-            } else {
-              // Redirect based on role (admin, principal, teacher, mentor)
-              window.location.href = result + ".html";
-            }
-          })
-          .verifyLogin(id, password, role); // Call the backend Apps Script function
-      }
-    </script>
-  </body>
+      })
+      .catch((err) => {
+        console.error(err);
+        message.className = "error-message";
+        message.innerText = "Error connecting to server.";
+      });
+    });
+  </script>
+</body>
 </html>
