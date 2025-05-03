@@ -192,26 +192,26 @@
     let studentData = [];
 
     fetch(webAppUrl)
-      .then(res => res.json())
-      .then(data => {
-        studentData = data;
-        const tbody = document.querySelector('#studentTable tbody');
+  .then(res => res.json())
+  .then(data => {
+    console.log(data); // Check the structure of the data here.
+    studentData = data;
+    const tbody = document.querySelector('#studentTable tbody');
 
-        data.forEach((student, index) => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${student['Student ID'] || ''}</td>
-            <td>${student['Student Full Name'] || ''}</td>
-            <td>${student['Class Admitted To'] || ''}</td>
-            <td>${student['Phone Number (WhatsApp)'] || ''}</td>
-            <td>${student["Guardian’s Name"] || ''}</td>
-            <td>${student['Admission Date'] || ''}</td>
-            <td><button onclick="viewDetails(${index})">View</button></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      });
-
+    data.forEach((student, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${student['Student ID'] || ''}</td>
+        <td>${student['Student Full Name'] || ''}</td>
+        <td>${student['Class Admitted To'] || ''}</td>
+        <td>${student['Phone Number (WhatsApp)'] || ''}</td>
+        <td>${student["Guardian’s Name"] || ''}</td>
+        <td>${student['Admission Date'] || ''}</td>
+        <td><button onclick="viewDetails(${index})">View</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
     function viewDetails(index) {
       const student = studentData[index];
       const modalBody = document.getElementById('modalBody');
