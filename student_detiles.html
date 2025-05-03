@@ -1,241 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Alif Academy - Student Admission Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Details Viewer - Alif Edu</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f9f9f9;
-      color: #222;
-      padding: 20px;
+      padding: 0;
     }
-    header {
+    .topbar {
+      background-color: navy;
+      color: goldenrod;
+      padding: 10px 20px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background-color: goldenrod;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 8px;
+      justify-content: space-between;
     }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
+    .topbar img {
+      height: 40px;
     }
-    header a {
-      color: white;
-      font-weight: bold;
-      text-decoration: none;
-      background: rgba(0, 0, 0, 0.15);
-      padding: 6px 12px;
-      border-radius: 6px;
-    }
-    main {
-      margin-top: 20px;
+    .container {
+      padding: 20px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
       background: white;
-      border-radius: 10px;
-      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     th, td {
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #ddd;
       text-align: left;
     }
     th {
-      background-color: #f2c94c;
+      background-color: goldenrod;
       color: white;
     }
-    img {
-      max-width: 60px;
+    .footer {
+      text-align: center;
+      padding: 10px;
+      background: navy;
+      color: goldenrod;
+    }
+    .button {
+      background: goldenrod;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      cursor: pointer;
       border-radius: 5px;
     }
-    #overlay, #studentModal {
+    #individualView {
       display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 9998;
-    }
-    #overlay {
-      background: rgba(0, 0, 0, 0.5);
-    }
-    #studentModal {
       background: white;
-      color: black;
-      overflow-y: auto;
-      padding: 30px;
-      max-width: 700px;
-      margin: 40px auto;
-      z-index: 9999;
-      border-radius: 12px;
-      position: relative;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    #studentModal img {
-      max-width: 120px;
-      float: right;
-      margin-left: 15px;
-    }
-    #studentModal h2 {
-      color: goldenrod;
-      margin-top: 0;
-    }
-    .modal-buttons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-    @media (max-width: 768px) {
-      th, td { font-size: 12px; }
-      #studentModal { width: 90%; padding: 20px; }
-      #studentModal img { float: none; display: block; margin: 10px auto; }
+    #studentPhoto {
+      max-width: 150px;
+      border: 1px solid #ddd;
     }
   </style>
 </head>
 <body>
+  <div class="topbar">
+    <img src="1.png" alt="Alif Edu Logo">
+    <button class="button" onclick="goBack()">Dashboard</button>
+  </div>
 
-  <header>
-    <h1>Alif Academy - Student Admissions</h1>
-    <a href="#" onclick="history.back()">🏠 Dashboard</a>
-  </header>
-
-  <main>
-    <p><strong>Note:</strong> You can paste another URL if needed.</p>
-    <input type="text" id="scriptUrl" style="width:100%; max-width:600px; padding:8px" value="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" />
-    <button onclick="loadStudents()">🔄 Load Students</button>
-
-    <table id="studentsTable">
-      <thead><tr id="tableHead"></tr></thead>
+  <div class="container">
+    <h2>All Students</h2>
+    <table id="studentTable">
+      <thead>
+        <tr id="tableHeader"></tr>
+      </thead>
       <tbody id="tableBody"></tbody>
     </table>
-  </main>
 
-  <div id="overlay" onclick="closeModal()"></div>
-  <div id="studentModal">
-    <div id="studentDetails"></div>
-    <div class="modal-buttons">
-      <button onclick="downloadPDF()">⬇ Download PDF</button>
-      <button onclick="closeModal()">❌ Close</button>
+    <div id="individualView">
+      <h3>Student Details</h3>
+      <img id="studentPhoto" src="" alt="Student Photo">
+      <div id="studentInfo"></div>
+      <br>
+      <button class="button" onclick="downloadStudentData()">Download</button>
+      <button class="button" onclick="closeIndividualView()">Close</button>
     </div>
   </div>
 
+  <div class="footer">
+    &copy; ALIF EDU. All rights reserved.
+  </div>
+
   <script>
-    let selectedStudent = {};
-    async function loadStudents() {
-      const url = document.getElementById("scriptUrl").value.trim();
-      if (!url) return alert("https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec");
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your Apps Script Web App URL
+    let studentData = [];
+    let selectedStudent = null;
 
-      const res = await fetch(url);
-      const data = await res.json();
+    fetch(sheetURL)
+      .then(res => res.json())
+      .then(data => {
+        studentData = data;
+        renderTable(data);
+      });
 
-      const tableHead = document.getElementById("tableHead");
-      const tableBody = document.getElementById("tableBody");
-      tableHead.innerHTML = '';
-      tableBody.innerHTML = '';
+    function renderTable(data) {
+      const headerRow = document.getElementById('tableHeader');
+      const body = document.getElementById('tableBody');
 
       if (data.length === 0) return;
 
-      const headers = Object.keys(data[0]).filter(h => h !== 'HELPER');
+      const keys = Object.keys(data[0]).filter(k => k !== 'HELPER');
+      headerRow.innerHTML = keys.map(k => `<th>${k}</th>`).join('') + '<th>Action</th>';
 
-      headers.forEach(header => {
-        const th = document.createElement("th");
-        th.textContent = header;
-        tableHead.appendChild(th);
-      });
-
-      const thAction = document.createElement("th");
-      thAction.textContent = "Actions";
-      tableHead.appendChild(thAction);
-
-      data.forEach(student => {
-        const tr = document.createElement("tr");
-        headers.forEach(header => {
-          const td = document.createElement("td");
-          if (header === "Photo") {
-            const img = document.createElement("img");
-            img.src = student[header];
-            td.appendChild(img);
-          } else {
-            td.textContent = student[header];
-          }
-          tr.appendChild(td);
-        });
-
-        const tdAction = document.createElement("td");
-        const btn = document.createElement("button");
-        btn.textContent = "View";
-        btn.onclick = () => openModal(student);
-        tdAction.appendChild(btn);
-        tr.appendChild(tdAction);
-
-        tableBody.appendChild(tr);
-      });
+      body.innerHTML = data.map((row, i) => {
+        const rowData = keys.map(k => `<td>${k === 'Photo' ? `<img src="${row[k]}" width="50">` : row[k]}</td>`).join('');
+        return `<tr>${rowData}<td><button class='button' onclick='viewStudent(${i})'>View</button></td></tr>`;
+      }).join('');
     }
 
-    function openModal(student) {
-      selectedStudent = student;
-      const container = document.getElementById("studentDetails");
+    function viewStudent(index) {
+      selectedStudent = studentData[index];
+      const infoDiv = document.getElementById('studentInfo');
+      const photo = document.getElementById('studentPhoto');
+      photo.src = selectedStudent['Photo'];
 
-      container.innerHTML = `
-        <h2>Admission Form - Alif Edu</h2>
-        <img src="${student["Photo"]}" />
-        <p><strong>Student ID:</strong> ${student["Student ID"]}</p>
-        <p><strong>Full Name:</strong> ${student["Student Full Name"]}</p>
-        <p><strong>Gender:</strong> ${student["Gender"]}</p>
-        <p><strong>Date of Birth:</strong> ${student["Date of Birth"]}</p>
-        <p><strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"]}</p>
-        <p><strong>Guardian's Name:</strong> ${student["Guardian’s Name"]}</p>
-        <p><strong>Guardian Contact:</strong> ${student["Guardian’s Contact Number"]}</p>
-        <p><strong>Email (Parent):</strong> ${student["Email ID(Parent)"]}</p>
-        <p><strong>Email (Student):</strong> ${student["Email ID(Student)"]}</p>
-        <p><strong>Class Admitted To:</strong> ${student["Class Admitted To"]}</p>
-        <p><strong>Fee Plan:</strong> ${student["Fee Plan"]}</p>
-        <p><strong>Subjects Opted:</strong> ${student["Subjects Opted"]}</p>
-        <p><strong>Admission Date:</strong> ${student["Admission Date"]}</p>
-        <p><strong>Mode of Admission:</strong> ${student["Mode of Admission"]}</p>
-        <p><strong>Preferred Class Timing:</strong> ${student["Preferred Class Timing"]}</p>
-        <p><strong>Remarks:</strong> ${student["Remarks"]}</p>
-      `;
+      infoDiv.innerHTML = Object.entries(selectedStudent)
+        .filter(([k]) => k !== 'Photo' && k !== 'HELPER')
+        .map(([k, v]) => `<p><strong>${k}</strong>: ${v}</p>`).join('');
 
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("studentModal").style.display = "block";
+      document.getElementById('individualView').style.display = 'block';
     }
 
-    function closeModal() {
-      document.getElementById("overlay").style.display = "none";
-      document.getElementById("studentModal").style.display = "none";
+    function closeIndividualView() {
+      document.getElementById('individualView').style.display = 'none';
     }
 
-    function downloadPDF() {
-      const modalContent = document.getElementById("studentModal");
+    function downloadStudentData() {
+      if (!selectedStudent) return;
+      const content = Object.entries(selectedStudent)
+        .filter(([k]) => k !== 'Photo' && k !== 'HELPER')
+        .map(([k, v]) => `${k}: ${v}`).join('\n');
 
-      html2canvas(modalContent).then(canvas => {
-        const imgData = canvas.toDataURL("image/png");
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF();
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`AdmissionForm_${selectedStudent["Student ID"] || "Student"}.pdf`);
-      });
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${selectedStudent['Student Full Name']}.txt`;
+      a.click();
     }
 
-    // Optional auto-load on open (uncomment below if needed)
-    // window.onload = () => loadStudents();
+    function goBack() {
+      window.history.back();
+    }
   </script>
-
 </body>
 </html>
