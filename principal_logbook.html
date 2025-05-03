@@ -1,182 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logbook Viewer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #1a1a2e;
-            color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: #1b1b3a;
-            border-radius: 12px;
-            padding: 40px;
-            width: 90%;
-            max-width: 1000px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        }
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            color: #f1c40f;
-            text-transform: uppercase;
-        }
-        .btn {
-            background: linear-gradient(135deg, #f1c40f, #f39c12);
-            color: #fff;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: transform 0.2s ease-in-out;
-        }
-        .btn:hover {
-            transform: scale(1.1);
-        }
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-            text-align: left;
-            padding: 12px;
-        }
-        th {
-            background-color: #1b1b3a;
-            color: #f1c40f;
-        }
-        tr:nth-child(even) {
-            background-color: #2a2a4b;
-        }
-        tr:hover {
-            background-color: #333344;
-        }
-        .pdf-btn {
-            background-color: #3498db;
-            font-size: 1.2rem;
-        }
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            background-color: #2a2a4b;
-            color: #f4f4f9;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Logbook Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1b2a;
+      color: #f0e9e9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #f1c40f;
+      font-size: 2.5rem;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    .controls input, .controls select, .controls button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+    }
+    input, select {
+      background-color: #1b263b;
+      color: white;
+    }
+    button {
+      background: linear-gradient(to right, #f1c40f, #f39c12);
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      background-color: #1e2a3c;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #3d5a80;
+    }
+    th {
+      background-color: #293b5f;
+      color: #f1c40f;
+      position: sticky;
+      top: 0;
+    }
+    tr:nth-child(even) {
+      background-color: #16263a;
+    }
+    tr:hover {
+      background-color: #2a3c5a;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Logbook Viewer</h1>
-    <button class="btn" onclick="window.location.href='/dashboard'">Dashboard</button>
+  <h1>Logbook Viewer</h1>
 
-    <h2 style="text-align: center; margin-top: 40px;">Logbook Entries</h2>
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search...">
+    <select id="filterSelect">
+      <option value="">Filter by Program</option>
+    </select>
+    <button onclick="downloadPDF()">Download PDF</button>
+    <button onclick="window.location.href='/http://smartbook.alifedu.org/principal-dashboard.html'">Dashboard</button>
+  </div>
+
+  <div class="table-wrapper">
     <table id="logbook-table">
-        <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th>Date</th>
-                <th>Month</th>
-                <th>Teacher’s Name</th>
-                <th>Staff ID</th>
-                <th>Program</th>
-                <th>Class</th>
-                <th>Student Name</th>
-                <th>Subjects</th>
-                <th>Class In</th>
-                <th>Class Duration</th>
-                <th>What did you teach today?</th>
-                <th>Student Engagement</th>
-                <th>Homework or Tasks Given?</th>
-                <th>What type of Work</th>
-                <th>Upload Class Notification Message</th>
-                <th>Anything you'd like to share?</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data from Google Sheets will be inserted here -->
-        </tbody>
+      <thead>
+        <tr id="table-headers"></tr>
+      </thead>
+      <tbody id="table-body"></tbody>
     </table>
-
-    <button class="btn pdf-btn" onclick="downloadPDF()">Download PDF</button>
-</div>
+  </div>
 
 <script>
-    // Google Sheets API data fetch (you need Google Apps Script for this backend)
-    function fetchLogbookData() {
-        // This function will interact with the Google Apps Script backend to fetch data
-        // You would replace this with actual fetching logic or use Google Apps Script
-        const logbookEntries = [
-            {
-                timestamp: '2025-05-01 08:00',
-                date: '2025-05-01',
-                month: 'May',
-                teacherName: 'John Doe',
-                staffID: '12345',
-                program: 'Math',
-                class: '10A',
-                studentName: 'Alice',
-                subjects: 'Algebra',
-                classIn: '08:00',
-                classDuration: '1 hour',
-                teachToday: 'Solving equations',
-                studentEngagement: 'High',
-                homework: 'Exercises 1-5',
-                workType: 'Classwork',
-                classNotification: 'Homework for next class',
-                share: 'Great session!'
-            },
-            // More entries...
-        ];
+  const sheetUrl = "https://script.google.com/macros/s/AKfycbxv4NzkYUwX5r6AFcijgwRuu9mf6wMaUiBnthw56dPhzL8UtDhwNoF4T_XEf7Ixb2YUvQ/exec"; // ← REPLACE WITH YOUR GOOGLE WEB APP URL
 
-        const tableBody = document.querySelector("#logbook-table tbody");
-        logbookEntries.forEach(entry => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${entry.timestamp}</td>
-                <td>${entry.date}</td>
-                <td>${entry.month}</td>
-                <td>${entry.teacherName}</td>
-                <td>${entry.staffID}</td>
-                <td>${entry.program}</td>
-                <td>${entry.class}</td>
-                <td>${entry.studentName}</td>
-                <td>${entry.subjects}</td>
-                <td>${entry.classIn}</td>
-                <td>${entry.classDuration}</td>
-                <td>${entry.teachToday}</td>
-                <td>${entry.studentEngagement}</td>
-                <td>${entry.homework}</td>
-                <td>${entry.workType}</td>
-                <td>${entry.classNotification}</td>
-                <td>${entry.share}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-    }
+  async function fetchData() {
+    const res = await fetch(sheetUrl);
+    const data = await res.json();
 
-    // Download PDF logic (you can integrate libraries like jsPDF)
-    function downloadPDF() {
-        alert('This will download the PDF (to be implemented with a PDF library)');
-    }
+    if (!data.length) return;
 
-    // Fetch data when the page loads
-    window.onload = fetchLogbookData;
+    const headers = Object.keys(data[0]);
+    const headerRow = document.getElementById('table-headers');
+    headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+
+    const tableBody = document.getElementById('table-body');
+    tableBody.innerHTML = '';
+
+    const programSet = new Set();
+
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = headers.map(h => `<td>${row[h] || ''}</td>`).join('');
+      tableBody.appendChild(tr);
+      if (row['Program']) programSet.add(row['Program']);
+    });
+
+    // Populate filter
+    const filterSelect = document.getElementById('filterSelect');
+    programSet.forEach(prog => {
+      const opt = document.createElement('option');
+      opt.value = prog;
+      opt.innerText = prog;
+      filterSelect.appendChild(opt);
+    });
+
+    // Setup search and filter
+    document.getElementById('searchInput').addEventListener('input', filterTable);
+    document.getElementById('filterSelect').addEventListener('change', filterTable);
+  }
+
+  function filterTable() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    const filterText = document.getElementById('filterSelect').value.toLowerCase();
+
+    const rows = document.querySelectorAll('#logbook-table tbody tr');
+    rows.forEach(row => {
+      const rowText = row.innerText.toLowerCase();
+      const matchSearch = rowText.includes(searchText);
+      const matchFilter = filterText ? rowText.includes(filterText) : true;
+      row.style.display = (matchSearch && matchFilter) ? '' : 'none';
+    });
+  }
+
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape' });
+    const table = document.getElementById('logbook-table');
+
+    doc.autoTable({ html: table });
+    doc.save('logbook.pdf');
+  }
+
+  window.onload = fetchData;
 </script>
 
 </body>
