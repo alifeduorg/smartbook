@@ -85,7 +85,7 @@
       background-color: #28a745;
     }
 
-   /* Modal backdrop */
+/* Modal backdrop */
 .modal {
   display: none;
   position: fixed;
@@ -104,27 +104,38 @@
 .modal-content {
   background: #fff;
   padding: 2cm;
-  width: 21cm; /* A4 width */
-  min-height: 29.7cm; /* A4 height */
+  width: 21cm;               /* A4 width */
+  height: 29.7cm;            /* A4 height */
   box-sizing: border-box;
   overflow: hidden;
-  border: 2px solid #003366;
+  border: 2px solid #003366; /* Full border */
   border-radius: 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   font-family: 'Arial', sans-serif;
   position: relative;
 }
 
-/* Hide buttons in print */
-.close-btn, .print-btn {
+/* Close button */
+.close-btn {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 60px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
   z-index: 10;
 }
 
 /* Download button */
 .print-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
   background-color: #003366;
   color: white;
   padding: 10px 20px;
@@ -132,16 +143,14 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  top: auto;
-  right: 20px;
-  bottom: 20px;
+  z-index: 10;
 }
 
 .print-btn:hover {
   background-color: #dc3545;
 }
 
-/* Print layout override */
+/* Print layout */
 @media print {
   body {
     margin: 0;
@@ -155,18 +164,17 @@
   .modal-content {
     display: block;
     position: static;
-    width: 100%;
-    max-width: none;
-    height: auto;
-    min-height: auto;
+    width: 21cm;
+    height: 29.7cm;
+    padding: 2cm;
     box-shadow: none;
+    border: 2px solid #000;
     border-radius: 0;
-    margin: 0;
+    margin: 0 auto;
+    overflow: visible;
     page-break-inside: avoid;
   }
 }
-
-
   </style>
 </head>
 <body>
