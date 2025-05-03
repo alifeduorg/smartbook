@@ -1,222 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C Alif Edu 2025 Login</title>
-    <style>
-        /* General body styles */
-        body {
-            background-color: #ffffff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            flex-direction: column;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title> Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a3a6c;
+      --accent: #f9c21b;
+      --white: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.15);
+    }
 
-        /* Login card styles */
-        .login-container {
-            background-color: #1a3a6c;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.2s ease-in-out;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
 
-        /* 3D effect */
-        .login-container:hover {
-            transform: rotateY(5deg) rotateX(5deg);
-        }
+    body {
+      background: linear-gradient(to bottom, var(--white), #e0e5ec);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
-        /* Logo styles */
-        .logo {
-            width: 100px;
-            margin-bottom: 20px;
-        }
+    .login-container {
+      background-color: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px var(--shadow);
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
 
-        /* Header styles */
-        h1 {
-            color: #f9c21b;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
+    .logo {
+      width: 90px;
+      margin-bottom: 20px;
+    }
 
-        /* Input group styles */
-        .input-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
+    h2 {
+      font-size: 26px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
 
-        .input-group input,
-        .input-group select {
-            width: 100%;
-            padding: 15px;
-            background-color: #ffffff;
-            border: 2px solid #f9c21b;
-            border-radius: 8px;
-            font-size: 16px;
-            color: #333;
-            box-sizing: border-box;
-        }
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
 
-        /* Label styling */
-        .input-group label {
-            position: absolute;
-            top: -12px;
-            left: 12px;
-            font-size: 14px;
-            color: #f9c21b;
-        }
+    .input-group label {
+      font-size: 14px;
+      color: var(--primary);
+      margin-bottom: 6px;
+      display: block;
+      font-weight: 500;
+    }
 
-        /* Button styles */
-        .btn {
-            background-color: #f9c21b;
-            color: #002147;
-            border: none;
-            padding: 15px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 14px;
+      border: 1.5px solid var(--primary);
+      border-radius: 10px;
+      font-size: 15px;
+      background: var(--white);
+      transition: border 0.3s ease;
+      color: #333;
+    }
 
-        .btn:hover {
-            background-color: #d69f18;
-        }
+    .input-group input:focus,
+    .input-group select:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
 
-        /* Footer styles */
-        .footer {
-            background-color: #1a3a6c;
-            color: #f9c21b;
-            text-align: center;
-            padding: 10px;
-            width: 100%;
-            font-size: 14px;
-            position: absolute;
-            bottom: 0;
-        }
+    .btn {
+      background: var(--accent);
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 16px;
+      padding: 14px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
 
-        /* Mobile responsiveness */
-        @media screen and (max-width: 600px) {
-            .login-container {
-                padding: 20px;
-            }
+    .btn:hover {
+      background-color: #e3ae17;
+    }
 
-            h1 {
-                font-size: 20px;
-            }
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: var(--primary);
+      text-align: center;
+    }
 
-            .input-group input,
-            .input-group select {
-                padding: 12px;
-            }
-
-            .btn {
-                padding: 12px;
-                font-size: 16px;
-            }
-        }
-
-    </style>
+    @media (max-width: 500px) {
+      .login-container {
+        padding: 25px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Login Container -->
-    <div class="login-container">
-        <!-- Logo -->
-        <img src="1.png" alt="Logo" class="logo">
-        <!-- Title -->
-        <h1> Login</h1>
-        
-        <!-- Login Form -->
-        <form id="login-form" onsubmit="return handleLogin(event)">
-            <div class="input-group">
-                <label for="staff-id">Staff ID</label>
-                <input type="text" id="staff-id" name="staff_id" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="input-group">
-                <label for="role">Role</label>
-                <select id="role" name="role" required>
-                    <option value="admin">Admin</option>
-                    <option value="principal">Principal</option>
-                    <option value="teacher">Teacher</option>
-                    <option value="mentor">Mentor</option>
-                </select>
-            </div>
-            <button type="submit" class="btn">Login</button>
-        </form>
-    </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        &copy; 2025 C Alif Edu. All rights reserved.
-    </div>
+  <div class="login-container">
+    <img src="1.png" alt="Logo" class="logo" />
+    <h2>Login</h2>
+    <form id="login-form" onsubmit="return handleLogin(event)">
+      <div class="input-group">
+        <label for="staff-id">Staff ID</label>
+        <input type="text" id="staff-id" name="staff_id" required />
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <div class="input-group">
+        <label for="role">Role</label>
+        <select id="role" name="role" required>
+          <option value="admin">Admin</option>
+          <option value="principal">Principal</option>
+          <option value="teacher">Teacher</option>
+          <option value="mentor">Mentor</option>
+        </select>
+      </div>
+      <button type="submit" class="btn">Login</button>
+    </form>
+  </div>
 
-    <!-- Login Handling Script -->
-    <script>
-        async function handleLogin(event) {
-            event.preventDefault(); // Prevent form submission to handle redirection
+  <div class="footer">
+    &copy; 2025  Alif Edu. All rights reserved.
+  </div>
 
-            const staffId = document.getElementById('staff-id').value;
-            const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
+  <script>
+    async function handleLogin(event) {
+      event.preventDefault();
+      const staffId = document.getElementById('staff-id').value;
+      const password = document.getElementById('password').value;
+      const role = document.getElementById('role').value;
 
-            const data = {
-                staff_id: staffId,
-                password: password,
-                role: role
-            };
+      const data = {
+        staff_id: staffId,
+        password: password,
+        role: role
+      };
 
-            const url = 'https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec'; // Replace with your Google Apps Script URL
+      const url = 'https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec'; // Replace this
 
-            const response = await fetch(url, {
-                method: 'POST',
-                contentType: 'application/json',
-                body: JSON.stringify(data)
-            });
+      const response = await fetch(url, {
+        method: 'POST',
+        contentType: 'application/json',
+        body: JSON.stringify(data)
+      });
 
-            const result = await response.json();
+      const result = await response.json();
 
-            if (result.success) {
-                // Redirect based on role
-                let redirectURL = '';
-
-                switch(result.role) {
-                    case 'admin':
-                        redirectURL = 'admin-dashboard.html';
-                        break;
-                    case 'principal':
-                        redirectURL = 'principal-dashboard.html';
-                        break;
-                    case 'teacher':
-                        redirectURL = 'teacher-dashboard.html';
-                        break;
-                    case 'mentor':
-                        redirectURL = 'mentor-dashboard.html';
-                        break;
-                    default:
-                        alert('Invalid role');
-                        return;
-                }
-
-                window.location.href = redirectURL;
-            } else {
-                alert(result.message || 'Login failed');
-            }
+      if (result.success) {
+        let redirectURL = '';
+        switch(result.role) {
+          case 'admin': redirectURL = 'admin-dashboard.html'; break;
+          case 'principal': redirectURL = 'principal-dashboard.html'; break;
+          case 'teacher': redirectURL = 'teacher-dashboard.html'; break;
+          case 'mentor': redirectURL = 'mentor-dashboard.html'; break;
         }
-    </script>
+        window.location.href = redirectURL;
+      } else {
+        alert(result.message || 'Login failed');
+      }
+    }
+  </script>
+
 </body>
 </html>
