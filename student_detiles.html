@@ -104,8 +104,8 @@
   padding: 1cm;
   width: 100%;
   max-width: 21cm; /* A4 width */
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: none; /* <== change this from 90vh to none */
+  overflow: visible; /* <== avoid clipping */
   border-radius: 12px;
   border: 2px solid #003366;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -336,12 +336,21 @@
 
 function downloadPDF() {
   const element = document.getElementById('modalContent');
+
   const opt = {
-    margin:       0.5,
-    filename:     'admission_form.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    margin: 0.5,
+    filename: 'admission_form.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      scrollY: 0, // Fix for capturing full content
+      useCORS: true
+    },
+    jsPDF: {
+      unit: 'cm',
+      format: 'a4',
+      orientation: 'portrait'
+    }
   };
 
   html2pdf().from(element).set(opt).save();
