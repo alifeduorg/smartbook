@@ -1,89 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Logbook Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #0d1b2a;
-      color: #f0e9e9;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0d1b2a;
+      color: #f8f8f8;
     }
-    h1 {
-      text-align: center;
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: #1b263b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    header img {
+      height: 50px;
+      margin-right: 15px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
       color: #f1c40f;
-      font-size: 2.5rem;
     }
+
     .controls {
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
-      margin-bottom: 15px;
+      justify-content: space-around;
+      padding: 15px;
+      background-color: #16263a;
+      border-bottom: 2px solid #f1c40f;
     }
-    .controls input, .controls select, .controls button {
-      margin: 5px;
+
+    .controls input, .controls button {
       padding: 10px;
+      margin: 5px;
       font-size: 1rem;
-      border-radius: 6px;
       border: none;
+      border-radius: 8px;
     }
-    input, select {
-      background-color: #1b263b;
-      color: white;
-    }
-    button {
-      background: linear-gradient(to right, #f1c40f, #f39c12);
+
+    .controls input {
+      background: #1e2a3c;
       color: #fff;
-      cursor: pointer;
+      width: 180px;
     }
-    button:hover {
+
+    .controls button {
+      background: linear-gradient(to right, #f1c40f, #f39c12);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(255, 200, 0, 0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .controls button:hover {
       transform: scale(1.05);
     }
+
     .table-wrapper {
       overflow-x: auto;
-      background-color: #1e2a3c;
-      border-radius: 10px;
-      padding: 10px;
+      padding: 20px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      min-width: 1000px;
     }
+
     th, td {
-      padding: 8px 12px;
-      text-align: left;
+      padding: 10px;
       border-bottom: 1px solid #3d5a80;
+      text-align: left;
     }
+
     th {
       background-color: #293b5f;
       color: #f1c40f;
       position: sticky;
       top: 0;
+      z-index: 2;
     }
+
     tr:nth-child(even) {
-      background-color: #16263a;
+      background-color: #1e2a3c;
     }
+
     tr:hover {
-      background-color: #2a3c5a;
+      background-color: #314e6e;
+    }
+
+    @media (max-width: 768px) {
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      .controls input {
+        width: 90%;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>Logbook Viewer</h1>
+  <header>
+    <img src="1.png" alt="Logo" />
+    <h1>Logbook Viewer</h1>
+  </header>
 
   <div class="controls">
-    <input type="text" id="searchInput" placeholder="Search...">
-    <select id="filterSelect">
-      <option value="">Filter by Program</option>
-    </select>
+    <input type="text" id="searchName" placeholder="Teacher Name" />
+    <input type="text" id="searchStaff" placeholder="Staff ID" />
+    <input type="text" id="searchProgram" placeholder="Program" />
+    <input type="text" id="searchClass" placeholder="Class" />
+    <input type="text" id="searchMonth" placeholder="Month" />
     <button onclick="downloadPDF()">Download PDF</button>
-    <button onclick="window.location.href='/http://smartbook.alifedu.org/principal-dashboard.html'">Dashboard</button>
+    <button onclick="window.location.href='/dashboard.html'">Dashboard</button>
   </div>
 
   <div class="table-wrapper">
@@ -95,69 +140,62 @@
     </table>
   </div>
 
-<script>
-  const sheetUrl = "https://script.google.com/macros/s/AKfycbxv4NzkYUwX5r6AFcijgwRuu9mf6wMaUiBnthw56dPhzL8UtDhwNoF4T_XEf7Ixb2YUvQ/exec"; // ← REPLACE WITH YOUR GOOGLE WEB APP URL
+  <script>
+    const sheetUrl = "https://script.google.com/macros/s/AKfycbxv4NzkYUwX5r6AFcijgwRuu9mf6wMaUiBnthw56dPhzL8UtDhwNoF4T_XEf7Ixb2YUvQ/exec";
 
-  async function fetchData() {
-    const res = await fetch(sheetUrl);
-    const data = await res.json();
+    async function fetchData() {
+      const res = await fetch(sheetUrl);
+      const data = await res.json();
 
-    if (!data.length) return;
+      if (!data.length) return;
 
-    const headers = Object.keys(data[0]);
-    const headerRow = document.getElementById('table-headers');
-    headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+      const headers = Object.keys(data[0]);
+      const headerRow = document.getElementById('table-headers');
+      headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
 
-    const tableBody = document.getElementById('table-body');
-    tableBody.innerHTML = '';
+      const tableBody = document.getElementById('table-body');
+      tableBody.innerHTML = '';
 
-    const programSet = new Set();
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = headers.map(h => `<td>${row[h] || ''}</td>`).join('');
+        tableBody.appendChild(tr);
+      });
 
-    data.forEach(row => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = headers.map(h => `<td>${row[h] || ''}</td>`).join('');
-      tableBody.appendChild(tr);
-      if (row['Program']) programSet.add(row['Program']);
-    });
+      document.querySelectorAll('.controls input').forEach(input => {
+        input.addEventListener('input', filterTable);
+      });
+    }
 
-    // Populate filter
-    const filterSelect = document.getElementById('filterSelect');
-    programSet.forEach(prog => {
-      const opt = document.createElement('option');
-      opt.value = prog;
-      opt.innerText = prog;
-      filterSelect.appendChild(opt);
-    });
+    function filterTable() {
+      const name = document.getElementById('searchName').value.toLowerCase();
+      const staff = document.getElementById('searchStaff').value.toLowerCase();
+      const program = document.getElementById('searchProgram').value.toLowerCase();
+      const clas = document.getElementById('searchClass').value.toLowerCase();
+      const month = document.getElementById('searchMonth').value.toLowerCase();
 
-    // Setup search and filter
-    document.getElementById('searchInput').addEventListener('input', filterTable);
-    document.getElementById('filterSelect').addEventListener('change', filterTable);
-  }
+      const rows = document.querySelectorAll('#logbook-table tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const visible =
+          text.includes(name) &&
+          text.includes(staff) &&
+          text.includes(program) &&
+          text.includes(clas) &&
+          text.includes(month);
+        row.style.display = visible ? '' : 'none';
+      });
+    }
 
-  function filterTable() {
-    const searchText = document.getElementById('searchInput').value.toLowerCase();
-    const filterText = document.getElementById('filterSelect').value.toLowerCase();
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt' });
+      doc.autoTable({ html: '#logbook-table' });
+      doc.save('logbook.pdf');
+    }
 
-    const rows = document.querySelectorAll('#logbook-table tbody tr');
-    rows.forEach(row => {
-      const rowText = row.innerText.toLowerCase();
-      const matchSearch = rowText.includes(searchText);
-      const matchFilter = filterText ? rowText.includes(filterText) : true;
-      row.style.display = (matchSearch && matchFilter) ? '' : 'none';
-    });
-  }
-
-  function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape' });
-    const table = document.getElementById('logbook-table');
-
-    doc.autoTable({ html: table });
-    doc.save('logbook.pdf');
-  }
-
-  window.onload = fetchData;
-</script>
+    window.onload = fetchData;
+  </script>
 
 </body>
 </html>
