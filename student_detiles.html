@@ -85,7 +85,7 @@
       background-color: #28a745;
     }
 
-    /* Modal container */
+   /* Modal backdrop */
 .modal {
   display: none;
   position: fixed;
@@ -100,97 +100,30 @@
   overflow: auto;
 }
 
-/* Main content inside modal */
+/* Modal inner content */
 .modal-content {
   background: #fff;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 18cm; /* Close to A4 width */
-  height: auto;
-  max-height: 90vh;
-  overflow-y: auto;
-  border-radius: 8px;
-  border: 2px solid #003366;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  margin: auto;
-  font-family: 'Arial', sans-serif;
+  padding: 2cm;
+  width: 21cm; /* A4 width */
+  min-height: 29.7cm; /* A4 height */
   box-sizing: border-box;
+  overflow: hidden;
+  border: 2px solid #003366;
+  border-radius: 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  font-family: 'Arial', sans-serif;
   position: relative;
 }
 
-/* Close button */
-.close-btn {
+/* Hide buttons in print */
+.close-btn, .print-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
+  z-index: 10;
 }
 
-/* Headings */
-h2, h3 {
-  color: #003366;
-  font-weight: bold;
-  text-align: center;
-  margin: 10px 0;
-}
-
-h2 {
-  font-size: 24px;
-}
-
-h3 {
-  font-size: 20px;
-}
-
-/* Sections */
-.form-section {
-  margin-bottom: 20px;
-}
-
-.form-row p {
-  font-size: 16px;
-  line-height: 1.5;
-  color: #333;
-}
-
-/* Photo Box */
-.photo-box {
-  width: 100px;
-  height: 120px;
-  border: 2px dashed #dc3545;
-  text-align: center;
-  line-height: 120px;
-  font-size: 14px;
-  color: #dc3545;
-  float: right;
-  margin-left: 20px;
-  margin-bottom: 20px;
-}
-
-/* Signature */
-.signature-box {
-  margin-top: 40px;
-  text-align: right;
-}
-
-.signature-line {
-  border-top: 1px solid #003366;
-  width: 250px;
-  text-align: center;
-  margin-left: auto;
-  padding-top: 5px;
-  color: #003366;
-  font-size: 16px;
-}
-
-/* Print Button */
+/* Download button */
 .print-btn {
   background-color: #003366;
   color: white;
@@ -199,14 +132,16 @@ h3 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 20px;
+  top: auto;
+  right: 20px;
+  bottom: 20px;
 }
 
 .print-btn:hover {
   background-color: #dc3545;
 }
 
-/* Print settings */
+/* Print layout override */
 @media print {
   body {
     margin: 0;
@@ -223,15 +158,14 @@ h3 {
     width: 100%;
     max-width: none;
     height: auto;
-    max-height: none;
-    border-radius: 0;
+    min-height: auto;
     box-shadow: none;
-    border: none;
-    padding: 2cm;
-    overflow: visible;
+    border-radius: 0;
+    margin: 0;
     page-break-inside: avoid;
   }
 }
+
 
   </style>
 </head>
@@ -371,6 +305,12 @@ function downloadPDF() {
     window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
   }
 </script>
+  <script>
+  function printPage() {
+    window.print();
+  }
+</script>
+
 
 </body>
 </html>
