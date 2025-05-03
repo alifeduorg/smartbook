@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Logbook Viewer</title>
+    <title>Logbook Viewer</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #2C3E50; /* Dark blue-gray background */
-            color: #F39C12; /* Golden yellow text */
+            background-color: white; /* White background */
             margin: 0;
             padding: 0;
+            color: #2C3E50; /* Dark Navy text */
         }
         .container {
             width: 90%;
@@ -19,8 +19,13 @@
         }
         h1 {
             text-align: center;
-            color: #F39C12;
+            color: #F39C12; /* Golden yellow */
             font-size: 36px;
+        }
+        .logo {
+            display: block;
+            margin: 20px auto;
+            max-width: 150px;
         }
         .action-btns {
             display: flex;
@@ -55,8 +60,8 @@
             color: #F39C12;
         }
         td {
-            background-color: #2C3E50;
-            color: #F39C12;
+            background-color: #ECF0F1;
+            color: #2C3E50;
         }
         .filters {
             display: flex;
@@ -87,6 +92,9 @@
 <body>
 
 <div class="container">
+    <!-- ALIF Logo -->
+    <img src="1.png" alt="ALIF Logo" class="logo">
+
     <h1>Logbook Viewer</h1>
 
     <!-- Action Buttons -->
@@ -140,7 +148,7 @@
 
 <script>
     // Replace with your Google Apps Script Web App URL
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxv4NzkYUwX5r6AFcijgwRuu9mf6wMaUiBnthw56dPhzL8UtDhwNoF4T_XEf7Ixb2YUvQ/exec"; // Replace with your actual script URL
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxv4NzkYUwX5r6AFcijgwRuu9mf6wMaUiBnthw56dPhzL8UtDhwNoF4T_XEf7Ixb2YUvQ/exec; // Replace with your actual script URL
 
     // Fetch logbook data from Google Apps Script Web App
     function fetchLogbookData() {
