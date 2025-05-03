@@ -101,18 +101,18 @@
 
 .modal-content {
   background: #fff;
-  padding: 1rem;
+  padding: 1cm;
   width: 100%;
-  max-width: 16cm;   /* Shrinks width */
-  max-height: 95vh;  /* Keeps within screen height */
-  overflow-y: auto;  /* Adds scroll if needed */
-  border: 1px solid #003366;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 21cm; /* A4 width */
+  height: auto;
+  max-height: none;
+  border-radius: 0;
+  border: none;
   margin: auto;
+  box-shadow: none;
   font-family: 'Arial', sans-serif;
   box-sizing: border-box;
 }
-
     .close-btn {
       position: absolute;
       top: 10px;
@@ -285,42 +285,36 @@
   const modalBody = document.getElementById('modalBody');
   modalBody.innerHTML = '';
 
-  modalBody.innerHTML = `
-    <div id="modalContent" style="font-family: Arial, sans-serif; padding: 20px;">
-      <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" style="height: 160px; display: block; margin: auto;" />
-      <h2 style="text-align: center;">Student Admission Form</h2>
-      <p style="text-align: center; font-weight: bold; color: #dc3545;">Academic Year 2025-26</p>
+  <div id="printContent" style="width: 21cm; min-height: 29.7cm; padding: 1.5cm; font-size: 12pt; background: white; box-sizing: border-box;">
+  <h2 style="text-align:center; margin-bottom: 0;">Student Admission Form</h2>
+  <p style="text-align:center; margin-top: 0;">Academic Year 2025–26</p>
 
-      <!-- Personal Details -->
-     
-        <h3 style="text-align: center; margin-bottom: 10px;">Personal Details</h3>
-        <p><strong>Full Name:</strong> ${student["Student Full Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
-           <strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
-        <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
-           <strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
-        <p><strong>Email:</strong> ${student["Email ID"] || '-'}</p>
-      
+  <p><strong>Full Name:</strong> ${student["Student Full Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp;
+     <strong>Class Admitted:</strong> ${student["Class Admitted To"] || '-'}</p>
 
-      <!-- Family Details -->
-      
-        <h3 style="text-align: center; margin-bottom: 10px;">Family Details</h3>
-        <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
-           <strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
-        <p><strong>Parent Email:</strong> ${student["Parent Email"] || '-'}</p>
-        <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
-      
+  <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp;
+     <strong>Phone:</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
 
-      <!-- Officer Details -->
-      <div style="border: 2px solid #ccc; border-radius: 15px; padding: 15px; margin: 15px 0;">
-        <h3 style="text-align: center; margin-bottom: 10px;">Office Details</h3>
-        <p><strong>Admission Date:</strong> ${student["Admission Date"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp;
-           <strong>Admission No:</strong> ${student["Student ID"] || '-'}</p>
-        <br/><br/>
-        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-          <div><strong>Seal</strong></div>
-          <div><strong>Principal</strong></div>
-        </div>
-      </div>
+  <p><strong>Email:</strong> ${student["Email ID"] || '-'}</p>
+
+  <hr>
+
+  <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp;
+     <strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
+
+  <p><strong>Parent Email:</strong> ${student["Parent Email"] || '-'}</p>
+
+  <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
+
+  <hr>
+
+  <p><strong>Admission Date:</strong> ${student["Admission Date"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp;
+     <strong>Admission No:</strong> ${student["Student ID"] || '-'}</p>
+
+  <div style="text-align:right; margin-top: 3rem;">
+    <p>Seal & Signature of Principal</p>
+  </div>
+</div>
 
       <button class="print-btn" onclick="downloadPDF()" style="margin-top: 20px;">Download PDF</button>
     </div>
@@ -335,13 +329,13 @@
   }
 
 function downloadPDF() {
-  const element = document.getElementById('modalContent');
+  const element = document.getElementById('printContent');
   const opt = {
-    margin: 0.5,
+    margin: 0,
     filename: 'admission_form.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
+    image: { type: 'jpeg', quality: 1 },
     html2canvas: { scale: 2, scrollY: 0 },
-    jsPDF: { unit: 'cm', format: [16, 21], orientation: 'portrait' } // fits one A5-like page
+    jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
   };
 
   html2pdf().from(element).set(opt).save();
