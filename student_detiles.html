@@ -130,6 +130,20 @@
     .modal p {
       margin: 5px 0;
     }
+     .download-btn {
+  margin-top: 1rem;
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background-color: #c82333;
+}
+
   </style>
 </head>
 <body>
@@ -140,7 +154,7 @@
 
   <div class="container">
     <button class="dashboard-btn" onclick="goToDashboard()">🏠 Go to Dashboard</button>
-    <button onclick="downloadCSV()">⬇️ Download CSV</button>
+    <button onclick="downloadStudentDetails()" class="download-btn">⬇️ Download PDF</button>
 
     <table id="studentTable">
       <thead>
@@ -170,6 +184,12 @@
       <div id="modalBody"></div>
     </div>
   </div>
+<div class="modal-content" id="modalContent">
+  <span class="close-btn" onclick="closeModal()">&times;</span>
+  <div class="modal-header" id="modalHeader"></div>
+  <div id="modalBody"></div>
+  <button onclick="downloadStudentDetails()" class="download-btn">⬇️ Download PDF</button>
+</div>
 
   <script>
     const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your deployed Apps Script Web App URL
@@ -231,5 +251,19 @@
       document.body.removeChild(link);
     }
   </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  function downloadStudentDetails() {
+    const element = document.getElementById("modalContent");
+    const opt = {
+      margin:       0.5,
+      filename:     'student-details.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  }
+</script>
 </body>
 </html>
