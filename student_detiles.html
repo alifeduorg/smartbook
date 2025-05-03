@@ -2,182 +2,124 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Student Details - ALIF EDU</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <title>Student Data - ALIF EDU</title>
   <style>
-    /* [Your existing CSS styles here] */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #002B5B;
+      color: #FFD700;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .container {
+      padding: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #dee2e6;
+      text-align: left;
+    }
+
+    th {
+      background-color: #002B5B;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f1f1f1;
+    }
+
+    img {
+      height: 50px;
+      width: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      padding: 20px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
+
   <header>
-    <img src="1.png" alt="ALIF EDU Logo">
-    <h1>Student Details - ALIF EDU</h1>
-    <button class="dashboard-btn" onclick="window.history.back()">Dashboard</button>
+    ALIF EDU - Student Dashboard
   </header>
 
   <div class="container">
-    <div class="filters">
-      <input type="text" id="nameFilter" placeholder="Search Name">
-      <select id="programFilter"><option value="">All Programs</option></select>
-      <select id="feeFilter"><option value="">All Fee Plans</option></select>
-      <select id="timeFilter"><option value="">All Time Slots</option></select>
-    </div>
-
     <table id="studentTable">
       <thead>
         <tr>
           <th>Photo</th>
-          <th>Student Name</th>
+          <th>Name</th>
           <th>Class</th>
           <th>Phone</th>
           <th>Guardian</th>
-          <th>Action</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 
-  <!-- Modal -->
-  <div class="modal" id="studentModal">
-    <div class="modal-content" id="modalContent">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <div id="studentDetails"></div>
-      <button onclick="downloadPDF()">Download PDF</button>
-    </div>
-  </div>
-
   <footer>
-    <p>&copy; ALIF EDU | All rights reserved</p>
+    © 2025 ALIF EDU. All Rights Reserved.
   </footer>
 
   <script>
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your actual script URL
-    let studentData = [];
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your published web app URL
 
-    // Function to safely access object properties
-    function safeAccess(obj, key) {
-      return obj.hasOwnProperty(key) && obj[key] ? obj[key] : "Not Available";
-    }
-
-    // Function to convert Google Drive link to direct image link
-    function convertDriveURL(link) {
-      if (!link.includes("drive.google.com")) return link;
-      const idMatch = link.match(/[-\w]{25,}/);
-      return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[0]}` : link;
+    // Convert Google Drive link to viewable image link
+    function convertImage(link) {
+      if (!link) return '';
+      const match = link.match(/[-\w]{25,}/);
+      return match ? `https://drive.google.com/uc?export=view&id=${match[0]}` : link;
     }
 
     fetch(sheetURL)
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
-        studentData = data;
-        populateFilters(data);
-        renderTable(data);
+        const tbody = document.querySelector('#studentTable tbody');
+        tbody.innerHTML = '';
+        data.forEach(row => {
+          const imgSrc = convertImage(row['Photo']);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><img src="${imgSrc}" alt="Student Photo" onerror="this.src='https://via.placeholder.com/50'"></td>
+            <td>${row['Student Full Name'] || ''}</td>
+            <td>${row['Class Admitted To'] || ''}</td>
+            <td>${row['Phone Number (WhatsApp)'] || ''}</td>
+            <td>${row["Guardian’s Name"] || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        document.querySelector('#studentTable tbody').innerHTML = `<tr><td colspan="5">Unable to load data.</td></tr>`;
       });
-
-    function populateFilters(data) {
-      const programSet = new Set();
-      const feeSet = new Set();
-      const timeSet = new Set();
-
-      data.forEach(item => {
-        programSet.add(item["Class Admitted To"]);
-        feeSet.add(item["Fee Plan"]);
-        timeSet.add(item["Preferred Class Timing"]);
-      });
-
-      updateSelect("programFilter", programSet);
-      updateSelect("feeFilter", feeSet);
-      updateSelect("timeFilter", timeSet);
-    }
-
-    function updateSelect(id, dataSet) {
-      const select = document.getElementById(id);
-      [...dataSet].sort().forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val;
-        opt.textContent = val;
-        select.appendChild(opt);
-      });
-    }
-
-    function renderTable(data) {
-      const tbody = document.querySelector('#studentTable tbody');
-      tbody.innerHTML = '';
-      data.forEach(row => {
-        const imgURL = convertDriveURL(row['Photo']);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><img src="${imgURL}" onerror="this.src='https://via.placeholder.com/50'"/></td>
-          <td>${safeAccess(row, 'Student Full Name')}</td>
-          <td>${safeAccess(row, 'Class Admitted To')}</td>
-          <td>${safeAccess(row, 'Phone Number (WhatsApp)')}</td>
-          <td>${safeAccess(row, "Guardian’s Name")}</td>
-          <td><button onclick='viewStudent(${JSON.stringify(row)})'>View</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function filterData() {
-      const name = document.getElementById("nameFilter").value.toLowerCase();
-      const program = document.getElementById("programFilter").value;
-      const fee = document.getElementById("feeFilter").value;
-      const time = document.getElementById("timeFilter").value;
-
-      const filtered = studentData.filter(row => {
-        return (
-          safeAccess(row, 'Student Full Name').toLowerCase().includes(name) &&
-          (program === '' || safeAccess(row, 'Class Admitted To') === program) &&
-          (fee === '' || safeAccess(row, 'Fee Plan') === fee) &&
-          (time === '' || safeAccess(row, 'Preferred Class Timing') === time)
-        );
-      });
-
-      renderTable(filtered);
-    }
-
-    document.getElementById("nameFilter").addEventListener("input", filterData);
-    document.getElementById("programFilter").addEventListener("change", filterData);
-    document.getElementById("feeFilter").addEventListener("change", filterData);
-    document.getElementById("timeFilter").addEventListener("change", filterData);
-
-    function viewStudent(data) {
-      const modal = document.getElementById('studentModal');
-      const content = document.getElementById('studentDetails');
-      const imgURL = convertDriveURL(data['Photo']);
-
-      content.innerHTML = `
-        <div style="text-align:center">
-          <img src="${imgURL}" onerror="this.src='https://via.placeholder.com/80'">
-        </div>
-        <p><strong>Student Name:</strong> ${safeAccess(data, 'Student Full Name')}</p>
-        <p><strong>Gender:</strong> ${safeAccess(data, 'Gender')}</p>
-        <p><strong>Date of Birth:</strong> ${safeAccess(data, 'Date of Birth')}</p>
-        <p><strong>Phone:</strong> ${safeAccess(data, 'Phone Number (WhatsApp)')}</p>
-        <p><strong>Guardian:</strong> ${safeAccess(data, "Guardian’s Name")} (${safeAccess(data, "Guardian’s Contact Number")})</p>
-        <p><strong>Email (Parent):</strong> ${safeAccess(data, 'Email ID(Parent)')}</p>
-        <p><strong>Email (Student):</strong> ${safeAccess(data, 'Email ID(Student)')}</p>
-        <p><strong>Class Admitted To:</strong> ${safeAccess(data, 'Class Admitted To')}</p>
-        <p><strong>Fee Plan:</strong> ${safeAccess(data, 'Fee Plan')}</p>
-        <p><strong>Subjects Opted:</strong> ${safeAccess(data, 'Subjects Opted')}</p>
-        <p><strong>Admission Date:</strong> ${safeAccess(data, 'Admission Date')}</p>
-        <p><strong>Mode of Admission:</strong> ${safeAccess(data, 'Mode of Admission')}</p>
-        <p><strong>Preferred Class Timing:</strong> ${safeAccess(data, 'Preferred Class Timing')}</p>
-        <p><strong>Remarks:</strong> ${safeAccess(data, 'Remarks')}</p>
-      `;
-
-      modal.style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('studentModal').style.display = 'none';
-    }
-
-    function downloadPDF() {
-      const content = document.getElementById('modalContent');
-      html2pdf().from(content).save('student-details.pdf');
-    }
   </script>
+
 </body>
 </html>
