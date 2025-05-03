@@ -6,155 +6,179 @@
   <title>Logbook Entry</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 20px;
-      color: #333;
+      margin: 0;
+      padding: 0;
+      color: #0a1172;
     }
 
-    .card {
-      background-color: #0a1172;
-      max-width: 850px;
-      width: 100%;
-      border-radius: 20px;
-      padding: 35px;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
-      color: #ffffff;
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border: 1px solid #eee;
     }
 
     h2 {
       text-align: center;
-      color: #ffd700;
+      color: #0a1172;
       margin-bottom: 30px;
-      font-size: 32px;
+      font-size: 28px;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     label {
-      display: block;
       font-weight: 600;
-      margin-bottom: 6px;
-      color: #ffd700;
+      display: block;
+      margin-bottom: 8px;
+      color: #0a1172;
     }
 
-    input,
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
-      padding: 10px 14px;
-      border: none;
+      padding: 12px;
       border-radius: 8px;
-      font-size: 16px;
+      border: 1px solid #ccc;
+      font-size: 15px;
       box-sizing: border-box;
+      transition: 0.2s ease-in-out;
     }
 
-    textarea {
-      resize: vertical;
+    input:focus, select:focus, textarea:focus {
+      border-color: #ffd700;
+      outline: none;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
     }
 
     button {
-      width: 100%;
+      background-color: #0a1172;
+      color: #ffd700;
       padding: 12px;
-      background-color: #ffd700;
-      color: #0a1172;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
+      width: 100%;
       font-size: 16px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s ease;
-      margin-top: 12px;
+      transition: background 0.3s;
     }
 
     button:hover {
-      background-color: #e6be00;
-      box-shadow: 0 0 10px #ffd700;
-    }
-
-    .dashboard-btn {
-      margin-top: 20px;
-      background-color: transparent;
-      color: #ffd700;
-      border: 2px solid #ffd700;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .dashboard-btn:hover {
       background-color: #ffd700;
       color: #0a1172;
-      box-shadow: 0 0 15px #ffd70099;
     }
 
     .message {
       display: none;
+      padding: 15px;
       margin-top: 20px;
-      background-color: #27ae60;
+      background-color: #2ecc71;
       color: white;
       text-align: center;
-      padding: 12px;
-      border-radius: 8px;
+      border-radius: 5px;
     }
 
-    .footer {
-    background-color: #0a1172;
-    color: #ffd900;
-    text-align: center;
-    padding: 15px 10px;
-    margin-top: 50px;
-    font-size: 14px;
-    border-top: 2px solid #ffd900;
-}
+    .dashboard-btn {
+      background-color: #ffd700;
+      color: #0a1172;
+      margin-top: 20px;
+    }
 
+    .dashboard-btn:hover {
+      background-color: #e0bb00;
+    }
 
-    @media (max-width: 600px) {
-      .card {
+    footer.footer {
+      background-color: #0a1172;
+      color: #ffd700;
+      text-align: center;
+      padding: 15px 10px;
+      margin-top: 60px;
+      font-size: 14px;
+      border-top: 2px solid #ffd700;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 20px;
         padding: 20px;
+      }
+
+      h2 {
+        font-size: 24px;
       }
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h2>Teacher Logbook Entry</h2>
-    <form id="logbookForm" action="https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec" method="POST">
-      <div class="form-group"><label for="date">Date</label><input type="date" id="date" name="date" required></div>
-      <div class="form-group"><label for="month">Month</label>
+  <div class="container">
+    <h2>Login</h2>
+
+    <form id="logbookForm" action="YOUR_SCRIPT_URL_HERE" method="POST">
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="month">Month</label>
         <select id="month" name="month" required>
-          <option value="">Select Month</option>
-          <option>January</option><option>February</option><option>March</option><option>April</option>
-          <option>May</option><option>June</option><option>July</option><option>August</option>
-          <option>September</option><option>October</option><option>November</option><option>December</option>
+          <option>January</option><option>February</option><option>March</option>
+          <option>April</option><option>May</option><option>June</option>
+          <option>July</option><option>August</option><option>September</option>
+          <option>October</option><option>November</option><option>December</option>
         </select>
       </div>
-      <div class="form-group"><label for="teacherName">Teacher's Name</label><input type="text" id="teacherName" name="teacherName" required></div>
-      <div class="form-group"><label for="staffID">Staff ID</label><input type="text" id="staffID" name="staffID" required></div>
-      <div class="form-group"><label for="program">Program</label>
+
+      <div class="form-group">
+        <label for="teacherName">Teacher's Name</label>
+        <input type="text" id="teacherName" name="teacherName" required>
+      </div>
+
+      <div class="form-group">
+        <label for="staffID">Staff ID</label>
+        <input type="text" id="staffID" name="staffID" required>
+      </div>
+
+      <div class="form-group">
+        <label for="program">Program</label>
         <select id="program" name="program" required>
-          <option value="">Select Program</option>
           <option value="little_leaner">Little Learner</option>
           <option value="kg">KG</option>
           <option value="online_school">Online School</option>
           <option value="horizon">Horizon</option>
         </select>
       </div>
-      <div class="form-group"><label for="class">Class</label><input type="text" id="class" name="class" required></div>
-      <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
-      <div class="form-group"><label for="subjects">Subjects</label><input type="text" id="subjects" name="subjects" required></div>
-      <div class="form-group"><label for="classIn">Class In</label><input type="time" id="classIn" name="classIn" required></div>
-      <div class="form-group"><label for="classDuration">Class Duration</label>
+
+      <div class="form-group">
+        <label for="class">Class</label>
+        <input type="text" id="class" name="class" required>
+      </div>
+
+      <div class="form-group">
+        <label for="studentName">Student Name</label>
+        <input type="text" id="studentName" name="studentName" required>
+      </div>
+
+      <div class="form-group">
+        <label for="subjects">Subjects</label>
+        <input type="text" id="subjects" name="subjects" required>
+      </div>
+
+      <div class="form-group">
+        <label for="classIn">Class In (Time)</label>
+        <input type="time" id="classIn" name="classIn" required>
+      </div>
+
+      <div class="form-group">
+        <label for="classDuration">Class Duration</label>
         <select id="classDuration" name="classDuration" required>
           <option value="30">30 minutes</option>
           <option value="60">60 minutes</option>
@@ -162,30 +186,56 @@
           <option value="120">60 + 30 + 30 minutes</option>
         </select>
       </div>
-      <div class="form-group"><label for="teachToday">What did you teach today?</label><textarea id="teachToday" name="teachToday" rows="3" required></textarea></div>
-      <div class="form-group"><label for="studentEngagement">Student Engagement</label><textarea id="studentEngagement" name="studentEngagement" rows="3" required></textarea></div>
-      <div class="form-group"><label for="homework">Homework or Tasks Given?</label><textarea id="homework" name="homework" rows="3" required></textarea></div>
-      <div class="form-group"><label for="workType">What type of Work</label><input type="text" id="workType" name="workType" required></div>
-      <div class="form-group"><label for="classNotification">Upload Class Notification Message</label><textarea id="classNotification" name="classNotification" rows="3"></textarea></div>
-      <div class="form-group"><label for="additionalComments">Anything you'd like to share?</label><textarea id="additionalComments" name="additionalComments" rows="3"></textarea></div>
+
+      <div class="form-group">
+        <label for="teachToday">What did you teach today?</label>
+        <textarea id="teachToday" name="teachToday" rows="3" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="studentEngagement">Student Engagement</label>
+        <textarea id="studentEngagement" name="studentEngagement" rows="3" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="homework">Homework or Tasks Given?</label>
+        <textarea id="homework" name="homework" rows="3" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="workType">What type of Work</label>
+        <input type="text" id="workType" name="workType" required>
+      </div>
+
+      <div class="form-group">
+        <label for="classNotification">Upload Class Notification Message</label>
+        <textarea id="classNotification" name="classNotification" rows="2"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="additionalComments">Anything you'd like to share?</label>
+        <textarea id="additionalComments" name="additionalComments" rows="2"></textarea>
+      </div>
 
       <button type="submit">Submit Logbook Entry</button>
-      <div class="message" id="successMessage">Logbook submitted successfully!</div>
+
+      <div class="message" id="successMessage">
+        Your logbook entry has been submitted successfully!
+      </div>
     </form>
 
-    <button class="dashboard-btn" onclick="window.location.href='http://smartbook.alifedu.org/teacher-dashboard.html'">← Go to Dashboard</button>
+    <button class="dashboard-btn" onclick="window.location.href='http://smartbook.alifedu.org/teacher-dashboard.html'">Go to Dashboard</button>
   </div>
 
   <footer class="footer">
     <p>© Alif Edu 2025. All rights reserved.</p>
-</footer>
-
+  </footer>
 
   <script>
     document.getElementById('logbookForm').onsubmit = function(e) {
       e.preventDefault();
-      var form = e.target;
-      var formData = new FormData(form);
+      const form = e.target;
+      const formData = new FormData(form);
 
       fetch(form.action, {
         method: 'POST',
@@ -195,7 +245,7 @@
       .then(data => {
         if (data.result === "success") {
           document.getElementById('successMessage').style.display = 'block';
-          form.reset();
+          setTimeout(() => window.location.reload(), 2000);
         }
       })
       .catch(error => {
