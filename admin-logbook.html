@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Logbook Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0d1b2a;
+      color: #f8f8f8;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: #1b263b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    header img {
+      height: 50px;
+      margin-right: 15px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: #f1c40f;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 15px;
+      background-color: #16263a;
+      border-bottom: 2px solid #f1c40f;
+    }
+
+    .controls input, .controls button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .controls input {
+      background: #1e2a3c;
+      color: #fff;
+      width: 180px;
+    }
+
+    .controls button {
+      background: linear-gradient(to right, #f1c40f, #f39c12);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(255, 200, 0, 0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .controls button:hover {
+      transform: scale(1.05);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #3d5a80;
+      text-align: left;
+    }
+
+    th {
+      background-color: #293b5f;
+      color: #f1c40f;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    tr:nth-child(even) {
+      background-color: #1e2a3c;
+    }
+
+    tr:hover {
+      background-color: #314e6e;
+    }
+
+    @media (max-width: 768px) {
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      .controls input {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="1.png" alt="Logo" />
+    <h1>Logbook Viewer</h1>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="searchName" placeholder="Teacher Name" />
+    <input type="text" id="searchStaff" placeholder="Staff ID" />
+    <input type="text" id="searchProgram" placeholder="Program" />
+    <input type="text" id="searchClass" placeholder="Class" />
+    <input type="text" id="searchMonth" placeholder="Month" />
+    <button onclick="downloadPDF()">Download PDF</button>
+    <button onclick="window.location.href='principal-dashboard.html'">Dashboard</button>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="logbook-table">
+      <thead>
+        <tr id="table-headers"></tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const sheetUrl = "https://script.google.com/macros/s/AKfycbxzKxyW6dDcDaBe7vK6iI8hTlLfA1DC3TFcn9u4YL9sVCuJf8OE3Y8Ba1mTO76yBgz4GA/exec";
+
+    async function fetchData() {
+      const res = await fetch(sheetUrl);
+      const data = await res.json();
+
+      if (!data.length) return;
+
+      const headers = Object.keys(data[0]);
+      const headerRow = document.getElementById('table-headers');
+      headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+
+      const tableBody = document.getElementById('table-body');
+      tableBody.innerHTML = '';
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = headers.map(h => `<td>${row[h] || ''}</td>`).join('');
+        tableBody.appendChild(tr);
+      });
+
+      document.querySelectorAll('.controls input').forEach(input => {
+        input.addEventListener('input', filterTable);
+      });
+    }
+
+    function filterTable() {
+      const name = document.getElementById('searchName').value.toLowerCase();
+      const staff = document.getElementById('searchStaff').value.toLowerCase();
+      const program = document.getElementById('searchProgram').value.toLowerCase();
+      const clas = document.getElementById('searchClass').value.toLowerCase();
+      const month = document.getElementById('searchMonth').value.toLowerCase();
+
+      const rows = document.querySelectorAll('#logbook-table tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const visible =
+          text.includes(name) &&
+          text.includes(staff) &&
+          text.includes(program) &&
+          text.includes(clas) &&
+          text.includes(month);
+        row.style.display = visible ? '' : 'none';
+      });
+    }
+
+    function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: 'landscape', // ✅ Landscape mode
+    unit: 'pt',
+    format: 'a4' // Optional, but ensures standard size
+  });
+
+  doc.autoTable({
+    html: '#logbook-table',
+    startY: 20,
+    styles: {
+      fontSize: 8,
+      cellPadding: 4,
+      overflow: 'linebreak'
+    },
+    headStyles: {
+      fillColor: [241, 196, 15], // golden yellow
+      textColor: [0, 0, 0]
+    }
+  });
+
+  doc.save('logbook.pdf');
+}
+
+
+    window.onload = fetchData;
+  </script>
+
+</body>
+</html>
