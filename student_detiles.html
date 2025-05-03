@@ -1,80 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Details Viewer - Alif Edu</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
     }
     .topbar {
-      background-color: navy;
-      color: goldenrod;
-      padding: 10px 20px;
+      background-color: #001f3f;
+      color: #fdbb30;
+      padding: 15px 30px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     .topbar img {
-      height: 40px;
+      height: 45px;
+    }
+    .button {
+      background-color: #fdbb30;
+      color: #001f3f;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
     }
     .container {
-      padding: 20px;
+      padding: 30px;
+      max-width: 1200px;
+      margin: auto;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 12px rgba(0,0,0,0.05);
     }
     th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
+      padding: 12px 15px;
       text-align: left;
     }
     th {
-      background-color: goldenrod;
-      color: white;
+      background-color: #fdbb30;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td {
+      background-color: #f9f9f9;
+    }
+    img.student-photo-preview {
+      width: 45px;
+      height: 45px;
+      object-fit: cover;
+      border-radius: 50%;
     }
     .footer {
+      background-color: #001f3f;
+      color: #fdbb30;
       text-align: center;
-      padding: 10px;
-      background: navy;
-      color: goldenrod;
-    }
-    .button {
-      background: goldenrod;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 5px;
+      padding: 15px;
+      margin-top: 40px;
     }
     #individualView {
       display: none;
-      background: white;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: #fff;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-top: 30px;
     }
-    #studentPhoto {
+    #individualView h3 {
+      border-bottom: 2px solid #fdbb30;
+      padding-bottom: 10px;
+    }
+    .form-row {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 15px;
+    }
+    .form-col {
+      flex: 1;
+    }
+    .form-col p {
+      margin: 0;
+      padding: 6px 0;
+    }
+    .student-photo-large {
       max-width: 150px;
-      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 2px solid #fdbb30;
     }
   </style>
 </head>
 <body>
   <div class="topbar">
-    <img src="1.png" alt="Alif Edu Logo">
+    <img src="1.png" alt="Alif Edu Logo" />
     <button class="button" onclick="goBack()">Dashboard</button>
   </div>
 
   <div class="container">
     <h2>All Students</h2>
-    <table id="studentTable">
+    <table>
       <thead>
         <tr id="tableHeader"></tr>
       </thead>
@@ -82,10 +121,10 @@
     </table>
 
     <div id="individualView">
-      <h3>Student Details</h3>
-      <img id="studentPhoto" src="" alt="Student Photo">
+      <h3>Admission Form</h3>
+      <img id="studentPhoto" class="student-photo-large" src="" alt="Student Photo" />
       <div id="studentInfo"></div>
-      <br>
+      <br />
       <button class="button" onclick="downloadStudentData()">Download</button>
       <button class="button" onclick="closeIndividualView()">Close</button>
     </div>
@@ -96,65 +135,81 @@
   </div>
 
   <script>
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your Apps Script Web App URL
-    let studentData = [];
-    let selectedStudent = null;
+    document.addEventListener('DOMContentLoaded', () => {
+      const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your Apps Script Web App URL
+      let studentData = [];
+      let selectedStudent = null;
 
-    fetch(sheetURL)
-      .then(res => res.json())
-      .then(data => {
-        studentData = data;
-        renderTable(data);
-      });
+      fetch(sheetURL)
+        .then((res) => res.json())
+        .then((data) => {
+          studentData = data.map(row => {
+            const newRow = {...row};
+            if (newRow['Photo']) {
+              const match = newRow['Photo'].match(/[-\w]{25,}/);
+              if (match) newRow['Photo'] = `https://drive.google.com/uc?export=view&id=${match[0]}`;
+            }
+            return newRow;
+          });
+          renderTable(studentData);
+        });
 
-    function renderTable(data) {
-      const headerRow = document.getElementById('tableHeader');
-      const body = document.getElementById('tableBody');
+      function renderTable(data) {
+        const headerRow = document.getElementById('tableHeader');
+        const body = document.getElementById('tableBody');
+        if (data.length === 0) return;
 
-      if (data.length === 0) return;
+        const keys = Object.keys(data[0]).filter(k => k !== 'Timestamp' && k !== 'HELPER');
+        headerRow.innerHTML = keys.map(k => `<th>${k}</th>`).join('') + '<th>Action</th>';
 
-      const keys = Object.keys(data[0]).filter(k => k !== 'HELPER');
-      headerRow.innerHTML = keys.map(k => `<th>${k}</th>`).join('') + '<th>Action</th>';
+        body.innerHTML = data.map((row, i) => {
+          const rowData = keys.map(k =>
+            `<td>${k === 'Photo' ? `<img class='student-photo-preview' src="${row[k]}">` : row[k]}</td>`
+          ).join('');
+          return `<tr>${rowData}<td><button class='button' onclick='viewStudent(${i})'>View</button></td></tr>`;
+        }).join('');
+      }
 
-      body.innerHTML = data.map((row, i) => {
-        const rowData = keys.map(k => `<td>${k === 'Photo' ? `<img src="${row[k]}" width="50">` : row[k]}</td>`).join('');
-        return `<tr>${rowData}<td><button class='button' onclick='viewStudent(${i})'>View</button></td></tr>`;
-      }).join('');
-    }
+      window.viewStudent = function(index) {
+        selectedStudent = studentData[index];
+        const infoDiv = document.getElementById('studentInfo');
+        const photo = document.getElementById('studentPhoto');
+        photo.src = selectedStudent['Photo'] || '';
 
-    function viewStudent(index) {
-      selectedStudent = studentData[index];
-      const infoDiv = document.getElementById('studentInfo');
-      const photo = document.getElementById('studentPhoto');
-      photo.src = selectedStudent['Photo'];
+        const exclude = ['Photo', 'Timestamp', 'HELPER'];
+        const fields = Object.entries(selectedStudent).filter(([k]) => !exclude.includes(k));
 
-      infoDiv.innerHTML = Object.entries(selectedStudent)
-        .filter(([k]) => k !== 'Photo' && k !== 'HELPER')
-        .map(([k, v]) => `<p><strong>${k}</strong>: ${v}</p>`).join('');
+        infoDiv.innerHTML = fields.map(([k, v], i) => {
+          return `<div class='form-row'>
+            <div class='form-col'><p><strong>${k}:</strong> ${v}</p></div>
+          </div>`;
+        }).join('');
 
-      document.getElementById('individualView').style.display = 'block';
-    }
+        document.getElementById('individualView').style.display = 'block';
+      }
 
-    function closeIndividualView() {
-      document.getElementById('individualView').style.display = 'none';
-    }
+      window.downloadStudentData = function () {
+        if (!selectedStudent) return;
+        const exclude = ['Photo', 'Timestamp', 'HELPER'];
+        const content = Object.entries(selectedStudent)
+          .filter(([k]) => !exclude.includes(k))
+          .map(([k, v]) => `${k}: ${v}`).join('\n');
 
-    function downloadStudentData() {
-      if (!selectedStudent) return;
-      const content = Object.entries(selectedStudent)
-        .filter(([k]) => k !== 'Photo' && k !== 'HELPER')
-        .map(([k, v]) => `${k}: ${v}`).join('\n');
+        const blob = new Blob([content], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${selectedStudent['Student Full Name'] || 'Student'}.txt`;
+        a.click();
+      }
 
-      const blob = new Blob([content], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `${selectedStudent['Student Full Name']}.txt`;
-      a.click();
-    }
+      window.closeIndividualView = function () {
+        document.getElementById('individualView').style.display = 'none';
+      }
 
-    function goBack() {
-      window.history.back();
-    }
+      window.goBack = function () {
+        window.history.back();
+      }
+    });
   </script>
 </body>
 </html>
