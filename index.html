@@ -1,171 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - ALIF EDU</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      background-color: #0b1d3a;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    .login-container {
-      background-color: #fff;
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-    }
-    .logo {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 1rem;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #fcbf49;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-      text-align: left;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.3rem;
-      font-weight: bold;
-      color: #0b1d3a;
-    }
-    input, select {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      width: 100%;
-      padding: 0.7rem;
-      background-color: #fcbf49;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: #0b1d3a;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    button:hover {
-      background-color: #f5a623;
-      transform: scale(1.05);
-    }
-    .message {
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-    .error { color: red; }
-    .success { color: green; }
-    footer {
-      color: #fff;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C Alif Edu 2025 Login</title>
+    <style>
+        body {
+            background-color: #002147;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .login-container {
+            background-color: #1a3a6c;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        .login-container:hover {
+            transform: rotateY(10deg) rotateX(10deg);
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #f9c21b;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: #fff;
+            border: 2px solid #f9c21b;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .input-group label {
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            font-size: 14px;
+            color: #f9c21b;
+        }
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: #fff;
+            border: 2px solid #f9c21b;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #f9c21b;
+            color: #002147;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #d69f18;
+        }
+    </style>
 </head>
 <body>
-  <div class="login-container">
-    <img src="1.png" alt="Logo" class="logo" />
-    <h2>Login</h2>
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="staffId">Staff ID</label>
-        <input type="text" id="staffId" name="staffId" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required />
-      </div>
-      <div class="form-group">
-        <label for="role">Role</label>
-        <select id="role" name="role" required>
-          <option value="">--Select Role--</option>
-          <option value="Admin">Admin</option>
-          <option value="Principal">Principal</option>
-          <option value="Teacher">Teacher</option>
-          <option value="Mentor">Mentor</option>
-        </select>
-      </div>
-      <button type="submit">Login</button>
-    </form>
-    <div id="message" class="message"></div>
-  </div>
-  <footer>© 2025 ALIF EDU</footer>
+    <div class="login-container">
+        <img src="1.png" alt="Logo" class="logo">
+        <h1>C Alif Edu 2025 Login</h1>
+        
+        <form id="login-form" onsubmit="return handleLogin(event)">
+            <div class="input-group">
+                <label for="staff-id">Staff ID</label>
+                <input type="text" id="staff-id" name="staff_id" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="input-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="admin">Admin</option>
+                    <option value="principal">Principal</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="mentor">Mentor</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+    </div>
 
-  <script>
-    const loginForm = document.getElementById("loginForm");
-    const messageDiv = document.getElementById("message");
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault(); // Prevent form submission to handle redirection
 
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec"; // <-- Replace this
+            const staffId = document.getElementById('staff-id').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
 
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+            const data = {
+                staff_id: staffId,
+                password: password,
+                role: role
+            };
 
-      const staffId = document.getElementById("staffId").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const role = document.getElementById("role").value;
+            const url = 'https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec'; // Replace with your Google Apps Script URL
 
-      try {
-        const response = await fetch(GOOGLE_SHEET_URL);
-        const data = await response.json();
+            const response = await fetch(url, {
+                method: 'POST',
+                contentType: 'application/json',
+                body: JSON.stringify(data)
+            });
 
-        const match = data.find(
-          user =>
-            user.staffId === staffId &&
-            user.password === password &&
-            user.role.toLowerCase() === role.toLowerCase()
-        );
+            const result = await response.json();
 
-        if (match) {
-          messageDiv.textContent = "Login successful!";
-          messageDiv.className = "message success";
-          setTimeout(() => {
-            switch (role) {
-              case "Admin":
-                window.location.href = "admin-dashboard.html";
-                break;
-              case "Principal":
-                window.location.href = "principal-dashboard.html";
-                break;
-              case "Teacher":
-                window.location.href = "teacher-dashboard.html";
-                break;
-              case "Mentor":
-                window.location.href = "mentor-dashboard.html";
-                break;
-              default:
-                messageDiv.textContent = "Unknown role.";
-                messageDiv.className = "message error";
+            if (result.success) {
+                // Redirect based on role
+                let redirectURL = '';
+
+                switch(result.role) {
+                    case 'admin':
+                        redirectURL = 'admin-dashboard.html';
+                        break;
+                    case 'principal':
+                        redirectURL = 'principal-dashboard.html';
+                        break;
+                    case 'teacher':
+                        redirectURL = 'teacher-dashboard.html';
+                        break;
+                    case 'mentor':
+                        redirectURL = 'mentor-dashboard.html';
+                        break;
+                    default:
+                        alert('Invalid role');
+                        return;
+                }
+
+                window.location.href = redirectURL;
+            } else {
+                alert(result.message || 'Login failed');
             }
-          }, 1000);
-        } else {
-          messageDiv.textContent = "Invalid credentials. Please try again.";
-          messageDiv.className = "message error";
         }
-      } catch (error) {
-        console.error("Error:", error);
-        messageDiv.textContent = "Error connecting to server.";
-        messageDiv.className = "message error";
-      }
-    });
-  </script>
+    </script>
 </body>
 </html>
