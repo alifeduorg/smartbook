@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logbook Viewer - Principal Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0A2A3E; /* Dark Navy Blue */
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #1C3B56; /* Darker Navy */
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #FFD700; /* Golden Yellow */
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 2rem;
+            color: #FFD700;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+        }
+        .filters select, .filters input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #FFF;
+            color: #333;
+            font-size: 1rem;
+        }
+        .filters button {
+            padding: 10px 20px;
+            background-color: #FFD700;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+        .filters button:hover {
+            background-color: #FFA500;
+        }
+        .logbook-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .logbook-table th, .logbook-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .logbook-table th {
+            background-color: #1C3B56;
+        }
+        .logbook-table td {
+            background-color: #0A2A3E;
+        }
+        .logbook-table tr:hover {
+            background-color: #FFD700;
+            color: #0A2A3E;
+        }
+        .action-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .action-btns button {
+            padding: 12px 25px;
+            background-color: #1C3B56;
+            color: #FFD700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .action-btns button:hover {
+            background-color: #FFD700;
+            color: #0A2A3E;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Logbook Viewer</h1>
+            <div class="filters">
+                <input type="text" id="search" placeholder="Search...">
+                <select id="teacherFilter">
+                    <option value="">Filter by Teacher</option>
+                </select>
+                <select id="programFilter">
+                    <option value="">Filter by Program</option>
+                </select>
+                <select id="staffIdFilter">
+                    <option value="">Filter by Staff ID</option>
+                </select>
+                <button id="filterBtn">Filter</button>
+            </div>
+        </div>
+
+        <table class="logbook-table" id="logbookTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Date</th>
+                    <th>Month</th>
+                    <th>Teacher’s Name</th>
+                    <th>Staff ID</th>
+                    <th>Program</th>
+                    <th>Class</th>
+                    <th>Student Name</th>
+                    <th>Subjects</th>
+                    <th>Class In</th>
+                    <th>Class Duration</th>
+                    <th>What did you teach today?</th>
+                    <th>Student Engagement</th>
+                    <th>Homework or Tasks Given?</th>
+                    <th>What type of Work</th>
+                    <th>Upload Class Notification Message</th>
+                    <th>Anything you'd like to share?</th>
+                </tr>
+            </thead>
+            <tbody id="logbookTableBody">
+                <!-- Data rows will be populated here -->
+            </tbody>
+        </table>
+
+        <div class="action-btns">
+            <button id="printBtn">Print as PDF</button>
+        </div>
+    </div>
+
+  <script>
+    // Replace this with your Google Apps Script Web App URL
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbwHBn0I_C2X9uoLJgq85V2i6ntnUCRHmd3lfFt8A-r5_MzCZFiZqrTmKOWcBfudZ1TlvQ/exec"; // Replace this with your actual script URL
+
+    // Fetch logbook data from Google Apps Script Web App
+    function fetchLogbookData() {
+        fetch(scriptUrl)
+            .then(response => response.json())
+            .then(data => populateTable(data))
+            .catch(error => console.error("Error fetching data:", error));
+    }
+
+    // Populate table with fetched data
+    function populateTable(data) {
+        const logbookTableBody = document.getElementById('logbookTableBody');
+        data.forEach(entry => {
+            const row = logbookTableBody.insertRow();
+            row.innerHTML = `
+                <td>${entry.timestamp}</td>
+                <td>${entry.date}</td>
+                <td>${entry.month}</td>
+                <td>${entry.teacherName}</td>
+                <td>${entry.staffId}</td>
+                <td>${entry.program}</td>
+                <td>${entry.class}</td>
+                <td>${entry.studentName}</td>
+                <td>${entry.subjects}</td>
+                <td>${entry.classIn}</td>
+                <td>${entry.classDuration}</td>
+                <td>${entry.taughtToday}</td>
+                <td>${entry.studentEngagement}</td>
+                <td>${entry.homework}</td>
+                <td>${entry.workType}</td>
+                <td>${entry.notificationMessage}</td>
+                <td>${entry.additionalNotes}</td>
+            `;
+        });
+
+        populateFilters(data);
+    }
+
+    // Populate filter dropdowns
+    function populateFilters(data) {
+        const teachers = [...new Set(data.map(entry => entry.teacherName))];
+        const programs = [...new Set(data.map(entry => entry.program))];
+        const staffIds = [...new Set(data.map(entry => entry.staffId))];
+
+        const teacherFilter = document.getElementById('teacherFilter');
+        const programFilter = document.getElementById('programFilter');
+        const staffIdFilter = document.getElementById('staffIdFilter');
+
+        // Populate teacher filter
+        teachers.forEach(teacher => {
+            const option = document.createElement('option');
+            option.value = teacher;
+            option.textContent = teacher;
+            teacherFilter.appendChild(option);
+        });
+
+        // Populate program filter
+        programs.forEach(program => {
+            const option = document.createElement('option');
+            option.value = program;
+            option.textContent = program;
+            programFilter.appendChild(option);
+        });
+
+        // Populate staff ID filter
+        staffIds.forEach(staffId => {
+            const option = document.createElement('option');
+            option.value = staffId;
+            option.textContent = staffId;
+            staffIdFilter.appendChild(option);
+        });
+    }
+
+    // Apply filter logic
+    document.getElementById('filterBtn').addEventListener('click', function() {
+        const teacher = document.getElementById('teacherFilter').value;
+        const program = document.getElementById('programFilter').value;
+        const staffId = document.getElementById('staffIdFilter').value;
+
+        // Add your filtering logic here based on the selected filters
+        // Example: Filter the table data before rendering
+    });
+
+    // Print functionality
+    document.getElementById('printBtn').addEventListener('click', () => {
+        window.print();
+    });
+
+    // Fetch data on page load
+    window.onload = fetchLogbookData;
+</script>
+
+</body>
+</html>
