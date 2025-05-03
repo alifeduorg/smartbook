@@ -1,222 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Alif - Student Admission Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <meta charset="UTF-8" />
+  <title>Alif Academy - Student Admission Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
+  <!-- Styles -->
   <style>
     body {
-      background-color: #0b1d3a;
-      color: white;
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      color: #222;
       padding: 20px;
     }
 
-    h1, h2 {
-      text-align: center;
-      color: goldenrod;
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: goldenrod;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header a {
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    main {
+      margin-top: 20px;
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 10px;
+      max-width: 600px;
+      padding: 12px;
       font-size: 16px;
-      margin-bottom: 15px;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      border: none;
+      margin-bottom: 10px;
     }
 
     button {
       background-color: goldenrod;
       color: white;
       border: none;
-      padding: 8px 16px;
+      padding: 10px 16px;
       cursor: pointer;
       border-radius: 5px;
       font-weight: bold;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #d4af37;
+      margin-left: 5px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background: #fff;
-      color: #000;
+      background: white;
       border-radius: 10px;
       overflow: hidden;
     }
 
     th, td {
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #ddd;
+      text-align: left;
     }
 
     th {
-      background-color: goldenrod;
+      background-color: #f2c94c;
       color: white;
     }
 
     img {
-      max-width: 80px;
-      border-radius: 6px;
+      max-width: 60px;
+      border-radius: 5px;
     }
 
-    #studentModal {
-      display: none;
-      position: fixed;
-      top: 5%;
-      left: 5%;
-      width: 90%;
-      max-height: 90%;
-      background: white;
-      color: black;
-      overflow-y: auto;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.6);
-      z-index: 9999;
-    }
-
-    #studentModal img {
-      max-width: 120px;
-      border-radius: 8px;
-    }
-
-    #overlay {
+    #overlay, #studentModal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6);
       z-index: 9998;
     }
 
-    .top-buttons {
+    #overlay {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    #studentModal {
+      background: white;
+      color: black;
+      overflow-y: auto;
+      padding: 30px;
+      max-width: 700px;
+      margin: 40px auto;
+      z-index: 9999;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    #studentModal img {
+      max-width: 120px;
+      float: right;
+      margin-left: 15px;
+    }
+
+    #studentModal h2 {
+      color: goldenrod;
+      margin-top: 0;
+    }
+
+    .modal-buttons {
+      margin-top: 20px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
     }
 
-    .top-buttons a {
-      background-color: goldenrod;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    @media (max-width: 600px) {
-      table, th, td {
-        font-size: 12px;
-      }
-      #studentModal {
-        padding: 10px;
-      }
+    @media (max-width: 768px) {
+      th, td { font-size: 12px; }
+      #studentModal { width: 90%; padding: 20px; }
+      #studentModal img { float: none; display: block; margin: 10px auto; }
     }
   </style>
 </head>
 <body>
 
-  <div class="top-buttons">
-    <a href="your-dashboard-link.html">🏠 Dashboard</a>
-    <div>
-      <input type="text" id="scriptUrl" placeholder="Paste your Google Apps Script Web App URL here" />
-      <button onclick="loadStudents()">Load Students</button>
+  <header>
+    <h1>Alif Academy - Student Admissions</h1>
+    <a href="#" onclick="history.back()">🏠 Dashboard</a>
+  </header>
+
+  <main>
+    <input type="text" id="scriptUrl" placeholder="Paste Google Web App URL here..." />
+    <button onclick="loadStudents()">Load Students</button>
+
+    <table id="studentsTable">
+      <thead><tr id="tableHead"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </main>
+
+  <!-- Modal -->
+  <div id="overlay" onclick="closeModal()"></div>
+  <div id="studentModal">
+    <div id="studentDetails"></div>
+    <div class="modal-buttons">
+      <button onclick="downloadPDF()">Download PDF</button>
+      <button onclick="closeModal()">Close</button>
     </div>
   </div>
 
-  <h1>Alif Academy - Student Admission Viewer</h1>
-
-  <table id="studentsTable">
-    <thead><tr id="tableHead"></tr></thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-
-  <div id="overlay" onclick="closeModal()"></div>
-  <div id="studentModal">
-    <button onclick="closeModal()">Close</button>
-    <div id="studentDetails"></div>
-    <br>
-    <button onclick="downloadPDF()">Download Admission Form (PDF)</button>
-  </div>
-
+  <!-- Script -->
   <script>
     let selectedStudent = {};
 
     async function loadStudents() {
       const url = document.getElementById("scriptUrl").value.trim();
-      if (!url) return alert("Please paste your Web App URL.");
+      if (!url) return alert("Please enter the Google Web App URL");
 
-      const response = await fetch(url);
-      const data = await response.json();
+      const res = await fetch(url);
+      const data = await res.json();
 
-      const tableHead = document.getElementById('tableHead');
-      const tableBody = document.getElementById('tableBody');
+      const tableHead = document.getElementById("tableHead");
+      const tableBody = document.getElementById("tableBody");
       tableHead.innerHTML = '';
       tableBody.innerHTML = '';
 
       if (data.length === 0) return;
 
-      const headers = Object.keys(data[0]);
+      const headers = Object.keys(data[0]).filter(h => h !== 'HELPER');
 
-      // Create header
-      headers.forEach(key => {
-        const th = document.createElement('th');
-        th.textContent = key;
+      headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
         tableHead.appendChild(th);
       });
-      const thAction = document.createElement('th');
-      thAction.textContent = 'Actions';
+
+      const thAction = document.createElement("th");
+      thAction.textContent = "Actions";
       tableHead.appendChild(thAction);
 
-      // Create rows
       data.forEach(student => {
-        const row = document.createElement('tr');
-        headers.forEach(key => {
-          const td = document.createElement('td');
-          if (key === "Photo") {
-            const img = document.createElement('img');
-            img.src = student[key];
+        const tr = document.createElement("tr");
+        headers.forEach(header => {
+          const td = document.createElement("td");
+          if (header === "Photo") {
+            const img = document.createElement("img");
+            img.src = student[header];
             td.appendChild(img);
           } else {
-            td.textContent = student[key];
+            td.textContent = student[header];
           }
-          row.appendChild(td);
+          tr.appendChild(td);
         });
 
-        const actionTd = document.createElement('td');
-        const viewBtn = document.createElement('button');
-        viewBtn.textContent = "View";
-        viewBtn.onclick = () => openModal(student);
-        actionTd.appendChild(viewBtn);
-        row.appendChild(actionTd);
-        tableBody.appendChild(row);
+        const tdAction = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.textContent = "View";
+        btn.onclick = () => openModal(student);
+        tdAction.appendChild(btn);
+        tr.appendChild(tdAction);
+
+        tableBody.appendChild(tr);
       });
     }
 
     function openModal(student) {
       selectedStudent = student;
       const container = document.getElementById("studentDetails");
+
       container.innerHTML = `
-        <h2 style="color: goldenrod;">Admission Form - Alif Academy</h2>
-        ${Object.entries(student).map(([key, value]) => {
-          if (key === "Photo") {
-            return `<img src="${value}" style="margin-top:10px;" />`;
-          } else {
-            return `<p><strong>${key}:</strong> ${value}</p>`;
-          }
-        }).join('')}
+        <h2>Admission Form - Alif Academy</h2>
+        <img src="${student["Photo"]}" />
+        <p><strong>Student ID:</strong> ${student["Student ID"]}</p>
+        <p><strong>Full Name:</strong> ${student["Student Full Name"]}</p>
+        <p><strong>Gender:</strong> ${student["Gender"]}</p>
+        <p><strong>Date of Birth:</strong> ${student["Date of Birth"]}</p>
+        <p><strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"]}</p>
+        <p><strong>Guardian's Name:</strong> ${student["Guardian’s Name"]}</p>
+        <p><strong>Guardian Contact:</strong> ${student["Guardian’s Contact Number"]}</p>
+        <p><strong>Email (Parent):</strong> ${student["Email ID(Parent)"]}</p>
+        <p><strong>Email (Student):</strong> ${student["Email ID(Student)"]}</p>
+        <p><strong>Class Admitted To:</strong> ${student["Class Admitted To"]}</p>
+        <p><strong>Fee Plan:</strong> ${student["Fee Plan"]}</p>
+        <p><strong>Subjects Opted:</strong> ${student["Subjects Opted"]}</p>
+        <p><strong>Admission Date:</strong> ${student["Admission Date"]}</p>
+        <p><strong>Mode of Admission:</strong> ${student["Mode of Admission"]}</p>
+        <p><strong>Preferred Class Timing:</strong> ${student["Preferred Class Timing"]}</p>
+        <p><strong>Remarks:</strong> ${student["Remarks"]}</p>
       `;
+
       document.getElementById("overlay").style.display = "block";
       document.getElementById("studentModal").style.display = "block";
     }
@@ -227,17 +259,17 @@
     }
 
     function downloadPDF() {
-      const modalContent = document.getElementById("studentDetails");
+      const modalContent = document.getElementById("studentModal");
 
       html2canvas(modalContent).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL("image/png");
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
         const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
         pdf.save(`AdmissionForm_${selectedStudent["Student ID"] || "Student"}.pdf`);
       });
     }
