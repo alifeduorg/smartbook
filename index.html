@@ -14,6 +14,7 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            flex-direction: column;
         }
 
         .login-container {
@@ -105,12 +106,24 @@
             }
         }
 
+        /* Footer Style */
+        .footer {
+            background-color: #1a3a6c;
+            color: #f9c21b;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
     <div class="login-container">
         <img src="1.png" alt="Logo" class="logo">
-        <h1>C Alif Edu 2025 Login</h1>
+        <h1>  Login</h1>
         
         <form id="login-form" onsubmit="return handleLogin(event)">
             <div class="input-group">
@@ -132,6 +145,11 @@
             </div>
             <button type="submit" class="btn">Login</button>
         </form>
+    </div>
+
+    <!-- Copyright Footer -->
+    <div class="footer">
+        &copy; 2025 C Alif Edu. All rights reserved.
     </div>
 
     <script>
