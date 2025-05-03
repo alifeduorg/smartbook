@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #0b1d3a;
+      background: linear-gradient(145deg, #0b1d3a, #143266);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -16,31 +16,37 @@
     }
 
     .login-card {
-      background-color: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
       padding: 40px;
-      width: 350px;
+      width: 360px;
       text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .login-card:hover {
+      transform: translateY(-5px);
     }
 
     .login-card img {
-      width: 80px;
+      width: 90px;
       margin-bottom: 20px;
     }
 
     .login-card h2 {
-      margin-bottom: 20px;
       color: #0b1d3a;
+      margin-bottom: 25px;
+      font-weight: 700;
     }
 
     .login-card input,
     .login-card select {
       width: 100%;
-      padding: 12px;
+      padding: 12px 15px;
       margin: 10px 0;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
     }
 
@@ -49,33 +55,38 @@
       color: #0b1d3a;
       font-weight: bold;
       border: none;
-      padding: 12px;
+      padding: 14px;
       width: 100%;
-      margin-top: 15px;
-      border-radius: 8px;
+      margin-top: 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: background 0.3s ease, transform 0.2s ease;
       cursor: pointer;
-      transition: transform 0.2s ease;
     }
 
     .login-card button:hover {
+      background-color: #ffd633;
       transform: scale(1.05);
-      background-color: #ffdb4d;
     }
 
     .footer-note {
       margin-top: 20px;
       font-size: 12px;
-      color: #555;
+      color: #999;
+    }
+
+    .error-message,
+    .success-message {
+      margin-top: 15px;
+      font-size: 14px;
     }
 
     .error-message {
       color: red;
-      margin-top: 10px;
     }
 
     .success-message {
       color: green;
-      margin-top: 10px;
     }
   </style>
 </head>
@@ -94,69 +105,59 @@
         <option value="Mentor">Mentor</option>
       </select>
       <button type="submit">Login</button>
-      <div id="message" class="error-message"></div>
+      <div id="message"></div>
     </form>
     <div class="footer-note">© 2025 ALIF EDU</div>
   </div>
 
   <script>
-    const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
-
-    form.addEventListener("submit", function (e) {
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
       e.preventDefault();
 
-      const staffId = document.getElementById("staffId").value;
-      const password = document.getElementById("password").value;
+      const staffId = document.getElementById("staffId").value.trim();
+      const password = document.getElementById("password").value.trim();
       const role = document.getElementById("role").value;
+      const message = document.getElementById("message");
 
-      // Replace with your Google Apps Script Web App URL
-      const url = "https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec";
+      if (!staffId || !password || !role) {
+        message.className = "error-message";
+        message.innerText = "All fields are required.";
+        return;
+      }
+
+      const url = "https://script.google.com/macros/s/AKfycbyqUF0DDyawqGr2AXIpLWR-Xn8yZmWBBkZoTkACt0PEYqj4D369eqE2-DcZ3vHGZMHcdg/exec"; // Replace with your actual script URL
 
       fetch(url, {
         method: "POST",
-        body: new URLSearchParams({
-          staffId: staffId,
-          password: password,
-          role: role
-        }),
+        body: new URLSearchParams({ staffId, password, role }),
       })
-      .then((res) => res.text())
-      .then((text) => {
+      .then(res => res.text())
+      .then(text => {
         if (text.trim() === "success") {
-  const selectedRole = role.toLowerCase();
+          message.className = "success-message";
+          message.innerText = "Login successful! Redirecting...";
 
-  let dashboardPage = "";
-  switch (selectedRole) {
-    case "admin":
-      dashboardPage = "admin-dashboard.html";
-      break;
-    case "principal":
-      dashboardPage = "principal-dashboard.html";
-      break;
-    case "teacher":
-      dashboardPage = "teacher-dashboard.html";
-      break;
-    case "mentor":
-      dashboardPage = "mentor-dashboard.html";
-      break;
-    default:
-      message.innerText = "Unknown role.";
-      return;
-  }
+          let page = "";
+          switch (role.toLowerCase()) {
+            case "admin": page = "admin-dashboard.html"; break;
+            case "principal": page = "principal-dashboard.html"; break;
+            case "teacher": page = "teacher-dashboard.html"; break;
+            case "mentor": page = "mentor-dashboard.html"; break;
+            default:
+              message.className = "error-message";
+              message.innerText = "Invalid role.";
+              return;
+          }
 
-  message.className = "success-message";
-  message.innerText = "Login successful! Redirecting...";
-  setTimeout(() => {
-    window.location.href = dashboardPage;
-  }, 1000);
-}
- else {
+          setTimeout(() => {
+            window.location.href = page;
+          }, 1200);
+        } else {
           message.className = "error-message";
-          message.innerText = "Invalid login credentials.";
+          message.innerText = "Invalid credentials.";
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
         message.className = "error-message";
         message.innerText = "Error connecting to server.";
