@@ -188,11 +188,30 @@
     }
 
     function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt' });
-      doc.autoTable({ html: '#logbook-table' });
-      doc.save('logbook.pdf');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: 'landscape', // ✅ Landscape mode
+    unit: 'pt',
+    format: 'a4' // Optional, but ensures standard size
+  });
+
+  doc.autoTable({
+    html: '#logbook-table',
+    startY: 20,
+    styles: {
+      fontSize: 8,
+      cellPadding: 4,
+      overflow: 'linebreak'
+    },
+    headStyles: {
+      fillColor: [241, 196, 15], // golden yellow
+      textColor: [0, 0, 0]
     }
+  });
+
+  doc.save('logbook.pdf');
+}
+
 
     window.onload = fetchData;
   </script>
