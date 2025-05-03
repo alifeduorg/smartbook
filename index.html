@@ -6,7 +6,7 @@
     <title>C Alif Edu 2025 Login</title>
     <style>
         body {
-            background-color: #002147;
+            background-color: #ffffff;
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -15,11 +15,12 @@
             margin: 0;
             overflow: hidden;
         }
+
         .login-container {
             background-color: #1a3a6c;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             text-align: center;
             width: 100%;
             max-width: 400px;
@@ -27,62 +28,83 @@
             transform-style: preserve-3d;
             transition: transform 0.5s ease;
         }
+
         .login-container:hover {
             transform: rotateY(10deg) rotateX(10deg);
         }
+
         .logo {
             width: 100px;
             margin-bottom: 20px;
         }
+
         h1 {
             color: #f9c21b;
             margin-bottom: 20px;
+            font-size: 24px;
         }
+
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             position: relative;
         }
-        .input-group input {
+
+        .input-group input,
+        .input-group select {
             width: 100%;
-            padding: 10px;
-            background-color: #fff;
+            padding: 15px;
+            background-color: #ffffff;
             border: 2px solid #f9c21b;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
             color: #333;
             box-sizing: border-box;
         }
+
         .input-group label {
             position: absolute;
-            top: -10px;
-            left: 10px;
+            top: -12px;
+            left: 12px;
             font-size: 14px;
             color: #f9c21b;
         }
-        .input-group select {
-            width: 100%;
-            padding: 10px;
-            background-color: #fff;
-            border: 2px solid #f9c21b;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #333;
-            box-sizing: border-box;
-        }
+
         .btn {
             background-color: #f9c21b;
             color: #002147;
             border: none;
-            padding: 10px 20px;
+            padding: 15px;
             font-size: 18px;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
             transition: background-color 0.3s;
         }
+
         .btn:hover {
             background-color: #d69f18;
         }
+
+        @media screen and (max-width: 600px) {
+            .login-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .input-group input,
+            .input-group select {
+                padding: 12px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
+
     </style>
 </head>
 <body>
