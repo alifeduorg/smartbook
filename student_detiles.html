@@ -1,154 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Student List</title>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <title>Student Admissions</title>
   <style>
-    /* Your provided CSS */
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
-      color: #333;
-    }
-
-    header {
-      background-color: #001f3f;
-      color: #fff;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    header img {
-      height: 50px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-
-    .container {
-      padding: 2rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #ffc107;
-      color: #000;
-    }
-
-    td img {
-      height: 50px;
-      border-radius: 50%;
-    }
-
-    button {
-      padding: 6px 12px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #001f3f;
-      color: #fff;
-      margin-top: 2rem;
-    }
-
-    .dashboard-btn {
-      margin-bottom: 1rem;
-      background-color: #28a745;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      max-width: 600px;
-      width: 100%;
-      position: relative;
-    }
-
-    .modal-header {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 20px;
-      cursor: pointer;
-      color: red;
-    }
-
-    .modal img {
-      height: 80px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-
-    .modal p {
-      margin: 5px 0;
-    }
+    /* [Your CSS pasted here — already correct] */
+    /* ...PASTE YOUR CSS EXACTLY AS SHARED ABOVE HERE... */
   </style>
 </head>
 <body>
-
   <header>
-    <h1>Student List</h1>
-    <img src="https://via.placeholder.com/100x50?text=Logo" alt="Logo" />
+    <h1>Alif Edu - Student Admissions</h1>
+    <img src="your-logo-url.png" alt="Logo" />
   </header>
 
   <div class="container">
+    <button class="dashboard-btn" onclick="goToDashboard()">🏠 Go to Dashboard</button>
+    <button onclick="downloadCSV()">⬇️ Download CSV</button>
+
     <table id="studentTable">
       <thead>
         <tr>
-          <th>Photo</th>
-          <th>Student Name</th>
+          <th>Student ID</th>
+          <th>Full Name</th>
           <th>Class</th>
           <th>Phone</th>
           <th>Guardian</th>
+          <th>Admission Date</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -156,61 +34,77 @@
     </table>
   </div>
 
+  <footer>
+    © 2025 Alif Edu. All rights reserved.
+  </footer>
+
+  <!-- Modal for Student Details -->
   <div class="modal" id="detailModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">×</span>
+      <div class="modal-header">Student Details</div>
       <div id="modalBody"></div>
     </div>
   </div>
 
-  <footer>
-    &copy; 2025 Alif Edu. All rights reserved.
-  </footer>
-
   <script>
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your Google Apps Script Web App URL
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your deployed Apps Script Web App URL
+
+    let studentData = [];
 
     fetch(webAppUrl)
       .then(res => res.json())
       .then(data => {
+        studentData = data;
         const tbody = document.querySelector('#studentTable tbody');
-        window.studentData = data;
 
         data.forEach((student, index) => {
           const tr = document.createElement('tr');
-
           tr.innerHTML = `
-            <td><img src="${student.Photo || 'https://via.placeholder.com/50'}" alt="photo"></td>
-            <td>${student['Student Full Name'] || '-'}</td>
-            <td>${student['Class Admitted To'] || '-'}</td>
-            <td>${student['Phone Number (WhatsApp)'] || '-'}</td>
-            <td>${student["Guardian’s Name"] || '-'}</td>
-            <td><button onclick="viewStudent(${index})">View</button></td>
+            <td>${student['Student ID'] || ''}</td>
+            <td>${student['Student Full Name'] || ''}</td>
+            <td>${student['Class Admitted To'] || ''}</td>
+            <td>${student['Phone Number (WhatsApp)'] || ''}</td>
+            <td>${student["Guardian’s Name"] || ''}</td>
+            <td>${student['Admission Date'] || ''}</td>
+            <td><button onclick="viewDetails(${index})">View</button></td>
           `;
-
           tbody.appendChild(tr);
         });
       });
 
-    function viewStudent(index) {
-      const student = window.studentData[index];
-      const modal = document.getElementById('detailModal');
+    function viewDetails(index) {
+      const student = studentData[index];
       const modalBody = document.getElementById('modalBody');
 
-      const content = `
-        <div class="modal-header">${student['Student Full Name'] || 'Student Details'}</div>
-        ${student.Photo ? `<img src="${student.Photo}" alt="Student Photo" />` : ''}
-        ${Object.entries(student).map(([key, value]) => {
-          return `<p><strong>${key}:</strong> ${value || '-'}</p>`;
-        }).join('')}
-      `;
+      modalBody.innerHTML = Object.entries(student).map(([key, value]) =>
+        `<p><strong>${key}:</strong> ${value || '-'}</p>`
+      ).join('');
 
-      modalBody.innerHTML = content;
-      modal.style.display = 'flex';
+      document.getElementById('detailModal').style.display = 'flex';
     }
 
     function closeModal() {
       document.getElementById('detailModal').style.display = 'none';
+    }
+
+   function goToDashboard() {
+  window.history.back(); // ← this goes to the previous page
+}
+
+    function downloadCSV() {
+      let csv = "Student ID,Full Name,Class,Phone,Guardian,Admission Date\n";
+      studentData.forEach(s => {
+        csv += `"${s['Student ID'] || ''}","${s['Student Full Name'] || ''}","${s['Class Admitted To'] || ''}","${s['Phone Number (WhatsApp)'] || ''}","${s["Guardian’s Name"] || ''}","${s['Admission Date'] || ''}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "student_data.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
 </body>
