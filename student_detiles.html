@@ -55,11 +55,6 @@
       color: #000;
     }
 
-    td img {
-      height: 50px;
-      border-radius: 50%;
-    }
-
     button {
       padding: 6px 12px;
       background-color: #007bff;
@@ -122,12 +117,6 @@
       color: red;
     }
 
-    .modal img {
-      height: 80px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-
     .modal p {
       margin: 5px 0;
     }
@@ -144,7 +133,6 @@
     <table id="studentTable">
       <thead>
         <tr>
-          <th>Photo</th>
           <th>Student Name</th>
           <th>Class</th>
           <th>Phone</th>
@@ -181,10 +169,8 @@
         const tbody = document.querySelector('#studentTable tbody');
         data.forEach((row, index) => {
           console.log(row); // Log each row to see its content
-          const imgURL = convertDriveURL(row['Photo']);
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><img src="${imgURL}" alt="Photo" onerror="this.src='https://via.placeholder.com/50'"/></td>
             <td>${row['Student Full Name']}</td>
             <td>${row['Class Admitted To']}</td>
             <td>${row['Phone Number (WhatsApp)']}</td>
@@ -196,23 +182,12 @@
       })
       .catch(error => console.error("Error fetching data:", error));
 
-    // Function to convert Google Drive URL to viewable image
-    function convertDriveURL(link) {
-      if (!link.includes("drive.google.com")) return link;
-      const idMatch = link.match(/[-\w]{25,}/);
-      return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[0]}` : link;
-    }
-
     // Function to view student details in modal
     function viewStudent(data) {
       const modal = document.getElementById('studentModal');
       const content = document.getElementById('studentDetails');
-      const imgURL = convertDriveURL(data['Photo']);
 
       content.innerHTML = `
-        <div style="text-align:center">
-          <img src="${imgURL}" onerror="this.src='https://via.placeholder.com/80'" alt="Photo">
-        </div>
         <p><strong>Student Name:</strong> ${data['Student Full Name']}</p>
         <p><strong>Gender:</strong> ${data['Gender']}</p>
         <p><strong>Date of Birth:</strong> ${data['Date of Birth']}</p>
