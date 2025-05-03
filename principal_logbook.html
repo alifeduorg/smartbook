@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logbook Viewer</title>
+    <title>Premium Logbook Viewer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #001f3d; /* Navy blue background */
-            color: #f1c40f; /* Golden yellow text */
+            font-family: 'Arial', sans-serif;
+            background-color: #2C3E50; /* Dark blue-gray background */
+            color: #F39C12; /* Golden yellow text */
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
         .container {
             width: 90%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
         }
         h1 {
             text-align: center;
-            color: #f1c40f;
+            color: #F39C12;
+            font-size: 36px;
         }
         .action-btns {
             display: flex;
@@ -28,36 +28,35 @@
             margin: 20px 0;
         }
         .action-btns button {
-            padding: 10px 20px;
-            background-color: #f1c40f;
+            padding: 12px 30px;
+            background-color: #F39C12;
             border: none;
-            color: #001f3d;
+            color: #2C3E50;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
+            transition: background-color 0.3s;
         }
         .action-btns button:hover {
-            background-color: #d9b104;
+            background-color: #F1C40F;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        table, th, td {
-            border: 1px solid #f1c40f;
-        }
         th, td {
-            padding: 12px;
+            padding: 15px;
             text-align: left;
+            border: 1px solid #F39C12;
         }
         th {
-            background-color: #001f3d;
-            color: #f1c40f;
+            background-color: #34495E;
+            color: #F39C12;
         }
         td {
-            background-color: #1a2a44;
-            color: #f1c40f;
+            background-color: #2C3E50;
+            color: #F39C12;
         }
         .filters {
             display: flex;
@@ -65,22 +64,34 @@
             margin-bottom: 15px;
         }
         select {
-            padding: 8px;
+            padding: 10px;
             font-size: 14px;
-            border-radius: 5px;
+            background-color: #34495E;
+            color: #F39C12;
+            border: 1px solid #F39C12;
+            border-radius: 8px;
+        }
+        .filters button {
+            padding: 12px 30px;
+            background-color: #F39C12;
+            color: #2C3E50;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .filters button:hover {
+            background-color: #F1C40F;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Logbook Viewer</h1>
+    <h1>Premium Logbook Viewer</h1>
 
+    <!-- Action Buttons -->
     <div class="action-btns">
-        <!-- Button to Go to Dashboard -->
         <button id="goToDashboardBtn">Go to Dashboard</button>
-        
-        <!-- Button to Download Data as CSV -->
         <button id="downloadBtn">Download Data</button>
     </div>
 
@@ -98,7 +109,7 @@
         <button id="filterBtn">Apply Filters</button>
     </div>
 
-    <!-- Table to display the logbook data -->
+    <!-- Logbook Table -->
     <table>
         <thead>
             <tr>
@@ -122,7 +133,7 @@
             </tr>
         </thead>
         <tbody id="logbookTableBody">
-            <!-- Data will be populated here dynamically -->
+            <!-- Data will be dynamically populated here -->
         </tbody>
     </table>
 </div>
@@ -134,7 +145,7 @@
     // Fetch logbook data from Google Apps Script Web App
     function fetchLogbookData() {
         fetch(scriptUrl)
-            .then(response => response.json())  // Parse response as JSON
+            .then(response => response.json())
             .then(data => {
                 if (data && Array.isArray(data)) {
                     populateTable(data);
@@ -145,7 +156,7 @@
             .catch(error => console.error("Error fetching data:", error));
     }
 
-    // Populate table with fetched data
+    // Populate the table with fetched data
     function populateTable(data) {
         const logbookTableBody = document.getElementById('logbookTableBody');
         logbookTableBody.innerHTML = '';  // Clear any previous rows
@@ -176,7 +187,7 @@
         populateFilters(data);
     }
 
-    // Populate filter dropdowns
+    // Populate filter options dynamically
     function populateFilters(data) {
         const teachers = [...new Set(data.map(entry => entry.teacherName))];
         const programs = [...new Set(data.map(entry => entry.program))];
@@ -186,7 +197,6 @@
         const programFilter = document.getElementById('programFilter');
         const staffIdFilter = document.getElementById('staffIdFilter');
 
-        // Populate teacher filter
         teachers.forEach(teacher => {
             const option = document.createElement('option');
             option.value = teacher;
@@ -194,7 +204,6 @@
             teacherFilter.appendChild(option);
         });
 
-        // Populate program filter
         programs.forEach(program => {
             const option = document.createElement('option');
             option.value = program;
@@ -202,7 +211,6 @@
             programFilter.appendChild(option);
         });
 
-        // Populate staff ID filter
         staffIds.forEach(staffId => {
             const option = document.createElement('option');
             option.value = staffId;
@@ -211,14 +219,13 @@
         });
     }
 
-    // Apply filter logic
+    // Apply filters to the table data
     document.getElementById('filterBtn').addEventListener('click', function() {
         const teacher = document.getElementById('teacherFilter').value;
         const program = document.getElementById('programFilter').value;
         const staffId = document.getElementById('staffIdFilter').value;
 
         // Add your filtering logic here based on the selected filters
-        // Example: Filter the table data before rendering
     });
 
     // Download data as CSV
@@ -241,7 +248,7 @@
         link.click();
     });
 
-    // Add click event to go to the dashboard
+    // Go to Dashboard
     document.getElementById('goToDashboardBtn').addEventListener('click', function() {
         window.location.href = "http://smartbook.alifedu.org/principal-dashboard.html"; // Replace with your actual dashboard URL
     });
