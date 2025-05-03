@@ -233,39 +233,40 @@ h3 {
   </div>
 </div>
 
+const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
 
-  <script>
-  const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
+let studentData = [];
 
-  let studentData = [];
+fetch(webAppUrl)
+  .then(res => res.json())
+  .then(data => {
+    studentData = data;
+    const tbody = document.querySelector('#studentTable tbody');
 
-  fetch(webAppUrl)
-    .then(res => res.json())
-    .then(data => {
-      studentData = data;
-      const tbody = document.querySelector('#studentTable tbody');
+    setTimeout(() => {
+      data.forEach((student, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${student['Admission Date'] || ''}</td>
+          <td>${student['Student ID'] || ''}</td>
+          <td>${student['Student Full Name'] || ''}</td>
+          <td>${student['Class Admitted To'] || ''}</td>
+          <td>${student['Phone Number (WhatsApp)'] || ''}</td>
+          <td>${student["Guardian’s Name"] || ''}</td>
+          <td><button onclick="viewDetails(${index})">View</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }, 100);
+  });
 
-      setTimeout(() => {
-        data.forEach((student, index) => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${student['Admission Date'] || ''}</td>
-            <td>${student['Student ID'] || ''}</td>
-            <td>${student['Student Full Name'] || ''}</td>
-            <td>${student['Class Admitted To'] || ''}</td>
-            <td>${student['Phone Number (WhatsApp)'] || ''}</td>
-            <td>${student["Guardian’s Name"] || ''}</td>
-            <td><button onclick="viewDetails(${index})">View</button></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }, 100);
-    });
-
-  // ✅ Updated Function
+// ✅ Updated Function to View Details
 function viewDetails(index) {
   const student = studentData[index];
   const modalBody = document.getElementById('modalBody');
+  
+  // Clear previous modal content
+  modalBody.innerHTML = '';
 
   modalBody.innerHTML = `
     <div>
@@ -279,87 +280,8 @@ function viewDetails(index) {
         <h3>Personal Details</h3>
         <div class="form-row">
           <p><strong>Full Name:</strong> ${student["Student Full Name"] || '-'}</p>
-          <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'}</p>
-        </div>
-        <div class="form-row">
-          <p><strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
-          <p><strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
-        </div>
-      </div>
+          <p><strong>Date of Birth:</strong>
 
-      <div class="form-section">
-        <h3>Family Details</h3>
-        <div class="form-row">
-          <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'}</p>
-          <p><strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
-        </div>
-        <div class="form-row">
-          <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <h3>Office Use</h3>
-        <div class="form-row">
-          <p><strong>Admission No:</strong> ${student["Student ID"] || '-'}</p>
-          <p><strong>Admission Date:</strong> ${student["Admission Date"] || '-'}</p>
-        </div>
-        <div class="form-row">
-          <p><strong>Remarks:</strong> ${student["Remarks"] || '-'}</p>
-        </div>
-      </div>
-
-      <div class="signature-box">
-        <div class="signature-line">Principal Signature & Seal</div>
-      </div>
-
-      <button onclick="downloadStudentDetails()" class="print-btn">⬇️ Download / Print</button>
-    </div>
-  `;
-
-  document.getElementById('detailModal').style.display = 'flex';
-}
-
-function downloadStudentDetails() {
-  const element = document.getElementById("modalContent");
-  
-  const opt = {
-    margin:       1,
-    filename:     'student-details.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
-  };
-
-  html2pdf().set(opt).from(element).save();
-}
-
-function closeModal() {
-  document.getElementById('detailModal').style.display = 'none';
-}
-
-
-  function closeModal() {
-    document.getElementById('detailModal').style.display = 'none';
-  }
-
-  function goToDashboard() {
-    window.history.back();
-  }
-
-  function downloadStudentDetails() {
-    const element = document.getElementById("modalContent");
-    const opt = {
-      margin: 0.5,
-      filename: 'student-details.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
-  }
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 </body>
 </html>
