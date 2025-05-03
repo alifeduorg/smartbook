@@ -3,165 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logbook Viewer - Principal Dashboard</title>
+    <title>Logbook Viewer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #0A2A3E; /* Dark Navy Blue */
-            color: #fff;
+            background-color: #001f3d; /* Navy blue background */
+            color: #f1c40f; /* Golden yellow text */
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
         .container {
             width: 90%;
-            margin: 20px auto;
+            margin: 0 auto;
             padding: 20px;
-            border-radius: 10px;
-            background-color: #1C3B56; /* Darker Navy */
         }
-        .header {
+        h1 {
+            text-align: center;
+            color: #f1c40f;
+        }
+        .action-btns {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #FFD700; /* Golden Yellow */
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
-        .header h1 {
-            font-size: 2rem;
-            color: #FFD700;
-        }
-        .filters {
-            display: flex;
-            gap: 15px;
-        }
-        .filters select, .filters input {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: #FFF;
-            color: #333;
-            font-size: 1rem;
-        }
-        .filters button {
+        .action-btns button {
             padding: 10px 20px;
-            background-color: #FFD700;
-            color: #fff;
+            background-color: #f1c40f;
             border: none;
+            color: #001f3d;
             cursor: pointer;
-            font-size: 1rem;
             border-radius: 5px;
+            font-size: 16px;
         }
-        .filters button:hover {
-            background-color: #FFA500;
+        .action-btns button:hover {
+            background-color: #d9b104;
         }
-        .logbook-table {
+        table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .logbook-table th, .logbook-table td {
+        table, th, td {
+            border: 1px solid #f1c40f;
+        }
+        th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
-        .logbook-table th {
-            background-color: #1C3B56;
+        th {
+            background-color: #001f3d;
+            color: #f1c40f;
         }
-        .logbook-table td {
-            background-color: #0A2A3E;
+        td {
+            background-color: #1a2a44;
+            color: #f1c40f;
         }
-        .logbook-table tr:hover {
-            background-color: #FFD700;
-            color: #0A2A3E;
-        }
-        .action-btns {
+        .filters {
             display: flex;
-            gap: 20px;
-            justify-content: flex-end;
-            margin-top: 20px;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
-        .action-btns button {
-            padding: 12px 25px;
-            background-color: #1C3B56;
-            color: #FFD700;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .action-btns button:hover {
-            background-color: #FFD700;
-            color: #0A2A3E;
+        select {
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Logbook Viewer</h1>
-            <div class="filters">
-                <input type="text" id="search" placeholder="Search...">
-                <select id="teacherFilter">
-                    <option value="">Filter by Teacher</option>
-                </select>
-                <select id="programFilter">
-                    <option value="">Filter by Program</option>
-                </select>
-                <select id="staffIdFilter">
-                    <option value="">Filter by Staff ID</option>
-                </select>
-                <button id="filterBtn">Filter</button>
-            </div>
-        </div>
 
-        <table class="logbook-table" id="logbookTable">
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Date</th>
-                    <th>Month</th>
-                    <th>Teacher’s Name</th>
-                    <th>Staff ID</th>
-                    <th>Program</th>
-                    <th>Class</th>
-                    <th>Student Name</th>
-                    <th>Subjects</th>
-                    <th>Class In</th>
-                    <th>Class Duration</th>
-                    <th>What did you teach today?</th>
-                    <th>Student Engagement</th>
-                    <th>Homework or Tasks Given?</th>
-                    <th>What type of Work</th>
-                    <th>Upload Class Notification Message</th>
-                    <th>Anything you'd like to share?</th>
-                </tr>
-            </thead>
-            <tbody id="logbookTableBody">
-                <!-- Data rows will be populated here -->
-            </tbody>
-        </table>
+<div class="container">
+    <h1>Logbook Viewer</h1>
 
-        <div class="action-btns">
-            <button id="printBtn">Print as PDF</button>
-        </div>
+    <div class="action-btns">
+        <!-- Button to Go to Dashboard -->
+        <button id="goToDashboardBtn">Go to Dashboard</button>
+        
+        <!-- Button to Download Data as CSV -->
+        <button id="downloadBtn">Download Data</button>
     </div>
 
-  <script>
-    // Replace this with your Google Apps Script Web App URL
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbwHBn0I_C2X9uoLJgq85V2i6ntnUCRHmd3lfFt8A-r5_MzCZFiZqrTmKOWcBfudZ1TlvQ/exec"; // Replace this with your actual script URL
+    <!-- Filter Section -->
+    <div class="filters">
+        <select id="teacherFilter">
+            <option value="">Filter by Teacher</option>
+        </select>
+        <select id="programFilter">
+            <option value="">Filter by Program</option>
+        </select>
+        <select id="staffIdFilter">
+            <option value="">Filter by Staff ID</option>
+        </select>
+        <button id="filterBtn">Apply Filters</button>
+    </div>
+
+    <!-- Table to display the logbook data -->
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Date</th>
+                <th>Month</th>
+                <th>Teacher’s Name</th>
+                <th>Staff ID</th>
+                <th>Program</th>
+                <th>Class</th>
+                <th>Student Name</th>
+                <th>Subjects</th>
+                <th>Class In</th>
+                <th>Class Duration</th>
+                <th>What did you teach today?</th>
+                <th>Student Engagement</th>
+                <th>Homework or Tasks Given?</th>
+                <th>What type of Work</th>
+                <th>Upload Class Notification Message</th>
+                <th>Anything you'd like to share?</th>
+            </tr>
+        </thead>
+        <tbody id="logbookTableBody">
+            <!-- Data will be populated here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Replace with your Google Apps Script Web App URL
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbwHBn0I_C2X9uoLJgq85V2i6ntnUCRHmd3lfFt8A-r5_MzCZFiZqrTmKOWcBfudZ1TlvQ/exec"; // Replace with your actual script URL
 
     // Fetch logbook data from Google Apps Script Web App
     function fetchLogbookData() {
         fetch(scriptUrl)
-            .then(response => response.json())
-            .then(data => populateTable(data))
+            .then(response => response.json())  // Parse response as JSON
+            .then(data => {
+                if (data && Array.isArray(data)) {
+                    populateTable(data);
+                } else {
+                    console.error("Data is not in expected format");
+                }
+            })
             .catch(error => console.error("Error fetching data:", error));
     }
 
     // Populate table with fetched data
     function populateTable(data) {
         const logbookTableBody = document.getElementById('logbookTableBody');
+        logbookTableBody.innerHTML = '';  // Clear any previous rows
+
         data.forEach(entry => {
             const row = logbookTableBody.insertRow();
             row.innerHTML = `
@@ -233,9 +221,29 @@
         // Example: Filter the table data before rendering
     });
 
-    // Print functionality
-    document.getElementById('printBtn').addEventListener('click', () => {
-        window.print();
+    // Download data as CSV
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        const table = document.querySelector("table");
+        const rows = Array.from(table.querySelectorAll("tr"));
+        let csvContent = "";
+
+        rows.forEach(row => {
+            const cols = Array.from(row.querySelectorAll("td, th"));
+            const rowData = cols.map(col => col.textContent).join(",");
+            csvContent += rowData + "\n";
+        });
+
+        // Create a downloadable link for the CSV file
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'logbook_data.csv';
+        link.click();
+    });
+
+    // Add click event to go to the dashboard
+    document.getElementById('goToDashboardBtn').addEventListener('click', function() {
+        window.location.href = "http://smartbook.alifedu.org/principal-dashboard.html"; // Replace with your actual dashboard URL
     });
 
     // Fetch data on page load
