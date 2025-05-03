@@ -99,17 +99,19 @@
       align-items: center;
     }
 
-   .modal-content {
+.modal-content {
   background: #fff;
   padding: 1cm;
-  width: 19cm;
-  max-height: 27cm;
+  width: 100%;
+  max-width: 21cm; /* A4 width */
+  max-height: 90vh;
   overflow-y: auto;
   border-radius: 12px;
   border: 2px solid #003366;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin: auto;
   font-family: 'Arial', sans-serif;
+  box-sizing: border-box;
 }
     .close-btn {
       position: absolute;
@@ -290,23 +292,23 @@
       <p style="text-align: center; font-weight: bold; color: #dc3545;">Academic Year 2025-26</p>
 
       <!-- Personal Details -->
-      <div style="border: 2px solid #ccc; border-radius: 15px; padding: 15px; margin: 15px 0;">
+     
         <h3 style="text-align: center; margin-bottom: 10px;">Personal Details</h3>
         <p><strong>Full Name:</strong> ${student["Student Full Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
            <strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
         <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
            <strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
         <p><strong>Email:</strong> ${student["Email ID"] || '-'}</p>
-      </div>
+      
 
       <!-- Family Details -->
-      <div style="border: 2px solid #ccc; border-radius: 15px; padding: 15px; margin: 15px 0;">
+      
         <h3 style="text-align: center; margin-bottom: 10px;">Family Details</h3>
         <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
            <strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
         <p><strong>Parent Email:</strong> ${student["Parent Email"] || '-'}</p>
         <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
-      </div>
+      
 
       <!-- Officer Details -->
       <div style="border: 2px solid #ccc; border-radius: 15px; padding: 15px; margin: 15px 0;">
