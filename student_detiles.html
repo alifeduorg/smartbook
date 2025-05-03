@@ -106,7 +106,7 @@
 <body>
 
   <header>
-    <h1>Alif Edu- Student Admissions</h1>
+    <h1>Alif Academy - Student Admissions</h1>
     <a href="#" onclick="history.back()">🏠 Dashboard</a>
   </header>
 
@@ -134,7 +134,7 @@
     let selectedStudent = {};
     async function loadStudents() {
       const url = document.getElementById("scriptUrl").value.trim();
-      if (!url) return alert("Please enter the Google Web App URL");
+      if (!url) return alert("https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec");
 
       const res = await fetch(url);
       const data = await res.json();
@@ -188,7 +188,7 @@
       const container = document.getElementById("studentDetails");
 
       container.innerHTML = `
-        <h2>Admission Form - Alif Academy</h2>
+        <h2>Admission Form - Alif Edu</h2>
         <img src="${student["Photo"]}" />
         <p><strong>Student ID:</strong> ${student["Student ID"]}</p>
         <p><strong>Full Name:</strong> ${student["Student Full Name"]}</p>
