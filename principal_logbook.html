@@ -87,12 +87,12 @@
 <body>
 
 <div class="container">
-    <h1>Premium Logbook Viewer</h1>
+    <h1>Logbook Viewer</h1>
 
     <!-- Action Buttons -->
     <div class="action-btns">
         <button id="goToDashboardBtn">Go to Dashboard</button>
-        <button id="downloadBtn">Download Data</button>
+        <button id="downloadBtn">Download as PDF</button>
     </div>
 
     <!-- Filter Section -->
@@ -110,7 +110,7 @@
     </div>
 
     <!-- Logbook Table -->
-    <table>
+    <table id="logbookTable">
         <thead>
             <tr>
                 <th>Timestamp</th>
@@ -228,24 +228,38 @@
         // Add your filtering logic here based on the selected filters
     });
 
-    // Download data as CSV
+    // Download data as PDF
     document.getElementById('downloadBtn').addEventListener('click', () => {
-        const table = document.querySelector("table");
-        const rows = Array.from(table.querySelectorAll("tr"));
-        let csvContent = "";
+        const doc = new jsPDF();
+
+        doc.setFillColor(255, 255, 255); // Set background to white
+        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
+
+        doc.setTextColor(0, 51, 102); // Navy blue text
+        doc.setFontSize(16);
+        doc.text('Logbook Data', 14, 20);
+
+        // Fetch the table rows to add them to the PDF
+        const table = document.getElementById('logbookTable');
+        const rows = Array.from(table.querySelectorAll('tr'));
+        let tableData = [];
 
         rows.forEach(row => {
-            const cols = Array.from(row.querySelectorAll("td, th"));
-            const rowData = cols.map(col => col.textContent).join(",");
-            csvContent += rowData + "\n";
+            const cols = Array.from(row.querySelectorAll('td, th'));
+            const rowData = cols.map(col => col.textContent);
+            tableData.push(rowData);
         });
 
-        // Create a downloadable link for the CSV file
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'logbook_data.csv';
-        link.click();
+        doc.autoTable({
+            head: [tableData[0]],
+            body: tableData.slice(1),
+            startY: 30,
+            theme: 'grid',
+            headStyles: { fillColor: [0, 51, 102] }, // Navy Blue
+            styles: { cellPadding: 2, fontSize: 10 },
+        });
+
+        doc.save('logbook_data.pdf');
     });
 
     // Go to Dashboard
@@ -256,6 +270,8 @@
     // Fetch data on page load
     window.onload = fetchLogbookData;
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>
