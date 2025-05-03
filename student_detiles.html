@@ -6,15 +6,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
+      background: #f4f6f8;
+      margin: 0;
       color: #333;
     }
 
     header {
-      background-color: #001f3f;
-      color: #fff;
+      background: #001f3f;
+      color: white;
       padding: 1rem 2rem;
       display: flex;
       align-items: center;
@@ -34,12 +34,26 @@
       padding: 2rem;
     }
 
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       border-radius: 8px;
       overflow: hidden;
     }
@@ -73,17 +87,16 @@
       background-color: #0056b3;
     }
 
+    .dashboard-btn {
+      background-color: #28a745;
+    }
+
     footer {
       text-align: center;
       padding: 1rem;
       background-color: #001f3f;
       color: #fff;
       margin-top: 2rem;
-    }
-
-    .dashboard-btn {
-      margin-bottom: 1rem;
-      background-color: #28a745;
     }
 
     /* Modal */
@@ -131,6 +144,12 @@
     .modal p {
       margin: 5px 0;
     }
+
+    @media (max-width: 768px) {
+      .filters {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -141,6 +160,13 @@
   </header>
 
   <div class="container">
+    <div class="filters">
+      <input type="text" id="nameFilter" placeholder="Search Name">
+      <select id="programFilter"><option value="">All Programs</option></select>
+      <select id="feeFilter"><option value="">All Fee Plans</option></select>
+      <select id="timeFilter"><option value="">All Time Slots</option></select>
+    </div>
+
     <table id="studentTable">
       <thead>
         <tr>
@@ -170,25 +196,15 @@
   </footer>
 
   <script>
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your Apps Script URL
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your actual script URL
+    let studentData = [];
 
     fetch(sheetURL)
       .then(res => res.json())
       .then(data => {
-        const tbody = document.querySelector('#studentTable tbody');
-        data.forEach((row, index) => {
-          const imgURL = convertDriveURL(row['Photo']);
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><img src="${imgURL}" alt="Photo" onerror="this.src='https://via.placeholder.com/50'"/></td>
-            <td>${row['Student Full Name']}</td>
-            <td>${row['Class Admitted To']}</td>
-            <td>${row['Phone Number (WhatsApp)']}</td>
-            <td>${row["Guardian’s Name"]}</td>
-            <td><button onclick='viewStudent(${JSON.stringify(row)})'>View</button></td>
-          `;
-          tbody.appendChild(tr);
-        });
+        studentData = data;
+        populateFilters(data);
+        renderTable(data);
       });
 
     function convertDriveURL(link) {
@@ -197,6 +213,73 @@
       return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[0]}` : link;
     }
 
+    function populateFilters(data) {
+      const programSet = new Set();
+      const feeSet = new Set();
+      const timeSet = new Set();
+
+      data.forEach(item => {
+        programSet.add(item["Class Admitted To"]);
+        feeSet.add(item["Fee Plan"]);
+        timeSet.add(item["Preferred Class Timing"]);
+      });
+
+      updateSelect("programFilter", programSet);
+      updateSelect("feeFilter", feeSet);
+      updateSelect("timeFilter", timeSet);
+    }
+
+    function updateSelect(id, dataSet) {
+      const select = document.getElementById(id);
+      [...dataSet].sort().forEach(val => {
+        const opt = document.createElement("option");
+        opt.value = val;
+        opt.textContent = val;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderTable(data) {
+      const tbody = document.querySelector('#studentTable tbody');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const imgURL = convertDriveURL(row['Photo']);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><img src="${imgURL}" onerror="this.src='https://via.placeholder.com/50'"/></td>
+          <td>${row['Student Full Name']}</td>
+          <td>${row['Class Admitted To']}</td>
+          <td>${row['Phone Number (WhatsApp)']}</td>
+          <td>${row["Guardian’s Name"]}</td>
+          <td><button onclick='viewStudent(${JSON.stringify(row)})'>View</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterData() {
+      const name = document.getElementById("nameFilter").value.toLowerCase();
+      const program = document.getElementById("programFilter").value;
+      const fee = document.getElementById("feeFilter").value;
+      const time = document.getElementById("timeFilter").value;
+
+      const filtered = studentData.filter(row => {
+        return (
+          row['Student Full Name'].toLowerCase().includes(name) &&
+          (program === '' || row['Class Admitted To'] === program) &&
+          (fee === '' || row['Fee Plan'] === fee) &&
+          (time === '' || row['Preferred Class Timing'] === time)
+        );
+      });
+
+      renderTable(filtered);
+    }
+
+    document.getElementById("nameFilter").addEventListener("input", filterData);
+    document.getElementById("programFilter").addEventListener("change", filterData);
+    document.getElementById("feeFilter").addEventListener("change", filterData);
+    document.getElementById("timeFilter").addEventListener("change", filterData);
+
     function viewStudent(data) {
       const modal = document.getElementById('studentModal');
       const content = document.getElementById('studentDetails');
@@ -204,7 +287,7 @@
 
       content.innerHTML = `
         <div style="text-align:center">
-          <img src="${imgURL}" onerror="this.src='https://via.placeholder.com/80'" alt="Photo">
+          <img src="${imgURL}" onerror="this.src='https://via.placeholder.com/80'">
         </div>
         <p><strong>Student Name:</strong> ${data['Student Full Name']}</p>
         <p><strong>Gender:</strong> ${data['Gender']}</p>
