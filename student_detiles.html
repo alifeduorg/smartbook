@@ -85,7 +85,8 @@
       background-color: #28a745;
     }
 
-    .modal {
+   /* Modal background */
+.modal {
   display: none;
   position: fixed;
   z-index: 9999;
@@ -98,25 +99,29 @@
   align-items: center;
 }
 
+/* Modal Content - Styling the A4 form with curved borders and professional layout */
 .modal-content {
   background: white;
   padding: 2rem;
-  width: 800px;
+  width: 21cm; /* A4 width */
+  height: 29.7cm; /* A4 height */
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  border-radius: 10px;
-  border: 2px solid #001f3f;
-  box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+  border-radius: 15px;
+  border: 2px solid #003366;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
   transform: scale(1);
   animation: popIn 0.3s ease-out;
 }
 
+/* Animation for smooth popup effect */
 @keyframes popIn {
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
 
+/* Close button */
 .close-btn {
   position: absolute;
   top: 10px;
@@ -124,6 +129,118 @@
   font-size: 24px;
   cursor: pointer;
   color: #dc3545;
+}
+
+/* Style for the entire form */
+.admission-form {
+  font-family: 'Times New Roman', serif;
+  color: #003366;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* Header */
+.admission-form h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #003366;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.admission-form p {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* Bold sections for important information */
+.admission-form .bold-text {
+  font-weight: bold;
+}
+
+/* Photo box */
+.photo-box {
+  border: 2px dashed #dc3545;
+  width: 120px;
+  height: 150px;
+  float: right;
+  text-align: center;
+  line-height: 150px;
+  font-size: 12px;
+  color: #dc3545;
+  margin-bottom: 20px;
+}
+
+/* Form section headers */
+.form-section h3 {
+  border-bottom: 1px solid #ccc;
+  color: #ffc107;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+/* Section layout with two columns */
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.form-row p {
+  flex: 1;
+  margin-right: 20px;
+  font-size: 14px;
+}
+
+/* Signature box styling */
+.signature-box {
+  margin-top: 40px;
+  text-align: right;
+}
+
+.signature-line {
+  border-top: 1px solid #003366;
+  width: 200px;
+  text-align: center;
+  margin-left: auto;
+  padding-top: 5px;
+  color: #003366;
+  font-size: 14px;
+}
+
+/* Button to Download or Print */
+.print-btn {
+  background: #003366;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  margin-top: 30px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.print-btn:hover {
+  background: #dc3545;
+}
+
+/* Print-friendly page styles (hide everything unnecessary) */
+@media print {
+  .modal-content {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  .close-btn, .print-btn {
+    display: none;
+  }
 }
 
 .admission-form {
@@ -319,8 +436,6 @@ function viewDetails(index) {
 
   document.getElementById('detailModal').style.display = 'flex';
 }
-
-
   function closeModal() {
     document.getElementById('detailModal').style.display = 'none';
   }
