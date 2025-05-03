@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Alif - Student Details Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- jsPDF & html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      background-color: #0b1d3a;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: goldenrod;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      color: #000;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: goldenrod;
+      color: white;
+    }
+
+    img {
+      max-width: 80px;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: goldenrod;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #d4af37;
+    }
+
+    /* Modal */
+    #studentModal {
+      display: none;
+      position: fixed;
+      top: 5%;
+      left: 5%;
+      width: 90%;
+      max-height: 90%;
+      background: white;
+      color: black;
+      overflow-y: auto;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      z-index: 9999;
+    }
+
+    #studentModal img {
+      max-width: 120px;
+      border-radius: 8px;
+    }
+
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9998;
+    }
+
+    @media (max-width: 600px) {
+      table, th, td {
+        font-size: 12px;
+      }
+      #studentModal {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Student Details - Alif Admission Portal</h1>
+
+  <table id="studentsTable">
+    <thead><tr id="tableHead"></tr></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div id="overlay" onclick="closeModal()"></div>
+  <div id="studentModal">
+    <button onclick="closeModal()">Close</button>
+    <div id="studentDetails"></div>
+    <br>
+    <button onclick="downloadPDF()">Download Admission Form (PDF)</button>
+  </div>
+
+  <script>
+    const apiUrl = 'YOUR_SCRIPT_URL_HERE';
+    let selectedStudent = {};
+
+    async function fetchStudentData() {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      if (data.length === 0) return;
+
+      const tableHead = document.getElementById('tableHead');
+      const tableBody = document.getElementById('tableBody');
+
+      // Create table header
+      Object.keys(data[0]).forEach(key => {
+        const th = document.createElement('th');
+        th.textContent = key;
+        tableHead.appendChild(th);
+      });
+      const thView = document.createElement('th');
+      thView.textContent = 'Actions';
+      tableHead.appendChild(thView);
+
+      // Create table rows
+      data.forEach(student => {
+        const row = document.createElement('tr');
+        Object.entries(student).forEach(([key, value]) => {
+          const td = document.createElement('td');
+          if (key === "Photo") {
+            const img = document.createElement('img');
+            img.src = value;
+            td.appendChild(img);
+          } else {
+            td.textContent = value;
+          }
+          row.appendChild(td);
+        });
+
+        const actionTd = document.createElement('td');
+        const viewBtn = document.createElement('button');
+        viewBtn.textContent = "View";
+        viewBtn.onclick = () => openModal(student);
+        actionTd.appendChild(viewBtn);
+        row.appendChild(actionTd);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    function openModal(student) {
+      selectedStudent = student;
+      const container = document.getElementById("studentDetails");
+      container.innerHTML = `
+        <h2 style="color: goldenrod;">Admission Form - Alif Academy</h2>
+        <p><strong>Student ID:</strong> ${student["Student ID"]}</p>
+        <p><strong>Full Name:</strong> ${student["Student Full Name"]}</p>
+        <p><strong>Gender:</strong> ${student["Gender"]}</p>
+        <p><strong>Date of Birth:</strong> ${student["Date of Birth"]}</p>
+        <p><strong>Phone:</strong> ${student["Phone Number (WhatsApp)"]}</p>
+        <p><strong>Guardian:</strong> ${student["Guardian’s Name"]}</p>
+        <p><strong>Guardian Contact:</strong> ${student["Guardian’s Contact Number"]}</p>
+        <p><strong>Email (Parent):</strong> ${student["Email ID(Parent)"]}</p>
+        <p><strong>Email (Student):</strong> ${student["Email ID(Student)"]}</p>
+        <p><strong>Class Admitted To:</strong> ${student["Class Admitted To"]}</p>
+        <p><strong>Fee Plan:</strong> ${student["Fee Plan"]}</p>
+        <p><strong>Subjects Opted:</strong> ${student["Subjects Opted"]}</p>
+        <p><strong>Admission Date:</strong> ${student["Admission Date"]}</p>
+        <p><strong>Mode of Admission:</strong> ${student["Mode of Admission"]}</p>
+        <p><strong>Preferred Class Timing:</strong> ${student["Preferred Class Timing"]}</p>
+        <p><strong>Remarks:</strong> ${student["Remarks"]}</p>
+        <img src="${student["Photo"]}" />
+      `;
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("studentModal").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("studentModal").style.display = "none";
+    }
+
+    function downloadPDF() {
+      const modalContent = document.getElementById("studentDetails");
+
+      html2canvas(modalContent).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`AdmissionForm_${selectedStudent["Student ID"]}.pdf`);
+      });
+    }
+
+    fetchStudentData();
+  </script>
+
+</body>
+</html>
