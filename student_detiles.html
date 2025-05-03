@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Student Data - ALIF EDU</title>
+  <title>Student Details - ALIF EDU</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -54,6 +55,41 @@
       object-fit: cover;
     }
 
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 60%;
+      border-radius: 5px;
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
     footer {
       text-align: center;
       font-size: 14px;
@@ -63,7 +99,6 @@
   </style>
 </head>
 <body>
-
   <header>
     ALIF EDU - Student Dashboard
   </header>
@@ -73,53 +108,107 @@
       <thead>
         <tr>
           <th>Photo</th>
-          <th>Name</th>
+          <th>Student Name</th>
           <th>Class</th>
           <th>Phone</th>
           <th>Guardian</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 
+  <!-- Modal -->
+  <div class="modal" id="studentModal">
+    <div class="modal-content" id="modalContent">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <div id="studentDetails"></div>
+      <button onclick="downloadPDF()">Download PDF</button>
+    </div>
+  </div>
+
   <footer>
-    © 2025 ALIF EDU. All Rights Reserved.
+    &copy; 2025 ALIF EDU. All Rights Reserved.
   </footer>
 
   <script>
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your published web app URL
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your actual script URL
+    let studentData = [];
 
-    // Convert Google Drive link to viewable image link
-    function convertImage(link) {
-      if (!link) return '';
-      const match = link.match(/[-\w]{25,}/);
-      return match ? `https://drive.google.com/uc?export=view&id=${match[0]}` : link;
+    // Function to safely access object properties
+    function safeAccess(obj, key) {
+      return obj.hasOwnProperty(key) && obj[key] ? obj[key] : "Not Available";
+    }
+
+    // Function to convert Google Drive link to direct image link
+    function convertDriveURL(link) {
+      if (!link.includes("drive.google.com")) return link;
+      const idMatch = link.match(/[-\w]{25,}/);
+      return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[0]}` : link;
     }
 
     fetch(sheetURL)
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
-        const tbody = document.querySelector('#studentTable tbody');
-        tbody.innerHTML = '';
-        data.forEach(row => {
-          const imgSrc = convertImage(row['Photo']);
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><img src="${imgSrc}" alt="Student Photo" onerror="this.src='https://via.placeholder.com/50'"></td>
-            <td>${row['Student Full Name'] || ''}</td>
-            <td>${row['Class Admitted To'] || ''}</td>
-            <td>${row['Phone Number (WhatsApp)'] || ''}</td>
-            <td>${row["Guardian’s Name"] || ''}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        document.querySelector('#studentTable tbody').innerHTML = `<tr><td colspan="5">Unable to load data.</td></tr>`;
+        studentData = data;
+        renderTable(data);
       });
-  </script>
 
+    function renderTable(data) {
+      const tbody = document.querySelector('#studentTable tbody');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const imgURL = convertDriveURL(row['Photo']);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><img src="${imgURL}" onerror="this.src='https://via.placeholder.com/50'"/></td>
+          <td>${safeAccess(row, 'Student Full Name')}</td>
+          <td>${safeAccess(row, 'Class Admitted To')}</td>
+          <td>${safeAccess(row, 'Phone Number (WhatsApp)')}</td>
+          <td>${safeAccess(row, "Guardian’s Name")}</td>
+          <td><button onclick='viewStudent(${JSON.stringify(row)})'>View</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function viewStudent(data) {
+      const modal = document.getElementById('studentModal');
+      const content = document.getElementById('studentDetails');
+      const imgURL = convertDriveURL(data['Photo']);
+
+      content.innerHTML = `
+        <div style="text-align:center">
+          <img src="${imgURL}" onerror="this.src='https://via.placeholder.com/80'">
+        </div>
+        <p><strong>Student Name:</strong> ${safeAccess(data, 'Student Full Name')}</p>
+        <p><strong>Gender:</strong> ${safeAccess(data, 'Gender')}</p>
+        <p><strong>Date of Birth:</strong> ${safeAccess(data, 'Date of Birth')}</p>
+        <p><strong>Phone:</strong> ${safeAccess(data, 'Phone Number (WhatsApp)')}</p>
+        <p><strong>Guardian:</strong> ${safeAccess(data, "Guardian’s Name")} (${safeAccess(data, "Guardian’s Contact Number")})</p>
+        <p><strong>Email (Parent):</strong> ${safeAccess(data, 'Email ID(Parent)')}</p>
+        <p><strong>Email (Student):</strong> ${safeAccess(data, 'Email ID(Student)')}</p>
+        <p><strong>Class Admitted To:</strong> ${safeAccess(data, 'Class Admitted To')}</p>
+        <p><strong>Fee Plan:</strong> ${safeAccess(data, 'Fee Plan')}</p>
+        <p><strong>Subjects Opted:</strong> ${safeAccess(data, 'Subjects Opted')}</p>
+        <p><strong>Admission Date:</strong> ${safeAccess(data, 'Admission Date')}</p>
+        <p><strong>Mode of Admission:</strong> ${safeAccess(data, 'Mode of Admission')}</p>
+        <p><strong>Preferred Class Timing:</strong> ${safeAccess(data, 'Preferred Class Timing')}</p>
+        <p><strong>Remarks:</strong> ${safeAccess(data, 'Remarks')}</p>
+      `;
+
+      modal.style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('studentModal').style.display = 'none';
+    }
+
+    function downloadPDF() {
+      const content = document.getElementById('modalContent');
+      html2pdf().from(content).save('student-details.pdf');
+    }
+  </script>
 </body>
 </html>
