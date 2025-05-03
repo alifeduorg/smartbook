@@ -159,12 +159,13 @@
     <table id="studentTable">
       <thead>
         <tr>
+          <th>Admission Date</th>
           <th>Student ID</th>
           <th>Full Name</th>
           <th>Class</th>
           <th>Phone</th>
           <th>Guardian</th>
-          <th>Admission Date</th>
+          <th>Fee Plan</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -201,12 +202,13 @@
       data.forEach((student, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
+          <td>${student['Admission Date'] || ''}</td>
           <td>${student['Student ID'] || ''}</td>
           <td>${student['Student Full Name'] || ''}</td>
           <td>${student['Class Admitted To'] || ''}</td>
           <td>${student['Phone Number (WhatsApp)'] || ''}</td>
           <td>${student["Guardian’s Name"] || ''}</td>
-          <td>${student['Admission Date'] || ''}</td>
+          <td>${student["Fee Plan"] || ''}</td>
           <td><button onclick="viewDetails(${index})">View</button></td>
         `;
         tbody.appendChild(tr);
