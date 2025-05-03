@@ -1,104 +1,217 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Student Details</title>
+  <title>Student List</title>
+  <meta charset="UTF-8" />
   <style>
+    /* Your provided CSS */
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f7f9fc;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
     }
 
-    h2 {
-      text-align: center;
-      color: navy;
+    header {
+      background-color: #001f3f;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .container {
+      padding: 2rem;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 1rem;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
     }
 
     th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      font-size: 14px;
-      text-align: center;
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
 
     th {
-      background-color: #003366;
-      color: white;
+      background-color: #ffc107;
+      color: #000;
     }
 
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
+    td img {
+      height: 50px;
+      border-radius: 50%;
+    }
+
+    button {
+      padding: 6px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #001f3f;
+      color: #fff;
+      margin-top: 2rem;
+    }
+
+    .dashboard-btn {
+      margin-bottom: 1rem;
+      background-color: #28a745;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+    }
+
+    .modal-header {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: red;
+    }
+
+    .modal img {
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .modal p {
+      margin: 5px 0;
     }
   </style>
 </head>
 <body>
 
-  <h2>Student Admission Details</h2>
+  <header>
+    <h1>Student List</h1>
+    <img src="https://via.placeholder.com/100x50?text=Logo" alt="Logo" />
+  </header>
 
-  <table id="studentTable">
-    <thead>
-      <tr>
-        <th>Student ID</th>
-        <th>Full Name</th>
-        <th>Gender</th>
-        <th>Date of Birth</th>
-        <th>Phone</th>
-        <th>Guardian Name</th>
-        <th>Guardian Contact</th>
-        <th>Parent Email</th>
-        <th>Student Email</th>
-        <th>Class</th>
-        <th>Fee Plan</th>
-        <th>Subjects</th>
-        <th>Admission Date</th>
-        <th>Mode</th>
-        <th>Preferred Time</th>
-        <th>Remarks</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="container">
+    <table id="studentTable">
+      <thead>
+        <tr>
+          <th>Photo</th>
+          <th>Student Name</th>
+          <th>Class</th>
+          <th>Phone</th>
+          <th>Guardian</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">×</span>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Alif Edu. All rights reserved.
+  </footer>
 
   <script>
-    fetch('https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec') // 🔁 Replace this with your actual web app URL
-      .then(response => response.json())
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your Google Apps Script Web App URL
+
+    fetch(webAppUrl)
+      .then(res => res.json())
       .then(data => {
         const tbody = document.querySelector('#studentTable tbody');
-        data.forEach(row => {
+        window.studentData = data;
+
+        data.forEach((student, index) => {
           const tr = document.createElement('tr');
+
           tr.innerHTML = `
-            <td>${row['Student ID'] || ''}</td>
-            <td>${row['Student Full Name'] || ''}</td>
-            <td>${row['Gender'] || ''}</td>
-            <td>${row['Date of Birth'] || ''}</td>
-            <td>${row['Phone Number (WhatsApp)'] || ''}</td>
-            <td>${row["Guardian’s Name"] || ''}</td>
-            <td>${row['Guardian’s Contact Number'] || ''}</td>
-            <td>${row['Email ID(Parent)'] || ''}</td>
-            <td>${row['Email ID(Student)'] || ''}</td>
-            <td>${row['Class Admitted To'] || ''}</td>
-            <td>${row['Fee Plan'] || ''}</td>
-            <td>${row['Subjects Opted'] || ''}</td>
-            <td>${row['Admission Date'] || ''}</td>
-            <td>${row['Mode of Admission'] || ''}</td>
-            <td>${row['Preferred Class Timing'] || ''}</td>
-            <td>${row['Remarks'] || ''}</td>
+            <td><img src="${student.Photo || 'https://via.placeholder.com/50'}" alt="photo"></td>
+            <td>${student['Student Full Name'] || '-'}</td>
+            <td>${student['Class Admitted To'] || '-'}</td>
+            <td>${student['Phone Number (WhatsApp)'] || '-'}</td>
+            <td>${student["Guardian’s Name"] || '-'}</td>
+            <td><button onclick="viewStudent(${index})">View</button></td>
           `;
+
           tbody.appendChild(tr);
         });
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
       });
-  </script>
 
+    function viewStudent(index) {
+      const student = window.studentData[index];
+      const modal = document.getElementById('detailModal');
+      const modalBody = document.getElementById('modalBody');
+
+      const content = `
+        <div class="modal-header">${student['Student Full Name'] || 'Student Details'}</div>
+        ${student.Photo ? `<img src="${student.Photo}" alt="Student Photo" />` : ''}
+        ${Object.entries(student).map(([key, value]) => {
+          return `<p><strong>${key}:</strong> ${value || '-'}</p>`;
+        }).join('')}
+      `;
+
+      modalBody.innerHTML = content;
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').style.display = 'none';
+    }
+  </script>
 </body>
 </html>
