@@ -355,7 +355,10 @@ function downloadPDF() {
 
   html2pdf().from(element).set(opt).save();
 }
-
+html2canvas: {
+  scrollY: 0,
+  windowHeight: document.body.scrollHeight
+}
   function goToDashboard() {
     window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
   }
