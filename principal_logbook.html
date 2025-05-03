@@ -4,126 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logbook Viewer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a2e;
+            color: #f4f4f9;
             margin: 0;
             padding: 0;
-            background-color: #fff;
-            font-family: 'Roboto', sans-serif;
-            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
-            width: 85%;
-            margin: 0 auto;
-            padding: 50px 0;
+            background: #1b1b3a;
+            border-radius: 12px;
+            padding: 40px;
+            width: 90%;
+            max-width: 1000px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
         }
         h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 40px;
-            color: #F1C40F; /* Gold color */
             text-align: center;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #f1c40f;
+            text-transform: uppercase;
         }
-        .logo {
-            display: block;
-            margin: 0 auto 20px;
-            width: 150px;
-        }
-        .action-btns {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-        .action-btns button {
-            padding: 12px 30px;
-            background-color: #F39C12;
+        .btn {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
             color: #fff;
-            font-size: 18px;
             border: none;
-            border-radius: 8px;
+            padding: 15px 30px;
+            font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            border-radius: 8px;
+            transition: transform 0.2s ease-in-out;
         }
-        .action-btns button:hover {
-            background-color: #D35400;
+        .btn:hover {
+            transform: scale(1.1);
         }
         table {
             width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #F39C12;
             margin-top: 20px;
+            border-collapse: collapse;
         }
-        th, td {
-            padding: 20px;
+        table, th, td {
+            border: 1px solid #ddd;
             text-align: left;
-            font-size: 16px;
-            border-bottom: 1px solid #ddd;
+            padding: 12px;
         }
         th {
-            background-color: #34495E;
-            color: #F1C40F;
-            font-family: 'Poppins', sans-serif;
+            background-color: #1b1b3a;
+            color: #f1c40f;
         }
-        td {
-            background-color: #F7F7F7;
+        tr:nth-child(even) {
+            background-color: #2a2a4b;
         }
-        .filters {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+        tr:hover {
+            background-color: #333344;
         }
-        select, .filters button {
-            padding: 10px 20px;
-            font-size: 14px;
-            background-color: #34495E;
-            color: #F1C40F;
-            border: 1px solid #F39C12;
+        .pdf-btn {
+            background-color: #3498db;
+            font-size: 1.2rem;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
             border-radius: 8px;
-        }
-        .filters button {
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .filters button:hover {
-            background-color: #D35400;
-        }
-        .filters select {
-            width: 200px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            background-color: #2a2a4b;
+            color: #f4f4f9;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- ALIF Logo -->
-    <img src="1.png" alt="ALIF Logo" class="logo">
+    <h1>Logbook Viewer</h1>
+    <button class="btn" onclick="window.location.href='/dashboard'">Dashboard</button>
 
-    <!-- Page Title -->
-    <h1>Premium Logbook Viewer</h1>
-
-    <!-- Action Buttons -->
-    <div class="action-btns">
-        <button id="goToDashboardBtn">Go to Dashboard</button>
-        <button id="downloadBtn">Download as PDF</button>
-    </div>
-
-    <!-- Filters Section -->
-    <div class="filters">
-        <select id="teacherFilter">
-            <option value="">Filter by Teacher</option>
-        </select>
-        <select id="programFilter">
-            <option value="">Filter by Program</option>
-        </select>
-        <select id="staffIdFilter">
-            <option value="">Filter by Staff ID</option>
-        </select>
-        <button id="filterBtn">Apply Filters</button>
-    </div>
-
-    <!-- Logbook Table -->
-    <table id="logbookTable">
+    <h2 style="text-align: center; margin-top: 40px;">Logbook Entries</h2>
+    <table id="logbook-table">
         <thead>
             <tr>
                 <th>Timestamp</th>
@@ -145,138 +108,76 @@
                 <th>Anything you'd like to share?</th>
             </tr>
         </thead>
-        <tbody id="logbookTableBody">
-            <!-- Data will be dynamically populated here -->
+        <tbody>
+            <!-- Data from Google Sheets will be inserted here -->
         </tbody>
     </table>
+
+    <button class="btn pdf-btn" onclick="downloadPDF()">Download PDF</button>
 </div>
 
 <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxv4NzkYUwX5r6AFcijgwRuu9mf6wMaUiBnthw56dPhzL8UtDhwNoF4T_XEf7Ixb2YUvQ/exec"; // Replace with your actual Google Apps Script URL
-
+    // Google Sheets API data fetch (you need Google Apps Script for this backend)
     function fetchLogbookData() {
-        fetch(scriptUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data && Array.isArray(data)) {
-                    populateTable(data);
-                } else {
-                    console.error("No data returned from the script.");
-                }
-            })
-            .catch(error => console.error("Error fetching data:", error));
-    }
+        // This function will interact with the Google Apps Script backend to fetch data
+        // You would replace this with actual fetching logic or use Google Apps Script
+        const logbookEntries = [
+            {
+                timestamp: '2025-05-01 08:00',
+                date: '2025-05-01',
+                month: 'May',
+                teacherName: 'John Doe',
+                staffID: '12345',
+                program: 'Math',
+                class: '10A',
+                studentName: 'Alice',
+                subjects: 'Algebra',
+                classIn: '08:00',
+                classDuration: '1 hour',
+                teachToday: 'Solving equations',
+                studentEngagement: 'High',
+                homework: 'Exercises 1-5',
+                workType: 'Classwork',
+                classNotification: 'Homework for next class',
+                share: 'Great session!'
+            },
+            // More entries...
+        ];
 
-    function populateTable(data) {
-        const logbookTableBody = document.getElementById('logbookTableBody');
-        logbookTableBody.innerHTML = '';  // Clear any previous rows
-
-        data.forEach(entry => {
-            const row = logbookTableBody.insertRow();
+        const tableBody = document.querySelector("#logbook-table tbody");
+        logbookEntries.forEach(entry => {
+            const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${entry.timestamp}</td>
                 <td>${entry.date}</td>
                 <td>${entry.month}</td>
                 <td>${entry.teacherName}</td>
-                <td>${entry.staffId}</td>
+                <td>${entry.staffID}</td>
                 <td>${entry.program}</td>
                 <td>${entry.class}</td>
                 <td>${entry.studentName}</td>
                 <td>${entry.subjects}</td>
                 <td>${entry.classIn}</td>
                 <td>${entry.classDuration}</td>
-                <td>${entry.taughtToday}</td>
+                <td>${entry.teachToday}</td>
                 <td>${entry.studentEngagement}</td>
                 <td>${entry.homework}</td>
                 <td>${entry.workType}</td>
-                <td>${entry.notificationMessage}</td>
-                <td>${entry.additionalNotes}</td>
+                <td>${entry.classNotification}</td>
+                <td>${entry.share}</td>
             `;
-        });
-
-        populateFilters(data);
-    }
-
-    function populateFilters(data) {
-        const teachers = [...new Set(data.map(entry => entry.teacherName))];
-        const programs = [...new Set(data.map(entry => entry.program))];
-        const staffIds = [...new Set(data.map(entry => entry.staffId))];
-
-        const teacherFilter = document.getElementById('teacherFilter');
-        const programFilter = document.getElementById('programFilter');
-        const staffIdFilter = document.getElementById('staffIdFilter');
-
-        teachers.forEach(teacher => {
-            const option = document.createElement('option');
-            option.value = teacher;
-            option.textContent = teacher;
-            teacherFilter.appendChild(option);
-        });
-
-        programs.forEach(program => {
-            const option = document.createElement('option');
-            option.value = program;
-            option.textContent = program;
-            programFilter.appendChild(option);
-        });
-
-        staffIds.forEach(staffId => {
-            const option = document.createElement('option');
-            option.value = staffId;
-            option.textContent = staffId;
-            staffIdFilter.appendChild(option);
+            tableBody.appendChild(row);
         });
     }
 
-    document.getElementById('filterBtn').addEventListener('click', function() {
-        const teacher = document.getElementById('teacherFilter').value;
-        const program = document.getElementById('programFilter').value;
-        const staffId = document.getElementById('staffIdFilter').value;
+    // Download PDF logic (you can integrate libraries like jsPDF)
+    function downloadPDF() {
+        alert('This will download the PDF (to be implemented with a PDF library)');
+    }
 
-        // Add filtering logic here based on the selected values
-    });
-
-    document.getElementById('downloadBtn').addEventListener('click', function() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        doc.setFillColor(255, 255, 255); // White background
-        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
-        doc.setTextColor(0, 0, 0); // Black text
-        doc.setFont('Arial', 'normal');
-        doc.setFontSize(16);
-        doc.text('Logbook Data', 14, 20);
-
-        const table = document.getElementById('logbookTable');
-        const rows = Array.from(table.querySelectorAll('tr'));
-        let tableData = [];
-
-        rows.forEach(row => {
-            const cols = Array.from(row.querySelectorAll('td, th'));
-            const rowData = cols.map(col => col.textContent);
-            tableData.push(rowData);
-        });
-
-        doc.autoTable({
-            head: [tableData[0]],
-            body: tableData.slice(1),
-            startY: 30,
-            theme: 'grid',
-            headStyles: { fillColor: [0, 0, 0] }, // Black headers
-            styles: { cellPadding: 2, fontSize: 10 },
-        });
-
-        doc.save('logbook_data.pdf');
-    });
-
-    document.getElementById('goToDashboardBtn').addEventListener('click', function() {
-        window.location.href = "http://smartbook.alifedu.org/principal-dashboard.html"; // Replace with your actual dashboard URL
-    });
-
+    // Fetch data when the page loads
     window.onload = fetchLogbookData;
 </script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>
