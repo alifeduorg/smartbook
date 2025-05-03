@@ -250,104 +250,123 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script>
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
+<script>
+  const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
 
-    let studentData = [];
+  let studentData = [];
 
-    fetch(webAppUrl)
-      .then(res => res.json())
-      .then(data => {
-        studentData = data;
-        const tbody = document.querySelector('#studentTable tbody');
+  fetch(webAppUrl)
+    .then(res => res.json())
+    .then(data => {
+      studentData = data;
+      const tbody = document.querySelector('#studentTable tbody');
 
-        setTimeout(() => {
-          data.forEach((student, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${student['Admission Date'] || ''}</td>
-              <td>${student['Student ID'] || ''}</td>
-              <td>${student['Student Full Name'] || ''}</td>
-              <td>${student['Class Admitted To'] || ''}</td>
-              <td>${student['Phone Number (WhatsApp)'] || ''}</td>
-              <td>${student["Guardian’s Name"] || ''}</td>
-              <td><button onclick="viewDetails(${index})">View</button></td>
-            `;
-            tbody.appendChild(tr);
-          });
-        }, 100);
-      });
+      setTimeout(() => {
+        data.forEach((student, index) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${student['Admission Date'] || ''}</td>
+            <td>${student['Student ID'] || ''}</td>
+            <td>${student['Student Full Name'] || ''}</td>
+            <td>${student['Class Admitted To'] || ''}</td>
+            <td>${student['Phone Number (WhatsApp)'] || ''}</td>
+            <td>${student["Guardian’s Name"] || ''}</td>
+            <td><button onclick="viewDetails(${index})">View</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }, 100);
+    });
 
-    function viewDetails(index) {
-      const student = studentData[index];
-      const modalBody = document.getElementById('modalBody');
-      
-      // Clear previous modal content
-      modalBody.innerHTML = '';
+  function viewDetails(index) {
+    const student = studentData[index];
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = '';
 
-      modalBody.innerHTML = `
-        <div>
-          <img src="1.png" alt="Logo" style="height: 60px; display: block; margin: auto;" />
-          <h2>Student Admission Form</h2>
-          <p style="text-align: center; font-weight: bold; color: #dc3545;">Academic Year 2025-26</p>
+    modalBody.innerHTML = `
+      <div id="modalContent" style="width: 100%; padding: 20px;">
+        <img src="1.png" alt="Logo" style="height: 60px; display: block; margin: auto;" />
+        <h2 style="text-align:center;">Student Admission Form</h2>
+        <p style="text-align: center; font-weight: bold; color: #dc3545;">Academic Year 2025-26</p>
 
-          <div class="photo-box">Photo</div>
+        <div class="photo-box">Photo</div>
 
-          <div class="form-section">
-            <h3>Personal Details</h3>
-            <div class="form-row">
-              <p><strong>Full Name:</strong> ${student["Student Full Name"] || '-'}</p>
-              <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'}</p>
-            </div>
-            <div class="form-row">
-              <p><strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
-              <p><strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
-            </div>
+        <div class="form-section">
+          <h3>Personal Details</h3>
+          <div class="form-row">
+            <p><strong>Full Name:</strong> ${student["Student Full Name"] || '-'}</p>
+            <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'}</p>
           </div>
-
-          <div class="form-section">
-            <h3>Family Details</h3>
-            <div class="form-row">
-              <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'}</p>
-              <p><strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
-            </div>
-            <div class="form-row">
-              <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
-            </div>
+          <div class="form-row">
+            <p><strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
+            <p><strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
           </div>
-
-          <div class="signature-box">
-            <p><strong>Signature of Guardian:</strong></p>
-            <div class="signature-line"></div>
+          <div class="form-row">
+            <p><strong>Email ID:</strong> ${student["Email ID"] || '-'}</p>
           </div>
-
-          <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
         </div>
-      `;
 
-      document.getElementById('detailModal').style.display = 'flex'; // Display as a pop-up
-    }
+        <div class="form-section">
+          <h3>Family Details</h3>
+          <div class="form-row">
+            <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'}</p>
+            <p><strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
+          </div>
+          <div class="form-row">
+            <p><strong>Parent Email:</strong> ${student["Parent Email"] || '-'}</p>
+          </div>
+          <div class="form-row">
+            <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
+          </div>
+        </div>
 
-    function closeModal() {
-      document.getElementById('detailModal').style.display = 'none'; // Close the pop-up
-    }
+        <div class="form-section">
+          <h3>Officer Details</h3>
+          <div class="form-row">
+            <p><strong>Class:</strong> ${student["Class Admitted To"] || '-'}</p>
+            <p><strong>Admission Date:</strong> ${student["Admission Date"] || '-'}</p>
+            <p><strong>Admission No.:</strong> ${student["Student ID"] || '-'}</p>
+          </div>
+        </div>
 
-    function downloadPDF() {
-      const element = document.getElementById('modalContent');
-      const opt = {
-        margin:       1,
-        filename:     'admission_form.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { dpi: 300, letterRendering: true },
-        jsPDF:        { unit: 'cm', format: 'letter', orientation: 'portrait' }
-      };
+        <div class="signature-box">
+          <p><strong>Signature of Guardian:</strong></p>
+          <div class="signature-line"></div>
+        </div>
 
-      html2pdf().from(element).set(opt).save();
-    }
+        <div class="signature-box">
+          <p><strong>Principal's Signature & Seal:</strong></p>
+          <div class="signature-line"></div>
+        </div>
 
-    function goToDashboard() {
-      window.location.href = 'https://alifedu.com/dashboard'; // Change this URL to your dashboard link
-    }
-  </script>
+        <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
+      </div>
+    `;
+
+    document.getElementById('detailModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('detailModal').style.display = 'none';
+  }
+
+  function downloadPDF() {
+    const element = document.getElementById('modalContent');
+    const opt = {
+      margin: 0.5,
+      filename: 'admission_form.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: [148, 210], orientation: 'landscape' } // A5 landscape (half A4)
+    };
+
+    html2pdf().set(opt).from(element).save();
+  }
+
+  function goToDashboard() {
+    window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
+  }
+</script>
+
 </body>
 </html>
