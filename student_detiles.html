@@ -287,13 +287,12 @@
   modalBody.innerHTML = '';
 
   modalBody.innerHTML = `
-    <div id="modalContent" style="font-family: Arial, sans-serif; padding: 20px;">
       <img src="1.png" alt="Logo" style="height: 60px; display: block; margin: auto;" />
       <h2 style="text-align: center;">Student Admission Form</h2>
       <p style="text-align: center; font-weight: bold; color: #dc3545;">Academic Year 2025-26</p>
 
       <!-- Personal Details -->
-      <div style="border: 2px solid #ccc; border-radius: 15px; padding: 15px; margin: 15px 0;">
+      
         <h3 style="text-align: center; margin-bottom: 10px;">Personal Details</h3>
         <p><strong>Full Name:</strong> ${student["Student Full Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
            <strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
@@ -303,7 +302,7 @@
       </div>
 
       <!-- Family Details -->
-      <div style="border: 2px solid #ccc; border-radius: 15px; padding: 15px; margin: 15px 0;">
+      
         <h3 style="text-align: center; margin-bottom: 10px;">Family Details</h3>
         <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
            <strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
@@ -329,6 +328,7 @@
 
   document.getElementById('detailModal').style.display = 'flex';
 }
+
   function closeModal() {
     document.getElementById('detailModal').style.display = 'none';
   }
