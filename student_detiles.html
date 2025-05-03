@@ -101,13 +101,15 @@
 
 .modal-content {
   background: #fff;
-  padding: 1rem;
+  padding: 1.5rem;
   width: 100%;
-  max-width: 14cm;  /* Reduced width */
-  max-height: 18cm; /* Reduced height */
-  overflow: hidden; /* Prevent scrolling */
-  border: 1px solid #003366;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 15cm;  /* Smaller than A4 */
+  height: auto;
+  max-height: 90vh;  /* Keep within screen */
+  overflow: hidden;
+  border-radius: 8px;
+  border: 2px solid #003366;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   margin: auto;
   font-family: 'Arial', sans-serif;
   box-sizing: border-box;
@@ -334,15 +336,16 @@
 function downloadPDF() {
   const element = document.getElementById('modalContent');
   const opt = {
-    margin: 0.5,
+    margin: 1,
     filename: 'admission_form.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2, scrollY: 0 },
-    jsPDF: { unit: 'cm', format: [14, 18], orientation: 'portrait' } // custom small size
+    jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
   };
 
   html2pdf().from(element).set(opt).save();
 }
+
 
   function goToDashboard() {
     window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
