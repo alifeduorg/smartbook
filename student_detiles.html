@@ -4,12 +4,9 @@
   <meta charset="UTF-8" />
   <title>Alif Academy - Student Admission Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-  <!-- Styles -->
   <style>
     body {
       margin: 0;
@@ -18,7 +15,6 @@
       color: #222;
       padding: 20px;
     }
-
     header {
       display: flex;
       justify-content: space-between;
@@ -28,12 +24,10 @@
       padding: 15px 20px;
       border-radius: 8px;
     }
-
     header h1 {
       margin: 0;
       font-size: 24px;
     }
-
     header a {
       color: white;
       font-weight: bold;
@@ -42,32 +36,9 @@
       padding: 6px 12px;
       border-radius: 6px;
     }
-
     main {
       margin-top: 20px;
     }
-
-    input[type="text"] {
-      width: 100%;
-      max-width: 600px;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-
-    button {
-      background-color: goldenrod;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-weight: bold;
-      margin-left: 5px;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -76,23 +47,19 @@
       border-radius: 10px;
       overflow: hidden;
     }
-
     th, td {
       padding: 12px;
       border: 1px solid #ddd;
       text-align: left;
     }
-
     th {
       background-color: #f2c94c;
       color: white;
     }
-
     img {
       max-width: 60px;
       border-radius: 5px;
     }
-
     #overlay, #studentModal {
       display: none;
       position: fixed;
@@ -100,11 +67,9 @@
       width: 100%; height: 100%;
       z-index: 9998;
     }
-
     #overlay {
       background: rgba(0, 0, 0, 0.5);
     }
-
     #studentModal {
       background: white;
       color: black;
@@ -116,25 +81,21 @@
       border-radius: 12px;
       position: relative;
     }
-
     #studentModal img {
       max-width: 120px;
       float: right;
       margin-left: 15px;
     }
-
     #studentModal h2 {
       color: goldenrod;
       margin-top: 0;
     }
-
     .modal-buttons {
       margin-top: 20px;
       display: flex;
       justify-content: flex-end;
       gap: 10px;
     }
-
     @media (max-width: 768px) {
       th, td { font-size: 12px; }
       #studentModal { width: 90%; padding: 20px; }
@@ -145,13 +106,14 @@
 <body>
 
   <header>
-    <h1>Alif Academy - Student Admissions</h1>
+    <h1>Alif Edu- Student Admissions</h1>
     <a href="#" onclick="history.back()">🏠 Dashboard</a>
   </header>
 
   <main>
-    <input type="text" id="scriptUrl" placeholder="Paste Google Web App URL here..." />
-    <button onclick="loadStudents()">Load Students</button>
+    <p><strong>Note:</strong> You can paste another URL if needed.</p>
+    <input type="text" id="scriptUrl" style="width:100%; max-width:600px; padding:8px" value="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" />
+    <button onclick="loadStudents()">🔄 Load Students</button>
 
     <table id="studentsTable">
       <thead><tr id="tableHead"></tr></thead>
@@ -159,20 +121,17 @@
     </table>
   </main>
 
-  <!-- Modal -->
   <div id="overlay" onclick="closeModal()"></div>
   <div id="studentModal">
     <div id="studentDetails"></div>
     <div class="modal-buttons">
-      <button onclick="downloadPDF()">Download PDF</button>
-      <button onclick="closeModal()">Close</button>
+      <button onclick="downloadPDF()">⬇ Download PDF</button>
+      <button onclick="closeModal()">❌ Close</button>
     </div>
   </div>
 
-  <!-- Script -->
   <script>
     let selectedStudent = {};
-
     async function loadStudents() {
       const url = document.getElementById("scriptUrl").value.trim();
       if (!url) return alert("Please enter the Google Web App URL");
@@ -273,6 +232,9 @@
         pdf.save(`AdmissionForm_${selectedStudent["Student ID"] || "Student"}.pdf`);
       });
     }
+
+    // Optional auto-load on open (uncomment below if needed)
+    // window.onload = () => loadStudents();
   </script>
 
 </body>
