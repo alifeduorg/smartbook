@@ -117,6 +117,12 @@
       color: red;
     }
 
+    .modal img {
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
     .modal p {
       margin: 5px 0;
     }
@@ -160,29 +166,26 @@
   <script>
     const sheetURL = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec'; // Replace with your Apps Script URL
 
-    // Fetch data from Google Sheets
     fetch(sheetURL)
-  .then(res => res.json())
-  .then(data => {
-    console.log("Fetched data:", data);  // Log the fetched data to see the structure
+      .then(res => res.json())
+      .then(data => {
+        console.log("Fetched data:", data);  // Log the fetched data to see the structure
+        const tbody = document.querySelector('#studentTable tbody');
+        data.forEach((row, index) => {
+          console.log("Row data:", row); // Log each row of data for debugging
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row['Student Full Name']}</td>
+            <td>${row['Class Admitted To']}</td>
+            <td>${row['Phone Number (WhatsApp)']}</td>
+            <td>${row["Guardian’s Name"]}</td>
+            <td><button onclick='viewStudent(${JSON.stringify(row)})'>View</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(error => console.error("Error fetching data:", error));
 
-    const tbody = document.querySelector('#studentTable tbody');
-    data.forEach((row, index) => {
-      console.log("Row data:", row); // Log each row of data for debugging
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row['Student Full Name']}</td>
-        <td>${row['Class Admitted To']}</td>
-        <td>${row['Phone Number (WhatsApp)']}</td>
-        <td>${row["Guardian’s Name"]}</td>
-        <td><button onclick='viewStudent(${JSON.stringify(row)})'>View</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  })
-  .catch(error => console.error("Error fetching data:", error));
-
-    // Function to view student details in modal
     function viewStudent(data) {
       const modal = document.getElementById('studentModal');
       const content = document.getElementById('studentDetails');
@@ -199,23 +202,19 @@
         <p><strong>Fee Plan:</strong> ${data['Fee Plan']}</p>
         <p><strong>Subjects Opted:</strong> ${data['Subjects Opted']}</p>
         <p><strong>Admission Date:</strong> ${data['Admission Date']}</p>
-        <p><strong>Mode of Admission:</strong> ${data['Mode of Admission']}</p>
-        <p><strong>Preferred Class Timing:</strong> ${data['Preferred Class Timing']}</p>
-        <p><strong>Remarks:</strong> ${data['Remarks']}</p>
+        <p><strong>Emergency Contact:</strong> ${data['Emergency Contact']}</p>
       `;
-
+      
       modal.style.display = 'flex';
     }
 
-    // Function to close the modal
     function closeModal() {
       document.getElementById('studentModal').style.display = 'none';
     }
 
-    // Function to download PDF
     function downloadPDF() {
-      const content = document.getElementById('modalContent');
-      html2pdf().from(content).save('student-details.pdf');
+      const element = document.getElementById('studentDetails');
+      html2pdf().from(element).save();
     }
   </script>
 </body>
