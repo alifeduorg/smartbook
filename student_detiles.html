@@ -85,134 +85,154 @@
       background-color: #28a745;
     }
 
-    /* Modal content for PDF download */
-    .modal {
-      display: none; /* Initially hidden */
-      position: fixed; /* Fixed position */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
+    /* Modal container */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
 
+/* Main content inside modal */
 .modal-content {
   background: #fff;
   padding: 1.5rem;
   width: 100%;
-  max-width: 15cm;  /* Smaller than A4 */
+  max-width: 18cm; /* Close to A4 width */
   height: auto;
-  max-height: 90vh;  /* Keep within screen */
-  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
   border-radius: 8px;
   border: 2px solid #003366;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   margin: auto;
   font-family: 'Arial', sans-serif;
   box-sizing: border-box;
+  position: relative;
 }
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      font-size: 20px;
-      cursor: pointer;
-    }
 
-    h2 {
-      font-size: 24px;
-      color: #003366;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 10px;
-    }
+/* Close button */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+}
 
-    h3 {
-      font-size: 20px;
-      color: #003366;
-      font-weight: bold;
-      margin-top: 20px;
-    }
+/* Headings */
+h2, h3 {
+  color: #003366;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+}
 
-    .form-section {
-      margin-bottom: 20px;
-    }
+h2 {
+  font-size: 24px;
+}
 
-    .form-row p {
-      font-size: 16px;
-      line-height: 1.5;
-      color: #333;
-    }
+h3 {
+  font-size: 20px;
+}
 
-    .photo-box {
-      width: 100px;
-      height: 120px;
-      border: 2px dashed #dc3545;
-      text-align: center;
-      line-height: 120px;
-      font-size: 14px;
-      color: #dc3545;
-      margin-bottom: 20px;
-      float: right;
-      margin-left: 20px;
-    }
+/* Sections */
+.form-section {
+  margin-bottom: 20px;
+}
 
-    .signature-box {
-      margin-top: 40px;
-      text-align: right;
-    }
+.form-row p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+}
 
-    .signature-line {
-      border-top: 1px solid #003366;
-      width: 250px;
-      text-align: center;
-      margin-left: auto;
-      padding-top: 5px;
-      color: #003366;
-      font-size: 16px;
-    }
+/* Photo Box */
+.photo-box {
+  width: 100px;
+  height: 120px;
+  border: 2px dashed #dc3545;
+  text-align: center;
+  line-height: 120px;
+  font-size: 14px;
+  color: #dc3545;
+  float: right;
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
 
-    .print-btn {
-      background-color: #003366;
-      color: white;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
+/* Signature */
+.signature-box {
+  margin-top: 40px;
+  text-align: right;
+}
 
-    .print-btn:hover {
-      background-color: #dc3545;
-    }
+.signature-line {
+  border-top: 1px solid #003366;
+  width: 250px;
+  text-align: center;
+  margin-left: auto;
+  padding-top: 5px;
+  color: #003366;
+  font-size: 16px;
+}
 
-    @media print {
-      .modal-content {
-        width: 100%;
-        height: 100%;
-        border-radius: 0;
-        box-shadow: none;
-        border: 2px solid #003366;
-        margin-top: 20px;
-      }
+/* Print Button */
+.print-btn {
+  background-color: #003366;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
 
-      .close-btn, .print-btn {
-        display: none;
-      }
+.print-btn:hover {
+  background-color: #dc3545;
+}
 
-      body {
-        margin: 0;
-        padding: 0;
-      }
-    }
+/* Print settings */
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .modal, .close-btn, .print-btn {
+    display: none !important;
+  }
+
+  .modal-content {
+    display: block;
+    position: static;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    padding: 2cm;
+    overflow: visible;
+    page-break-inside: avoid;
+  }
+}
+
   </style>
 </head>
 <body>
