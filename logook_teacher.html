@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #0a1172;
+      background-color: #ffffff;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,30 +17,31 @@
     }
 
     .card {
-      background-color: #ffffff;
-      max-width: 800px;
+      background-color: #0a1172;
+      max-width: 850px;
       width: 100%;
       border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+      padding: 35px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+      color: #ffffff;
     }
 
     h2 {
       text-align: center;
-      color: #0a1172;
+      color: #ffd700;
       margin-bottom: 30px;
-      font-size: 28px;
+      font-size: 32px;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
       font-weight: 600;
       margin-bottom: 6px;
-      color: #0a1172;
+      color: #ffd700;
     }
 
     input,
@@ -48,7 +49,7 @@
     textarea {
       width: 100%;
       padding: 10px 14px;
-      border: 1px solid #ccc;
+      border: none;
       border-radius: 8px;
       font-size: 16px;
       box-sizing: border-box;
@@ -69,7 +70,7 @@
       font-size: 16px;
       cursor: pointer;
       transition: 0.3s ease;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     button:hover {
@@ -107,9 +108,9 @@
     }
 
     footer {
-      margin-top: 40px;
+      margin-top: 30px;
       text-align: center;
-      color: #fff;
+      color: #333;
       font-size: 14px;
     }
 
@@ -123,74 +124,33 @@
 <body>
 
   <div class="card">
-    <h2>Login</h2>
-    <form id="logbookForm" action="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" method="POST">
-      <div class="form-group">
-        <label for="date">Date</label>
-        <input type="date" id="date" name="date" required>
-      </div>
-
-      <div class="form-group">
-        <label for="month">Month</label>
+    <h2>Teacher Logbook Entry</h2>
+    <form id="logbookForm" action="https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec" method="POST">
+      <div class="form-group"><label for="date">Date</label><input type="date" id="date" name="date" required></div>
+      <div class="form-group"><label for="month">Month</label>
         <select id="month" name="month" required>
           <option value="">Select Month</option>
-          <option value="January">January</option>
-          <option value="February">February</option>
-          <option value="March">March</option>
-          <option value="April">April</option>
-          <option value="May">May</option>
-          <option value="June">June</option>
-          <option value="July">July</option>
-          <option value="August">August</option>
-          <option value="September">September</option>
-          <option value="October">October</option>
-          <option value="November">November</option>
-          <option value="December">December</option>
+          <option>January</option><option>February</option><option>March</option><option>April</option>
+          <option>May</option><option>June</option><option>July</option><option>August</option>
+          <option>September</option><option>October</option><option>November</option><option>December</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label for="teacherName">Teacher's Name</label>
-        <input type="text" id="teacherName" name="teacherName" required>
-      </div>
-
-      <div class="form-group">
-        <label for="staffID">Staff ID</label>
-        <input type="text" id="staffID" name="staffID" required>
-      </div>
-
-      <div class="form-group">
-        <label for="program">Program</label>
+      <div class="form-group"><label for="teacherName">Teacher's Name</label><input type="text" id="teacherName" name="teacherName" required></div>
+      <div class="form-group"><label for="staffID">Staff ID</label><input type="text" id="staffID" name="staffID" required></div>
+      <div class="form-group"><label for="program">Program</label>
         <select id="program" name="program" required>
+          <option value="">Select Program</option>
           <option value="little_leaner">Little Learner</option>
           <option value="kg">KG</option>
           <option value="online_school">Online School</option>
           <option value="horizon">Horizon</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label for="class">Class</label>
-        <input type="text" id="class" name="class" required>
-      </div>
-
-      <div class="form-group">
-        <label for="studentName">Student Name</label>
-        <input type="text" id="studentName" name="studentName" required>
-      </div>
-
-      <div class="form-group">
-        <label for="subjects">Subjects</label>
-        <input type="text" id="subjects" name="subjects" required>
-      </div>
-
-      <div class="form-group">
-        <label for="classIn">Class In (Time)</label>
-        <input type="time" id="classIn" name="classIn" required>
-      </div>
-
-      <div class="form-group">
-        <label for="classDuration">Class Duration</label>
+      <div class="form-group"><label for="class">Class</label><input type="text" id="class" name="class" required></div>
+      <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+      <div class="form-group"><label for="subjects">Subjects</label><input type="text" id="subjects" name="subjects" required></div>
+      <div class="form-group"><label for="classIn">Class In</label><input type="time" id="classIn" name="classIn" required></div>
+      <div class="form-group"><label for="classDuration">Class Duration</label>
         <select id="classDuration" name="classDuration" required>
           <option value="30">30 minutes</option>
           <option value="60">60 minutes</option>
@@ -198,53 +158,25 @@
           <option value="120">60 + 30 + 30 minutes</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label for="teachToday">What did you teach today?</label>
-        <textarea id="teachToday" name="teachToday" rows="3" required></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="studentEngagement">Student Engagement</label>
-        <textarea id="studentEngagement" name="studentEngagement" rows="3" required></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="homework">Homework or Tasks Given?</label>
-        <textarea id="homework" name="homework" rows="3" required></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="workType">What type of Work</label>
-        <input type="text" id="workType" name="workType" required>
-      </div>
-
-      <div class="form-group">
-        <label for="classNotification">Upload Class Notification Message</label>
-        <textarea id="classNotification" name="classNotification" rows="3"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="additionalComments">Anything you'd like to share?</label>
-        <textarea id="additionalComments" name="additionalComments" rows="3"></textarea>
-      </div>
+      <div class="form-group"><label for="teachToday">What did you teach today?</label><textarea id="teachToday" name="teachToday" rows="3" required></textarea></div>
+      <div class="form-group"><label for="studentEngagement">Student Engagement</label><textarea id="studentEngagement" name="studentEngagement" rows="3" required></textarea></div>
+      <div class="form-group"><label for="homework">Homework or Tasks Given?</label><textarea id="homework" name="homework" rows="3" required></textarea></div>
+      <div class="form-group"><label for="workType">What type of Work</label><input type="text" id="workType" name="workType" required></div>
+      <div class="form-group"><label for="classNotification">Upload Class Notification Message</label><textarea id="classNotification" name="classNotification" rows="3"></textarea></div>
+      <div class="form-group"><label for="additionalComments">Anything you'd like to share?</label><textarea id="additionalComments" name="additionalComments" rows="3"></textarea></div>
 
       <button type="submit">Submit Logbook Entry</button>
-
       <div class="message" id="successMessage">Logbook submitted successfully!</div>
     </form>
 
-    <button class="dashboard-btn" onclick="window.location.href='http://smartbook.alifedu.org/teacher-dashboard.html'">Go to Dashboard</button>
+    <button class="dashboard-btn" onclick="window.location.href='http://smartbook.alifedu.org/teacher-dashboard.html'">← Go to Dashboard</button>
   </div>
 
-  <footer>
-    © Alif Edu 2025 | All rights reserved
-  </footer>
+  <footer>© Alif Edu 2025 | All rights reserved</footer>
 
   <script>
     document.getElementById('logbookForm').onsubmit = function(e) {
       e.preventDefault();
-
       var form = e.target;
       var formData = new FormData(form);
 
