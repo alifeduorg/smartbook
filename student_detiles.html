@@ -332,18 +332,19 @@
     document.getElementById('detailModal').style.display = 'none';
   }
 
-  function downloadPDF() {
-    const element = document.getElementById('modalContent');
-    const opt = {
-      margin: 0.5,
-      filename: 'admission_form.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: [148, 210], orientation: 'landscape' } // A5 landscape (half A4)
-    };
+ function downloadPDF() {
+  const element = document.getElementById('modalContent');
+  const opt = {
+    margin:       1,
+    filename:     'admission_form.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { dpi: 300, letterRendering: true },
+    jsPDF:        { unit: 'cm', format: 'a4', orientation: 'landscape' }
+  };
 
-    html2pdf().set(opt).from(element).save();
-  }
+  html2pdf().from(element).set(opt).save();
+}
+
 
   function goToDashboard() {
     window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
