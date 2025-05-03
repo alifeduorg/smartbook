@@ -1,224 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Student Details - ALIF EDU</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <title>Student Details</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
-      color: #333;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f9fc;
     }
 
-    header {
-      background-color: #001f3f;
-      color: #fff;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    header img {
-      height: 50px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-
-    .container {
-      padding: 2rem;
+    h2 {
+      text-align: center;
+      color: navy;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
+      margin-top: 20px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
     }
 
     th {
-      background-color: #ffc107;
-      color: #000;
-    }
-
-    button {
-      padding: 6px 12px;
-      background-color: #007bff;
+      background-color: #003366;
       color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
     }
 
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #001f3f;
-      color: #fff;
-      margin-top: 2rem;
-    }
-
-    .dashboard-btn {
-      margin-bottom: 1rem;
-      background-color: #28a745;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      max-width: 600px;
-      width: 100%;
-      position: relative;
-    }
-
-    .modal-header {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 20px;
-      cursor: pointer;
-      color: red;
-    }
-
-    .modal img {
-      height: 80px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-
-    .modal p {
-      margin: 5px 0;
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="1.png" alt="ALIF EDU Logo">
-    <h1>Student Details - ALIF EDU</h1>
-    <button class="dashboard-btn" onclick="window.history.back()">Dashboard</button>
-  </header>
 
-  <div class="container">
-    <table id="studentTable">
-      <thead>
-        <tr>
-          <th>Student Name</th>
-          <th>Class</th>
-          <th>Phone</th>
-          <th>Guardian</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <h2>Student Admission Details</h2>
 
-  <!-- Modal -->
-  <div class="modal" id="studentModal">
-    <div class="modal-content" id="modalContent">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <div id="studentDetails"></div>
-      <button onclick="downloadPDF()">Download PDF</button>
-    </div>
-  </div>
-
-  <footer>
-    <p>&copy; ALIF EDU | All rights reserved</p>
-  </footer>
+  <table id="studentTable">
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Full Name</th>
+        <th>Gender</th>
+        <th>Date of Birth</th>
+        <th>Phone</th>
+        <th>Guardian Name</th>
+        <th>Guardian Contact</th>
+        <th>Parent Email</th>
+        <th>Student Email</th>
+        <th>Class</th>
+        <th>Fee Plan</th>
+        <th>Subjects</th>
+        <th>Admission Date</th>
+        <th>Mode</th>
+        <th>Preferred Time</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-   fetch('https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec')  // Replace with the correct URL
-  .then(response => response.json())
-  .then(data => {
-    console.log("Fetched data:", data);  // Log the fetched data
-    const tbody = document.querySelector('#studentTable tbody');
-    if (data && Array.isArray(data)) {
-      data.forEach((row, index) => {
-        console.log("Row data:", row); // Log each row of data
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${row['Student Full Name']}</td>
-          <td>${row['Class Admitted To']}</td>
-          <td>${row['Phone Number (WhatsApp)']}</td>
-          <td>${row["Guardian’s Name"]}</td>
-          <td><button onclick='viewStudent(${JSON.stringify(row)})'>View</button></td>
-        `;
-        tbody.appendChild(tr);
+    fetch('https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec') // 🔁 Replace this with your actual web app URL
+      .then(response => response.json())
+      .then(data => {
+        const tbody = document.querySelector('#studentTable tbody');
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row['Student ID'] || ''}</td>
+            <td>${row['Student Full Name'] || ''}</td>
+            <td>${row['Gender'] || ''}</td>
+            <td>${row['Date of Birth'] || ''}</td>
+            <td>${row['Phone Number (WhatsApp)'] || ''}</td>
+            <td>${row["Guardian’s Name"] || ''}</td>
+            <td>${row['Guardian’s Contact Number'] || ''}</td>
+            <td>${row['Email ID(Parent)'] || ''}</td>
+            <td>${row['Email ID(Student)'] || ''}</td>
+            <td>${row['Class Admitted To'] || ''}</td>
+            <td>${row['Fee Plan'] || ''}</td>
+            <td>${row['Subjects Opted'] || ''}</td>
+            <td>${row['Admission Date'] || ''}</td>
+            <td>${row['Mode of Admission'] || ''}</td>
+            <td>${row['Preferred Class Timing'] || ''}</td>
+            <td>${row['Remarks'] || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
       });
-    } else {
-      console.error("Invalid data format:", data);  // Error logging
-    }
-  })
-  .catch(error => console.error("Error fetching data:", error));
-
-
-    function viewStudent(data) {
-      const modal = document.getElementById('studentModal');
-      const content = document.getElementById('studentDetails');
-
-      content.innerHTML = `
-        <p><strong>Student Name:</strong> ${data['Student Full Name']}</p>
-        <p><strong>Gender:</strong> ${data['Gender']}</p>
-        <p><strong>Date of Birth:</strong> ${data['Date of Birth']}</p>
-        <p><strong>Phone:</strong> ${data['Phone Number (WhatsApp)']}</p>
-        <p><strong>Guardian:</strong> ${data["Guardian’s Name"]} (${data["Guardian’s Contact Number"]})</p>
-        <p><strong>Email (Parent):</strong> ${data['Email ID(Parent)']}</p>
-        <p><strong>Email (Student):</strong> ${data['Email ID(Student)']}</p>
-        <p><strong>Class Admitted To:</strong> ${data['Class Admitted To']}</p>
-        <p><strong>Fee Plan:</strong> ${data['Fee Plan']}</p>
-        <p><strong>Subjects Opted:</strong> ${data['Subjects Opted']}</p>
-        <p><strong>Admission Date:</strong> ${data['Admission Date']}</p>
-        <p><strong>Emergency Contact:</strong> ${data['Emergency Contact']}</p>
-      `;
-      
-      modal.style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('studentModal').style.display = 'none';
-    }
-
-    function downloadPDF() {
-      const element = document.getElementById('studentDetails');
-      html2pdf().from(element).save();
-    }
   </script>
+
 </body>
 </html>
