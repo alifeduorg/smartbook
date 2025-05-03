@@ -165,7 +165,6 @@
           <th>Class</th>
           <th>Phone</th>
           <th>Guardian</th>
-          <th>Fee Plan</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -208,7 +207,6 @@
           <td>${student['Class Admitted To'] || ''}</td>
           <td>${student['Phone Number (WhatsApp)'] || ''}</td>
           <td>${student["Guardian’s Name"] || ''}</td>
-          <td>${student["Fee Plan"] || ''}</td>
           <td><button onclick="viewDetails(${index})">View</button></td>
         `;
         tbody.appendChild(tr);
