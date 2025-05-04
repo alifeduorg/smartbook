@@ -4,379 +4,245 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fee Billing Panel</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #ffffff;
-      color: #333;
       margin: 0;
       padding: 0;
     }
     header {
-      background-color: #003366;
+      background-color: #001f3f;
       color: #fff;
-      padding: 10px 0;
+      padding: 20px;
       text-align: center;
       font-size: 24px;
+      font-weight: bold;
     }
     .container {
-      width: 80%;
-      margin: 20px auto;
+      max-width: 900px;
+      margin: auto;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      background-color: #f9f9f9;
+      background: #f9f9f9;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 10px;
     }
     label {
-      display: block;
-      margin: 10px 0 5px;
       font-weight: bold;
+      margin-top: 10px;
+      display: block;
+      color: #001f3f;
     }
     input, select, textarea {
       width: 100%;
       padding: 8px;
-      margin-bottom: 15px;
-      border: 2px solid #003366;
-      border-radius: 5px;
+      margin: 6px 0 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
     button {
-      background-color: #003366;
+      background-color: goldenrod;
       color: white;
       padding: 10px 20px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
       margin-top: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    button:hover {
-      background-color: #005cbf;
-    }
-    .pdf-preview {
-      display: none;
-      padding: 20px;
-      background-color: #ffffff;
-      border: 2px solid #003366;
-      margin-top: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    .pdf-preview table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .pdf-preview table, .pdf-preview th, .pdf-preview td {
-      border: 1px solid #003366;
-    }
-    .pdf-preview th, .pdf-preview td {
-      padding: 10px;
-      text-align: left;
-    }
-    .pdf-preview th {
-      background-color: #003366;
-      color: white;
-    }
-    .logo {
-      max-width: 150px;
-      margin-bottom: 20px;
-    }
-
-    /* Popup Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-    .modal-content {
-      background-color: white;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 70%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-    .modal-header {
-      background-color: #003366;
-      color: white;
-      padding: 10px;
-      font-size: 24px;
-      text-align: center;
-      border-radius: 5px 5px 0 0;
-    }
-    .modal-body {
-      padding: 20px;
-    }
-    .modal-footer {
-      text-align: center;
-      padding: 10px;
-      background-color: #f1f1f1;
-      border-radius: 0 0 5px 5px;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
+      border: none;
+      border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
     }
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
+    button:hover {
+      background-color: #e0a800;
+    }
+    #pdfModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border: 3px solid goldenrod;
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+      z-index: 999;
+    }
+    #pdf-content table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #pdf-content td, #pdf-content th {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
     }
   </style>
 </head>
 <body>
-  <header>
-    Fee Billing Panel
-  </header>
 
-  <div class="container">
-    <form id="billing-form">
-      <label for="billDate">Bill Date</label>
-      <input type="date" id="billDate" readonly>
+<header>ALIF EDU Fee Billing Panel</header>
+<div style="text-align: right; padding: 10px 20px;">
+  <button onclick="window.location.href='dashboard.html'">⬅ Go to Dashboard</button>
+</div>
 
-      <label for="receiptNo">Receipt Number</label>
-      <input type="text" id="receiptNo" readonly>
+<div class="container">
+  <form id="billing-form">
+    <label>Bill Date</label>
+    <input type="date" id="billDate" readonly>
 
-      <label for="class">Class</label>
-      <select id="class" onchange="filterStudents()" required>
-        <option value="">Select Class</option>
-        <!-- Classes will be populated here dynamically -->
-      </select>
+    <label>Receipt Number</label>
+    <input type="text" id="receiptNo" readonly>
 
-      <label for="studentId">Student ID</label>
-      <select id="studentId" onchange="fillStudentName()" required>
-        <option value="">Select Student ID</option>
-        <!-- Student IDs will be populated here dynamically -->
-      </select>
+    <label>Class</label>
+    <select id="class" onchange="filterStudents()"></select>
 
-      <label for="studentName">Student Name</label>
-      <input type="text" id="studentName" readonly>
+    <label>Student ID</label>
+    <select id="studentId" onchange="fillStudentName()"></select>
 
-      <label for="totalFee">Total Fee</label>
-      <input type="number" id="totalFee" required oninput="calculateBalance()">
+    <label>Student Name</label>
+    <input type="text" id="studentName" readonly>
 
-      <label for="paidAmount">Paid Amount</label>
-      <input type="number" id="paidAmount" required oninput="calculateBalance()">
+    <label>Fee Plan</label>
+    <input type="text" id="feePlan">
 
-      <label for="balance">Balance</label>
-      <input type="number" id="balance" readonly>
+    <label>Class Start Date</label>
+    <input type="date" id="startDate">
 
-      <label for="paymentMode">Payment Mode</label>
-      <select id="paymentMode">
-        <option value="Cash">Cash</option>
-        <option value="UPI">UPI</option>
-        <option value="Card">Card</option>
-      </select>
+    <label>Days Purchased</label>
+    <input type="number" id="daysPurchased">
 
-      <label for="remarks">Remarks</label>
-      <textarea id="remarks"></textarea>
+    <label>Total Fee</label>
+    <input type="number" id="totalFee" oninput="calculateBalance()">
 
-      <button type="button" onclick="saveToSheet()">Save</button>
-      <button type="button" onclick="showModal()">Generate PDF</button>
-    </form>
+    <label>Paid Amount</label>
+    <input type="number" id="paidAmount" oninput="calculateBalance()">
+
+    <label>Balance</label>
+    <input type="number" id="balance" readonly>
+
+    <label>Payment Mode</label>
+    <select id="paymentMode">
+      <option value="Cash">Cash</option>
+      <option value="UPI">UPI</option>
+      <option value="Card">Card</option>
+    </select>
+
+    <label>Remarks</label>
+    <textarea id="remarks"></textarea>
+
+    <label>Payment Status</label>
+    <select id="paymentStatus">
+      <option value="Paid">Paid</option>
+      <option value="Partially Paid">Partially Paid</option>
+      <option value="Pending">Pending</option>
+    </select>
+
+    <button type="button" onclick="saveToSheet()">💾 Save</button>
+    <button type="button" onclick="showModal()">📄 Preview Bill</button>
+  </form>
+</div>
+
+<!-- Modal Preview -->
+<div id="pdfModal">
+  <h3 style="text-align:center;color:#001f3f;">FEE RECEIPT</h3>
+  <table id="pdf-content"></table>
+  <div style="text-align:center;margin-top:20px;">
+    <button onclick="generatePDF()">⬇ Download PDF</button>
+    <button onclick="closeModal()">❌ Close</button>
   </div>
+</div>
 
-  <!-- Modal for PDF Preview -->
-  <div id="pdfModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Fee Receipt Preview</h2>
-      </div>
-      <div class="modal-body">
-        <div id="pdf-preview">
-          <div class="logo">
-            <img src="1.png" alt="Logo">
-          </div>
-          <table id="pdf-content">
-            <!-- PDF content will be dynamically filled here -->
-          </table>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button onclick="generatePDF()">Download PDF</button>
-      </div>
-    </div>
-  </div>
+<script>
+  let studentData = {};
+  document.getElementById('billDate').valueAsDate = new Date();
 
-  <script>
-    // Fetching receipt number and populating class data
-    document.getElementById('billDate').valueAsDate = new Date();
-    let studentData = {};
-    let classData = [];
+  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getReceiptNo")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('receiptNo').value = data.receiptNo;
+    });
 
-    // Fetch Receipt Number
-    fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getReceiptNo")
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('receiptNo').value = data.receiptNo;
-      })
-      .catch(error => console.error("Error fetching receipt number:", error));
+  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getStudentData")
+    .then(res => res.json())
+    .then(data => {
+      studentData = data;
+      const classSelect = document.getElementById('class');
+      classSelect.innerHTML = '<option value="">Select Class</option>';
+      Object.keys(studentData).forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.textContent = cls;
+        classSelect.appendChild(option);
+      });
+    });
 
-    // Fetch Class and Student Data
-    fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getStudentData")
-      .then(res => res.json())
-      .then(data => {
-        studentData = data;
-        classData = Object.keys(data);
-        
-        // Populating the Class Dropdown
-        const classSelect = document.getElementById('class');
-        classData.forEach(className => {
-          const option = document.createElement('option');
-          option.value = className;
-          option.textContent = className;
-          classSelect.appendChild(option);
-        });
-      })
-      .catch(error => console.error("Error fetching class/student data:", error));
+  function filterStudents() {
+    const classVal = document.getElementById('class').value;
+    const studentSelect = document.getElementById('studentId');
+    studentSelect.innerHTML = '<option value="">Select Student ID</option>';
 
-    function filterStudents() {
-      const classVal = document.getElementById('class').value;
-      const studentSelect = document.getElementById('studentId');
-      studentSelect.innerHTML = '<option value="">Select Student ID</option>';
-      
-      if (classVal && studentData[classVal]) {
-        studentData[classVal].forEach(student => {
-          const option = document.createElement('option');
-          option.value = student.id;
-          option.textContent = student.id;
-          studentSelect.appendChild(option);
-        });
-      }
-    }
-
-    function fillStudentName() {
-      const classVal = document.getElementById('class').value;
-      const studentId = document.getElementById('studentId').value;
-      
-      if (classVal && studentId && studentData[classVal]) {
-        const student = studentData[classVal].find(s => s.id === studentId);
-        document.getElementById('studentName').value = student ? student.name : '';
-      }
-    }
-
-    function calculateBalance() {
-      const totalFee = parseFloat(document.getElementById('totalFee').value) || 0;
-      const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
-      document.getElementById('balance').value = totalFee - paidAmount;
-    }
-
-    function saveToSheet() {
-      const billData = {
-        billDate: document.getElementById('billDate').value,
-        receiptNo: document.getElementById('receiptNo').value,
-        class: document.getElementById('class').value,
-        studentId: document.getElementById('studentId').value,
-        studentName: document.getElementById('studentName').value,
-        totalFee: document.getElementById('totalFee').value,
-        paidAmount: document.getElementById('paidAmount').value,
-        balance: document.getElementById('balance').value,
-        paymentMode: document.getElementById('paymentMode').value,
-        remarks: document.getElementById('remarks').value
-      };
-
-      console.log("Saving data:", billData);
-
-      fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=saveBillData", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(billData)
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log("Data saved:", data);
-        })
-        .catch(error => console.error("Error saving data:", error));
-    }
-
-    function showModal() {
-      const pdfPreview = document.getElementById('pdf-preview');
-      const pdfContent = document.getElementById('pdf-content');
-      
-      const billData = {
-        billDate: document.getElementById('billDate').value,
-        receiptNo: document.getElementById('receiptNo').value,
-        class: document.getElementById('class').value,
-        studentId: document.getElementById('studentId').value,
-        studentName: document.getElementById('studentName').value,
-        totalFee: document.getElementById('totalFee').value,
-        paidAmount: document.getElementById('paidAmount').value,
-        balance: document.getElementById('balance').value,
-        paymentMode: document.getElementById('paymentMode').value,
-        remarks: document.getElementById('remarks').value
-      };
-
-      pdfContent.innerHTML = `
-        <tr>
-          <th>Bill Date</th>
-          <td>${billData.billDate}</td>
-        </tr>
-        <tr>
-          <th>Receipt Number</th>
-          <td>${billData.receiptNo}</td>
-        </tr>
-        <tr>
-          <th>Class</th>
-          <td>${billData.class}</td>
-        </tr>
-        <tr>
-          <th>Student ID</th>
-          <td>${billData.studentId}</td>
-        </tr>
-        <tr>
-          <th>Student Name</th>
-          <td>${billData.studentName}</td>
-        </tr>
-        <tr>
-          <th>Total Fee</th>
-          <td>${billData.totalFee}</td>
-        </tr>
-        <tr>
-          <th>Paid Amount</th>
-          <td>${billData.paidAmount}</td>
-        </tr>
-        <tr>
-          <th>Balance</th>
-          <td>${billData.balance}</td>
-        </tr>
-        <tr>
-          <th>Payment Mode</th>
-          <td>${billData.paymentMode}</td>
-        </tr>
-        <tr>
-          <th>Remarks</th>
-          <td>${billData.remarks}</td>
-        </tr>
-      `;
-      
-      pdfPreview.style.display = 'block';
-      document.getElementById('pdfModal').style.display = 'block';
-    }
-
-    function closeModal() {
-      document.getElementById('pdfModal').style.display = 'none';
-    }
-
-    function generatePDF() {
-      const doc = new jsPDF();
-      doc.html(document.getElementById('pdf-content'), {
-        callback: function (doc) {
-          doc.save('fee-receipt.pdf');
-        }
+    if (classVal && studentData[classVal]) {
+      studentData[classVal].forEach(student => {
+        const option = document.createElement('option');
+        option.value = student.id;
+        option.textContent = student.id;
+        studentSelect.appendChild(option);
       });
     }
-  </script>
+  }
+
+  function fillStudentName() {
+    const classVal = document.getElementById('class').value;
+    const studentId = document.getElementById('studentId').value;
+
+    if (classVal && studentId && studentData[classVal]) {
+      const student = studentData[classVal].find(s => s.id === studentId);
+      document.getElementById('studentName').value = student ? student.name : '';
+    }
+  }
+
+  function calculateBalance() {
+    const total = parseFloat(document.getElementById('totalFee').value) || 0;
+    const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+    document.getElementById('balance').value = (total - paid).toFixed(2);
+  }
+
+  function saveToSheet() {
+    const formData = new FormData(document.getElementById('billing-form'));
+    const obj = {};
+    formData.forEach((val, key) => obj[key] = val);
+
+    fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=saveBillData", {
+      method: "POST",
+      body: JSON.stringify(obj),
+      headers: { "Content-Type": "application/json" }
+    }).then(res => alert("Saved Successfully")).catch(err => alert("Error saving: " + err));
+  }
+
+  function showModal() {
+    const content = document.getElementById('pdf-content');
+    const data = [...new FormData(document.getElementById('billing-form')).entries()];
+    let html = '';
+    data.forEach(([key, val]) => {
+      html += `<tr><th>${key.replace(/([A-Z])/g, ' $1')}</th><td>${val}</td></tr>`;
+    });
+    content.innerHTML = html;
+    document.getElementById('pdfModal').style.display = 'block';
+  }
+
+  function closeModal() {
+    document.getElementById('pdfModal').style.display = 'none';
+  }
+
+  function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.html(document.getElementById('pdfModal'), {
+      callback: function (doc) {
+        doc.save('fee-receipt.pdf');
+      },
+      x: 10,
+      y: 10
+    });
+  }
+</script>
 </body>
 </html>
