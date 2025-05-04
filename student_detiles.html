@@ -271,7 +271,7 @@
     <div class="section-title">Family Details</div>
     <div class="info-grid">
       <div><span class="info-label">Father Name:</span> <span id="fatherName"></span></div>
-      <div><span class="info-label">Phone:</span> <span id="studentPhone"></span></div>
+      <div><span class="info-label">Phone:</span> <span id="Guardian’sContactNumber"></span></div>
     </div>
     <div class="info-grid">
       <div><span class="info-label">Mother Name:</span> <span id="motherName"></span></div>
@@ -341,6 +341,7 @@
   document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
   document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
   document.getElementById("fatherName").innerText = student["Father Name"] || "-";
+ document.getElementById("Guardian’sContactNumber").innerText = student["  Guardian’s Contact Number  "] || "-";
   document.getElementById("motherName").innerText = student["Mother Name"] || "-";
   document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
   document.getElementById("studentAddress").innerText = student["Address"] || "-";
