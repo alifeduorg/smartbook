@@ -86,7 +86,7 @@
       background-color: #28a745;
     }
 
- .modal {
+   .modal {
       display: none;
       position: fixed;
       z-index: 999;
@@ -94,18 +94,23 @@
       top: 0;
       width: 100%;
       height: 100%;
+      overflow: auto;
       background-color: rgba(0, 0, 0, 0.7);
       justify-content: center;
       align-items: center;
+      padding: 20px;
     }
 
     .modal-content {
       background: #fff;
       padding: 30px;
-      width: 80%;
-      max-width: 900px;
+      width: 90%;
+      max-width: 850px;
       border-radius: 12px;
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
 
     .close-btn {
@@ -121,28 +126,41 @@
       margin: auto;
       max-width: 100%;
       height: auto;
+      margin-bottom: 20px;
     }
 
     .admission-number-box {
       font-weight: bold;
-      margin-top: 20px;
+      margin-bottom: 20px;
     }
 
     .boxes {
       display: flex;
-      gap: 5px;
-      margin-top: 8px;
+      gap: 6px;
+      margin-top: 6px;
     }
 
     .boxes div {
-      width: 30px;
-      height: 35px;
+      width: 35px;
+      height: 40px;
       border: 2px solid #333;
       text-align: center;
-      line-height: 35px;
+      line-height: 40px;
       font-weight: bold;
       font-size: 16px;
       background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .photo-box {
+      border: 2px dashed #ccc;
+      width: 120px;
+      height: 140px;
+      text-align: center;
+      line-height: 140px;
+      margin-left: auto;
+      font-size: 12px;
+      color: #555;
     }
 
     .section-title {
@@ -150,25 +168,34 @@
       color: white;
       padding: 8px 12px;
       border-radius: 20px;
-      margin-top: 30px;
-      margin-bottom: 10px;
       font-weight: bold;
+      text-align: center;
+      margin-top: 30px;
+      margin-bottom: 20px;
     }
 
-    .info-row {
+    .info-grid {
+      display: flex;
+      gap: 20px;
       margin-bottom: 12px;
     }
 
-    .photo-box {
-      border: 1px solid #ccc;
-      width: 120px;
-      height: 140px;
-      margin-left: auto;
-      margin-bottom: 10px;
+    .info-grid div {
+      flex: 1;
+    }
+
+    .info-label {
+      font-weight: bold;
+    }
+
+    .footer-sign {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
     }
 
     .print-btn {
-      margin-top: 20px;
+      margin-top: 30px;
       padding: 10px 20px;
       background-color: #007bff;
       color: white;
@@ -210,29 +237,44 @@
 <div id="detailModal" class="modal">
   <div class="modal-content" id="modalContent">
     <span class="close-btn" onclick="closeModal()">&times;</span>
+
     <img class="header-img" src="your-header.png" alt="Header" />
 
-    <div class="admission-number-box">
-      <label>Admission Number:</label>
-      <div class="boxes" id="admissionNumberBoxes"></div>
+    <div class="info-grid">
+      <div>
+        <label class="info-label">Admission Number:</label>
+        <div class="boxes" id="admissionNumberBoxes"></div>
+      </div>
+      <div class="photo-box">Paste Photo<br>Here</div>
     </div>
 
-    <div class="photo-box">Paste Photo Here</div>
-
     <div class="section-title">Personal Details</div>
-    <div class="info-row"><strong>Name:</strong> <span id="studentName"></span></div>
-    <div class="info-row"><strong>DOB:</strong> <span id="studentDOB"></span></div>
-    <div class="info-row"><strong>Class:</strong> <span id="studentClass"></span></div>
-    <div class="info-row"><strong>Phone:</strong> <span id="studentPhone"></span></div>
-    <div class="info-row"><strong>Email:</strong> <span id="studentEmail"></span></div>
+    <div class="info-grid">
+      <div><span class="info-label">Name:</span> <span id="studentName"></span></div>
+      <div><span class="info-label">DOB:</span> <span id="studentDOB"></span></div>
+    </div>
+    <div class="info-grid">
+      <div><span class="info-label">Class:</span> <span id="studentClass"></span></div>
+      <div><span class="info-label">Phone:</span> <span id="studentPhone"></span></div>
+    </div>
+    <div class="info-grid">
+      <div><span class="info-label">Email:</span> <span id="studentEmail"></span></div>
+    </div>
 
     <div class="section-title">Family Details</div>
-    <div class="info-row"><strong>Father's Name:</strong> <span id="fatherName"></span></div>
-    <div class="info-row"><strong>Mother's Name:</strong> <span id="motherName"></span></div>
-    <div class="info-row"><strong>Parent Email:</strong> <span id="parentEmail"></span></div>
-    <div class="info-row"><strong>Address:</strong> <span id="studentAddress"></span></div>
+    <div class="info-grid">
+      <div><span class="info-label">Father Name:</span> <span id="fatherName"></span></div>
+      <div><span class="info-label">Phone:</span> <span id="studentPhone"></span></div>
+    </div>
+    <div class="info-grid">
+      <div><span class="info-label">Mother Name:</span> <span id="motherName"></span></div>
+      <div><span class="info-label">Email:</span> <span id="parentEmail"></span></div>
+    </div>
+    <div class="info-grid">
+      <div style="flex: 100%;"><span class="info-label">Address:</span> <span id="studentAddress"></span></div>
+    </div>
 
-    <div style="margin-top: 30px; display: flex; justify-content: space-between;">
+    <div class="footer-sign">
       <div><strong>Seal</strong></div>
       <div><strong>Principal</strong></div>
     </div>
@@ -291,10 +333,6 @@
       box.textContent = char;
       container.appendChild(box);
     });
-  }
-
-  function closeModal() {
-    document.getElementById("detailModal").style.display = "none";
   }
 
   function downloadPDF() {
