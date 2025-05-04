@@ -248,12 +248,12 @@
           data.forEach((student, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-              <td>${student['Admission Date'] || ''}</td>
+              <td>${student['Admission Date '] || ''}</td>
               <td>${student['Student ID'] || ''}</td>
-              <td>${student['Student Full Name'] || ''}</td>
-              <td>${student['Class Admitted To'] || ''}</td>
-              <td>${student['Phone Number (WhatsApp)'] || ''}</td>
-              <td>${student["Guardian’s Name"] || ''}</td>
+              <td>${student['Student Full Name '] || ''}</td>
+              <td>${student['  Class Admitted To  '] || ''}</td>
+              <td>${student['  Phone Number (WhatsApp)  '] || ''}</td>
+              <td>${student["  Guardian’s Name  "] || ''}</td>
               <td><button onclick="viewDetails(${index})">View</button></td>
             `;
             tbody.appendChild(tr);
