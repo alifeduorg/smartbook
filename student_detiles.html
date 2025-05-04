@@ -86,104 +86,102 @@
       background-color: #28a745;
     }
 
-/* Main Modal for A4 page */
-.modal-content {
-  background: #fff;
-  padding: 1.5cm;
-  width: 21cm;
-  height: 29.7cm;
-  box-sizing: border-box;
-  border: 2px solid #003366;
-  font-family: 'Segoe UI', sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  position: relative;
-}
+body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
 
-/* Header */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.header h2 {
-  font-size: 24px;
-  color: #003366;
-}
+    .admission-form {
+      background: white;
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
 
-/* Digit box (for date/admission no) */
-.digit-cell-group {
-  display: flex;
-  gap: 4px;
-}
-.digit-cell {
-  width: 20px;
-  height: 28px;
-  border: 1px solid #666;
-  box-shadow: inset 1px 1px 2px #aaa;
-  text-align: center;
-  font-size: 16px;
-  line-height: 28px;
-  font-weight: bold;
-}
+    .header-img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
 
-/* Section Title */
-.section-title {
-  font-size: 18px;
-  color: #003366;
-  margin-top: 15px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #003366;
-}
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
 
-/* Info Row */
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
+    .photo-box {
+      width: 150px;
+      height: 180px;
+      border: 2px solid #333;
+      text-align: center;
+      padding: 5px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-/* Signature Area */
-.signature-box {
-  margin-top: 40px;
-  text-align: right;
-}
-.signature-line {
-  border-top: 1px solid #003366;
-  width: 250px;
-  text-align: center;
-  margin-left: auto;
-  padding-top: 5px;
-  font-size: 14px;
-}
-    .digit-cell-group {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  margin-top: 5px;
-}
+    .section-title {
+      background-color: navy;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-top: 25px;
+      font-weight: bold;
+    }
 
-.digit-cell {
-  width: 18px;
-  height: 22px;
-  border: 1px solid #003366;
-  border-radius: 5px;
-  background: linear-gradient(145deg, #ffffff, #e6e6e6);
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  line-height: 22px;
-  font-weight: bold;
-  font-size: 12px;
-}
-#detailModal {
-  animation: fadeIn 0.3s ease-in-out;
-}
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+    .form-group {
+      flex: 1 1 45%;
+      margin: 10px 2.5%;
+    }
 
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .signature-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 60px;
+      padding: 0 20px;
+    }
+
+    .signature-box {
+      text-align: center;
+    }
+
+    .download-btn {
+      margin-top: 30px;
+      display: block;
+      text-align: center;
+    }
+
+    .download-btn button {
+      background-color: navy;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    @media print {
+      .download-btn { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -215,22 +213,72 @@
     © 2025 Alif Edu. All rights reserved.
   </footer>
 
-<!-- Modal -->
-<div id="detailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 10000;">
-  <div id="modalContent" style="background: #fff; padding: 25px; border-radius: 15px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);">
+<div class="admission-form" id="formContent">
 
-    <span onclick="closeModal()" style="position: absolute; top: 10px; right: 20px; font-size: 26px; font-weight: bold; cursor: pointer; color: #dc3545;">&times;</span>
+  <img src="header.png" class="header-img" alt="Header">
 
-    <!-- Only this part is printed -->
-    <div id="pdfContent">
-      <div id="modalBody"></div>
+  <div class="top-row">
+    <div>
+      <strong>Admission Number:</strong> <span id="admissionNo">----</span>
     </div>
-
-    <!-- Working download button -->
-   <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
-
-
+    <div class="photo-box">
+      Photo Paste Here
+    </div>
   </div>
+
+  <div class="section-title">Personal Details</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Full Name:</label>
+      <div id="studentName">----</div>
+    </div>
+    <div class="form-group">
+      <label>Date of Birth:</label>
+      <div id="dob">----</div>
+    </div>
+    <div class="form-group">
+      <label>Class Admitted To:</label>
+      <div id="classAdmitted">----</div>
+    </div>
+    <div class="form-group">
+      <label>Phone (WhatsApp):</label>
+      <div id="phone">----</div>
+    </div>
+    <div class="form-group">
+      <label>Email:</label>
+      <div id="email">----</div>
+    </div>
+  </div>
+
+  <div class="section-title">Family Details</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Father's Name:</label>
+      <div id="fatherName">----</div>
+    </div>
+    <div class="form-group">
+      <label>Mother's Name:</label>
+      <div id="motherName">----</div>
+    </div>
+    <div class="form-group">
+      <label>Parent Email:</label>
+      <div id="parentEmail">----</div>
+    </div>
+    <div class="form-group" style="flex: 1 1 95%;">
+      <label>Address:</label>
+      <div id="address">----</div>
+    </div>
+  </div>
+
+  <div class="signature-row">
+    <div class="signature-box"><strong>Seal</strong></div>
+    <div class="signature-box"><strong>Principal</strong></div>
+  </div>
+
+  <div class="download-btn">
+    <button onclick="downloadPDF()">Download PDF</button>
+  </div>
+
 </div>
 
 <script>
@@ -261,57 +309,42 @@
         }, 100);
       });
   
-  function viewDetails(index) {
-  const student = studentData[index];
-  const modalBody = document.getElementById('modalBody');
-  modalBody.innerHTML = ''; // Clear previous
+ const student = {
+    "Student Full Name": "Amina Rahman",
+    "Date of Birth": "2012-06-15",
+    "Class Admitted To": "Grade 6",
+    "Phone Number (WhatsApp)": "9876543210",
+    "Email ID": "amina@example.com",
+    "Father's Name": "Rahman M",
+    "Mother's Name": "Sabina K",
+    "Parent Email": "rahman.family@example.com",
+    "Address": "123, Green Street, Kochi, Kerala",
+    "Student ID": "ALIF2025-032"
+  };
 
-  modalBody.innerHTML = `
-      <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" style="height: 200px; display: block; margin: auto;" />
-      <h2 style="text-align: center;">Student Admission Form</h2>
-      <p style="text-align: center; font-weight: bold; color: #dc3545;">Academic Year 2025-26</p>
+  // Fill student data into the form
+  document.getElementById("studentName").innerText = student["Student Full Name"];
+  document.getElementById("dob").innerText = student["Date of Birth"];
+  document.getElementById("classAdmitted").innerText = student["Class Admitted To"];
+  document.getElementById("phone").innerText = student["Phone Number (WhatsApp)"];
+  document.getElementById("email").innerText = student["Email ID"];
+  document.getElementById("fatherName").innerText = student["Father's Name"];
+  document.getElementById("motherName").innerText = student["Mother's Name"];
+  document.getElementById("parentEmail").innerText = student["Parent Email"];
+  document.getElementById("address").innerText = student["Address"];
+  document.getElementById("admissionNo").innerText = student["Student ID"];
 
-      <h3 style="text-align: center; margin-bottom: 10px;">Personal Details</h3>
-      <p><strong>Full Name:</strong> ${student["Student Full Name "] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
-         <strong>Class Admitted To:</strong> ${student["  Class Admitted To  "] || '-'}</p>
-      <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
-         <strong>Phone (WhatsApp):</strong> ${student["  Phone Number (WhatsApp)  "] || '-'}</p>
-      <p><strong>Email:</strong> ${student["  Email ID(Student)  "] || '-'}</p>
-
-      <h3 style="text-align: center; margin-bottom: 10px;">Family Details</h3>
-      <p><strong>Father's Name:</strong> ${student["Father Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
-         <strong>Mother's Name:</strong> ${student["Mother Name"] || '-'}</p>
-      <p><strong>Parent Email:</strong> ${student["  Email ID(Parent)  "] || '-'}</p>
-      <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
-
-      <div style="border: 2px solid #ccc; border-radius: 15px; padding: 15px; margin: 15px 0;">
-        <h3 style="text-align: center; margin-bottom: 10px;">Office Details</h3>
-        <p><strong>Admission Date:</strong> ${student["Admission Date "] || '-'} &nbsp;&nbsp;&nbsp;&nbsp;
-           <strong>Admission No:</strong> ${student["Student ID"] || '-'}</p>
-        <br/><br/>
-        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-          <div><strong>Seal</strong></div>
-          <div><strong>Principal</strong></div>
-        </div>
-      </div>
-  `;
-
-  // Show the modal
-  document.getElementById('detailModal').style.display = 'flex';
-}
-
-  
-    function closeModal() {
-      document.getElementById('detailModal').style.display = 'none';
-    }
-  
- function downloadPDF() {
-  const element = document.getElementById('pdfContent');
-  if (!element) {
-    alert("PDF content not found!");
-    return;
+  // PDF Download Function
+  function downloadPDF() {
+    const element = document.getElementById('formContent');
+    html2pdf().from(element).set({
+      margin: 1,
+      filename: `${student["Student Full Name"]}_Admission_Form.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    }).save();
   }
-
   const opt = {
     margin: 1,
     filename: 'admission_form.pdf',
