@@ -300,68 +300,68 @@
   </div>
 </div>
 <script>
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
+   <script>
+  const webAppUrl = 'https://script.google.com/macros/library/d/1_eiiiv0R8xnzUgeVuIYu3BWwM_KNLF37jcuHSAsHFT0FC29vIl0qzhhF/49';
   
-    let studentData = [];
+  let teacherData = []; // Change variable name from studentData to teacherData
   
-    fetch(webAppUrl)
-      .then(res => res.json())
-      .then(data => {
-        studentData = data;
-        const tbody = document.querySelector('#studentTable tbody');
+  fetch(webAppUrl)
+    .then(res => res.json())
+    .then(data => {
+      teacherData = data;
+      const tbody = document.querySelector('#teacherTable tbody');
   
-        setTimeout(() => {
-          data.forEach((student, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${teacher['Joining Date '] || ''}</td>
-              <td>${teacher['staff ID'] || ''}</td>
-              <td>${teacher['Full Name  '] || ''}</td>
-              <td>${teacher['Assigned Classes'] || ''}</td>
-              <td>${teacher['Phone'] || ''}</td>
-              <td>${teacher["Email ID"] || ''}</td>
-              <td><button onclick="viewDetails(${index})">View</button></td>
-            `;
-            tbody.appendChild(tr);
-          });
-        }, 100);
-      });
- function viewDetails(index) {
-  const student = studentData[index];
+      setTimeout(() => {
+        data.forEach((teacher, index) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${teacher['Joining Date'] || ''}</td>
+            <td>${teacher['Staff ID'] || ''}</td>
+            <td>${teacher['Full Name'] || ''}</td>
+            <td>${teacher['Assigned Classes'] || ''}</td>
+            <td>${teacher['Phone Number'] || ''}</td>
+            <td>${teacher['Email ID'] || ''}</td>
+            <td><button onclick="viewDetails(${index})">View</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }, 100);
+    });
 
-  // Display modal
-  document.getElementById("detailModal").style.display = "flex";
+  function viewDetails(index) {
+    const teacher = teacherData[index]; // Change variable name from student to teacher
 
-  // Fill data safely
-  document.getElementById("teacherName").innerText = student["Name"] || "-";
-  document.getElementById("teacherDOB").innerText = student["DOB"] || "-";
-  document.getElementById("teachergender").innerText = student["Gender"] || "-";
-  document.getElementById("teacheremail").innerText = student["Email"] || "-";
-  document.getElementById("teacherPhone").innerText = student["Phone"] || "-";
-   document.getElementById("Religion").innerText = student["Religion"] || "-";
-  document.getElementById("Address").innerText = student["Address"] || "-";
- document.getElementById("SubjectsCanTeach").innerText = student["  Subjects Can Teach  "] || "-";
-  document.getElementById("ClassesCanTeach").innerText = student["  Classes  Can Teach  "] || "-";
-  document.getElementById("PreferredTimeSlots").innerText = student["  Preferred Time Slots  ] || "-";
-document.getElementById("Experience").innerText = student["Experience"] || "-";
-  document.getElementById("Qualification").innerText = student["Qualification "] || "-";
-   document.getElementById("EmploymentType").innerText = student["  Employment Type  "] || "-";
-document.getElementById("SalaryPlan").innerText = student["  Salary Plan  "] || "-";
-document.getElementById("JoiningDate").innerText = student["Joining Date"] || "-";
-document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
+    // Display modal
+    document.getElementById("detailModal").style.display = "flex";
 
+    // Fill data safely
+    document.getElementById("teacherName").innerText = teacher["Full Name"] || "-";
+    document.getElementById("teacherDOB").innerText = teacher["Date of Birth"] || "-";
+    document.getElementById("teacherGender").innerText = teacher["Gender"] || "-";
+    document.getElementById("teacherEmail").innerText = teacher["Email ID"] || "-";
+    document.getElementById("teacherPhone").innerText = teacher["Phone Number"] || "-";
+    document.getElementById("teacherReligion").innerText = teacher["Religion"] || "-";
+    document.getElementById("teacherAddress").innerText = teacher["Address"] || "-";
+    document.getElementById("teacherSubjectsCanTeach").innerText = teacher["Subjects You Can Teach"] || "-";
+    document.getElementById("teacherClassesCanTeach").innerText = teacher["Classes You Can Teach"] || "-";
+    document.getElementById("teacherPreferredTimeSlots").innerText = teacher["Preferred Time Slots"] || "-";
+    document.getElementById("teacherExperience").innerText = teacher["Experience (in years)"] || "-";
+    document.getElementById("teacherQualification").innerText = teacher["Qualification"] || "-";
+    document.getElementById("teacherEmploymentType").innerText = teacher["Employment Type"] || "-";
+    document.getElementById("teacherSalaryPlan").innerText = teacher["Salary Plan"] || "-";
+    document.getElementById("teacherJoiningDate").innerText = teacher["Joining Date"] || "-";
+    document.getElementById("teacherRemarks").innerText = teacher["Remarks"] || "-";
 
-  // Fill admission number box visually
-  const admissionNumber = student["Student ID"] || "";
-  const boxesContainer = document.getElementById("admissionNumberBoxes");
-  boxesContainer.innerHTML = "";
-  for (let char of admissionNumber) {
-    const div = document.createElement("div");
-    div.innerText = char;
-    boxesContainer.appendChild(div);
+    // Fill teacher ID box visually
+    const teacherID = teacher["Staff ID"] || "";
+    const boxesContainer = document.getElementById("teacherIDBoxes");
+    boxesContainer.innerHTML = "";
+    for (let char of teacherID) {
+      const div = document.createElement("div");
+      div.innerText = char;
+      boxesContainer.appendChild(div);
+    }
   }
-}
-
   function closeModal() {
     document.getElementById("detailModal").style.display = "none";
   }
@@ -385,9 +385,9 @@ function downloadPDF() {
   };
   html2pdf().set(opt).from(element).save();
 }
-    function goToDashboard() {
-      window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
-    }
+   function goToDashboard() {
+  window.history.back();  // Takes the user to the previous page
+}
   </script>
     <script>
     function printPage() {
