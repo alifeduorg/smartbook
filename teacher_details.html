@@ -291,6 +291,7 @@
 <div class="info-grid">
   <div><span class="info-label">Joining Date:</span> <span id="JoiningDate"></span></div>
 <div><span class="info-label">Remarks:</span> <span id="admissionRemarks"></span></div>
+    </div>
       <div><strong>Seal</strong></div>
       <div><strong>Principal</strong></div>
     </div>
@@ -348,7 +349,7 @@ document.getElementById("JoiningDate").innerText = student["Joining Date"] || "-
 document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
   // Fill admission number box visually
   const admissionNumber = student["Staff id"] || "";
-  const boxesContainer = document.getElementById("admissionNumberBoxes");
+  const boxesContainer = document.getElementById("StaffIDBoxes");
   boxesContainer.innerHTML = "";
   for (let char of admissionNumber) {
     const div = document.createElement("div");
