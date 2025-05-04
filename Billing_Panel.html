@@ -169,12 +169,20 @@
 
 <script>
   document.getElementById('billDate').valueAsDate = new Date();
-  document.getElementById('receiptNo').value = 'REC-' + Date.now().toString().slice(-5);
+  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('receiptNo').value = data.receiptNo;
+  });
 
-  const studentData = {
-    'Class A': [{ id: 'A001', name: 'Ali Khan' }, { id: 'A002', name: 'Fatima Noor' }],
-    'Class B': [{ id: 'B001', name: 'Omar Aziz' }, { id: 'B002', name: 'Zara Sheikh' }]
-  };
+ let studentData = {};
+
+fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec")
+  .then(res => res.json())
+  .then(data => {
+    studentData = data;
+  });
+
 
   function filterStudents() {
     const classVal = document.getElementById('class').value;
@@ -226,7 +234,7 @@
     formData.forEach((val, key) => obj[key] = val);
 
     // Example: Send to Google Apps Script via fetch (fill in your script URL)
-    fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", {
+    fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
       method: "POST",
       body: JSON.stringify(obj),
       headers: { "Content-Type": "application/json" }
