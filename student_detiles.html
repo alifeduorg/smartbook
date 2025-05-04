@@ -267,7 +267,9 @@
     <div class="info-grid">
       <div><span class="info-label">Email:</span> <span id="studentEmail"></span></div>
     </div>
-
+<div class="info-grid">
+      <div><span class="info-label">Religion:</span> <span id="Religion"></span></div>
+    </div>
     <div class="section-title">Family Details</div>
     <div class="info-grid">
       <div><span class="info-label">Father Name:</span> <span id="fatherName"></span></div>
@@ -276,6 +278,7 @@
     <div class="info-grid">
       <div><span class="info-label">Mother Name:</span> <span id="motherName"></span></div>
       <div><span class="info-label">Email:</span> <span id="parentEmail"></span></div>
+        <div><span class="info-label">Guardian’sOccupation</span> <span id="Guardian’s  Occupation "></span></div>
     </div>
     <div class="info-grid">
       <div style="flex: 100%;"><span class="info-label">Address:</span> <span id="studentAddress"></span></div>
@@ -340,10 +343,12 @@
   document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
   document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
   document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
+   document.getElementById("Religion").innerText = student["Religion"] || "-";
   document.getElementById("fatherName").innerText = student["Father Name"] || "-";
  document.getElementById("Guardian’sContactNumber").innerText = student["  Guardian’s Contact Number  "] || "-";
   document.getElementById("motherName").innerText = student["Mother Name"] || "-";
   document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
+document.getElementById("Guardian’sOccupation").innerText = student["Guardian’s  Occupation "] || "-";
   document.getElementById("studentAddress").innerText = student["Address"] || "-";
    document.getElementById("studentSubjects").innerText = student["  Subjects Opted  "] || "-";
 document.getElementById("studentFeePlan").innerText = student["  Fee Plan  "] || "-";
