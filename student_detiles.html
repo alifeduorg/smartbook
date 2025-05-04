@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Student Admissions</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -205,8 +206,6 @@
   <footer>
     © 2025 Alif Edu. All rights reserved.
   </footer>
-<!-- Trigger Button -->
-<button onclick="viewDetails(0)">View Student Details</button>
 <!-- Modal -->
 <div id="detailModal" class="modal">
   <div class="modal-content" id="modalContent">
@@ -241,7 +240,7 @@
     <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
 <script>
     const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
   
