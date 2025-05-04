@@ -299,83 +299,83 @@
   </div>
 </div>
 <script>
-const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
-
-let teacherData = [];
-
-fetch(webAppUrl)
-  .then(res => res.json())
-  .then(data => {
-    teacherData = data;
-    const tbody = document.querySelector('#teacherTable tbody');
-
-    setTimeout(() => {
-      data.forEach((teacher, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${teacher['Joining Date'] || ''}</td>
-          <td>${teacher['Staff ID'] || ''}</td>
-          <td>${teacher['Full Name'] || ''}</td>
-          <td>${teacher['Assigned Classes'] || ''}</td>
-          <td>${teacher['Phone'] || ''}</td>
-          <td>${teacher["Email ID"] || ''}</td>
-          <td><button onclick="viewTeacherDetails(${index})">View</button></td>
-        `;
-        tbody.appendChild(tr);
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
+  
+    let studentData = [];
+  
+    fetch(webAppUrl)
+      .then(res => res.json())
+      .then(data => {
+        studentData = data;
+        const tbody = document.querySelector('#studentTable tbody');
+  
+        setTimeout(() => {
+          data.forEach((student, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${student['Admission Date '] || ''}</td>
+              <td>${student['Student ID'] || ''}</td>
+              <td>${student['Student Full Name '] || ''}</td>
+              <td>${student['  Class Admitted To  '] || ''}</td>
+              <td>${student['  Phone Number (WhatsApp)  '] || ''}</td>
+              <td>${student["  Guardian’s Name  "] || ''}</td>
+              <td><button onclick="viewDetails(${index})">View</button></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }, 100);
       });
-    }, 100);
-  });
-
-function viewTeacherDetails(index) {
-  const teacher = teacherData[index];
+ function viewDetails(index) {
+  const student = studentData[index];
 
   // Display modal
   document.getElementById("detailModal").style.display = "flex";
 
   // Fill data safely
-  document.getElementById("teacherName").innerText = teacher["Full Name"] || "-";
-  document.getElementById("teacherDOB").innerText = teacher["DOB"] || "-";
-  document.getElementById("teachergender").innerText = teacher["Gender"] || "-";
-  document.getElementById("teacheremail").innerText = teacher["Email"] || "-";
-  document.getElementById("teacherPhone").innerText = teacher["Phone"] || "-";
-  document.getElementById("Religion").innerText = teacher["Religion"] || "-";
-  document.getElementById("Address").innerText = teacher["Address"] || "-";
-  document.getElementById("SubjectsCanTeach").innerText = teacher["Subjects Can Teach"] || "-";
-  document.getElementById("ClassesCanTeach").innerText = teacher["Classes Can Teach"] || "-";
-  document.getElementById("PreferredTimeSlots").innerText = teacher["Preferred Time Slots"] || "-";
-  document.getElementById("Experience").innerText = teacher["Experience"] || "-";
-  document.getElementById("Qualification").innerText = teacher["Qualification"] || "-";
-  document.getElementById("EmploymentType").innerText = teacher["Employment Type"] || "-";
-  document.getElementById("SalaryPlan").innerText = teacher["Salary Plan"] || "-";
-  document.getElementById("JoiningDate").innerText = teacher["Joining Date"] || "-";
-  document.getElementById("admissionRemarks").innerText = teacher["Remarks"] || "-";
+  document.getElementById("studentName").innerText = student["Student Full Name "] || "-";
+  document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
+  document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
+  document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
+  document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
+   document.getElementById("Religion").innerText = student["Religion"] || "-";
+  document.getElementById("fatherName").innerText = student["Father Name"] || "-";
+ document.getElementById("Guardian’sContactNumber").innerText = student["  Guardian’s Contact Number  "] || "-";
+  document.getElementById("motherName").innerText = student["Mother Name"] || "-";
+  document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
+document.getElementById("Guardian’sOccupation").innerText = student["Guardian’s  Occupation "] || "-";
+  document.getElementById("studentAddress").innerText = student["Address"] || "-";
+   document.getElementById("studentSubjects").innerText = student["  Subjects Opted  "] || "-";
+document.getElementById("studentFeePlan").innerText = student["  Fee Plan  "] || "-";
+document.getElementById("admissionDate").innerText = student["Admission Date "] || "-";
+document.getElementById("admissionMode").innerText = student["  Mode of Admission  "] || "-";
+document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
 
-  // Fill Staff ID box visually
-  const staffID = teacher["Staff ID"] || "";
-  const boxesContainer = document.getElementById("StaffIDBoxes");
+
+  // Fill admission number box visually
+  const admissionNumber = student["Student ID"] || "";
+  const boxesContainer = document.getElementById("admissionNumberBoxes");
   boxesContainer.innerHTML = "";
-  for (let char of staffID) {
+  for (let char of admissionNumber) {
     const div = document.createElement("div");
     div.innerText = char;
     boxesContainer.appendChild(div);
   }
 }
 
-function closeModal() {
-  document.getElementById("detailModal").style.display = "none";
-}
-
-function downloadTeacherPDF() {
+  function closeModal() {
+    document.getElementById("detailModal").style.display = "none";
+  }
+function downloadPDF() {
   const element = document.getElementById('modalContent');
   const opt = {
     margin: 10,
-    filename: 'teacher-details.pdf',
+    filename: 'student-details.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
       scrollY: 0,
       useCORS: true,
-      windowHeight: element.scrollHeight
+      windowHeight: element.scrollHeight  // KEY: capture full height
     },
     jsPDF: {
       unit: 'mm',
@@ -385,11 +385,9 @@ function downloadTeacherPDF() {
   };
   html2pdf().set(opt).from(element).save();
 }
-
-function goToDashboard() {
-  window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
-}
-
+    function goToDashboard() {
+      window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
+    }
   </script>
     <script>
     function printPage() {
