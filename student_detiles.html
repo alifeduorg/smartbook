@@ -113,7 +113,7 @@
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
 
-    ..close-btn {
+    .close-btn {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -261,8 +261,8 @@
       <div><span class="info-label">DOB:</span> <span id="studentDOB"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Class:</span> <span id="  Class Admitted To  s"></span></div>
-      <div><span class="info-label">Phone:</span> <span id="  Phone Number (WhatsApp)  "></span></div>
+      <div><span class="info-label">Class:</span> <span id="studentClass"></span></div>
+      <div><span class="info-label">Phone:</span> <span id="studentPhone"></span></div>
     </div>
     <div class="info-grid">
       <div><span class="info-label">Email:</span> <span id="studentEmail"></span></div>
@@ -280,9 +280,12 @@
     <div class="info-grid">
       <div style="flex: 100%;"><span class="info-label">Address:</span> <span id="studentAddress"></span></div>
     </div>
-      <div class="footer-sign">
+      <div class="section-title">Family Details</div>
+    <div class="info-grid">
+ <div class="footer-sign">
       <div><strong>Seal</strong></div>
       <div><strong>Principal</strong></div>
+    </div>
     </div>
 
     <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
