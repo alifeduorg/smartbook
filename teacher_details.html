@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Student Admissions</title>
+  <title>Teacher Detiles</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <style>
     body {
@@ -224,12 +224,12 @@
     <table id="studentTable">
       <thead>
         <tr>
-          <th>Admission Date</th>
-          <th>Student ID</th>
-          <th>Full Name</th>
-          <th>Class</th>
+          <th>Joining Date</th>
+          <th>Staff ID</th>
+          <th> Name</th>
+          <th>Assigned Classes</th>
           <th>Phone</th>
-          <th>Guardian</th>
+          <th>Email</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -246,51 +246,50 @@
       <span onclick="closeModal()" style="position: absolute; top: 10px; right: 20px; font-size: 26px; font-weight: bold; cursor: pointer; color: #dc3545;">&times;</span>
 
     <img class="header-img" src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Header" />
-
-    <div class="info-grid">
+<div class="info-grid">
       <div>
-        <label class="info-label">Admission Number:</label>
-        <div class="boxes" id="admissionNumberBoxes"></div>
+        <label class="info-label">Staff ID:</label>
+        <div class="boxes" id="StaffIDBoxes"></div>
       </div>
       <div class="photo-box">Paste Photo<br>Here</div>
     </div>
 
     <div class="section-title">Personal Details</div>
     <div class="info-grid">
-      <div><span class="info-label">Name:</span> <span id="studentName"></span></div>
-      <div><span class="info-label">DOB:</span> <span id="studentDOB"></span></div>
+      <div><span class="info-label">Name:</span> <span id="teacherName"></span></div>
+      <div><span class="info-label">DOB:</span> <span id="teacherDOB"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Class:</span> <span id="studentClass"></span></div>
-      <div><span class="info-label">Phone:</span> <span id="studentPhone"></span></div>
+      <div><span class="info-label">Gender:</span> <span id="teachergender"></span></div>
+      <div><span class="info-label">Email:</span> <span id="teacheremail"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Email:</span> <span id="studentEmail"></span></div>
-      <div><span class="info-label">Religion:</span> <span id="Religion"></span></div>
+      <div><span class="info-label">Phone:</span> <span id="teacherPhone"></span></div>
+       <div><span class="info-label">Religion:</span> <span id="Religion"></span></div>
+    </div>
+    <div class="info-grid">
+      <div><span class="info-label">Address:</span> <span id="Address"></span></div>
     </div>
       
-    <div class="section-title">Family Details</div>
+    <div class="section-title">Academic & Teaching Details:</div>
     <div class="info-grid">
-      <div><span class="info-label">Father Name:</span> <span id="fatherName"></span></div>
-      <div><span class="info-label">Phone:</span> <span id="Guardian’sContactNumber"></span></div>
+      <div><span class="info-label">  Subjects Can Teach  :</span> <span id="SubjectsCanTeach"></span></div>
+      <div><span class="info-label">  Classes  Can Teach  :</span> <span id="ClassesCanTeach"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Mother Name:</span> <span id="motherName"></span></div>
-      <div><span class="info-label">Email:</span> <span id="parentEmail"></span></div>
+      <div><span class="info-label">  Preferred Time Slots  </span> <span id="PreferredTimeSlots"></span></div>
+      <div><span class="info-label">Experience:</span> <span id="Experience"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Guardian’s Occupation</span> <span id="Guardian’sOccupation"></span></div>
-      <div><span class="info-label">Address:</span> <span id="studentAddress"></span></div>
+      <div><span class="info-label">Qualification </span> <span id="Qualification"></span></div>
     </div>
       <div class="section-title"> Offices Purpose </div>
     <div class="info-grid">
-  <div><span class="info-label">Subjects Opted:</span> <span id="studentSubjects"></span></div>
-  <div><span class="info-label">Fee Plan:</span> <span id="studentFeePlan"></span></div>
+  <div><span class="info-label">  Employment Type  :</span> <span id="EmploymentType"></span></div>
+  <div><span class="info-label">  Salary Plan  :</span> <span id="SalaryPlan"></span></div>
 </div>
 <div class="info-grid">
-  <div><span class="info-label">Date of Admission:</span> <span id="admissionDate"></span></div>
-  <div><span class="info-label">Mode of Admission:</span> <span id="admissionMode"></span></div>
-</div>
+  <div><span class="info-label">Joining Date:</span> <span id="JoiningDate"></span></div>
 <div><span class="info-label">Remarks:</span> <span id="admissionRemarks"></span></div>
 <div class="footer-sign">
       <div><strong>Seal</strong></div>
@@ -300,83 +299,83 @@
   </div>
 </div>
 <script>
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
-  
-    let studentData = [];
-  
-    fetch(webAppUrl)
-      .then(res => res.json())
-      .then(data => {
-        studentData = data;
-        const tbody = document.querySelector('#studentTable tbody');
-  
-        setTimeout(() => {
-          data.forEach((student, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${student['Admission Date '] || ''}</td>
-              <td>${student['Student ID'] || ''}</td>
-              <td>${student['Student Full Name '] || ''}</td>
-              <td>${student['  Class Admitted To  '] || ''}</td>
-              <td>${student['  Phone Number (WhatsApp)  '] || ''}</td>
-              <td>${student["  Guardian’s Name  "] || ''}</td>
-              <td><button onclick="viewDetails(${index})">View</button></td>
-            `;
-            tbody.appendChild(tr);
-          });
-        }, 100);
+const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
+
+let teacherData = [];
+
+fetch(webAppUrl)
+  .then(res => res.json())
+  .then(data => {
+    teacherData = data;
+    const tbody = document.querySelector('#teacherTable tbody');
+
+    setTimeout(() => {
+      data.forEach((teacher, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${teacher['Joining Date'] || ''}</td>
+          <td>${teacher['Staff ID'] || ''}</td>
+          <td>${teacher['Full Name'] || ''}</td>
+          <td>${teacher['Assigned Classes'] || ''}</td>
+          <td>${teacher['Phone'] || ''}</td>
+          <td>${teacher["Email ID"] || ''}</td>
+          <td><button onclick="viewTeacherDetails(${index})">View</button></td>
+        `;
+        tbody.appendChild(tr);
       });
- function viewDetails(index) {
-  const student = studentData[index];
+    }, 100);
+  });
+
+function viewTeacherDetails(index) {
+  const teacher = teacherData[index];
 
   // Display modal
   document.getElementById("detailModal").style.display = "flex";
 
   // Fill data safely
-  document.getElementById("studentName").innerText = student["Student Full Name "] || "-";
-  document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
-  document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
-  document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
-  document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
-   document.getElementById("Religion").innerText = student["Religion"] || "-";
-  document.getElementById("fatherName").innerText = student["Father Name"] || "-";
- document.getElementById("Guardian’sContactNumber").innerText = student["  Guardian’s Contact Number  "] || "-";
-  document.getElementById("motherName").innerText = student["Mother Name"] || "-";
-  document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
-document.getElementById("Guardian’sOccupation").innerText = student["Guardian’s  Occupation "] || "-";
-  document.getElementById("studentAddress").innerText = student["Address"] || "-";
-   document.getElementById("studentSubjects").innerText = student["  Subjects Opted  "] || "-";
-document.getElementById("studentFeePlan").innerText = student["  Fee Plan  "] || "-";
-document.getElementById("admissionDate").innerText = student["Admission Date "] || "-";
-document.getElementById("admissionMode").innerText = student["  Mode of Admission  "] || "-";
-document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
+  document.getElementById("teacherName").innerText = teacher["Full Name"] || "-";
+  document.getElementById("teacherDOB").innerText = teacher["DOB"] || "-";
+  document.getElementById("teachergender").innerText = teacher["Gender"] || "-";
+  document.getElementById("teacheremail").innerText = teacher["Email"] || "-";
+  document.getElementById("teacherPhone").innerText = teacher["Phone"] || "-";
+  document.getElementById("Religion").innerText = teacher["Religion"] || "-";
+  document.getElementById("Address").innerText = teacher["Address"] || "-";
+  document.getElementById("SubjectsCanTeach").innerText = teacher["Subjects Can Teach"] || "-";
+  document.getElementById("ClassesCanTeach").innerText = teacher["Classes Can Teach"] || "-";
+  document.getElementById("PreferredTimeSlots").innerText = teacher["Preferred Time Slots"] || "-";
+  document.getElementById("Experience").innerText = teacher["Experience"] || "-";
+  document.getElementById("Qualification").innerText = teacher["Qualification"] || "-";
+  document.getElementById("EmploymentType").innerText = teacher["Employment Type"] || "-";
+  document.getElementById("SalaryPlan").innerText = teacher["Salary Plan"] || "-";
+  document.getElementById("JoiningDate").innerText = teacher["Joining Date"] || "-";
+  document.getElementById("admissionRemarks").innerText = teacher["Remarks"] || "-";
 
-
-  // Fill admission number box visually
-  const admissionNumber = student["Student ID"] || "";
-  const boxesContainer = document.getElementById("admissionNumberBoxes");
+  // Fill Staff ID box visually
+  const staffID = teacher["Staff ID"] || "";
+  const boxesContainer = document.getElementById("StaffIDBoxes");
   boxesContainer.innerHTML = "";
-  for (let char of admissionNumber) {
+  for (let char of staffID) {
     const div = document.createElement("div");
     div.innerText = char;
     boxesContainer.appendChild(div);
   }
 }
 
-  function closeModal() {
-    document.getElementById("detailModal").style.display = "none";
-  }
-function downloadPDF() {
+function closeModal() {
+  document.getElementById("detailModal").style.display = "none";
+}
+
+function downloadTeacherPDF() {
   const element = document.getElementById('modalContent');
   const opt = {
     margin: 10,
-    filename: 'student-details.pdf',
+    filename: 'teacher-details.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
       scrollY: 0,
       useCORS: true,
-      windowHeight: element.scrollHeight  // KEY: capture full height
+      windowHeight: element.scrollHeight
     },
     jsPDF: {
       unit: 'mm',
@@ -386,9 +385,11 @@ function downloadPDF() {
   };
   html2pdf().set(opt).from(element).save();
 }
-    function goToDashboard() {
-      window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
-    }
+
+function goToDashboard() {
+  window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
+}
+
   </script>
     <script>
     function printPage() {
