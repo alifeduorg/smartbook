@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Fee Billing Panel</title>
+  <title>Fee-Billing Panel</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
@@ -98,11 +98,11 @@
     </div>
 
     <label>Class</label>
-    <select id="class" required onchange="filterStudents()">
-      <option value="">Select Class</option>
-      <option value="Class A">Class A</option>
-      <option value="Class B">Class B</option>
-    </select>
+  <select id="classSelect" required onchange="filterStudents()">
+  <option value="">Select Class</option>
+  <!-- Classes will be dynamically populated here -->
+</select>
+
 
     <label>Student ID</label>
     <select id="studentId" required onchange="fillStudentName()">
@@ -168,82 +168,89 @@
 </div>
 
 <script>
-  document.getElementById('billDate').valueAsDate = new Date();
-  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getReceiptNo")
+ // Set Bill Date to Current Date
+document.getElementById('billDate').valueAsDate = new Date();
 
+// Fetch and Set Receipt Number
+fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getReceiptNo")
   .then(res => res.json())
   .then(data => {
     document.getElementById('receiptNo').value = data.receiptNo;
   });
 
-
+// Initialize Empty Student Data
 let studentData = {};
 
+// Fetch Student Data from Google Sheets
 fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getStudentData")
-
   .then(res => res.json())
   .then(data => {
     studentData = data;
   });
 
-
-
-  function filterStudents() {
-    const classVal = document.getElementById('class').value;
-    const studentSelect = document.getElementById('studentId');
-    studentSelect.innerHTML = '<option value="">Select ID</option>';
-    if (studentData[classVal]) {
-      studentData[classVal].forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = s.id;
-        studentSelect.appendChild(opt);
-      });
-    }
-    document.getElementById('studentName').value = '';
-  }
-
-  function fillStudentName() {
-    const classVal = document.getElementById('class').value;
-    const idVal = document.getElementById('studentId').value;
-    const student = studentData[classVal]?.find(s => s.id === idVal);
-    document.getElementById('studentName').value = student ? student.name : '';
-  }
-
-  function calculateBalance() {
-    const total = parseFloat(document.getElementById('totalFee').value) || 0;
-    const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
-    document.getElementById('balance').value = (total - paid).toFixed(2);
-  }
-
-  function generatePDF() {
-    const data = [...new FormData(document.getElementById('billing-form')).entries()];
-    let html = '<table>';
-    data.forEach(([key, val]) => {
-      if (key !== 'remarks') {
-        html += `<tr><td><strong>${key.replace(/([A-Z])/g, ' $1')}:</strong></td><td>${val}</td></tr>`;
-      }
+// Filter Students Based on Selected Class
+function filterStudents() {
+  const classVal = document.getElementById('class').value;
+  const studentSelect = document.getElementById('studentId');
+  studentSelect.innerHTML = '<option value="">Select ID</option>';
+  if (studentData[classVal]) {
+    studentData[classVal].forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.id;
+      studentSelect.appendChild(opt);
     });
-    html += `<tr><td><strong>Remarks:</strong></td><td>${document.getElementById('remarks').value}</td></tr>`;
-    html += '</table>';
-    document.getElementById('pdf-content').innerHTML = html;
-    const bill = document.getElementById('bill-preview');
-    bill.style.display = 'block';
-    html2pdf().from(bill).save('Fee_Bill.pdf');
   }
+  document.getElementById('studentName').value = ''; // Clear the name field
+}
 
-  function saveToSheet() {
-    const formData = new FormData(document.getElementById('billing-form'));
-    const obj = {};
-    formData.forEach((val, key) => obj[key] = val);
+// Fill Student Name Based on Selected ID
+function fillStudentName() {
+  const classVal = document.getElementById('class').value;
+  const idVal = document.getElementById('studentId').value;
+  const student = studentData[classVal]?.find(s => s.id === idVal);
+  document.getElementById('studentName').value = student ? student.name : '';
+}
 
-    // Example: Send to Google Apps Script via fetch (fill in your script URL)
-    fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
-      method: "POST",
-      body: JSON.stringify(obj),
-      headers: { "Content-Type": "application/json" }
-    }).then(res => alert("Saved Successfully")).catch(err => alert("Error saving: " + err));
-  }
+// Calculate Balance
+function calculateBalance() {
+  const total = parseFloat(document.getElementById('totalFee').value) || 0;
+  const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+  document.getElementById('balance').value = (total - paid).toFixed(2);
+}
+
+// Generate PDF Bill
+function generatePDF() {
+  const data = [...new FormData(document.getElementById('billing-form')).entries()];
+  let html = '<table>';
+  data.forEach(([key, val]) => {
+    if (key !== 'remarks') {
+      html += `<tr><td><strong>${key.replace(/([A-Z])/g, ' $1')}:</strong></td><td>${val}</td></tr>`;
+    }
+  });
+  html += `<tr><td><strong>Remarks:</strong></td><td>${document.getElementById('remarks').value}</td></tr>`;
+  html += '</table>';
+  document.getElementById('pdf-content').innerHTML = html;
+  const bill = document.getElementById('bill-preview');
+  bill.style.display = 'block';
+  html2pdf().from(bill).save('Fee_Bill.pdf');
+}
+
+// Save Billing Data to Google Sheets
+function saveToSheet() {
+  const formData = new FormData(document.getElementById('billing-form'));
+  const obj = {};
+  formData.forEach((val, key) => obj[key] = val);
+
+  // Example: Send to Google Apps Script via fetch (fill in your script URL)
+  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
+    method: "POST",
+    body: JSON.stringify(obj),
+    headers: { "Content-Type": "application/json" }
+  })
+    .then(res => alert("Saved Successfully"))
+    .catch(err => alert("Error saving: " + err));
+}
 </script>
 
 </body>
