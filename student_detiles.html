@@ -153,15 +153,20 @@
     }
 
     .photo-box {
-      border: 2px dashed #ccc;
-      width: 120px;
-      height: 140px;
-      text-align: center;
-      line-height: 140px;
-      margin-left: auto;
-      font-size: 12px;
-      color: #555;
-    }
+  border: 1px solid #ccc;
+  width: 100px;     /* narrower width */
+  height: 160px;    /* more height */
+  margin-left: auto;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #555;
+  background-color: #f2f2f2;
+  border-radius: 8px;
+}
+
 
     .section-title {
       background-color: navy;
@@ -238,7 +243,7 @@
   <div class="modal-content" id="modalContent">
     <span class="close-btn" onclick="closeModal()">&times;</span>
 
-    <img class="header-img" src="your-header.png" alt="Header" />
+    <img class="header-img" src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Header" />
 
     <div class="info-grid">
       <div>
@@ -336,7 +341,7 @@
   }
 
   function downloadPDF() {
-  const element = document.getElementById('pdfContent');
+  const element = document.getElementById('modalContent');
   if (!element) {
     alert("PDF content not found!");
     return;
