@@ -330,28 +330,26 @@
   // Display modal
   document.getElementById("detailModal").style.display = "flex";
 
-  // Fill data safely
-  document.getElementById("studentName").innerText = student["Student Full Name "] || "-";
-  document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
-  document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
-  document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
-  document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
+ document.getElementById("teacherName").innerText = student["Name"] || "-";
+  document.getElementById("teacherDOB").innerText = student["DOB"] || "-";
+  document.getElementById("teachergender").innerText = student["Gender"] || "-";
+  document.getElementById("teacheremail").innerText = student["Email"] || "-";
+  document.getElementById("teacherPhone").innerText = student["Phone"] || "-";
    document.getElementById("Religion").innerText = student["Religion"] || "-";
-  document.getElementById("fatherName").innerText = student["Father Name"] || "-";
- document.getElementById("Guardian’sContactNumber").innerText = student["  Guardian’s Contact Number  "] || "-";
-  document.getElementById("motherName").innerText = student["Mother Name"] || "-";
-  document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
-document.getElementById("Guardian’sOccupation").innerText = student["Guardian’s  Occupation "] || "-";
-  document.getElementById("studentAddress").innerText = student["Address"] || "-";
-   document.getElementById("studentSubjects").innerText = student["  Subjects Opted  "] || "-";
-document.getElementById("studentFeePlan").innerText = student["  Fee Plan  "] || "-";
-document.getElementById("admissionDate").innerText = student["Admission Date "] || "-";
-document.getElementById("admissionMode").innerText = student["  Mode of Admission  "] || "-";
+  document.getElementById("Address").innerText = student["Address"] || "-";
+ document.getElementById("SubjectsCanTeach").innerText = student["  Subjects Can Teach  "] || "-";
+  document.getElementById("ClassesCanTeach").innerText = student["  Classes  Can Teach  "] || "-";
+  document.getElementById("PreferredTimeSlots").innerText = student["  Preferred Time Slots  ] || "-";
+document.getElementById("Experience").innerText = student["Experience"] || "-";
+  document.getElementById("Qualification").innerText = student["Qualification "] || "-";
+   document.getElementById("EmploymentType").innerText = student["  Employment Type  "] || "-";
+document.getElementById("SalaryPlan").innerText = student["  Salary Plan  "] || "-";
+document.getElementById("JoiningDate").innerText = student["Joining Date"] || "-";
 document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
 
 
   // Fill admission number box visually
-  const admissionNumber = student["Student ID"] || "";
+  const admissionNumber = student["Staff ID"] || "";
   const boxesContainer = document.getElementById("admissionNumberBoxes");
   boxesContainer.innerHTML = "";
   for (let char of admissionNumber) {
