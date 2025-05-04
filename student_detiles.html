@@ -315,36 +315,36 @@
           });
         }, 100);
       });
-   function viewDetails(index) {
-    const student = studentData[index];
-  const modalBody = document.getElementById('modalBody');
-  modalBody.innerHTML = ''; // Clear previous
-    document.getElementById("studentName").innerText = student["Student Full Name"] || "-";
-    document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
-    document.getElementById("studentClass").innerText = student["Class Admitted To"] || "-";
-    document.getElementById("studentPhone").innerText = student["Phone Number (WhatsApp)"] || "-";
-    document.getElementById("studentEmail").innerText = student["Email ID"] || "-";
-    document.getElementById("fatherName").innerText = student["Father's Name"] || "-";
-    document.getElementById("motherName").innerText = student["Mother's Name"] || "-";
-    document.getElementById("parentEmail").innerText = student["Parent Email"] || "-";
-    document.getElementById("studentAddress").innerText = student["Address"] || "-";
+ function viewDetails(index) {
+  const student = studentData[index];
 
-    fillAdmissionNumberBoxes(student["Student ID"] || "");
-    document.getElementById("detailModal").style.display = "flex";
-  }
+  // Display modal
+  document.getElementById("detailModal").style.display = "flex";
 
-  function fillAdmissionNumberBoxes(admissionNo) {
-    const container = document.getElementById("admissionNumberBoxes");
-    container.innerHTML = "";
-    admissionNo.split("").forEach(char => {
-      const box = document.createElement("div");
-      box.textContent = char;
-      container.appendChild(box);
-    });
+  // Fill data safely
+  document.getElementById("studentName").innerText = student["Student Full Name "] || "-";
+  document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
+  document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
+  document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
+  document.getElementById("studentEmail").innerText = student["Email ID"] || "-";
+  document.getElementById("fatherName").innerText = student["Father's Name"] || "-";
+  document.getElementById("motherName").innerText = student["Mother's Name"] || "-";
+  document.getElementById("parentEmail").innerText = student["Parent Email"] || "-";
+  document.getElementById("studentAddress").innerText = student["Address"] || "-";
+
+  // Fill admission number box visually
+  const admissionNumber = student["Student ID"] || "";
+  const boxesContainer = document.getElementById("admissionNumberBoxes");
+  boxesContainer.innerHTML = "";
+  for (let char of admissionNumber) {
+    const div = document.createElement("div");
+    div.innerText = char;
+    boxesContainer.appendChild(div);
   }
+}
 
   function closeModal() {
-    document.getElementById("detailModal").style.display = "flex";
+    document.getElementById("detailModal").style.display = "none";
   }
 function downloadPDF() {
   const element = document.getElementById('modalContent');
