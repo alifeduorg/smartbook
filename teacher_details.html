@@ -334,7 +334,7 @@
 
  document.getElementById("FullName").innerText = student["Full Name  "] || "-";
   document.getElementById("teacherDOB").innerText = student["Date of Birth"] || "-";
-  document.getElementById("teachergender").innerText = student["Gender "] || "-";
+  document.getElementById("teachergender").innerText = student["Gender"] || "-";
   document.getElementById("teacheremail").innerText = student["Email ID"] || "-";
   document.getElementById("teacherPhone").innerText = student["Phone Number"] || "-";
    document.getElementById("Religion").innerText = student["Religion "] || "-";
@@ -383,8 +383,8 @@ function downloadPDF() {
   html2pdf().set(opt).from(element).save();
 }
     function goToDashboard() {
-      window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
-    }
+  window.history.back(); // Goes back to the previous page
+}
   </script>
     <script>
     function printPage() {
