@@ -267,7 +267,7 @@
              <strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
           <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
              <strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
-          <p><strong>Email_student:</strong> ${student["Email ID"] || '-'}</p>
+          <p><strong>Email:</strong> ${student["Email ID"] || '-'}</p>
         </div>
   
         <!-- Family Details -->
@@ -275,7 +275,7 @@
           <h3 style="text-align: center; margin-bottom: 10px;">Family Details</h3>
           <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
              <strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
-          <p><strong>Parent Parent_Email:</strong> ${student["Parent Email"] || '-'}</p>
+          <p><strong>Parent Email:</strong> ${student["Parent Email"] || '-'}</p>
           <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
         </div>
   
@@ -291,6 +291,10 @@
           </div>
         </div>
   
+        <button class="print-btn" onclick="downloadPDF()" style="margin-top: 20px;">Download PDF</button>
+      </div>
+    `;
+  
     document.getElementById('detailModal').style.display = 'flex';
   }
   
@@ -298,7 +302,7 @@
       document.getElementById('detailModal').style.display = 'none';
     }
   
-   function downloadPDF() {
+  function downloadPDF() {
     const element = document.getElementById('modalContent');
     const opt = {
       margin: 1,
@@ -310,7 +314,7 @@
   
     html2pdf().from(element).set(opt).save();
   }
-
+  
   
     function goToDashboard() {
       window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
