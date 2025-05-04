@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fee Billing Panel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0c1e3c;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #122a52;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: gold;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #ffd700;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    button {
+      background: gold;
+      color: #000;
+      padding: 10px 15px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row > div {
+      flex: 1;
+    }
+
+    #bill-preview {
+      display: none;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    #bill-preview img {
+      width: 80px;
+    }
+
+    .signature {
+      margin-top: 50px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1><img src="1.png" alt="Logo" style="height: 40px; vertical-align: middle;"> ALIF EDU - Fee Billing Panel</h1>
+  <form id="billing-form">
+    <div class="row">
+      <div>
+        <label>Bill Date</label>
+        <input type="date" id="billDate" required>
+      </div>
+      <div>
+        <label>Receipt No</label>
+        <input type="text" id="receiptNo" required>
+      </div>
+    </div>
+
+    <label>Class</label>
+    <select id="class" required onchange="filterStudents()">
+      <option value="">Select Class</option>
+      <option value="Class A">Class A</option>
+      <option value="Class B">Class B</option>
+    </select>
+
+    <label>Student ID</label>
+    <select id="studentId" required onchange="fillStudentName()">
+      <option value="">Select ID</option>
+    </select>
+
+    <label>Student Name</label>
+    <input type="text" id="studentName" readonly>
+
+    <label>Fee Plan</label>
+    <input type="text" id="feePlan" required>
+
+    <div class="row">
+      <div>
+        <label>Class Start Date</label>
+        <input type="date" id="startDate" required>
+      </div>
+      <div>
+        <label>Days Purchased</label>
+        <input type="number" id="daysPurchased" required>
+      </div>
+    </div>
+
+    <label>Total Fee</label>
+    <input type="number" id="totalFee" required>
+
+    <label>Paid Amount</label>
+    <input type="number" id="paidAmount" required oninput="calculateBalance()">
+
+    <label>Balance</label>
+    <input type="number" id="balance" readonly>
+
+    <label>Payment Mode</label>
+    <select id="paymentMode" required>
+      <option value="Cash">Cash</option>
+      <option value="UPI">UPI</option>
+      <option value="Card">Card</option>
+    </select>
+
+    <label>Remarks</label>
+    <textarea id="remarks"></textarea>
+
+    <label>Payment Status</label>
+    <select id="paymentStatus" required>
+      <option value="Paid">Paid</option>
+      <option value="Partially Paid">Partially Paid</option>
+      <option value="Pending">Pending</option>
+    </select>
+
+    <button type="button" onclick="saveToSheet()">Submit & Save</button>
+    <button type="button" onclick="generatePDF()">Generate PDF</button>
+  </form>
+
+  <!-- PDF Preview -->
+  <div id="bill-preview">
+    <img src="1.png" alt="Logo">
+    <h2>Fee Receipt</h2>
+    <div id="pdf-content"></div>
+    <div class="signature">
+      <p>Recipient Signature</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('billDate').valueAsDate = new Date();
+  document.getElementById('receiptNo').value = 'REC-' + Date.now().toString().slice(-5);
+
+  const studentData = {
+    'Class A': [{ id: 'A001', name: 'Ali Khan' }, { id: 'A002', name: 'Fatima Noor' }],
+    'Class B': [{ id: 'B001', name: 'Omar Aziz' }, { id: 'B002', name: 'Zara Sheikh' }]
+  };
+
+  function filterStudents() {
+    const classVal = document.getElementById('class').value;
+    const studentSelect = document.getElementById('studentId');
+    studentSelect.innerHTML = '<option value="">Select ID</option>';
+    if (studentData[classVal]) {
+      studentData[classVal].forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.id;
+        studentSelect.appendChild(opt);
+      });
+    }
+    document.getElementById('studentName').value = '';
+  }
+
+  function fillStudentName() {
+    const classVal = document.getElementById('class').value;
+    const idVal = document.getElementById('studentId').value;
+    const student = studentData[classVal]?.find(s => s.id === idVal);
+    document.getElementById('studentName').value = student ? student.name : '';
+  }
+
+  function calculateBalance() {
+    const total = parseFloat(document.getElementById('totalFee').value) || 0;
+    const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+    document.getElementById('balance').value = (total - paid).toFixed(2);
+  }
+
+  function generatePDF() {
+    const data = [...new FormData(document.getElementById('billing-form')).entries()];
+    let html = '<table>';
+    data.forEach(([key, val]) => {
+      if (key !== 'remarks') {
+        html += `<tr><td><strong>${key.replace(/([A-Z])/g, ' $1')}:</strong></td><td>${val}</td></tr>`;
+      }
+    });
+    html += `<tr><td><strong>Remarks:</strong></td><td>${document.getElementById('remarks').value}</td></tr>`;
+    html += '</table>';
+    document.getElementById('pdf-content').innerHTML = html;
+    const bill = document.getElementById('bill-preview');
+    bill.style.display = 'block';
+    html2pdf().from(bill).save('Fee_Bill.pdf');
+  }
+
+  function saveToSheet() {
+    const formData = new FormData(document.getElementById('billing-form'));
+    const obj = {};
+    formData.forEach((val, key) => obj[key] = val);
+
+    // Example: Send to Google Apps Script via fetch (fill in your script URL)
+    fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", {
+      method: "POST",
+      body: JSON.stringify(obj),
+      headers: { "Content-Type": "application/json" }
+    }).then(res => alert("Saved Successfully")).catch(err => alert("Error saving: " + err));
+  }
+</script>
+
+</body>
+</html>
