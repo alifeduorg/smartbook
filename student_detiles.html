@@ -207,18 +207,39 @@
     © 2025 Alif Edu. All rights reserved.
   </footer>
 <!-- Modal -->
-<div id="detailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 10000;">
-  <div id="modalContent" style="background: #fff; padding: 25px; border-radius: 15px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);">
+<div id="detailModal" class="modal">
+  <div class="modal-content" id="modalContent">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <img class="header-img" src="your-header.png" alt="Header" />
 
-    <span onclick="closeModal()" style="position: absolute; top: 10px; right: 20px; font-size: 26px; font-weight: bold; cursor: pointer; color: #dc3545;">&times;</span>
-
-    <!-- Only this part is printed -->
-    <div id="pdfContent">
-      <div id="modalBody"></div>
+    <div class="admission-number-box">
+      <label>Admission Number:</label>
+      <div class="boxes" id="admissionNumberBoxes"></div>
     </div>
 
-    <!-- Working download button -->
-   <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
+    <div class="photo-box">Paste Photo Here</div>
+
+    <div class="section-title">Personal Details</div>
+    <div class="info-row"><strong>Name:</strong> <span id="studentName"></span></div>
+    <div class="info-row"><strong>DOB:</strong> <span id="studentDOB"></span></div>
+    <div class="info-row"><strong>Class:</strong> <span id="studentClass"></span></div>
+    <div class="info-row"><strong>Phone:</strong> <span id="studentPhone"></span></div>
+    <div class="info-row"><strong>Email:</strong> <span id="studentEmail"></span></div>
+
+    <div class="section-title">Family Details</div>
+    <div class="info-row"><strong>Father's Name:</strong> <span id="fatherName"></span></div>
+    <div class="info-row"><strong>Mother's Name:</strong> <span id="motherName"></span></div>
+    <div class="info-row"><strong>Parent Email:</strong> <span id="parentEmail"></span></div>
+    <div class="info-row"><strong>Address:</strong> <span id="studentAddress"></span></div>
+
+    <div style="margin-top: 30px; display: flex; justify-content: space-between;">
+      <div><strong>Seal</strong></div>
+      <div><strong>Principal</strong></div>
+    </div>
+
+    <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
+  </div>
+</div>
 <script>
     const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
   
@@ -246,22 +267,6 @@
           });
         }, 100);
       });
-  
-   const studentData = [
-    {
-      "Student ID": "ALIF2501",
-      "Student Full Name": "Mohammed Ali",
-      "Date of Birth": "2005-08-15",
-      "Class Admitted To": "10",
-      "Phone Number (WhatsApp)": "9876543210",
-      "Email ID": "ali@example.com",
-      "Father's Name": "Abdul Kareem",
-      "Mother's Name": "Fatima Kareem",
-      "Parent Email": "parents@example.com",
-      "Address": "123, Green Street, Kerala"
-    }
-  ];
-
   function viewDetails(index) {
     const student = studentData[index];
     document.getElementById("studentName").innerText = student["Student Full Name"] || "-";
