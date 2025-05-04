@@ -154,7 +154,7 @@
 
     .photo-box {
   border: 1px solid #ccc;
-  width: 100px;     /* narrower width */
+  width: 80px;     /* narrower width */
   height: 160px;    /* more height */
   margin-left: auto;
   margin-bottom: 10px;
@@ -340,23 +340,26 @@
     });
   }
 
-  function downloadPDF() {
+function downloadPDF() {
   const element = document.getElementById('modalContent');
-  if (!element) {
-    alert("PDF content not found!");
-    return;
-  }
-
   const opt = {
-    margin: 1,
-    filename: 'admission_form.pdf',
+    margin: 10,
+    filename: 'student-details.pdf',
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, scrollY: 0 },
-    jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    html2canvas: {
+      scale: 2,
+      scrollY: 0,
+      useCORS: true,
+      windowHeight: element.scrollHeight  // KEY: capture full height
+    },
+    jsPDF: {
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'portrait'
+    }
   };
-
-  html2pdf().from(element).set(opt).save();
- }
+  html2pdf().set(opt).from(element).save();
+}
     function goToDashboard() {
       window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
     }
