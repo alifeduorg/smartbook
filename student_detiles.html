@@ -303,8 +303,13 @@
       document.getElementById('detailModal').style.display = 'none';
     }
   
-  function downloadPDF() {
+ function downloadPDF() {
   const element = document.getElementById('pdfContent');
+  if (!element) {
+    alert("PDF content not found!");
+    return;
+  }
+
   const opt = {
     margin: 1,
     filename: 'admission_form.pdf',
@@ -314,9 +319,8 @@
   };
 
   html2pdf().from(element).set(opt).save();
-}
     function goToDashboard() {
-      window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
+      window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
     }
   </script>
     <script>
