@@ -217,21 +217,18 @@
  <!-- Modal Popup for Student Details -->
 <div id="detailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 10000;">
   <div id="modalContent" style="background: #fff; padding: 25px; border-radius: 15px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);">
-    
+
     <!-- Close Button -->
     <span onclick="closeModal()" style="position: absolute; top: 10px; right: 20px; font-size: 26px; font-weight: bold; cursor: pointer; color: #dc3545;">&times;</span>
 
-    <div id="pdfContent">
-      <div id="modalBody"></div>
-    </div>
+    <!-- This entire content will be visible and downloadable -->
+    <div id="pdfContent"></div>
 
-    <!-- Download button stays outside the printable area -->
+    <!-- Download button -->
     <button class="print-btn" onclick="downloadPDF()" style="margin-top: 20px;">Download PDF</button>
-    
+
   </div>
 </div>
-
-
 <script>
     const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
   
@@ -277,7 +274,7 @@
              <strong>Class Admitted To:</strong> ${student["Class Admitted To"] || '-'}</p>
           <p><strong>Date of Birth:</strong> ${student["Date of Birth"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
              <strong>Phone (WhatsApp):</strong> ${student["Phone Number (WhatsApp)"] || '-'}</p>
-          <p><strong>Email:</strong> ${student["Email ID"] || '-'}</p>
+          <p><strong>Email_student:</strong> ${student["Email ID"] || '-'}</p>
         </div>
   
         <!-- Family Details -->
@@ -285,7 +282,7 @@
           <h3 style="text-align: center; margin-bottom: 10px;">Family Details</h3>
           <p><strong>Father's Name:</strong> ${student["Father's Name"] || '-'} &nbsp;&nbsp;&nbsp;&nbsp; 
              <strong>Mother's Name:</strong> ${student["Mother's Name"] || '-'}</p>
-          <p><strong>Parent Email:</strong> ${student["Parent Email"] || '-'}</p>
+          <p><strong>Parent Parent_Email:</strong> ${student["Parent Email"] || '-'}</p>
           <p><strong>Address:</strong> ${student["Address"] || '-'}</p>
         </div>
   
