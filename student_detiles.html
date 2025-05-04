@@ -301,10 +301,6 @@
           </div>
         </div>
   
-        <button class="print-btn" onclick="downloadPDF()" style="margin-top: 20px;">Download PDF</button>
-      </div>
-    `;
-  
     document.getElementById('detailModal').style.display = 'flex';
   }
   
@@ -313,18 +309,18 @@
     }
   
   function downloadPDF() {
-    const element = document.getElementById('modalContent');
-    const opt = {
-      margin: 1,
-      filename: 'admission_form.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, scrollY: 0 },
-      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-    };
-  
-    html2pdf().from(element).set(opt).save();
-  }
-  
+  const element = document.getElementById('pdfContent');
+  const opt = {
+    margin: 1,
+    filename: 'admission_form.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, scrollY: 0 },
+    jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().from(element).set(opt).save();
+}
+
   
     function goToDashboard() {
       window.location.href = 'https://alifedu.com/dashboard'; // Change this URL if needed
