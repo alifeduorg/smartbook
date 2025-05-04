@@ -315,7 +315,7 @@
           });
         }, 100);
       });
-  function viewDetails(index) {
+   function viewDetails(index) {
     const student = studentData[index];
     document.getElementById("studentName").innerText = student["Student Full Name"] || "-";
     document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
@@ -341,6 +341,9 @@
     });
   }
 
+  function closeModal() {
+    document.getElementById("detailModal").style.display = "none";
+  }
 function downloadPDF() {
   const element = document.getElementById('modalContent');
   const opt = {
