@@ -248,48 +248,50 @@
     <img class="header-img" src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Header" />
 <div class="info-grid">
       <div>
+        <div class="info-grid">
+      <div>
         <label class="info-label">Staff ID:</label>
-        <div class="boxes" id="StaffIDBoxes"></div>
+        <div class="boxes" id="admissionNumberBoxes"></div>
       </div>
       <div class="photo-box">Paste Photo<br>Here</div>
-    </div>
+    </div>>
 
     <div class="section-title">Personal Details</div>
     <div class="info-grid">
-      <div><span class="info-label">Name:</span> <span id="teacherName"></span></div>
-      <div><span class="info-label">DOB:</span> <span id="teacherDOB"></span></div>
+      <div><span class="info-label">Name:</span> <span id="studentName"></span></div>
+      <div><span class="info-label">DOB:</span> <span id="studentDOB"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Gender:</span> <span id="teachergender"></span></div>
-      <div><span class="info-label">Email:</span> <span id="teacheremail"></span></div>
+      <div><span class="info-label">Class:</span> <span id="studentClass"></span></div>
+      <div><span class="info-label">Phone:</span> <span id="studentPhone"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Phone:</span> <span id="teacherPhone"></span></div>
-       <div><span class="info-label">Religion:</span> <span id="Religion"></span></div>
-    </div>
-    <div class="info-grid">
-      <div><span class="info-label">Address:</span> <span id="Address"></span></div>
+      <div><span class="info-label">Email:</span> <span id="studentEmail"></span></div>
+      <div><span class="info-label">Religion:</span> <span id="Religion"></span></div>
     </div>
       
-    <div class="section-title">Academic & Teaching Details:</div>
+    <div class="section-title">Family Details</div>
     <div class="info-grid">
-      <div><span class="info-label">  Subjects Can Teach  :</span> <span id="SubjectsCanTeach"></span></div>
-      <div><span class="info-label">  Classes  Can Teach  :</span> <span id="ClassesCanTeach"></span></div>
+      <div><span class="info-label">Father Name:</span> <span id="fatherName"></span></div>
+      <div><span class="info-label">Phone:</span> <span id="Guardian’sContactNumber"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">  Preferred Time Slots  </span> <span id="PreferredTimeSlots"></span></div>
-      <div><span class="info-label">Experience:</span> <span id="Experience"></span></div>
+      <div><span class="info-label">Mother Name:</span> <span id="motherName"></span></div>
+      <div><span class="info-label">Email:</span> <span id="parentEmail"></span></div>
     </div>
     <div class="info-grid">
-      <div><span class="info-label">Qualification </span> <span id="Qualification"></span></div>
+      <div><span class="info-label">Guardian’s Occupation</span> <span id="Guardian’sOccupation"></span></div>
+      <div><span class="info-label">Address:</span> <span id="studentAddress"></span></div>
     </div>
       <div class="section-title"> Offices Purpose </div>
     <div class="info-grid">
-  <div><span class="info-label">  Employment Type  :</span> <span id="EmploymentType"></span></div>
-  <div><span class="info-label">  Salary Plan  :</span> <span id="SalaryPlan"></span></div>
+  <div><span class="info-label">Subjects Opted:</span> <span id="studentSubjects"></span></div>
+  <div><span class="info-label">Fee Plan:</span> <span id="studentFeePlan"></span></div>
 </div>
 <div class="info-grid">
-  <div><span class="info-label">Joining Date:</span> <span id="JoiningDate"></span></div>
+  <div><span class="info-label">Date of Admission:</span> <span id="admissionDate"></span></div>
+  <div><span class="info-label">Mode of Admission:</span> <span id="admissionMode"></span></div>
+</div>
 <div><span class="info-label">Remarks:</span> <span id="admissionRemarks"></span></div>
 <div class="footer-sign">
       <div><strong>Seal</strong></div>
@@ -313,12 +315,12 @@
           data.forEach((student, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-              <td>${student['Admission Date '] || ''}</td>
-              <td>${student['Student ID'] || ''}</td>
-              <td>${student['Student Full Name '] || ''}</td>
-              <td>${student['  Class Admitted To  '] || ''}</td>
-              <td>${student['  Phone Number (WhatsApp)  '] || ''}</td>
-              <td>${student["  Guardian’s Name  "] || ''}</td>
+              <td>${student['Joining Date'] || ''}</td>
+              <td>${student['Staff id'] || ''}</td>
+              <td>${student['Full Name  '] || ''}</td>
+              <td>${student['Assigned Classes'] || ''}</td>
+              <td>${student['Phone Number'] || ''}</td>
+              <td>${student["Email ID"] || ''}</td>
               <td><button onclick="viewDetails(${index})">View</button></td>
             `;
             tbody.appendChild(tr);
