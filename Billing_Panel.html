@@ -169,19 +169,23 @@
 
 <script>
   document.getElementById('billDate').valueAsDate = new Date();
-  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec")
+  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getReceiptNo")
+
   .then(res => res.json())
   .then(data => {
     document.getElementById('receiptNo').value = data.receiptNo;
   });
 
- let studentData = {};
 
-fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec")
+let studentData = {};
+
+fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getStudentData")
+
   .then(res => res.json())
   .then(data => {
     studentData = data;
   });
+
 
 
   function filterStudents() {
