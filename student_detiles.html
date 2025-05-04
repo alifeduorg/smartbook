@@ -156,8 +156,8 @@
 
     .photo-box {
   border: 1px solid #ccc;
-  width: 50px;     /* narrower width */
-  height: 160px;    /* more height */
+  width: 100px;     /* narrower width */
+  height: 60px;    /* more height */
   margin-left: auto;
   margin-bottom: 10px;
   display: flex;
@@ -280,9 +280,21 @@
     <div class="info-grid">
       <div style="flex: 100%;"><span class="info-label">Address:</span> <span id="studentAddress"></span></div>
     </div>
-      <div class="section-title">Family Details</div>
+      <div class="section-title"> Offices Purpose </div>
     <div class="info-grid">
  <div class="footer-sign">
+<div class="section-title">Admission Summary</div>
+<div class="info-grid">
+  <div><span class="info-label">Subjects Opted:</span> <span id="studentSubjects"></span></div>
+  <div><span class="info-label">Fee Plan:</span> <span id="studentFeePlan"></span></div>
+</div>
+<div class="info-grid">
+  <div><span class="info-label">Date of Admission:</span> <span id="admissionDate"></span></div>
+  <div><span class="info-label">Mode of Admission:</span> <span id="admissionMode"></span></div>
+</div>
+<div class="info-grid">
+  <div><span class="info-label">Remarks:</span> <span id="admissionRemarks"></span></div>
+</div>
       <div><strong>Seal</strong></div>
       <div><strong>Principal</strong></div>
     </div>
@@ -329,11 +341,17 @@
   document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
   document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
   document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
-  document.getElementById("studentEmail").innerText = student["Email ID"] || "-";
-  document.getElementById("fatherName").innerText = student["Father's Name"] || "-";
-  document.getElementById("motherName").innerText = student["Mother's Name"] || "-";
-  document.getElementById("parentEmail").innerText = student["Parent Email"] || "-";
+  document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
+  document.getElementById("fatherName").innerText = student["Father Name"] || "-";
+  document.getElementById("motherName").innerText = student["Mother Name"] || "-";
+  document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
   document.getElementById("studentAddress").innerText = student["Address"] || "-";
+   document.getElementById("studentSubjects").innerText = student["  Subjects Opted  "] || "-";
+document.getElementById("studentFeePlan").innerText = student["  Fee Plan  "] || "-";
+document.getElementById("admissionDate").innerText = student["Admission Date "] || "-";
+document.getElementById("admissionMode").innerText = student["  Mode of Admission  "] || "-";
+document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
+
 
   // Fill admission number box visually
   const admissionNumber = student["Student ID"] || "";
