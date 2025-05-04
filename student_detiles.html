@@ -214,14 +214,20 @@
     © 2025 Alif Edu. All rights reserved.
   </footer>
 
- <!-- Modal Popup for Student Details -->
-<div class="modal" id="studentModal">
-    <div class="modal-content" id="modalContent">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <div id="studentDetails"></div>
-      <button onclick="downloadPDF()">Download PDF</button>
-    </div>
+<div id="detailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 10000;">
+  <div id="modalContent" style="background: #fff; padding: 25px; border-radius: 15px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);">
+
+    <!-- Close Button -->
+    <span onclick="closeModal()" style="position: absolute; top: 10px; right: 20px; font-size: 26px; font-weight: bold; cursor: pointer; color: #dc3545;">&times;</span>
+
+    <!-- This entire content will be visible and downloadable -->
+    <div id="pdfContent"></div>
+
+    <!-- Download button -->
+    <button class="print-btn" onclick="downloadPDF()" style="margin-top: 20px;">Download PDF</button>
+
   </div>
+</div>
 <script>
     const webAppUrl = 'https://script.google.com/macros/s/AKfycbycmQxO8mPgxXoaGBFvpybamBhxC8JF3UGyEZvlFSm-1Arw4xPZJhjQ9HUX2NvUFR5s0Q/exec';
   
