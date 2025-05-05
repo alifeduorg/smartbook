@@ -248,9 +248,25 @@
     });
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const element = document.getElementById("pdfContent");
-      html2pdf().from(element).save("fee_receipt.pdf");
-    });
+  const original = document.getElementById("pdfContent");
+  const clone = original.cloneNode(true);
+  clone.querySelector("#closeModal")?.remove(); // Remove close button from PDF
+
+  // Optional: Set background white in PDF
+  clone.style.background = "#fff";
+  clone.style.color = "#000";
+
+  const opt = {
+    margin: 0.3,
+    filename: 'fee_receipt.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(clone).save();
+});
+
   </script>
 </body>
 </html>
