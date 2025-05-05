@@ -7,7 +7,7 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #0a1a2f;
       color: #fff;
     }
@@ -84,8 +84,8 @@
     }
 
     #pdfContent img {
-      width: 200px;
-      margin-bottom: 15px;
+      width: 180px;
+      margin-bottom: 10px;
     }
 
     #pdfContent h3 {
@@ -136,7 +136,15 @@
     <form id="billingForm">
       <div class="form-group">
         <label>Class</label>
-        <input type="text" name="class" required />
+        <select name="class" required>
+          <option value="">Select Class</option>
+          <option value="Nursery">Nursery</option>
+          <option value="LKG">LKG</option>
+          <option value="UKG">UKG</option>
+          <option value="1st">1st</option>
+          <option value="2nd">2nd</option>
+          <!-- Add more as needed -->
+        </select>
       </div>
       <div class="form-group">
         <label>Student ID</label>
@@ -168,7 +176,13 @@
       </div>
       <div class="form-group">
         <label>Payment Mode</label>
-        <input type="text" name="paymentMode" required />
+        <select name="paymentMode" required>
+          <option value="">Select Mode</option>
+          <option value="Cash">Cash</option>
+          <option value="UPI">UPI</option>
+          <option value="Card">Card</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+        </select>
       </div>
       <div class="form-group">
         <label>Remarks</label>
@@ -176,7 +190,12 @@
       </div>
       <div class="form-group">
         <label>Payment Status</label>
-        <input type="text" name="paymentStatus" required />
+        <select name="paymentStatus" required>
+          <option value="">Select Status</option>
+          <option value="Paid">Paid</option>
+          <option value="Partially Paid">Partially Paid</option>
+          <option value="Pending">Pending</option>
+        </select>
       </div>
       <button type="submit">Submit & Generate Bill</button>
     </form>
@@ -205,28 +224,25 @@
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
-
       const date = new Date().toLocaleDateString();
       const balance = parseFloat(data.totalFee) - parseFloat(data.paidAmount);
-      const receiptNumber = "2025-" + Date.now();
 
-      // Append balance and receipt
+      // Generate receipt number using timestamp (to be replaced by Google Sheet row count if needed)
+      const receiptNumber = "2025-" + Math.floor(Date.now() / 1000);
+
+      // Append additional fields
       data.billDate = date;
       data.balance = balance;
       data.receiptNo = receiptNumber;
 
-      // Send to Google Sheets
-      const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec",
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
+      // Store in Google Sheet
+      await fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
 
+      // Create receipt table
       const rows = `
         <table>
           <tr><td>Receipt No:</td><td>${receiptNumber}</td></tr>
@@ -251,14 +267,7 @@
 
     function downloadPDF() {
       const element = document.getElementById("pdfContent");
-      const opt = {
-        margin:       0.5,
-        filename:     'Fee_Receipt.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
+      html2pdf().from(element).save("Fee_Receipt.pdf");
     }
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
