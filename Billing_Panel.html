@@ -70,10 +70,16 @@
       padding: 20px;
       border-radius: 12px;
       position: relative;
+      font-family: 'Georgia', serif;
     }
     #pdfContent img {
       width: 80px;
-      margin-bottom: 10px;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    #pdfContent h3 {
+      text-align: center;
+      margin: 5px 0 15px 0;
     }
     #closeModal {
       position: absolute;
@@ -83,16 +89,28 @@
       cursor: pointer;
       color: #900;
     }
-    .row {
-      display: flex;
-      justify-content: space-between;
+    #billData table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
     }
-    .row div {
-      width: 48%;
+    #billData th, #billData td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: left;
     }
-    @media (max-width: 600px) {
-      .row { flex-direction: column; }
-      .row div { width: 100%; }
+    #downloadBtn {
+      margin-top: 12px;
+      background: #0d6efd;
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 16px;
+      text-align: center;
+      display: block;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -157,11 +175,27 @@
     <div id="pdfContent">
       <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'">✖</span>
       <img src="1.png" alt="Logo" />
-      <h3>ALIF EDU - Fee Receipt</h3>
+      <h3>FEE RECEIPT</h3>
       <div id="billData"></div>
+      <button id="downloadBtn">Download PDF</button>
     </div>
   </div>
+<div style="text-align: center; margin-bottom: 20px;">
+  <button onclick="window.location.href='dashboard.html'" style="
+    background: #fff;
+    color: #0d1b2a;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  ">
+    ⬅ Back to Dashboard
+  </button>
+</div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
 
@@ -189,16 +223,21 @@
       fetch(scriptURL, { method: "POST", body: formData })
         .then(res => res.json())
         .then(data => {
+          const receiptNo = `REC-2025-${data.receiptNo}`;
           const billHTML = `
-            <p><strong>Receipt:</strong> REC-2025-${data.receiptNo}</p>
-            <p><strong>Bill Date:</strong> ${formData.get("billDate")}</p>
-            <p><strong>Student:</strong> ${formData.get("studentName")} (${formData.get("studentId")})</p>
-            <p><strong>Class:</strong> ${formData.get("class")}</p>
-            <p><strong>Fee Plan:</strong> ${formData.get("feePlan")}</p>
-            <p><strong>Total Fee:</strong> ₹${formData.get("totalFee")}</p>
-            <p><strong>Paid:</strong> ₹${formData.get("paidAmount")}</p>
-            <p><strong>Balance:</strong> ₹${formData.get("balance")}</p>
-            <p><strong>Status:</strong> ${formData.get("paymentStatus")}</p>
+            <table>
+              <tr><th>Receipt No</th><td>${receiptNo}</td></tr>
+              <tr><th>Bill Date</th><td>${formData.get("billDate")}</td></tr>
+              <tr><th>Student Name</th><td>${formData.get("studentName")}</td></tr>
+              <tr><th>Student ID</th><td>${formData.get("studentId")}</td></tr>
+              <tr><th>Class</th><td>${formData.get("class")}</td></tr>
+              <tr><th>Fee Plan</th><td>${formData.get("feePlan")}</td></tr>
+              <tr><th>Total Fee</th><td>₹${formData.get("totalFee")}</td></tr>
+              <tr><th>Paid Amount</th><td>₹${formData.get("paidAmount")}</td></tr>
+              <tr><th>Balance</th><td>₹${formData.get("balance")}</td></tr>
+              <tr><th>Payment Mode</th><td>${formData.get("paymentMode")}</td></tr>
+              <tr><th>Status</th><td>${formData.get("paymentStatus")}</td></tr>
+            </table>
           `;
           document.getElementById("billData").innerHTML = billHTML;
           document.getElementById("pdfModal").style.display = "flex";
@@ -206,6 +245,11 @@
           document.getElementById("receiptNo").value = `REC-2025-${parseInt(data.receiptNo)+1}`;
         })
         .catch(() => alert("Error submitting data."));
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const element = document.getElementById("pdfContent");
+      html2pdf().from(element).save("fee_receipt.pdf");
     });
   </script>
 </body>
