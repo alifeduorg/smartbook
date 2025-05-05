@@ -2,315 +2,211 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fee Billing Panel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       background: #0d1b2a;
       color: #fff;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
-      margin: 0;
     }
     h2 {
-      color: #ffd700;
       text-align: center;
+      margin-bottom: 20px;
     }
     form {
-      max-width: 600px;
-      margin: auto;
       background: #1b263b;
       padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
     }
     label {
       display: block;
-      margin-top: 12px;
-      font-weight: bold;
+      margin-top: 10px;
     }
     input, select {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
       border: none;
-      margin-top: 6px;
-      box-sizing: border-box;
+      font-size: 16px;
     }
     button {
       margin-top: 20px;
-      padding: 12px;
-      width: 100%;
-      background: #ffd700;
-      color: #000;
-      font-weight: bold;
+      padding: 12px 20px;
       border: none;
-      border-radius: 10px;
+      border-radius: 6px;
+      background: gold;
+      color: #0d1b2a;
+      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
     }
-    button:hover {
-      background: #e6c200;
+    #dashboardBtn {
+      background: #fff;
+      color: #0d1b2a;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
+
+    /* Modal */
     #pdfModal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
       display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
-      z-index: 9999;
     }
     #pdfContent {
-      background: #fff;
-      color: #000;
+      background: white;
+      padding: 30px;
       width: 90%;
-      max-width: 500px;
-      padding: 20px;
+      max-width: 600px;
       border-radius: 12px;
       position: relative;
-      font-family: 'Georgia', serif;
-    }
-    #pdfContent img {
-      width: 80px;
-      display: block;
-      margin: 0 auto 10px auto;
-    }
-    #pdfContent h3 {
       text-align: center;
-      margin: 5px 0 15px 0;
+      color: #000;
     }
     #closeModal {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 18px;
-      cursor: pointer;
-      color: #900;
-    }
-    #billData table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    #billData th, #billData td {
-      border: 1px solid #333;
-      padding: 8px;
-      text-align: left;
-    }
-    #downloadBtn {
-      margin-top: 12px;
-      background: #0d6efd;
-      color: #fff;
-      border-radius: 8px;
-      padding: 8px 16px;
-      text-align: center;
-      display: block;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <h2>Fee Billing Panel</h2>
-  <form id="billingForm">
-    <label>Bill Date</label>
-    <input type="date" id="billDate" name="billDate" readonly>
-
-    <label>Receipt Number</label>
-    <input type="text" id="receiptNo" name="receiptNo" readonly>
-
-    <label>Class</label>
-    <input type="text" name="class" required>
-
-    <label>Student ID</label>
-    <input type="text" name="studentId" required>
-
-    <label>Student Name</label>
-    <input type="text" name="studentName" required>
-
-    <label>Fee Plan</label>
-    <input type="text" name="feePlan">
-
-    <label>Class Start Date</label>
-    <input type="date" name="startDate">
-
-    <label>Days Purchased</label>
-    <input type="number" name="daysPurchased">
-
-    <label>Total Fee</label>
-    <input type="number" id="totalFee" name="totalFee" required>
-
-    <label>Paid Amount</label>
-    <input type="number" id="paidAmount" name="paidAmount" required>
-
-    <label>Balance</label>
-    <input type="number" id="balance" name="balance" readonly>
-
-    <label>Payment Mode</label>
-    <select name="paymentMode" required>
-      <option value="Cash">Cash</option>
-      <option value="Online">Online</option>
-      <option value="UPI">UPI</option>
-    </select>
-
-    <label>Remarks</label>
-    <input type="text" name="remarks">
-
-    <label>Payment Status</label>
-    <select name="paymentStatus" required>
-      <option value="Paid">Paid</option>
-      <option value="Unpaid">Unpaid</option>
-      <option value="Partial">Partial</option>
-    </select>
-
-    <button type="submit">Submit & Generate Bill</button>
-  </form>
-
-<!-- PDF Modal -->
-<div id="pdfModal" style="
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-">
-  <div id="pdfContent" style="
-    background: white;
-    padding: 30px;
-    width: 90%;
-    max-width: 600px;
-    border-radius: 12px;
-    position: relative;
-    text-align: center;
-    font-family: Arial, sans-serif;
-  ">
-    <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'" style="
       position: absolute;
       top: 10px;
       right: 15px;
       font-size: 20px;
       cursor: pointer;
-    ">✖</span>
-
-    <img src="1.png" alt="Logo" style="max-width: 100px; margin-bottom: 10px;" />
-    <h3 style="margin: 10px 0;">FEE RECEIPT</h3>
-
-    <div id="billData" style="margin-top: 20px; text-align: left;"></div>
-
-    <button id="downloadBtn" style="
-      margin-top: 20px;
-      padding: 10px 20px;
-      border: none;
-      background-color: navy;
-      color: white;
+    }
+    #pdfContent img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+    #billData table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    #billData td {
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+    #billData td:first-child {
       font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-    ">Download PDF</button>
+      width: 40%;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="text-align: center;">
+    <button id="dashboardBtn" onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
   </div>
-</div>
-<div style="text-align: center; margin-bottom: 20px;">
-  <button onclick="window.location.href='ADMIN_dashboard.html'" style="
-    background: #fff;
-    color: #0d1b2a;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  ">
-    ⬅ Back to Dashboard
-  </button>
-</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <h2>Fee Billing Panel</h2>
+
+  <form id="billingForm">
+    <label>Class: <input type="text" name="class" required></label>
+    <label>Student ID: <input type="text" name="studentId" required></label>
+    <label>Student Name: <input type="text" name="studentName" required></label>
+    <label>Fee Plan: <input type="text" name="feePlan" required></label>
+    <label>Class Start Date: <input type="date" name="startDate" required></label>
+    <label>Days Purchased: <input type="number" name="daysPurchased" required></label>
+    <label>Total Fee: <input type="number" name="totalFee" required></label>
+    <label>Paid Amount: <input type="number" name="paidAmount" required></label>
+    <label>Payment Mode:
+      <select name="paymentMode" required>
+        <option value="">Select Mode</option>
+        <option>Cash</option>
+        <option>Online</option>
+        <option>Bank Transfer</option>
+      </select>
+    </label>
+    <label>Remarks: <input type="text" name="remarks"></label>
+    <label>Payment Status:
+      <select name="paymentStatus" required>
+        <option value="">Select</option>
+        <option>Paid</option>
+        <option>Partial</option>
+        <option>Unpaid</option>
+      </select>
+    </label>
+    <button type="submit">Submit & Generate Slip</button>
+  </form>
+
+  <!-- PDF Modal -->
+  <div id="pdfModal">
+    <div id="pdfContent">
+      <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'">✖</span>
+      <img src="1.png" alt="Logo" />
+      <h3>FEE RECEIPT</h3>
+      <div id="billData"></div>
+      <button id="downloadBtn">Download PDF</button>
+    </div>
+  </div>
+
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
+    let receiptCounter = 1;
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const today = new Date().toISOString().substr(0, 10);
-      document.getElementById("billDate").value = today;
-
-      fetch(scriptURL)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("receiptNo").value = `REC-2025-${data.receiptNo}`;
-        });
-    });
-
-    document.getElementById("paidAmount").addEventListener("input", () => {
-      const total = parseFloat(document.getElementById("totalFee").value || 0);
-      const paid = parseFloat(document.getElementById("paidAmount").value || 0);
-      document.getElementById("balance").value = total - paid;
-    });
-
-    document.getElementById("billingForm").addEventListener("submit", e => {
+    document.getElementById("billingForm").addEventListener("submit", async function(e) {
       e.preventDefault();
-      const formData = new FormData(e.target);
+      const form = e.target;
+      const formData = new FormData(form);
+      const values = Object.fromEntries(formData.entries());
 
-      fetch(scriptURL, { method: "POST", body: formData })
-        .then(res => res.json())
-        .then(data => {
-          const receiptNo = `REC-2025-${data.receiptNo}`;
-          const billHTML = `
-            <table>
-              <tr><th>Receipt No</th><td>${receiptNo}</td></tr>
-              <tr><th>Bill Date</th><td>${formData.get("billDate")}</td></tr>
-              <tr><th>Student Name</th><td>${formData.get("studentName")}</td></tr>
-              <tr><th>Student ID</th><td>${formData.get("studentId")}</td></tr>
-              <tr><th>Class</th><td>${formData.get("class")}</td></tr>
-              <tr><th>Fee Plan</th><td>${formData.get("feePlan")}</td></tr>
-              <tr><th>Total Fee</th><td>₹${formData.get("totalFee")}</td></tr>
-              <tr><th>Paid Amount</th><td>₹${formData.get("paidAmount")}</td></tr>
-              <tr><th>Balance</th><td>₹${formData.get("balance")}</td></tr>
-              <tr><th>Payment Mode</th><td>${formData.get("paymentMode")}</td></tr>
-              <tr><th>Status</th><td>${formData.get("paymentStatus")}</td></tr>
-            </table>
-          `;
-          document.getElementById("billData").innerHTML = billHTML;
-          document.getElementById("pdfModal").style.display = "flex";
-          e.target.reset();
-          document.getElementById("receiptNo").value = `REC-2025-${parseInt(data.receiptNo)+1}`;
-        })
-        .catch(() => alert("Error submitting data."));
+      const balance = parseFloat(values.totalFee) - parseFloat(values.paidAmount);
+      const billDate = new Date().toLocaleDateString();
+      const receiptNo = `2025-${receiptCounter++}`;
+
+      // Update Modal Content
+      document.getElementById("billData").innerHTML = `
+        <table>
+          <tr><td>Bill Date:</td><td>${billDate}</td></tr>
+          <tr><td>Receipt No:</td><td>${receiptNo}</td></tr>
+          <tr><td>Class:</td><td>${values.class}</td></tr>
+          <tr><td>Student ID:</td><td>${values.studentId}</td></tr>
+          <tr><td>Student Name:</td><td>${values.studentName}</td></tr>
+          <tr><td>Fee Plan:</td><td>${values.feePlan}</td></tr>
+          <tr><td>Class Start Date:</td><td>${values.startDate}</td></tr>
+          <tr><td>Days Purchased:</td><td>${values.daysPurchased}</td></tr>
+          <tr><td>Total Fee:</td><td>₹${values.totalFee}</td></tr>
+          <tr><td>Paid Amount:</td><td>₹${values.paidAmount}</td></tr>
+          <tr><td>Balance:</td><td>₹${balance}</td></tr>
+          <tr><td>Payment Mode:</td><td>${values.paymentMode}</td></tr>
+          <tr><td>Remarks:</td><td>${values.remarks}</td></tr>
+          <tr><td>Payment Status:</td><td>${values.paymentStatus}</td></tr>
+        </table>
+      `;
+
+      document.getElementById("pdfModal").style.display = "flex";
+
+      // Optional: Send to Google Sheets
+      // await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec', { method: 'POST', body: formData });
     });
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
-    const element = document.getElementById("pdfContent");
+      const original = document.getElementById("pdfContent");
+      const clone = original.cloneNode(true);
+      clone.querySelector("#closeModal")?.remove();
+      clone.style.background = "#fff";
+      clone.style.color = "#000";
 
-    if (!element) {
-      alert("PDF content not found!");
-      return;
-    }
+      const opt = {
+        margin: 0.3,
+        filename: 'fee_receipt.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
 
-    // Clone and prepare the element
-    const clone = element.cloneNode(true);
-    clone.querySelector("#closeModal")?.remove(); // Remove close button if exists
-    clone.style.backgroundColor = "#fff";
-    clone.style.color = "#000";
-
-    const opt = {
-      margin: 0.5,
-      filename: 'fee_receipt.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(clone).save();
-  });
-
+      html2pdf().set(opt).from(clone).save();
+    });
   </script>
 </body>
 </html>
