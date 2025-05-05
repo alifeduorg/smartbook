@@ -139,6 +139,7 @@
         <input type="number" name="balance" required>
       </div>
     </div>
+<div id="pdfPreview" style="margin-top:40px;"></div>
 
     <label>Payment Mode</label>
     <select name="paymentMode" required>
@@ -163,80 +164,59 @@
   </form>
 
   <div id="billSlip"></div>
-
- <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split("T")[0];
-    document.getElementById('billDate').value = today;
-
-    // Generate receipt number: REC2025-0001 style
-    generateReceiptNumber();
-  });
-
-  async function generateReceiptNumber() {
-    // Fake counter for now (real version would fetch last row from backend)
-    const year = new Date().getFullYear();
-    const randomId = Math.floor(Math.random() * 9000 + 1000);
-    document.getElementById('receiptNo').value = `REC${year}-${randomId}`;
-  }
-
-  // Auto-calculate balance
-  document.querySelector('[name="paidAmount"]').addEventListener('input', calculateBalance);
-  document.querySelector('[name="totalFee"]').addEventListener('input', calculateBalance);
-
-  function calculateBalance() {
-    const total = parseFloat(document.querySelector('[name="totalFee"]').value) || 0;
-    const paid = parseFloat(document.querySelector('[name="paidAmount"]').value) || 0;
-    const balance = total - paid;
-    document.querySelector('[name="balance"]').value = balance.toFixed(2);
-  }
-
-  document.getElementById('billingForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-
-    try {
-      await fetch(scriptURL, { method: 'POST', body: formData });
-      alert("Billing data stored successfully!");
-
-      // Show popup bill (not delay-based now)
-      generatePDFBill(data);
-    } catch (err) {
-      alert("Error submitting form");
-    }
-  });
-
+<script>
   function generatePDFBill(data) {
-    const billHTML = `
-      <div style="font-family:Poppins; padding:20px;">
-        <h3 style="text-align:center;">ALIF EDU FEE RECEIPT</h3>
-        <hr>
-        <p><strong>Bill Date:</strong> ${data.billDate}</p>
-        <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
-        <p><strong>Student:</strong> ${data.studentName} (${data.studentId})</p>
-        <p><strong>Class:</strong> ${data.class}</p>
-        <p><strong>Fee Plan:</strong> ${data.feePlan}</p>
-        <p><strong>Class Start Date:</strong> ${data.startDate}</p>
-        <p><strong>Days Purchased:</strong> ${data.daysPurchased}</p>
-        <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
-        <p><strong>Paid Amount:</strong> ₹${data.paidAmount}</p>
-        <p><strong>Balance:</strong> ₹${data.balance}</p>
-        <p><strong>Payment Mode:</strong> ${data.paymentMode}</p>
-        <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
-        <p><strong>Remarks:</strong> ${data.remarks}</p>
-        <br><p style="text-align:right;">Recipient Signature</p>
-        <hr><p style="text-align:center;font-size:12px;">© ALIF EDU | www.alifedu.in</p>
+    const receiptWindow = document.getElementById('pdfPreview');
+    receiptWindow.innerHTML = `
+      <div style="max-width:700px;margin:auto;padding:30px;border:1px solid #ccc;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);font-family:'Poppins',sans-serif;background:#fff;position:relative;">
+        <div style="text-align:center;margin-bottom:20px;">
+          <img src="1.png" alt="ALIF EDU Logo" style="height:80px;margin-bottom:10px;">
+          <h2 style="margin:0;color:#003366;">ALIF EDU</h2>
+          <p style="font-size:12px;color:#666;">Premium Learning | www.alifedu.in</p>
+        </div>
+        <hr style="border-top:1px solid #999;">
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin:20px 0;">
+          <div>
+            <p><strong>Bill Date:</strong> ${data.billDate}</p>
+            <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
+          </div>
+          <div style="text-align:right;">
+            <p><strong>Student ID:</strong> ${data.studentId}</p>
+            <p><strong>Student Name:</strong> ${data.studentName}</p>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr style="background:#f0f0f0;">
+            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Class</th>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Fee Plan</th>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Start Date</th>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Days</th>
+          </tr>
+          <tr>
+            <td style="padding:8px;border:1px solid #ccc;">${data.class}</td>
+            <td style="padding:8px;border:1px solid #ccc;">${data.feePlan}</td>
+            <td style="padding:8px;border:1px solid #ccc;">${data.startDate}</td>
+            <td style="padding:8px;border:1px solid #ccc;">${data.daysPurchased}</td>
+          </tr>
+        </table>
+        <div style="margin-top:20px;">
+          <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
+          <p><strong>Paid Amount:</strong> ₹${data.paidAmount}</p>
+          <p><strong>Balance:</strong> ₹${data.balance}</p>
+          <p><strong>Payment Mode:</strong> ${data.paymentMode}</p>
+          <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
+          <p><strong>Remarks:</strong> ${data.remarks}</p>
+        </div>
+        <div style="text-align:right;margin-top:30px;">
+          <p>__________________________</p>
+          <p style="margin-top:-10px;">Recipient Signature</p>
+        </div>
+        <hr style="margin-top:40px;border-top:1px solid #ccc;">
+        <p style="text-align:center;font-size:12px;color:#888;">© 2025 ALIF EDU. All rights reserved.</p>
       </div>
     `;
 
-    const popup = window.open('', 'Receipt', 'width=800,height=600');
-    popup.document.write(`<html><head><title>Receipt</title></head><body>${billHTML}</body></html>`);
-    popup.document.close();
-    popup.focus();
+    receiptWindow.scrollIntoView({ behavior: 'smooth' });
   }
 </script>
 
