@@ -255,8 +255,17 @@ form.addEventListener('submit', async function(e) {
 });
 
 downloadBtn.addEventListener('click', () => {
-  html2pdf().from(document.getElementById('pdfContent')).save('Fee_Receipt.pdf');
+  const element = document.getElementById('receiptPrint'); // hidden printable version
+  const opt = {
+    margin: 0.5,
+    filename: 'Fee_Receipt.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
 });
+
 </script>
 
 </body>
