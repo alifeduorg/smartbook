@@ -1,271 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fee Billing Panel</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Student Detail Fetcher</title>
   <style>
     body {
-      background-color: #f4f6f9;
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-    }
-
-    header {
-      background-color: #0a2147;
-      color: white;
+      background: #ffffff;
       padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      letter-spacing: 1px;
     }
 
     .container {
-      background: white;
-      max-width: 800px;
-      margin: 30px auto;
+      max-width: 600px;
+      margin: auto;
+      background: #f4f6fa;
       padding: 30px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-      border-radius: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,50,0.1);
+    }
+
+    h2 {
+      color: #002147;
+      text-align: center;
     }
 
     label {
-      font-weight: bold;
-      color: #0a2147;
       display: block;
-      margin-top: 15px;
+      margin: 15px 0 5px;
+      color: #002147;
+      font-weight: bold;
     }
 
-    input, select, textarea {
+    select, input {
       width: 100%;
-      padding: 8px;
-      border-radius: 8px;
+      padding: 10px;
       border: 1px solid #ccc;
-      margin-top: 5px;
+      border-radius: 6px;
+      font-size: 16px;
     }
 
     .btn {
-      background-color: #f5c518;
-      color: #0a2147;
+      background-color: #002147;
+      color: white;
       border: none;
-      padding: 10px 18px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
       margin-top: 20px;
-      border-radius: 8px;
-      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
+      width: 100%;
     }
 
     .btn:hover {
-      background-color: #e0b217;
+      background-color: #ffb800;
+      color: #002147;
     }
 
-    #bill-preview {
-      display: none;
-      padding: 20px;
-      background: white;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-      border-radius: 20px;
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translate(-50%, 0);
-      z-index: 1000;
-      max-width: 600px;
-      width: 90%;
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 14px;
+      color: #777;
     }
-
-    #bill-preview table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    #bill-preview td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    #bill-preview .logo {
-      width: 80px;
-    }
-
-    .dashboard-btn {
-      margin-top: 15px;
-      background: #0a2147;
-      color: white;
-    }
-
-    .close-btn {
-      float: right;
-      cursor: pointer;
-      color: red;
-      font-weight: bold;
-    }
-
   </style>
 </head>
 <body>
 
-<header>Fee Billing Panel</header>
+  <div class="container">
+    <h2>Fetch Student Details</h2>
 
-<div class="container">
-  <form id="billing-form">
-    <label>Bill Date</label>
-    <input type="date" id="billDate" name="billDate" readonly />
-
-    <label>Receipt Number</label>
-    <input type="text" id="receiptNo" name="receiptNo" readonly />
-
-    <label>Class</label>
-    <select id="class" name="class" required onchange="filterStudents()">
+    <label for="classSelect">Class</label>
+    <select id="classSelect" onchange="populateStudentIds()" required>
       <option value="">Select Class</option>
     </select>
 
-    <label>Student Name</label>
-    <select id="studentName" name="studentName" onchange="fillStudentId()" required>
-      <option value="">Select Student</option>
+    <label for="studentId">Student ID</label>
+    <select id="studentId" onchange="fillStudentName()" required>
+      <option value="">Select ID</option>
     </select>
 
-    <label>Student ID</label>
-    <input type="text" id="studentId" name="studentId" readonly />
+    <label for="studentName">Student Name</label>
+    <input type="text" id="studentName" readonly>
 
-    <label>Fee Plan</label>
-    <input type="text" name="feePlan" required />
+    <button class="btn" onclick="alert('Data ready to store!')">Continue</button>
+  </div>
 
-    <label>Class Start Date</label>
-    <input type="date" name="startDate" required />
+  <div class="footer">ALIF EDU © 2025</div>
 
-    <label>Days Purchased</label>
-    <input type="number" name="daysPurchased" required />
+  <script>
+    const STUDENT_DATA_URL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
+    let studentMap = {};
 
-    <label>Total Fee</label>
-    <input type="number" id="totalFee" name="totalFee" oninput="calculateBalance()" required />
+    // Fetch student data on load
+    window.onload = () => {
+      fetch(STUDENT_DATA_URL)
+        .then(res => res.json())
+        .then(data => {
+          studentMap = data;
+          populateClassDropdown();
+        })
+        .catch(err => console.error("Error fetching data:", err));
+    };
 
-    <label>Paid Amount</label>
-    <input type="number" id="paidAmount" name="paidAmount" oninput="calculateBalance()" required />
-
-    <label>Balance</label>
-    <input type="text" id="balance" name="balance" readonly />
-
-    <label>Payment Mode</label>
-    <select name="paymentMode" required>
-      <option>Cash</option>
-      <option>UPI</option>
-      <option>Card</option>
-    </select>
-
-    <label>Remarks</label>
-    <textarea name="remarks" id="remarks" rows="2"></textarea>
-
-    <label>Payment Status</label>
-    <select name="paymentStatus" required>
-      <option>Paid</option>
-      <option>Partially Paid</option>
-      <option>Pending</option>
-    </select>
-
-    <button type="button" class="btn" onclick="saveToSheet()">Save</button>
-    <button type="button" class="btn" onclick="generatePDF()">Download PDF</button>
-    <button type="button" class="btn dashboard-btn" onclick="goToDashboard()">Go to Dashboard</button>
-  </form>
-</div>
-
-<!-- PDF Modal -->
-<div id="bill-preview">
-  <span class="close-btn" onclick="document.getElementById('bill-preview').style.display='none'">X</span>
-  <div id="pdf-content"></div>
-</div>
-
-<script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
-  let studentData = {};
-
-  // Auto-fill date
-  document.getElementById('billDate').valueAsDate = new Date();
-
-  // Fetch receipt number
-  fetch(scriptURL + "?action=getReceiptNo")
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('receiptNo').value = data.receiptNo;
-    });
-
-  // Fetch student data
-  fetch(scriptURL + "?action=getStudentData")
-    .then(res => res.json())
-    .then(data => {
-      studentData = data;
-      const classSelect = document.getElementById('class');
-      Object.keys(data).forEach(cls => {
-        const option = document.createElement('option');
-        option.value = cls;
-        option.textContent = cls;
-        classSelect.appendChild(option);
-      });
-    });
-
-  function filterStudents() {
-    const classVal = document.getElementById('class').value;
-    const studentSelect = document.getElementById('studentName');
-    studentSelect.innerHTML = '<option value="">Select Student</option>';
-    if (studentData[classVal]) {
-      studentData[classVal].forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.name;
-        opt.textContent = s.name;
-        studentSelect.appendChild(opt);
+    // Populate class dropdown
+    function populateClassDropdown() {
+      const classSelect = document.getElementById("classSelect");
+      const classes = Object.keys(studentMap).sort();
+      classes.forEach(cls => {
+        const opt = document.createElement("option");
+        opt.value = cls;
+        opt.textContent = cls;
+        classSelect.appendChild(opt);
       });
     }
-    document.getElementById('studentId').value = '';
-  }
 
-  function fillStudentId() {
-    const classVal = document.getElementById('class').value;
-    const nameVal = document.getElementById('studentName').value;
-    const student = studentData[classVal]?.find(s => s.name === nameVal);
-    document.getElementById('studentId').value = student ? student.id : '';
-  }
+    // Populate student IDs based on selected class
+    function populateStudentIds() {
+      const classVal = document.getElementById("classSelect").value;
+      const studentIdSelect = document.getElementById("studentId");
+      studentIdSelect.innerHTML = '<option value="">Select ID</option>';
+      document.getElementById("studentName").value = "";
 
-  function calculateBalance() {
-    const total = parseFloat(document.getElementById('totalFee').value) || 0;
-    const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
-    document.getElementById('balance').value = (total - paid).toFixed(2);
-  }
-
-  function generatePDF() {
-    const data = [...new FormData(document.getElementById('billing-form')).entries()];
-    let html = '<h2 style="text-align:center; color:#0a2147;">ALIF EDU - Fee Receipt</h2>';
-    html += '<table>';
-    data.forEach(([key, val]) => {
-      if (key !== 'remarks') {
-        html += `<tr><td><strong>${key.replace(/([A-Z])/g, ' $1')}:</strong></td><td>${val}</td></tr>`;
+      if (studentMap[classVal]) {
+        studentMap[classVal].forEach(student => {
+          const opt = document.createElement("option");
+          opt.value = student.id;
+          opt.textContent = student.id;
+          studentIdSelect.appendChild(opt);
+        });
       }
-    });
-    html += `<tr><td><strong>Remarks:</strong></td><td>${document.getElementById('remarks').value}</td></tr>`;
-    html += '</table><br><p style="text-align:right; margin-top:40px;">Recipient Signature: __________</p>';
-    document.getElementById('pdf-content').innerHTML = html;
-    document.getElementById('bill-preview').style.display = 'block';
-    html2pdf().from(document.getElementById('bill-preview')).save('Fee_Bill.pdf');
-  }
+    }
 
-  function saveToSheet() {
-    const formData = new FormData(document.getElementById('billing-form'));
-    const obj = {};
-    formData.forEach((val, key) => obj[key] = val);
-
-    fetch(scriptURL, {
-      method: "POST",
-      body: JSON.stringify(obj),
-      headers: { "Content-Type": "application/json" }
-    }).then(res => alert("Saved Successfully")).catch(err => alert("Error saving: " + err));
-  }
-
-  function goToDashboard() {
-    window.location.href = "dashboard.html"; // update with your actual dashboard link
-  }
-</script>
+    // Auto-fill name based on student ID
+    function fillStudentName() {
+      const classVal = document.getElementById("classSelect").value;
+      const idVal = document.getElementById("studentId").value;
+      const student = studentMap[classVal]?.find(s => s.id === idVal);
+      document.getElementById("studentName").value = student ? student.name : "";
+    }
+  </script>
 
 </body>
 </html>
