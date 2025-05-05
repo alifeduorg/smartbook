@@ -4,57 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fee Billing Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
   <style>
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #0a1a2f;
-      color: #fff;
+      background-color: #0a1f44;
+      color: #333;
+      margin: 0;
+      padding: 20px;
     }
 
     .container {
-      max-width: 900px;
-      margin: 30px auto;
-      background-color: white;
-      border-radius: 10px;
-      padding: 25px;
-      color: #000;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
-    h1 {
+    h2 {
       text-align: center;
-      color: #f4c542;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
+      color: #0a1f44;
     }
 
     label {
       font-weight: bold;
       display: block;
-      margin-bottom: 5px;
+      margin-top: 10px;
     }
 
     input, select {
       width: 100%;
-      padding: 10px;
-      border-radius: 6px;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 14px;
     }
 
     button {
-      background-color: #f4c542;
-      color: #0a1a2f;
+      background-color: #ffcc00;
+      color: #0a1f44;
+      padding: 10px 20px;
       border: none;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-weight: bold;
       cursor: pointer;
+      margin-top: 10px;
       width: 100%;
-      margin-top: 15px;
     }
 
     button:hover {
@@ -64,142 +62,133 @@
     #pdfModal {
       display: none;
       position: fixed;
-      top: 0; left: 0;
+      z-index: 999;
+      left: 0; top: 0;
       width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.7);
       justify-content: center;
       align-items: center;
-      z-index: 1000;
     }
 
     #pdfContent {
       background: white;
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 15px;
       width: 90%;
-      max-width: 700px;
+      max-width: 600px;
       text-align: center;
-      color: black;
-      position: relative;
     }
 
     #pdfContent img {
-      width: 180px;
-      margin-bottom: 10px;
+      width: 120px;
     }
 
-    #pdfContent h3 {
-      margin: 5px;
-      color: #0a1a2f;
-    }
-
-    #pdfContent table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    #pdfContent table, th, td {
-      border: 1px solid #ccc;
-    }
-
-    #pdfContent th, #pdfContent td {
-      padding: 10px;
+    #billTable {
+      margin-top: 10px;
       text-align: left;
     }
 
+    #billTable table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #billTable td {
+      border: 1px solid #ccc;
+      padding: 6px 8px;
+    }
+
     #closeModal {
-      position: absolute;
-      top: 5px;
-      right: 15px;
-      font-size: 18px;
+      float: right;
       cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
     }
 
-    .footer-btns {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-      justify-content: center;
+    .nav-button {
+      margin-top: 15px;
+      background-color: #0a1f44;
+      color: white;
     }
 
-    @media (max-width: 600px) {
-      .footer-btns {
-        flex-direction: column;
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #pdfContent, #pdfContent * {
+        visibility: visible;
+      }
+
+      #pdfContent {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+      }
+
+      #closeModal, #downloadBtn, .nav-button {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Fee Billing Panel</h1>
+    <h2>Fee Billing Panel</h2>
     <form id="billingForm">
-      <div class="form-group">
-        <label>Class</label>
-        <select name="class" required>
-          <option value="">Select Class</option>
-          <option value="Nursery">Nursery</option>
-          <option value="LKG">LKG</option>
-          <option value="UKG">UKG</option>
-          <option value="1st">1st</option>
-          <option value="2nd">2nd</option>
-          <!-- Add more as needed -->
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Student ID</label>
-        <input type="text" name="studentId" required />
-      </div>
-      <div class="form-group">
-        <label>Student Name</label>
-        <input type="text" name="studentName" required />
-      </div>
-      <div class="form-group">
-        <label>Fee Plan</label>
-        <input type="text" name="feePlan" required />
-      </div>
-      <div class="form-group">
-        <label>Class Start Date</label>
-        <input type="date" name="startDate" required />
-      </div>
-      <div class="form-group">
-        <label>Days Purchased</label>
-        <input type="number" name="daysPurchased" required />
-      </div>
-      <div class="form-group">
-        <label>Total Fee</label>
-        <input type="number" name="totalFee" required />
-      </div>
-      <div class="form-group">
-        <label>Paid Amount</label>
-        <input type="number" name="paidAmount" required />
-      </div>
-      <div class="form-group">
-        <label>Payment Mode</label>
-        <select name="paymentMode" required>
-          <option value="">Select Mode</option>
-          <option value="Cash">Cash</option>
-          <option value="UPI">UPI</option>
-          <option value="Card">Card</option>
-          <option value="Bank Transfer">Bank Transfer</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Remarks</label>
-        <input type="text" name="remarks" />
-      </div>
-      <div class="form-group">
-        <label>Payment Status</label>
-        <select name="paymentStatus" required>
-          <option value="">Select Status</option>
-          <option value="Paid">Paid</option>
-          <option value="Partially Paid">Partially Paid</option>
-          <option value="Pending">Pending</option>
-        </select>
-      </div>
+      <label>Class</label>
+      <select name="class" required>
+        <option value="">-- Select Class --</option>
+        <option>Nursery</option>
+        <option>LKG</option>
+        <option>UKG</option>
+        <option>Grade 1</option>
+        <option>Grade 2</option>
+      </select>
+
+      <label>Student ID</label>
+      <input type="text" name="studentId" required>
+
+      <label>Student Name</label>
+      <input type="text" name="studentName" required>
+
+      <label>Fee Plan</label>
+      <input type="text" name="feePlan" required>
+
+      <label>Class Start Date</label>
+      <input type="date" name="startDate" required>
+
+      <label>Days Purchased</label>
+      <input type="number" name="daysPurchased" required>
+
+      <label>Total Fee</label>
+      <input type="number" name="totalFee" required>
+
+      <label>Paid Amount</label>
+      <input type="number" name="paidAmount" required>
+
+      <label>Payment Mode</label>
+      <select name="paymentMode" required>
+        <option value="">-- Select Mode --</option>
+        <option>Cash</option>
+        <option>UPI</option>
+        <option>Bank Transfer</option>
+        <option>Cheque</option>
+      </select>
+
+      <label>Remarks</label>
+      <input type="text" name="remarks">
+
+      <label>Payment Status</label>
+      <select name="paymentStatus" required>
+        <option value="Paid">Paid</option>
+        <option value="Partially Paid">Partially Paid</option>
+        <option value="Pending">Pending</option>
+      </select>
+
       <button type="submit">Submit & Generate Bill</button>
+      <button type="button" class="nav-button" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
     </form>
-    <button onclick="window.location.href='admin_dashboard.html'">Go to Dashboard</button>
   </div>
 
   <!-- PDF Modal -->
@@ -209,44 +198,46 @@
       <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" />
       <h3>FEE RECEIPT</h3>
       <div id="billTable"></div>
-      <div class="footer-btns">
-        <button onclick="downloadPDF()">Download PDF</button>
-        <button onclick="window.print()">Print</button>
-      </div>
+      <button id="downloadBtn" onclick="downloadPDF()">Download Slip</button>
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
   <script>
-    const form = document.getElementById("billingForm");
-    const modal = document.getElementById("pdfModal");
-    const billTable = document.getElementById("billTable");
-
-    form.addEventListener("submit", async function (e) {
+    document.getElementById("billingForm").addEventListener("submit", async function (e) {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(form).entries());
-      const date = new Date().toLocaleDateString();
-      const balance = parseFloat(data.totalFee) - parseFloat(data.paidAmount);
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
 
-      // Generate receipt number using timestamp (to be replaced by Google Sheet row count if needed)
-      const receiptNumber = "2025-" + Math.floor(Date.now() / 1000);
+      const dateNow = new Date();
+      data.billDate = dateNow.toLocaleDateString();
+      data.balance = parseFloat(data.totalFee) - parseFloat(data.paidAmount);
+      data.receiptNo = "2025-" + Math.floor(Date.now() / 1000);
 
-      // Append additional fields
-      data.billDate = date;
-      data.balance = balance;
-      data.receiptNo = receiptNumber;
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
+        });
 
-      // Store in Google Sheet
-      await fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      });
+        const text = await res.text();
+        if (text.includes("Success")) {
+          showPDF(data);
+        } else {
+          alert("Submission failed: " + text);
+        }
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
 
-      // Create receipt table
-      const rows = `
+    function showPDF(data) {
+      document.getElementById("pdfModal").style.display = "flex";
+      document.getElementById("billTable").innerHTML = `
         <table>
-          <tr><td>Receipt No:</td><td>${receiptNumber}</td></tr>
-          <tr><td>Date:</td><td>${date}</td></tr>
+          <tr><td>Receipt No:</td><td>${data.receiptNo}</td></tr>
+          <tr><td>Date:</td><td>${data.billDate}</td></tr>
           <tr><td>Class:</td><td>${data.class}</td></tr>
           <tr><td>Student ID:</td><td>${data.studentId}</td></tr>
           <tr><td>Student Name:</td><td>${data.studentName}</td></tr>
@@ -255,21 +246,17 @@
           <tr><td>Days:</td><td>${data.daysPurchased}</td></tr>
           <tr><td>Total Fee:</td><td>₹${data.totalFee}</td></tr>
           <tr><td>Paid:</td><td>₹${data.paidAmount}</td></tr>
-          <tr><td>Balance:</td><td>₹${balance}</td></tr>
-          <tr><td>Mode:</td><td>${data.paymentMode}</td></tr>
+          <tr><td>Balance:</td><td>₹${data.balance}</td></tr>
+          <tr><td>Payment Mode:</td><td>${data.paymentMode}</td></tr>
           <tr><td>Remarks:</td><td>${data.remarks}</td></tr>
           <tr><td>Status:</td><td>${data.paymentStatus}</td></tr>
-        </table>
-      `;
-      billTable.innerHTML = rows;
-      modal.style.display = "flex";
-    });
+        </table>`;
+    }
 
     function downloadPDF() {
       const element = document.getElementById("pdfContent");
       html2pdf().from(element).save("Fee_Receipt.pdf");
     }
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 </body>
 </html>
