@@ -248,24 +248,29 @@
     });
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
-  const original = document.getElementById("pdfContent");
-  const clone = original.cloneNode(true);
-  clone.querySelector("#closeModal")?.remove(); // Remove close button from PDF
+    const element = document.getElementById("pdfContent");
 
-  // Optional: Set background white in PDF
-  clone.style.background = "#fff";
-  clone.style.color = "#000";
+    if (!element) {
+      alert("PDF content not found!");
+      return;
+    }
 
-  const opt = {
-    margin: 0.3,
-    filename: 'fee_receipt.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
+    // Clone and prepare the element
+    const clone = element.cloneNode(true);
+    clone.querySelector("#closeModal")?.remove(); // Remove close button if exists
+    clone.style.backgroundColor = "#fff";
+    clone.style.color = "#000";
 
-  html2pdf().set(opt).from(clone).save();
-});
+    const opt = {
+      margin: 0.5,
+      filename: 'fee_receipt.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(clone).save();
+  });
 
   </script>
 </body>
