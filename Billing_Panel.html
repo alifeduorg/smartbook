@@ -4,61 +4,57 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fee Billing Panel</title>
-  <style>
+ <style>
     body {
+      background: #0d1b2a;
+      color: #fff;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
       padding: 20px;
     }
-
     h2 {
       text-align: center;
-      color: #002147;
+      margin-bottom: 20px;
     }
-
     form {
+      background: #1b263b;
+      padding: 20px;
+      border-radius: 12px;
       max-width: 600px;
       margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
     }
-
     label {
       display: block;
-      margin-top: 15px;
-      font-weight: bold;
+      margin-top: 10px;
     }
-
-    input, select, textarea {
+    input, select {
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
     }
-
     button {
       margin-top: 20px;
-      background-color: #002147;
-      color: #FFD700;
+      padding: 12px 20px;
       border: none;
-      padding: 12px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 5px;
+      border-radius: 6px;
+      background: gold;
+      color: #0d1b2a;
+      font-weight: bold;
       cursor: pointer;
     }
-     #dashboardBtn {
+    #dashboardBtn {
       background: #fff;
       color: #0d1b2a;
       margin-bottom: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
+
+    /* Modal */
     #pdfModal {
-     display: none;
+      display: none;
       position: fixed;
       z-index: 1000;
       left: 0;
@@ -70,10 +66,8 @@
       justify-content: center;
       align-items: center;
     }
-    }
-
     #pdfContent {
-    background: white;
+      background: white;
       padding: 30px;
       width: 90%;
       max-width: 600px;
@@ -82,16 +76,6 @@
       text-align: center;
       color: #000;
     }
-      
-    #pdfContent img {
-      max-width: 100px;
-      margin-bottom: 10px;
-    }
-
-    #pdfContent h3 {
-      margin: 10px 0;
-    }
-
     #closeModal {
       position: absolute;
       top: 10px;
@@ -99,36 +83,24 @@
       font-size: 20px;
       cursor: pointer;
     }
-    #billTable {
+    #pdfContent img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+    #billData table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    #billTable th, #billTable td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
-
-    #downloadBtn {
       margin-top: 15px;
-      background-color: #FFD700;
-      color: #002147;
     }
-
-    .back-btn {
-      margin: 20px auto;
-      display: block;
-      background: #FFD700;
-      color: #002147;
-      padding: 10px 15px;
-      text-align: center;
-      width: 150px;
-      text-decoration: none;
-      border-radius: 5px;
+    #billData td {
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
     }
-  </style>
+    #billData td:first-child {
+      font-weight: bold;
+      width: 40%;
+    }
+   </style>
 </head>
 <body>
 
