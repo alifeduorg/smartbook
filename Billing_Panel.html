@@ -164,36 +164,57 @@
 
   <div id="billSlip"></div>
 
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
+ <script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const today = new Date().toISOString().split("T")[0];
-      document.getElementById('billDate').value = today;
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById('billDate').value = today;
 
-      // Optional: simulate receipt no as timestamp
-      document.getElementById('receiptNo').value = "REC" + Date.now().toString().slice(-6);
-    });
+    // Generate receipt number: REC2025-0001 style
+    generateReceiptNumber();
+  });
 
-    document.getElementById('billingForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
+  async function generateReceiptNumber() {
+    // Fake counter for now (real version would fetch last row from backend)
+    const year = new Date().getFullYear();
+    const randomId = Math.floor(Math.random() * 9000 + 1000);
+    document.getElementById('receiptNo').value = `REC${year}-${randomId}`;
+  }
 
-      // Store data to Google Sheets
-      const response = await fetch(scriptURL, { method: 'POST', body: formData });
-      const result = await response.text();
+  // Auto-calculate balance
+  document.querySelector('[name="paidAmount"]').addEventListener('input', calculateBalance);
+  document.querySelector('[name="totalFee"]').addEventListener('input', calculateBalance);
+
+  function calculateBalance() {
+    const total = parseFloat(document.querySelector('[name="totalFee"]').value) || 0;
+    const paid = parseFloat(document.querySelector('[name="paidAmount"]').value) || 0;
+    const balance = total - paid;
+    document.querySelector('[name="balance"]').value = balance.toFixed(2);
+  }
+
+  document.getElementById('billingForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      await fetch(scriptURL, { method: 'POST', body: formData });
       alert("Billing data stored successfully!");
 
-      // Show bill slip
-      const data = Object.fromEntries(formData.entries());
+      // Show popup bill (not delay-based now)
       generatePDFBill(data);
-    });
+    } catch (err) {
+      alert("Error submitting form");
+    }
+  });
 
-    function generatePDFBill(data) {
-      const billDiv = document.getElementById('billSlip');
-      billDiv.innerHTML = `
+  function generatePDFBill(data) {
+    const billHTML = `
+      <div style="font-family:Poppins; padding:20px;">
         <h3 style="text-align:center;">ALIF EDU FEE RECEIPT</h3>
+        <hr>
         <p><strong>Bill Date:</strong> ${data.billDate}</p>
         <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
         <p><strong>Student:</strong> ${data.studentName} (${data.studentId})</p>
@@ -208,16 +229,16 @@
         <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
         <p><strong>Remarks:</strong> ${data.remarks}</p>
         <br><p style="text-align:right;">Recipient Signature</p>
-      `;
-      billDiv.style.display = 'block';
+        <hr><p style="text-align:center;font-size:12px;">© ALIF EDU | www.alifedu.in</p>
+      </div>
+    `;
 
-      setTimeout(() => {
-        const billWindow = window.open('', '', 'width=800,height=600');
-        billWindow.document.write(`<html><head><title>Fee Receipt</title></head><body>${billDiv.innerHTML}</body></html>`);
-        billWindow.document.close();
-        billWindow.print();
-      }, 1000);
-    }
-  </script>
+    const popup = window.open('', 'Receipt', 'width=800,height=600');
+    popup.document.write(`<html><head><title>Receipt</title></head><body>${billHTML}</body></html>`);
+    popup.document.close();
+    popup.focus();
+  }
+</script>
+
 </body>
 </html>
