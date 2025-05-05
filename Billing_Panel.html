@@ -255,26 +255,7 @@ form.addEventListener('submit', async function(e) {
 });
 
 downloadBtn.addEventListener('click', () => {
-  document.getElementById('receiptPrint').innerHTML = document.getElementById('pdfContent').innerHTML;
-
-  const element = document.getElementById('receiptPrint'); // not the modal!
-  const opt = {
-    margin: 10,
-    filename: 'Fee_Receipt.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      scrollY: 0,
-      windowHeight: element.scrollHeight
-    },
-    jsPDF: {
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait'
-    }
-  };
-  html2pdf().set(opt).from(element).save();
+  html2pdf().from(document.getElementById('pdfContent')).save('Fee_Receipt.pdf');
 });
 
 
