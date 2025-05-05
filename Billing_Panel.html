@@ -81,12 +81,12 @@
         <option value="">Select Class</option>
       </select>
 
-      <label>Student ID</label>
+      <label>Student Name</label>
       <select id="studentId" name="studentId" onchange="fillStudentName()" required>
         <option value="">Select ID</option>
       </select>
 
-      <label>Student Name</label>
+      <label> Student ID</label>
       <input type="text" id="studentName" name="studentName" readonly>
 
       <label>Fee Plan</label>
@@ -193,20 +193,20 @@
       document.getElementById("balance").value = (total - paid).toFixed(2);
     }
 
-    function saveToSheet() {
-      const formData = new FormData(document.getElementById("billing-form"));
-      const obj = {};
-      formData.forEach((val, key) => obj[key] = val);
+   function saveToSheet() {
+  const formData = new FormData(document.getElementById('billing-form'));
+  const obj = {};
+  formData.forEach((val, key) => obj[key] = val);
 
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(obj),
-        headers: { "Content-Type": "application/json" }
-      }).then(() => {
-        generatePDF(obj);
-        alert("Saved Successfully");
-      }).catch(err => alert("Error: " + err));
-    }
+  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
+    method: "POST",
+    body: JSON.stringify(obj),
+    headers: { "Content-Type": "application/json" }
+  })
+    .then(res => res.text())
+    .then(res => alert("Saved Successfully"))
+    .catch(err => alert("Error saving: " + err));
+}
 
     function generatePDF(data) {
       let html = '<table>';
