@@ -198,7 +198,7 @@
   const obj = {};
   formData.forEach((val, key) => obj[key] = val);
 
-  fetch("https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbz933abjmypGrajkrRn3G42SvjRgucCWnuttzDOTcnU24yFpqlFT9V1PJ1OZ0U664Kw/exec", {
     method: "POST",
     body: JSON.stringify(obj),
     headers: { "Content-Type": "application/json" }
