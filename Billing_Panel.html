@@ -128,7 +128,8 @@
     </form>
 
     <div class="nav-btn">
-      <button onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+      <button onclick="window.location.href='admin-dashboard.html'; // Change this URL if needed
+    }'">Go to Dashboard</button>
     </div>
 
     <div id="bill-preview">
@@ -198,11 +199,12 @@
   const obj = {};
   formData.forEach((val, key) => obj[key] = val);
 
-  fetch("https://script.google.com/macros/s/AKfycbz933abjmypGrajkrRn3G42SvjRgucCWnuttzDOTcnU24yFpqlFT9V1PJ1OZ0U664Kw/exec", {
-    method: "POST",
-    body: JSON.stringify(obj),
-    headers: { "Content-Type": "application/json" }
-  })
+ fetch("https://script.google.com/macros/s/AKfycbz933abjmypGrajkrRn3G42SvjRgucCWnuttzDOTcnU24yFpqlFT9V1PJ1OZ0U664Kw/exec", {
+  method: "POST",
+  body: JSON.stringify(obj),
+  headers: { "Content-Type": "application/json" }
+})
+
     .then(res => res.text())
     .then(res => alert("Saved Successfully"))
     .catch(err => alert("Error saving: " + err));
