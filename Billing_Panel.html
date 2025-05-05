@@ -2,221 +2,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fee Billing Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <title>Fee Billing Panel - ALIF EDU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: #0a0f3d;
-      color: #fff;
-      padding: 20px;
       margin: 0;
+      padding: 20px;
+      background-color: #001f3f;
+      color: white;
     }
-
-    h2 {
+    h1 {
       text-align: center;
-      color: #ffd700;
+      color: gold;
     }
-
     form {
       max-width: 800px;
       margin: auto;
-      background: #10194e;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      background: #fff;
-      color: #000;
-    }
-
-    button {
-      margin-top: 25px;
-      padding: 12px 25px;
-      background: #ffd700;
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    #billSlip {
-      display: none;
-      background: #fff;
-      color: #000;
+      background: #ffffff10;
       padding: 20px;
       border-radius: 12px;
-      margin-top: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-
-    .row {
-      display: flex;
-      gap: 10px;
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
     }
-
-    .row > div {
-      flex: 1;
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
     }
-
-    @media(max-width: 768px) {
-      .row {
-        flex-direction: column;
-      }
+    button {
+      margin-top: 20px;
+      background-color: gold;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    button:hover {
+      background-color: #ffd700cc;
+    }
+    #pdfPreview {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      color: black;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
-  <h2>Fee Billing Panel</h2>
 
-  <form id="billingForm">
-    <label>Bill Date</label>
-    <input type="date" name="billDate" id="billDate" readonly>
+<h1>Fee Billing Panel</h1>
 
-    <label>Receipt Number</label>
-    <input type="text" name="receiptNo" id="receiptNo" readonly>
+<form id="billingForm">
+  <label>Bill Date</label>
+  <input type="date" name="billDate" id="billDate" readonly />
 
-    <div class="row">
-      <div>
-        <label>Class</label>
-        <input type="text" name="class" required>
-      </div>
-      <div>
-        <label>Student ID</label>
-        <input type="text" name="studentId" required>
-      </div>
-    </div>
+  <label>Receipt Number</label>
+  <input type="text" name="receiptNo" id="receiptNo" readonly />
 
-    <label>Student Name</label>
-    <input type="text" name="studentName" required>
+  <label>Class</label>
+  <input type="text" name="class" required />
 
-    <label>Fee Plan</label>
-    <input type="text" name="feePlan" required>
+  <label>Student ID</label>
+  <input type="text" name="studentId" required />
 
-    <div class="row">
-      <div>
-        <label>Class Start Date</label>
-        <input type="date" name="startDate" required>
-      </div>
-      <div>
-        <label>Days Purchased</label>
-        <input type="number" name="daysPurchased" required>
-      </div>
-    </div>
+  <label>Student Name</label>
+  <input type="text" name="studentName" required />
 
-    <div class="row">
-      <div>
-        <label>Total Fee</label>
-        <input type="number" name="totalFee" required>
-      </div>
-      <div>
-        <label>Paid Amount</label>
-        <input type="number" name="paidAmount" required>
-      </div>
-      <div>
-        <label>Balance</label>
-        <input type="number" name="balance" required>
-      </div>
-    </div>
-<div id="pdfPreview" style="margin-top:40px;"></div>
+  <label>Fee Plan</label>
+  <input type="text" name="feePlan" required />
 
-    <label>Payment Mode</label>
-    <select name="paymentMode" required>
-      <option value="">Select</option>
-      <option value="Cash">Cash</option>
-      <option value="Online">Online</option>
-      <option value="Cheque">Cheque</option>
-    </select>
+  <label>Class Start Date</label>
+  <input type="date" name="startDate" required />
 
-    <label>Remarks</label>
-    <textarea name="remarks" rows="2"></textarea>
+  <label>Days Purchased</label>
+  <input type="number" name="daysPurchased" required />
 
-    <label>Payment Status</label>
-    <select name="paymentStatus" required>
-      <option value="">Select</option>
-      <option value="Paid">Paid</option>
-      <option value="Partial">Partial</option>
-      <option value="Unpaid">Unpaid</option>
-    </select>
+  <label>Total Fee</label>
+  <input type="number" name="totalFee" required />
 
-    <button type="submit">Submit & Generate PDF</button>
-  </form>
+  <label>Paid Amount</label>
+  <input type="number" name="paidAmount" required />
 
-  <div id="billSlip"></div>
+  <label>Balance</label>
+  <input type="text" name="balance" id="balance" readonly />
+
+  <label>Payment Mode</label>
+  <select name="paymentMode" required>
+    <option value="Cash">Cash</option>
+    <option value="UPI">UPI</option>
+    <option value="Card">Card</option>
+    <option value="Bank Transfer">Bank Transfer</option>
+  </select>
+
+  <label>Remarks</label>
+  <textarea name="remarks" rows="2"></textarea>
+
+  <label>Payment Status</label>
+  <select name="paymentStatus" required>
+    <option value="Paid">Paid</option>
+    <option value="Partially Paid">Partially Paid</option>
+    <option value="Pending">Pending</option>
+  </select>
+
+  <button type="submit">Submit & Generate PDF</button>
+</form>
+
+<div id="pdfPreview"></div>
+
 <script>
-  function generatePDFBill(data) {
-    const receiptWindow = document.getElementById('pdfPreview');
-    receiptWindow.innerHTML = `
-      <div style="max-width:700px;margin:auto;padding:30px;border:1px solid #ccc;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);font-family:'Poppins',sans-serif;background:#fff;position:relative;">
-        <div style="text-align:center;margin-bottom:20px;">
-          <img src="1.png" alt="ALIF EDU Logo" style="height:80px;margin-bottom:10px;">
-          <h2 style="margin:0;color:#003366;">ALIF EDU</h2>
-          <p style="font-size:12px;color:#666;">Premium Learning | www.alifedu.in</p>
-        </div>
-        <hr style="border-top:1px solid #999;">
-        <div style="display:flex;justify-content:space-between;font-size:14px;margin:20px 0;">
-          <div>
-            <p><strong>Bill Date:</strong> ${data.billDate}</p>
-            <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
-          </div>
-          <div style="text-align:right;">
-            <p><strong>Student ID:</strong> ${data.studentId}</p>
-            <p><strong>Student Name:</strong> ${data.studentName}</p>
-          </div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;">
-          <tr style="background:#f0f0f0;">
-            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Class</th>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Fee Plan</th>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Start Date</th>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc;">Days</th>
-          </tr>
-          <tr>
-            <td style="padding:8px;border:1px solid #ccc;">${data.class}</td>
-            <td style="padding:8px;border:1px solid #ccc;">${data.feePlan}</td>
-            <td style="padding:8px;border:1px solid #ccc;">${data.startDate}</td>
-            <td style="padding:8px;border:1px solid #ccc;">${data.daysPurchased}</td>
-          </tr>
-        </table>
-        <div style="margin-top:20px;">
-          <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
-          <p><strong>Paid Amount:</strong> ₹${data.paidAmount}</p>
-          <p><strong>Balance:</strong> ₹${data.balance}</p>
-          <p><strong>Payment Mode:</strong> ${data.paymentMode}</p>
-          <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
-          <p><strong>Remarks:</strong> ${data.remarks}</p>
-        </div>
-        <div style="text-align:right;margin-top:30px;">
-          <p>__________________________</p>
-          <p style="margin-top:-10px;">Recipient Signature</p>
-        </div>
-        <hr style="margin-top:40px;border-top:1px solid #ccc;">
-        <p style="text-align:center;font-size:12px;color:#888;">© 2025 ALIF EDU. All rights reserved.</p>
-      </div>
-    `;
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
 
-    receiptWindow.scrollIntoView({ behavior: 'smooth' });
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById('billDate').value = today;
+
+    // Set receipt no format: REC 2025-<random>
+    const rand = Math.floor(Math.random() * 1000) + 1;
+    document.getElementById('receiptNo').value = `REC 2025-${rand}`;
+  });
+
+  document.querySelector('[name="totalFee"]').addEventListener('input', updateBalance);
+  document.querySelector('[name="paidAmount"]').addEventListener('input', updateBalance);
+
+  function updateBalance() {
+    const total = parseFloat(document.querySelector('[name="totalFee"]').value) || 0;
+    const paid = parseFloat(document.querySelector('[name="paidAmount"]').value) || 0;
+    const balance = total - paid;
+    document.getElementById('balance').value = balance.toFixed(2);
+  }
+
+  document.getElementById('billingForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      await fetch(scriptURL, { method: 'POST', body: formData });
+      alert("Billing data stored successfully!");
+      generatePDFBill(data);
+    } catch (err) {
+      alert("Failed to submit data.");
+      console.error(err);
+    }
+  });
+
+  function generatePDFBill(data) {
+    document.getElementById('pdfPreview').innerHTML = `
+      <div style="text-align:center;">
+        <img src="1.png" style="height:80px;" alt="Logo"><br>
+        <h2 style="margin:5px 0;color:#003366;">ALIF EDU</h2>
+        <p style="margin:0;font-size:12px;">www.alifedu.in | Premium Learning</p>
+      </div>
+      <hr style="margin:20px 0;">
+      <div style="display:flex;justify-content:space-between;font-size:14px;">
+        <div>
+          <p><strong>Bill Date:</strong> ${data.billDate}</p>
+          <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
+        </div>
+        <div style="text-align:right;">
+          <p><strong>Student ID:</strong> ${data.studentId}</p>
+          <p><strong>Name:</strong> ${data.studentName}</p>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:10px;">
+        <tr style="background:#f0f0f0;">
+          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Class</th>
+          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Fee Plan</th>
+          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Start Date</th>
+          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Days</th>
+        </tr>
+        <tr>
+          <td style="padding:8px;border:1px solid #ccc;">${data.class}</td>
+          <td style="padding:8px;border:1px solid #ccc;">${data.feePlan}</td>
+          <td style="padding:8px;border:1px solid #ccc;">${data.startDate}</td>
+          <td style="padding:8px;border:1px solid #ccc;">${data.daysPurchased}</td>
+        </tr>
+      </table>
+      <div style="margin-top:20px;">
+        <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
+        <p><strong>Paid Amount:</strong> ₹${data.paidAmount}</p>
+        <p><strong>Balance:</strong> ₹${data.balance}</p>
+        <p><strong>Payment Mode:</strong> ${data.paymentMode}</p>
+        <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
+        <p><strong>Remarks:</strong> ${data.remarks}</p>
+      </div>
+      <div style="text-align:right;margin-top:30px;">
+        <p>__________________________</p>
+        <p style="margin-top:-10px;">Recipient Signature</p>
+      </div>
+      <hr style="margin-top:30px;">
+      <p style="text-align:center;font-size:12px;color:#888;">© 2025 ALIF EDU. All rights reserved.</p>
+    `;
+    document.getElementById('pdfPreview').scrollIntoView({ behavior: 'smooth' });
   }
 </script>
 
