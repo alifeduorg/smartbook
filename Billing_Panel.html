@@ -254,17 +254,19 @@ form.addEventListener('submit', async function(e) {
   }
 });
 
-function downloadPDF() {
-  const element = document.getElementById('receiptPrint'); // use the correct ID
+downloadBtn.addEventListener('click', () => {
+  document.getElementById('receiptPrint').innerHTML = document.getElementById('pdfContent').innerHTML;
+
+  const element = document.getElementById('receiptPrint'); // not the modal!
   const opt = {
     margin: 10,
-    filename: 'fee-receipt.pdf',
+    filename: 'Fee_Receipt.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
-      scrollY: 0,
       useCORS: true,
-      windowHeight: element.scrollHeight // capture full height
+      scrollY: 0,
+      windowHeight: element.scrollHeight
     },
     jsPDF: {
       unit: 'mm',
@@ -273,7 +275,8 @@ function downloadPDF() {
     }
   };
   html2pdf().set(opt).from(element).save();
-}
+});
+
 
 </script>
 
