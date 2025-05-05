@@ -1,113 +1,146 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Fee Billing Panel</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      padding: 30px;
-    }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin: auto;
-    }
-    label, input, select {
-      display: block;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    button {
-      background-color: navy;
-      color: white;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: goldenrod;
-    }
-  </style>
-</head>
-<body>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial; padding: 20px; background: #f0f8ff; }
+      .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; max-width: 800px; margin: auto; }
+      input, select, textarea { width: 100%; padding: 8px; margin: 5px 0 15px 0; }
+      button { padding: 10px 20px; background: navy; color: white; border: none; border-radius: 5px; cursor: pointer; }
+      #pdfArea { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>Fee Billing Panel</h2>
 
-  <form id="billing-form">
-    <h2>Fee Billing</h2>
+      <label>Class</label>
+      <select id="class" onchange="loadStudents()">
+        <option value="">Select Class</option>
+        <option value="Grade 1">Grade 1</option>
+        <option value="Grade 2">Grade 2</option>
+        <!-- Add more classes -->
+      </select>
 
-    <label>Bill Date</label>
-    <input type="date" id="billDate" name="billDate" required>
+      <label>Student Name</label>
+      <select id="studentName" onchange="setStudentId()">
+        <option value="">Select Student</option>
+      </select>
 
-    <label>Class</label>
-    <input type="text" name="class" required>
+      <label>Student ID</label>
+      <input type="text" id="studentId" readonly>
 
-    <label>Student ID</label>
-    <input type="text" name="studentId" required>
+      <label>Fee Plan</label>
+      <input type="text" id="feePlan">
+      <label>Class Start Date</label>
+      <input type="date" id="startDate">
+      <label>Days Purchased</label>
+      <input type="number" id="daysPurchased">
+      <label>Total Fee</label>
+      <input type="number" id="totalFee">
+      <label>Paid Amount</label>
+      <input type="number" id="paidAmount">
+      <label>Balance</label>
+      <input type="number" id="balance">
+      <label>Payment Mode</label>
+      <select id="paymentMode">
+        <option>Cash</option>
+        <option>UPI</option>
+        <option>Bank Transfer</option>
+      </select>
+      <label>Remarks</label>
+      <textarea id="remarks"></textarea>
+      <label>Payment Status</label>
+      <select id="paymentStatus">
+        <option>Paid</option>
+        <option>Pending</option>
+      </select>
 
-    <label>Student Name</label>
-    <input type="text" name="studentName" required>
+      <button onclick="submitBill()">Submit and Generate Bill</button>
+      <button onclick="goDashboard()">Dashboard</button>
+    </div>
 
-    <label>Fee Plan</label>
-    <input type="text" name="feePlan" required>
+    <div id="pdfArea"></div>
 
-    <label>Class Start Date</label>
-    <input type="date" name="classStartDate" required>
+    <script>
+      function loadStudents() {
+        const className = document.getElementById('class').value;
+        if (!className) return;
+        google.script.run.withSuccessHandler(students => {
+          const select = document.getElementById('studentName');
+          select.innerHTML = '<option value="">Select Student</option>';
+          students.forEach(s => {
+            const opt = document.createElement('option');
+            opt.textContent = s.name;
+            opt.value = s.name;
+            opt.dataset.id = s.id;
+            select.appendChild(opt);
+          });
+        }).getStudentsByClass(className);
+      }
 
-    <label>Days Purchased</label>
-    <input type="number" name="daysPurchased" required>
+      function setStudentId() {
+        const studentSelect = document.getElementById('studentName');
+        const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+        document.getElementById('studentId').value = selectedOption.dataset.id || '';
+      }
 
-    <label>Total Fee</label>
-    <input type="number" name="totalFee" required>
+      function submitBill() {
+        const data = {
+          class: document.getElementById('class').value,
+          studentName: document.getElementById('studentName').value,
+          studentId: document.getElementById('studentId').value,
+          feePlan: document.getElementById('feePlan').value,
+          startDate: document.getElementById('startDate').value,
+          daysPurchased: document.getElementById('daysPurchased').value,
+          totalFee: document.getElementById('totalFee').value,
+          paidAmount: document.getElementById('paidAmount').value,
+          balance: document.getElementById('balance').value,
+          paymentMode: document.getElementById('paymentMode').value,
+          remarks: document.getElementById('remarks').value,
+          paymentStatus: document.getElementById('paymentStatus').value
+        };
 
-    <label>Paid Amount</label>
-    <input type="number" name="paidAmount" required>
+        google.script.run.withSuccessHandler(receiptNo => {
+          alert('Bill Saved! Receipt No: ' + receiptNo);
+          generatePDF(receiptNo, data);
+        }).saveBill(data);
+      }
 
-    <label>Balance</label>
-    <input type="number" name="balance" required>
+      function generatePDF(receiptNo, data) {
+        const win = window.open('', '', 'width=800,height=600');
+        const html = `
+          <html><head><title>Bill</title></head>
+          <body style="font-family:Arial;padding:40px;">
+            <img src="1.pngL" width="100"><br>
+            <h2>Alif Edu – Fee Receipt</h2>
+            <p><strong>Receipt No:</strong> ${receiptNo}</p>
+            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <hr>
+            <p><strong>Class:</strong> ${data.class}</p>
+            <p><strong>Student Name:</strong> ${data.studentName}</p>
+            <p><strong>Student ID:</strong> ${data.studentId}</p>
+            <p><strong>Fee Plan:</strong> ${data.feePlan}</p>
+            <p><strong>Start Date:</strong> ${data.startDate}</p>
+            <p><strong>Days Purchased:</strong> ${data.daysPurchased}</p>
+            <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
+            <p><strong>Paid:</strong> ₹${data.paidAmount}</p>
+            <p><strong>Balance:</strong> ₹${data.balance}</p>
+            <p><strong>Payment Mode:</strong> ${data.paymentMode}</p>
+            <p><strong>Status:</strong> ${data.paymentStatus}</p>
+            <p><strong>Remarks:</strong> ${data.remarks}</p>
+            <hr>
+            <p>Recipient Signature: ______________________</p>
+          </body></html>
+        `;
+        win.document.write(html);
+        win.document.close();
+        win.print();
+      }
 
-    <label>Payment Mode</label>
-    <select name="paymentMode" required>
-      <option value="Cash">Cash</option>
-      <option value="UPI">UPI</option>
-      <option value="Card">Card</option>
-    </select>
-
-    <label>Remarks</label>
-    <input type="text" name="remarks">
-
-    <label>Payment Status</label>
-    <select name="paymentStatus" required>
-      <option value="Paid">Paid</option>
-      <option value="Partially Paid">Partially Paid</option>
-      <option value="Pending">Pending</option>
-    </select>
-
-    <button type="button" onclick="submitForm()">Save to Sheet</button>
-  </form>
-
-  <script>
-    document.getElementById('billDate').valueAsDate = new Date();
-
-    function submitForm() {
-      const form = document.getElementById('billing-form');
-      const formData = new FormData(form);
-      const obj = {};
-      formData.forEach((val, key) => obj[key] = val);
-
-      fetch('https://script.google.com/macros/s/AKfycbz933abjmypGrajkrRn3G42SvjRgucCWnuttzDOTcnU24yFpqlFT9V1PJ1OZ0U664Kw/exec', {
-        method: 'POST',
-        body: JSON.stringify(obj),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.result === "Success" ? "Saved successfully!" : "Error: " + data.message);
-      })
-      .catch(err => alert("Error saving: " + err));
-    }
-  </script>
-
-</body>
+      function goDashboard() {
+        window.location.href = "https://your-dashboard-url.com";
+      }
+    </script>
+  </body>
 </html>
