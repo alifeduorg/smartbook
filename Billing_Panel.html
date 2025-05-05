@@ -1,227 +1,205 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Fee Billing Panel</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #fff;
       margin: 0;
-      padding: 0;
+      background: #f9f9f9;
+    }
+    header {
+      background: navy;
+      color: goldenrod;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
     .container {
       max-width: 800px;
-      margin: auto;
-      padding: 40px;
-    }
-    h2 {
-      color: #002147;
-      text-align: center;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 12px;
     }
     label {
       display: block;
-      margin: 10px 0 5px;
+      margin-top: 1rem;
       font-weight: 600;
     }
-    input, select {
+    input, select, button, textarea {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
       border-radius: 6px;
+      border: 1px solid #ccc;
     }
     button {
-      background: #002147;
-      color: #fff;
-      padding: 12px;
-      width: 100%;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      background: goldenrod;
+      color: navy;
+      font-weight: bold;
+      margin-top: 1.5rem;
       cursor: pointer;
     }
-    button:hover {
-      background: #ffb800;
-      color: #002147;
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
     }
-    #bill-preview {
-      display: none;
-      background: white;
-      padding: 30px;
-      border: 3px solid goldenrod;
-      border-radius: 12px;
-      margin-top: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    .actions button {
+      flex: 1;
     }
-    #logo {
-      width: 80px;
-    }
-    .nav-btn {
-      margin-top: 10px;
+    footer {
       text-align: center;
+      font-size: 0.9rem;
+      padding: 1rem;
+      color: gray;
     }
   </style>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
 </head>
 <body>
 
-  <div class="container">
-    <h2>Fee Billing Form</h2>
+<header>ALIF EDU - Fee Billing Panel</header>
 
-    <form id="billing-form">
-      <label>Bill Date</label>
-      <input type="date" id="billDate" name="billDate" readonly>
+<div class="container">
+  <form id="billingForm">
+    <label>Bill Date</label>
+    <input type="date" id="billDate" name="billDate" readonly>
 
-      <label>Receipt No</label>
-      <input type="text" id="receiptNo" name="receiptNo" readonly>
+    <label>Receipt Number</label>
+    <input type="text" id="receiptNo" name="receiptNo" readonly>
 
-      <label>Class</label>
-      <select id="classSelect" name="class" onchange="populateStudentIds()" required>
-        <option value="">Select Class</option>
-      </select>
+    <label>Class</label>
+    <select id="classSelect" name="class" required onchange="loadStudents()">
+      <option value="">Select Class</option>
+    </select>
 
-      <label>Student Name</label>
-      <select id="studentId" name="studentId" onchange="fillStudentName()" required>
-        <option value="">Select ID</option>
-      </select>
+    <label>Student ID</label>
+    <select id="studentName" name="studentName" required onchange="fillStudentId()">
+      <option value="">Select Student</option>
+    </select>
 
-      <label> Student ID</label>
-      <input type="text" id="studentName" name="studentName" readonly>
+    <label>Student Name </label>
+    <input type="text" id="studentId" name="studentId" readonly>
 
-      <label>Fee Plan</label>
-      <input type="text" name="feePlan">
+    <label>Fee Plan</label>
+    <input type="text" name="feePlan">
 
-      <label>Class Start Date</label>
-      <input type="date" name="classStartDate">
+    <label>Class Start Date</label>
+    <input type="date" name="classStartDate">
 
-      <label>Days Purchased</label>
-      <input type="number" name="daysPurchased">
+    <label>Days Purchased</label>
+    <input type="number" name="daysPurchased">
 
-      <label>Total Fee</label>
-      <input type="number" id="totalFee" name="totalFee" oninput="calculateBalance()">
+    <label>Total Fee</label>
+    <input type="number" id="totalFee" name="totalFee" oninput="updateBalance()">
 
-      <label>Paid Amount</label>
-      <input type="number" id="paidAmount" name="paidAmount" oninput="calculateBalance()">
+    <label>Paid Amount</label>
+    <input type="number" id="paidAmount" name="paidAmount" oninput="updateBalance()">
 
-      <label>Balance</label>
-      <input type="number" id="balance" name="balance" readonly>
+    <label>Balance</label>
+    <input type="number" id="balance" name="balance" readonly>
 
-      <label>Payment Mode</label>
-      <select name="paymentMode">
-        <option>Cash</option>
-        <option>UPI</option>
-        <option>Card</option>
-      </select>
+    <label>Payment Mode</label>
+    <select name="paymentMode">
+      <option value="Cash">Cash</option>
+      <option value="UPI">UPI</option>
+      <option value="Card">Card</option>
+    </select>
 
-      <label>Remarks</label>
-      <input type="text" name="remarks">
+    <label>Remarks</label>
+    <textarea name="remarks"></textarea>
 
-      <label>Payment Status</label>
-      <select name="paymentStatus">
-        <option>Paid</option>
-        <option>Partially Paid</option>
-        <option>Pending</option>
-      </select>
+    <label>Payment Status</label>
+    <select name="paymentStatus">
+      <option value="Paid">Paid</option>
+      <option value="Partially Paid">Partially Paid</option>
+      <option value="Pending">Pending</option>
+    </select>
 
-      <button type="button" onclick="saveToSheet()">Save & Generate PDF</button>
-    </form>
-
-    <div class="nav-btn">
-      <button onclick="window.location.href='admin-dashboard.html'>Go to Dashboard</button>
+    <div class="actions">
+      <button type="button" onclick="saveBill()">Save Bill</button>
+      <button type="button" onclick="location.href='dashboard.html'">Go to Dashboard</button>
     </div>
+  </form>
+</div>
 
-    <div id="bill-preview">
-      <img src="1.png" id="logo" alt="Logo"><br>
-      <h3>ALIF EDU  Fee Receipt</h3>
-      <div id="pdf-content"></div>
-      <p style="margin-top: 40px;">Recipient Signature: ____________________</p>
-    </div>
-  </div>
+<footer>© 2025 ALIF EDU. All rights reserved.</footer>
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
-    let studentMap = {};
+<script>
+const FETCH_URL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?action=getStudentData";
+const SAVE_URL = "https://script.google.com/macros/s/AKfycbz933abjmypGrajkrRn3G42SvjRgucCWnuttzDOTcnU24yFpqlFT9V1PJ1OZ0U664Kw/exec";
 
-    window.onload = () => {
-      document.getElementById('billDate').valueAsDate = new Date();
+let studentData = {};
 
-      fetch(SCRIPT_URL + "?action=getReceiptNo")
-        .then(res => res.json())
-        .then(data => document.getElementById('receiptNo').value = data.receiptNo);
+window.onload = () => {
+  document.getElementById("billDate").valueAsDate = new Date();
 
-      fetch(SCRIPT_URL + "?action=getStudentData")
-        .then(res => res.json())
-        .then(data => {
-          studentMap = data;
-          const classSelect = document.getElementById("classSelect");
-          Object.keys(studentMap).sort().forEach(cls => {
-            const opt = document.createElement("option");
-            opt.value = cls;
-            opt.textContent = cls;
-            classSelect.appendChild(opt);
-          });
-        });
-    };
+  fetch(FETCH_URL)
+    .then(res => res.json())
+    .then(data => {
+      studentData = data;
+      const classSelect = document.getElementById("classSelect");
+      Object.keys(data).forEach(cls => {
+        const opt = document.createElement("option");
+        opt.value = cls;
+        opt.textContent = cls;
+        classSelect.appendChild(opt);
+      });
+    });
+};
 
-    function populateStudentIds() {
-      const cls = document.getElementById("classSelect").value;
-      const idSelect = document.getElementById("studentId");
-      idSelect.innerHTML = '<option value="">Select ID</option>';
-      document.getElementById("studentName").value = "";
+function loadStudents() {
+  const cls = document.getElementById("classSelect").value;
+  const studentName = document.getElementById("studentName");
+  studentName.innerHTML = '<option value="">Select Student</option>';
 
-      if (studentMap[cls]) {
-        studentMap[cls].forEach(s => {
-          const opt = document.createElement("option");
-          opt.value = s.id;
-          opt.textContent = s.id;
-          idSelect.appendChild(opt);
-        });
-      }
-    }
-
-    function fillStudentName() {
-      const cls = document.getElementById("classSelect").value;
-      const id = document.getElementById("studentId").value;
-      const student = studentMap[cls]?.find(s => s.id === id);
-      document.getElementById("studentName").value = student ? student.name : "";
-    }
-
-    function calculateBalance() {
-      const total = parseFloat(document.getElementById("totalFee").value) || 0;
-      const paid = parseFloat(document.getElementById("paidAmount").value) || 0;
-      document.getElementById("balance").value = (total - paid).toFixed(2);
-    }
-
-   function saveToSheet() {
-  const formData = new FormData(document.getElementById('billing-form'));
-  const obj = {};
-  formData.forEach((val, key) => obj[key] = val);
-
- fetch("https://script.google.com/macros/s/AKfycbz933abjmypGrajkrRn3G42SvjRgucCWnuttzDOTcnU24yFpqlFT9V1PJ1OZ0U664Kw/exec", {
-  method: "POST",
-  body: JSON.stringify(obj),
-  headers: { "Content-Type": "application/json" }
+  if (studentData[cls]) {
+    studentData[cls].forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.name;
+      opt.textContent = s.name;
+      opt.dataset.id = s.id;
+      studentName.appendChild(opt);
+    });
+  }
+  document.getElementById("studentId").value = '';
 }
 
-    .then(res => res.text())
-    .then(res => alert("Saved Successfully"))
-    .catch(err => alert("Error saving: " + err));
+function fillStudentId() {
+  const cls = document.getElementById("classSelect").value;
+  const name = document.getElementById("studentName").value;
+  const found = studentData[cls]?.find(s => s.name === name);
+  document.getElementById("studentId").value = found ? found.id : '';
 }
 
-    function generatePDF(data) {
-      let html = '<table>';
-      for (const [k, v] of Object.entries(data)) {
-        html += `<tr><td><strong>${k.replace(/([A-Z])/g, ' $1')}:</strong></td><td>${v}</td></tr>`;
-      }
-      html += '</table>';
-      document.getElementById("pdf-content").innerHTML = html;
-      document.getElementById("bill-preview").style.display = "block";
+function updateBalance() {
+  const total = parseFloat(document.getElementById("totalFee").value) || 0;
+  const paid = parseFloat(document.getElementById("paidAmount").value) || 0;
+  document.getElementById("balance").value = (total - paid).toFixed(2);
+}
 
-      html2pdf().from(document.getElementById("bill-preview")).save("Fee_Receipt.pdf");
-    }
-  </script>
+function saveBill() {
+  const form = document.getElementById("billingForm");
+  const formData = new FormData(form);
+  const data = {};
+  formData.forEach((v, k) => data[k] = v);
+
+  fetch(SAVE_URL, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
+  }).then(res => res.json())
+    .then(res => {
+      alert("Saved successfully!");
+      form.reset();
+      document.getElementById("billDate").valueAsDate = new Date();
+    }).catch(err => alert("Error saving: " + err));
+}
+</script>
+
 </body>
 </html>
