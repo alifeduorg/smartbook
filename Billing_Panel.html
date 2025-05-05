@@ -63,6 +63,8 @@
       text-align: center;
     }
   </style>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
 </head>
 <body>
 
@@ -128,13 +130,12 @@
     </form>
 
     <div class="nav-btn">
-      <button onclick="window.location.href='admin-dashboard.html'; // Change this URL if needed
-    }'">Go to Dashboard</button>
+      <button onclick="window.location.href='admin-dashboard.html'>Go to Dashboard</button>
     </div>
 
     <div id="bill-preview">
       <img src="1.png" id="logo" alt="Logo"><br>
-      <h3>ALIF EDU - Fee Receipt</h3>
+      <h3>ALIF EDU  Fee Receipt</h3>
       <div id="pdf-content"></div>
       <p style="margin-top: 40px;">Recipient Signature: ____________________</p>
     </div>
@@ -203,7 +204,7 @@
   method: "POST",
   body: JSON.stringify(obj),
   headers: { "Content-Type": "application/json" }
-})
+}
 
     .then(res => res.text())
     .then(res => alert("Saved Successfully"))
