@@ -1,150 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fee Billing Panel</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
-      background: #0d1b2a;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #1a2a40;
+      color: white;
+      margin: 0;
+      padding: 0;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    form {
-      background: #1b263b;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 12px rgba(0,0,0,0.5);
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select {
+
+    .container {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #f0ad4e;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
       font-size: 16px;
+      color: #333;
     }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
     button {
-      margin-top: 20px;
-      padding: 12px 20px;
+      background-color: #f0ad4e;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
       border: none;
-      border-radius: 6px;
-      background: gold;
-      color: #0d1b2a;
-      font-weight: bold;
+      border-radius: 5px;
       cursor: pointer;
+      width: 100%;
     }
-    #dashboardBtn {
-      background: #fff;
-      color: #0d1b2a;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+    button:hover {
+      background-color: #ec971f;
     }
 
     /* Modal */
     #pdfModal {
       display: none;
       position: fixed;
-      z-index: 1000;
-      left: 0;
       top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.6);
+      background-color: rgba(0, 0, 0, 0.5);
       justify-content: center;
       align-items: center;
     }
+
     #pdfContent {
-      background: white;
-      padding: 30px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
       width: 90%;
-      max-width: 600px;
-      border-radius: 12px;
-      position: relative;
       text-align: center;
-      color: #000;
     }
+
     #closeModal {
       position: absolute;
       top: 10px;
-      right: 15px;
-      font-size: 20px;
+      right: 10px;
+      font-size: 24px;
       cursor: pointer;
     }
+
     #pdfContent img {
-      max-width: 100px;
-      margin-bottom: 10px;
+      width: 150px;
+      margin-bottom: 20px;
     }
-    #billData table {
+
+    #downloadBtn {
+      background-color: #f0ad4e;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    #downloadBtn:hover {
+      background-color: #ec971f;
+    }
+
+    table {
       width: 100%;
+      margin-top: 20px;
       border-collapse: collapse;
-      margin-top: 15px;
     }
-    #billData td {
-      padding: 8px;
-      border-bottom: 1px solid #ccc;
+
+    table, th, td {
+      border: 1px solid #ddd;
     }
-    #billData td:first-child {
-      font-weight: bold;
-      width: 40%;
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0ad4e;
+      color: white;
+    }
+
+    td {
+      background-color: #f9f9f9;
     }
   </style>
 </head>
 <body>
 
-  <div style="text-align: center;">
-    <button id="dashboardBtn" onclick="window.location.href='ADMIN_dashboard.html'">⬅ Back to Dashboard</button>
+  <div class="container">
+    <h1>Fee Billing Panel</h1>
+    <div class="form-container">
+      <form id="billingForm">
+        <div class="form-group">
+          <label for="class">Class:</label>
+          <input type="text" id="class" name="class" required>
+        </div>
+        <div class="form-group">
+          <label for="studentId">Student ID:</label>
+          <input type="text" id="studentId" name="studentId" required>
+        </div>
+        <div class="form-group">
+          <label for="studentName">Student Name:</label>
+          <input type="text" id="studentName" name="studentName" required>
+        </div>
+        <div class="form-group">
+          <label for="feePlan">Fee Plan:</label>
+          <input type="text" id="feePlan" name="feePlan" required>
+        </div>
+        <div class="form-group">
+          <label for="startDate">Class Start Date:</label>
+          <input type="date" id="startDate" name="startDate" required>
+        </div>
+        <div class="form-group">
+          <label for="daysPurchased">Days Purchased:</label>
+          <input type="number" id="daysPurchased" name="daysPurchased" required>
+        </div>
+        <div class="form-group">
+          <label for="totalFee">Total Fee:</label>
+          <input type="number" id="totalFee" name="totalFee" required>
+        </div>
+        <div class="form-group">
+          <label for="paidAmount">Paid Amount:</label>
+          <input type="number" id="paidAmount" name="paidAmount" required>
+        </div>
+        <div class="form-group">
+          <label for="paymentMode">Payment Mode:</label>
+          <input type="text" id="paymentMode" name="paymentMode" required>
+        </div>
+        <div class="form-group">
+          <label for="remarks">Remarks:</label>
+          <input type="text" id="remarks" name="remarks">
+        </div>
+        <div class="form-group">
+          <label for="paymentStatus">Payment Status:</label>
+          <input type="text" id="paymentStatus" name="paymentStatus" required>
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
   </div>
-
-  <h2>Fee Billing Panel</h2>
-
-  <form id="billingForm">
-    <label>Class: <input type="text" name="class" required></label>
-    <label>Student ID: <input type="text" name="studentId" required></label>
-    <label>Student Name: <input type="text" name="studentName" required></label>
-    <label>Fee Plan: <input type="text" name="feePlan" required></label>
-    <label>Class Start Date: <input type="date" name="startDate" required></label>
-    <label>Days Purchased: <input type="number" name="daysPurchased" required></label>
-    <label>Total Fee: <input type="number" name="totalFee" required></label>
-    <label>Paid Amount: <input type="number" name="paidAmount" required></label>
-    <label>Payment Mode:
-      <select name="paymentMode" required>
-        <option value="">Select Mode</option>
-        <option>Cash</option>
-        <option>Online</option>
-        <option>Bank Transfer</option>
-      </select>
-    </label>
-    <label>Remarks: <input type="text" name="remarks"></label>
-    <label>Payment Status:
-      <select name="paymentStatus" required>
-        <option value="">Select</option>
-        <option>Paid</option>
-        <option>Partial</option>
-        <option>Unpaid</option>
-      </select>
-    </label>
-    <button type="submit">Submit & Generate Slip</button>
-  </form>
 
   <!-- PDF Modal -->
   <div id="pdfModal">
     <div id="pdfContent">
       <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'">✖</span>
-      <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" />
+      <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo">
       <h3>FEE RECEIPT</h3>
       <div id="billData"></div>
       <button id="downloadBtn">Download PDF</button>
@@ -186,26 +241,23 @@
 
       document.getElementById("pdfModal").style.display = "flex";
 
-      // Optional: Send to Google Sheets
-      // await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec', { method: 'POST', body: formData });
-    });
-
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const original = document.getElementById("pdfContent");
-      const clone = original.cloneNode(true);
-      clone.querySelector("#closeModal")?.remove();
-      clone.style.background = "#fff";
-      clone.style.color = "#000";
-
-      const opt = {
-        margin: 0.3,
-        filename: 'fee_receipt.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      // Send data to Google Apps Script
+      const url = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec'; // Replace with your Web App URL
+      const params = {
+        method: 'POST',
+        contentType: 'application/json',
+        payload: JSON.stringify(values)
       };
 
-      html2pdf().set(opt).from(clone).save();
+      try {
+        const response = await fetch(url, params);
+        const result = await response.json();
+        if (result.success) {
+          console.log('Data saved successfully');
+        }
+      } catch (error) {
+        console.error('Error saving data:', error);
+      }
     });
   </script>
 </body>
