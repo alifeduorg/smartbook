@@ -2,216 +2,211 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fee Billing Panel - ALIF EDU</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fee Billing Panel</title>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1b2a;
+      color: #fff;
       padding: 20px;
-      background-color: #001f3f;
-      color: white;
+      margin: 0;
     }
-    h1 {
+    h2 {
+      color: #ffd700;
       text-align: center;
-      color: gold;
     }
     form {
-      max-width: 800px;
+      max-width: 600px;
       margin: auto;
-      background: #ffffff10;
+      background: #1b263b;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
     }
     label {
       display: block;
-      margin-top: 10px;
-      font-weight: 600;
+      margin-top: 12px;
+      font-weight: bold;
     }
-    input, select, textarea {
+    input, select {
       width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      border: none;
+      padding: 10px;
       border-radius: 8px;
-      background: #fff;
-      color: #000;
+      border: none;
+      margin-top: 6px;
+      box-sizing: border-box;
     }
     button {
       margin-top: 20px;
-      background-color: gold;
+      padding: 12px;
+      width: 100%;
+      background: #ffd700;
       color: #000;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
       font-weight: bold;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: 0.3s;
     }
     button:hover {
-      background-color: #ffd700cc;
+      background: #e6c200;
     }
-    #pdfPreview {
-      max-width: 800px;
-      margin: 40px auto;
-      background: white;
-      color: black;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    #pdfModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #pdfContent {
+      background: #fff;
+      color: #000;
+      width: 90%;
+      max-width: 500px;
+      padding: 20px;
+      border-radius: 12px;
+      position: relative;
+    }
+    #pdfContent img {
+      width: 80px;
+      margin-bottom: 10px;
+    }
+    #closeModal {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      color: #900;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+    }
+    .row div {
+      width: 48%;
+    }
+    @media (max-width: 600px) {
+      .row { flex-direction: column; }
+      .row div { width: 100%; }
     }
   </style>
 </head>
 <body>
+  <h2>Fee Billing Panel</h2>
+  <form id="billingForm">
+    <label>Bill Date</label>
+    <input type="date" id="billDate" name="billDate" readonly>
 
-<h1>Fee Billing Panel</h1>
+    <label>Receipt Number</label>
+    <input type="text" id="receiptNo" name="receiptNo" readonly>
 
-<form id="billingForm">
-  <label>Bill Date</label>
-  <input type="date" name="billDate" id="billDate" readonly />
+    <label>Class</label>
+    <input type="text" name="class" required>
 
-  <label>Receipt Number</label>
-  <input type="text" name="receiptNo" id="receiptNo" readonly />
+    <label>Student ID</label>
+    <input type="text" name="studentId" required>
 
-  <label>Class</label>
-  <input type="text" name="class" required />
+    <label>Student Name</label>
+    <input type="text" name="studentName" required>
 
-  <label>Student ID</label>
-  <input type="text" name="studentId" required />
+    <label>Fee Plan</label>
+    <input type="text" name="feePlan">
 
-  <label>Student Name</label>
-  <input type="text" name="studentName" required />
+    <label>Class Start Date</label>
+    <input type="date" name="startDate">
 
-  <label>Fee Plan</label>
-  <input type="text" name="feePlan" required />
+    <label>Days Purchased</label>
+    <input type="number" name="daysPurchased">
 
-  <label>Class Start Date</label>
-  <input type="date" name="startDate" required />
+    <label>Total Fee</label>
+    <input type="number" id="totalFee" name="totalFee" required>
 
-  <label>Days Purchased</label>
-  <input type="number" name="daysPurchased" required />
+    <label>Paid Amount</label>
+    <input type="number" id="paidAmount" name="paidAmount" required>
 
-  <label>Total Fee</label>
-  <input type="number" name="totalFee" required />
+    <label>Balance</label>
+    <input type="number" id="balance" name="balance" readonly>
 
-  <label>Paid Amount</label>
-  <input type="number" name="paidAmount" required />
+    <label>Payment Mode</label>
+    <select name="paymentMode" required>
+      <option value="Cash">Cash</option>
+      <option value="Online">Online</option>
+      <option value="UPI">UPI</option>
+    </select>
 
-  <label>Balance</label>
-  <input type="text" name="balance" id="balance" readonly />
+    <label>Remarks</label>
+    <input type="text" name="remarks">
 
-  <label>Payment Mode</label>
-  <select name="paymentMode" required>
-    <option value="Cash">Cash</option>
-    <option value="UPI">UPI</option>
-    <option value="Card">Card</option>
-    <option value="Bank Transfer">Bank Transfer</option>
-  </select>
+    <label>Payment Status</label>
+    <select name="paymentStatus" required>
+      <option value="Paid">Paid</option>
+      <option value="Unpaid">Unpaid</option>
+      <option value="Partial">Partial</option>
+    </select>
 
-  <label>Remarks</label>
-  <textarea name="remarks" rows="2"></textarea>
+    <button type="submit">Submit & Generate Bill</button>
+  </form>
 
-  <label>Payment Status</label>
-  <select name="paymentStatus" required>
-    <option value="Paid">Paid</option>
-    <option value="Partially Paid">Partially Paid</option>
-    <option value="Pending">Pending</option>
-  </select>
+  <!-- PDF Modal -->
+  <div id="pdfModal">
+    <div id="pdfContent">
+      <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'">✖</span>
+      <img src="1.png" alt="Logo" />
+      <h3>ALIF EDU - Fee Receipt</h3>
+      <div id="billData"></div>
+    </div>
+  </div>
 
-  <button type="submit">Submit & Generate PDF</button>
-</form>
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
 
-<div id="pdfPreview"></div>
+    document.addEventListener("DOMContentLoaded", () => {
+      const today = new Date().toISOString().substr(0, 10);
+      document.getElementById("billDate").value = today;
 
-<script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("receiptNo").value = `REC-2025-${data.receiptNo}`;
+        });
+    });
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split("T")[0];
-    document.getElementById('billDate').value = today;
+    document.getElementById("paidAmount").addEventListener("input", () => {
+      const total = parseFloat(document.getElementById("totalFee").value || 0);
+      const paid = parseFloat(document.getElementById("paidAmount").value || 0);
+      document.getElementById("balance").value = total - paid;
+    });
 
-    // Set receipt no format: REC 2025-<random>
-    const rand = Math.floor(Math.random() * 1000) + 1;
-    document.getElementById('receiptNo').value = `REC 2025-${rand}`;
-  });
+    document.getElementById("billingForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
 
-  document.querySelector('[name="totalFee"]').addEventListener('input', updateBalance);
-  document.querySelector('[name="paidAmount"]').addEventListener('input', updateBalance);
-
-  function updateBalance() {
-    const total = parseFloat(document.querySelector('[name="totalFee"]').value) || 0;
-    const paid = parseFloat(document.querySelector('[name="paidAmount"]').value) || 0;
-    const balance = total - paid;
-    document.getElementById('balance').value = balance.toFixed(2);
-  }
-
-  document.getElementById('billingForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-
-    try {
-      await fetch(scriptURL, { method: 'POST', body: formData });
-      alert("Billing data stored successfully!");
-      generatePDFBill(data);
-    } catch (err) {
-      alert("Failed to submit data.");
-      console.error(err);
-    }
-  });
-
-  function generatePDFBill(data) {
-    document.getElementById('pdfPreview').innerHTML = `
-      <div style="text-align:center;">
-        <img src="1.png" style="height:80px;" alt="Logo"><br>
-        <h2 style="margin:5px 0;color:#003366;">ALIF EDU</h2>
-        <p style="margin:0;font-size:12px;">www.alifedu.in | Premium Learning</p>
-      </div>
-      <hr style="margin:20px 0;">
-      <div style="display:flex;justify-content:space-between;font-size:14px;">
-        <div>
-          <p><strong>Bill Date:</strong> ${data.billDate}</p>
-          <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
-        </div>
-        <div style="text-align:right;">
-          <p><strong>Student ID:</strong> ${data.studentId}</p>
-          <p><strong>Name:</strong> ${data.studentName}</p>
-        </div>
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:10px;">
-        <tr style="background:#f0f0f0;">
-          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Class</th>
-          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Fee Plan</th>
-          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Start Date</th>
-          <th style="text-align:left;padding:8px;border:1px solid #ccc;">Days</th>
-        </tr>
-        <tr>
-          <td style="padding:8px;border:1px solid #ccc;">${data.class}</td>
-          <td style="padding:8px;border:1px solid #ccc;">${data.feePlan}</td>
-          <td style="padding:8px;border:1px solid #ccc;">${data.startDate}</td>
-          <td style="padding:8px;border:1px solid #ccc;">${data.daysPurchased}</td>
-        </tr>
-      </table>
-      <div style="margin-top:20px;">
-        <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
-        <p><strong>Paid Amount:</strong> ₹${data.paidAmount}</p>
-        <p><strong>Balance:</strong> ₹${data.balance}</p>
-        <p><strong>Payment Mode:</strong> ${data.paymentMode}</p>
-        <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
-        <p><strong>Remarks:</strong> ${data.remarks}</p>
-      </div>
-      <div style="text-align:right;margin-top:30px;">
-        <p>__________________________</p>
-        <p style="margin-top:-10px;">Recipient Signature</p>
-      </div>
-      <hr style="margin-top:30px;">
-      <p style="text-align:center;font-size:12px;color:#888;">© 2025 ALIF EDU. All rights reserved.</p>
-    `;
-    document.getElementById('pdfPreview').scrollIntoView({ behavior: 'smooth' });
-  }
-</script>
-
+      fetch(scriptURL, { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          const billHTML = `
+            <p><strong>Receipt:</strong> REC-2025-${data.receiptNo}</p>
+            <p><strong>Bill Date:</strong> ${formData.get("billDate")}</p>
+            <p><strong>Student:</strong> ${formData.get("studentName")} (${formData.get("studentId")})</p>
+            <p><strong>Class:</strong> ${formData.get("class")}</p>
+            <p><strong>Fee Plan:</strong> ${formData.get("feePlan")}</p>
+            <p><strong>Total Fee:</strong> ₹${formData.get("totalFee")}</p>
+            <p><strong>Paid:</strong> ₹${formData.get("paidAmount")}</p>
+            <p><strong>Balance:</strong> ₹${formData.get("balance")}</p>
+            <p><strong>Status:</strong> ${formData.get("paymentStatus")}</p>
+          `;
+          document.getElementById("billData").innerHTML = billHTML;
+          document.getElementById("pdfModal").style.display = "flex";
+          e.target.reset();
+          document.getElementById("receiptNo").value = `REC-2025-${parseInt(data.receiptNo)+1}`;
+        })
+        .catch(() => alert("Error submitting data."));
+    });
+  </script>
 </body>
 </html>
