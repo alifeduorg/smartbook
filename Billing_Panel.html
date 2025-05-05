@@ -132,6 +132,17 @@
     <option>LKG</option>
     <option>UKG</option>
     <option>Grade 1</option>
+    <option>Grade 2</option>
+    <option>Grade 3</option>
+    <option>Grade 4</option>
+    <option>Grade 5</option>
+    <option>Grade 6</option>
+    <option>Grade 7</option>
+    <option>Grade 8</option>
+    <option>Grade 9</option>
+    <option>Grade 10</option>
+    <option>Grade 11</option>
+    <option>Grade 12</option>
   </select>
 
   <label>Student ID</label>
@@ -140,11 +151,16 @@
   <label>Student Name</label>
   <input type="text" name="studentName" required />
 
-  <label>Fee Plan</label>
-  <input type="text" name="feePlan" required />
+   <label>Class</label>
+  <select name="class" required>
+    <option value="">Select</option>
+    <option>BASIC</option>
+    <option>STANDARD</option>
+    <option>PREMIUM</option>
 
-  <label>Class Start Date / Days Purchased</label>
-  <input type="text" name="classStart" required />
+  </select>
+  <label>Days Purchased</label>
+  <input type="number" name="classStart" required />
 
   <label>Total Fee</label>
   <input type="number" name="totalFee" required />
@@ -183,8 +199,13 @@
     <button id="downloadBtn">Download PDF</button>
   </div>
 </div>
+<div id="receiptWrapper" style="display:none;">
+  <div id="receiptPrint" style="width: 800px; margin: auto; background: white; padding: 20px; color: #000;">
+    <!-- Injected content -->
+  </div>
+</div>
 
-<a href="admin_dashboard.html" class="back-btn">← Dashboard</a>
+<a href="admin-dashboard.html" class="back-btn">← Dashboard</a>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
@@ -213,24 +234,26 @@ form.addEventListener('submit', async function(e) {
     if (result.success) {
       const balance = data.totalFee - data.paidAmount;
 
-      billData.innerHTML = `
-        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-        <p><strong>Receipt No:</strong> ${result.receiptNumber}</p>
-        <table id="billTable">
-          <tr><th>Field</th><th>Details</th></tr>
-          <tr><td>Class</td><td>${data.class}</td></tr>
-          <tr><td>Student ID</td><td>${data.studentId}</td></tr>
-          <tr><td>Name</td><td>${data.studentName}</td></tr>
-          <tr><td>Fee Plan</td><td>${data.feePlan}</td></tr>
-          <tr><td>Start Date</td><td>${data.classStart}</td></tr>
-          <tr><td>Total Fee</td><td>₹${data.totalFee}</td></tr>
-          <tr><td>Paid</td><td>₹${data.paidAmount}</td></tr>
-          <tr><td>Balance</td><td>₹${balance}</td></tr>
-          <tr><td>Payment Mode</td><td>${data.paymentMode}</td></tr>
-          <tr><td>Status</td><td>${data.paymentStatus}</td></tr>
-        </table>
-        <p style="margin-top:20px;">Thank you for your payment.</p>
-      `;
+      document.getElementById('receiptPrint').innerHTML = `
+  <img src="alif edu (600 x 300 px) (820 x 312 px).png" style="width:150px;"/>
+  <h2>FEE RECEIPT</h2>
+  <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+  <p><strong>Receipt No:</strong> ${result.receiptNumber}</p>
+  <table style="width:100%; border-collapse: collapse;" border="1">
+    <tr><th style="padding: 8px;">Field</th><th style="padding: 8px;">Details</th></tr>
+    <tr><td style="padding: 8px;">Class</td><td>${data.class}</td></tr>
+    <tr><td style="padding: 8px;">Student ID</td><td>${data.studentId}</td></tr>
+    <tr><td style="padding: 8px;">Student Name</td><td>${data.studentName}</td></tr>
+    <tr><td style="padding: 8px;">Fee Plan</td><td>${data.feePlan}</td></tr>
+    <tr><td style="padding: 8px;">Start Date</td><td>${data.classStart}</td></tr>
+    <tr><td style="padding: 8px;">Total Fee</td><td>₹${data.totalFee}</td></tr>
+    <tr><td style="padding: 8px;">Paid Amount</td><td>₹${data.paidAmount}</td></tr>
+    <tr><td style="padding: 8px;">Balance</td><td>₹${data.totalFee - data.paidAmount}</td></tr>
+    <tr><td style="padding: 8px;">Payment Mode</td><td>${data.paymentMode}</td></tr>
+    <tr><td style="padding: 8px;">Payment Status</td><td>${data.paymentStatus}</td></tr>
+  </table>
+  <p style="margin-top: 20px;">Thank you for your payment.</p>
+`;
 
       modal.style.display = 'block';
     }
@@ -240,7 +263,15 @@ form.addEventListener('submit', async function(e) {
 });
 
 downloadBtn.addEventListener('click', () => {
-  html2pdf().from(document.getElementById('pdfContent')).save('Fee_Receipt.pdf');
+  const element = document.getElementById('receiptPrint');
+  const opt = {
+    margin: 0.5,
+    filename: 'Fee_Receipt.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
 });
 </script>
 
