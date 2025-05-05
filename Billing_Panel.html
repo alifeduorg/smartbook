@@ -170,18 +170,57 @@
     <button type="submit">Submit & Generate Bill</button>
   </form>
 
-  <!-- PDF Modal -->
-  <div id="pdfModal">
-    <div id="pdfContent">
-      <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'">✖</span>
-      <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" />
-      <h3>FEE RECEIPT</h3>
-      <div id="billData"></div>
-      <button id="downloadBtn">Download PDF</button>
-    </div>
+<!-- PDF Modal -->
+<div id="pdfModal" style="
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+">
+  <div id="pdfContent" style="
+    background: white;
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    position: relative;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  ">
+    <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'" style="
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+    ">✖</span>
+
+    <img src="1.png" alt="Logo" style="max-width: 100px; margin-bottom: 10px;" />
+    <h3 style="margin: 10px 0;">FEE RECEIPT</h3>
+
+    <div id="billData" style="margin-top: 20px; text-align: left;"></div>
+
+    <button id="downloadBtn" style="
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      background-color: navy;
+      color: white;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    ">Download PDF</button>
   </div>
+</div>
 <div style="text-align: center; margin-bottom: 20px;">
-  <button onclick="window.location.href='dashboard.html'" style="
+  <button onclick="window.location.href='ADMIN_dashboard.html'" style="
     background: #fff;
     color: #0d1b2a;
     padding: 10px 20px;
