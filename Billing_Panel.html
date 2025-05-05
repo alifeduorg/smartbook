@@ -53,30 +53,25 @@
     }
 
     #pdfModal {
-        display: none;
+            display: none;
       position: fixed;
-      z-index: 999;
+      top: 5%;
       left: 0;
-      top: 0;
       width: 100%;
       height: 100%;
       overflow: auto;
       background-color: rgba(0, 0, 0, 0.7);
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      z-index: 9999;
     }
 
     #pdfContent {
-     background: #fff;
-      padding: 30px;
+     background: white;
+      margin: 5% auto;
+      padding: 20px;
       width: 90%;
-      max-width: 850px;
-      border-radius: 12px;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      border-radius: 8px;
+      text-align: center;
       
     #pdfContent img {
       width: 150px;
@@ -259,24 +254,8 @@ form.addEventListener('submit', async function(e) {
 });
 
 downloadBtn.addEventListener('click', () => {
-  margin: 10,
-    filename: 'FEE RECEIPT.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      scrollY: 0,
-      useCORS: true,
-      windowHeight: element.scrollHeight  // KEY: capture full height
-    },
-    jsPDF: {
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait'
-    }
-  };
   html2pdf().from(document.getElementById('pdfContent')).save('Fee_Receipt.pdf');
 });
-
 
 </script>
 
