@@ -259,6 +259,21 @@ form.addEventListener('submit', async function(e) {
 });
 
 downloadBtn.addEventListener('click', () => {
+  margin: 10,
+    filename: 'FEE RECEIPT.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      scrollY: 0,
+      useCORS: true,
+      windowHeight: element.scrollHeight  // KEY: capture full height
+    },
+    jsPDF: {
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'portrait'
+    }
+  };
   html2pdf().from(document.getElementById('pdfContent')).save('Fee_Receipt.pdf');
 });
 
