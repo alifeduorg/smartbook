@@ -255,7 +255,7 @@ form.addEventListener('submit', async function(e) {
 });
 
 downloadBtn.addEventListener('click', () => {
-  const element = document.getElementById('receiptPrint'); // hidden printable version
+  const element = document.getElementById('receiptPrint');
   const opt = {
     margin: 0.5,
     filename: 'Fee_Receipt.pdf',
@@ -265,7 +265,6 @@ downloadBtn.addEventListener('click', () => {
   };
   html2pdf().set(opt).from(element).save();
 });
-
 </script>
 
 </body>
