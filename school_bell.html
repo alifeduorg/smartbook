@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Automatic School Bell System</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    #clock {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>School Bell System</h1>
+  <div id="clock"></div>
+
+  <!-- Test buttons -->
+  <div>
+    <h3>Test Bells:</h3>
+    <button onclick="playSound('bell1')">Test Period Bell</button>
+    <button onclick="playSound('bell2')">Test Break Bell</button>
+    <button onclick="playSound('prayer')">Test Prayer Bell</button>
+  </div>
+
+  <!-- Audio Elements -->
+  <audio id="bell1" src="bell1.mp3"></audio>
+  <audio id="bell2" src="bell2.mp3"></audio>
+  <audio id="prayer" src="prayer.mp3"></audio>
+
+  <script>
+    const bellSchedule = {
+      // Format: "Day HH:MM": "soundID"
+      "Monday 09:00": "bell1",
+      "Monday 10:00": "bell2",
+      "Monday 12:00": "prayer",
+      "Tuesday 09:00": "bell1",
+      "Tuesday 10:00": "bell2",
+      "Tuesday 12:00": "prayer",
+      // Add more as needed
+    };
+
+    let lastPlayedTime = "";
+
+    function updateClock() {
+      const now = new Date();
+      const day = now.toLocaleString('en-US', { weekday: 'long' });
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const currentTime = `${day} ${hours}:${minutes}`;
+
+      document.getElementById('clock').textContent = `${hours}:${minutes}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+      if (bellSchedule[currentTime] && lastPlayedTime !== currentTime) {
+        playSound(bellSchedule[currentTime]);
+        lastPlayedTime = currentTime;
+      }
+    }
+
+    function playSound(id) {
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play();
+      }
+    }
+
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
