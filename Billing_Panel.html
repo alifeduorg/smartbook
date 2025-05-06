@@ -1,63 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Billing Panel</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: white;
+      background-color: #f8f9fa;
+      padding: 2rem;
       color: #333;
-      padding: 20px;
-    }
-    .billing-container {
-      max-width: 800px;
-      margin: auto;
-      border-radius: 10px;
-      border: 2px solid gold;
-      padding: 20px;
-      background: #fdfdfd;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
     h2 {
       color: navy;
-      text-align: center;
+    }
+    .billing-form {
+      background: white;
+      border: 2px solid #ffd700;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
     label {
+      display: block;
+      margin-top: 10px;
       font-weight: bold;
-      color: #333;
     }
-    input, select {
+    select, input {
       width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      border-radius: 5px;
+      padding: 10px;
+      margin-top: 5px;
       border: 1px solid #ccc;
+      border-radius: 5px;
     }
     button {
-      background: navy;
-      color: gold;
-      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: navy;
+      color: white;
+      padding: 10px 15px;
       border: none;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
     }
-    button:hover {
-      background: #004080;
+    #slipPopup {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      background: white;
+      border: 3px solid #ffd700;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    #slipPopup button {
+      margin-top: 10px;
+      background-color: goldenrod;
     }
   </style>
 </head>
 <body>
-  <div class="billing-container">
-    <h2>Billing Panel</h2>
+  <h2>Billing Panel</h2>
+  <div class="billing-form">
+    <label>Receipt No</label>
+    <input id="receiptNo" type="text" readonly />
+
     <label>Class</label>
-    <select id="classSelect" onchange="loadStudents()"></select>
+    <select id="classSelect"></select>
 
     <label>Student Name</label>
-    <select id="studentSelect" onchange="fillStudentId()"></select>
+    <select id="studentSelect"></select>
 
     <label>Student ID</label>
-    <input type="text" id="studentId" readonly>
+    <input id="studentId" type="text" readonly />
 
     <label>Fee Plan</label>
     <select id="feePlan">
@@ -67,97 +83,162 @@
     </select>
 
     <label>Class Start Date</label>
-    <input type="date" id="startDate">
+    <input id="startDate" type="date" />
 
     <label>Days Purchased</label>
-    <input type="number" id="daysPurchased">
+    <input id="days" type="number" />
 
     <label>Total Fee</label>
-    <input type="number" id="totalFee">
+    <input id="total" type="number" />
 
     <label>Paid Amount</label>
-    <input type="number" id="paidAmount" oninput="calcBalance()">
+    <input id="paid" type="number" />
 
     <label>Balance</label>
-    <input type="number" id="balance" readonly>
+    <input id="balance" type="number" readonly />
 
     <label>Payment Mode</label>
-    <input type="text" id="mode">
+    <select id="mode">
+      <option>Cash</option>
+      <option>Online</option>
+    </select>
 
     <label>Remarks</label>
-    <input type="text" id="remarks">
+    <input id="remarks" type="text" />
 
     <label>Payment Status</label>
     <select id="status">
       <option>Paid</option>
-      <option>Pending</option>
+      <option>Unpaid</option>
+      <option>Partial</option>
     </select>
 
-    <button onclick="submitData()">Submit</button>
+    <button onclick="submitForm()">Submit</button>
+  </div>
+
+  <div id="slipPopup">
+    <h3>Fee Slip</h3>
+    <div id="slipContent"></div>
+    <button onclick="downloadSlip()">Download</button>
+    <button onclick="closeSlip()">Close</button>
   </div>
 
   <script>
-    const url = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
-    let allData = {};
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
 
-    window.onload = async () => {
-      const res = await fetch(url);
-      allData = await res.json();
-      const classSelect = document.getElementById("classSelect");
-      classSelect.innerHTML = '<option disabled selected>Select Class</option>';
-      Object.keys(allData).forEach(cls => {
-        classSelect.innerHTML += `<option>${cls}</option>`;
-      });
+    let studentData = {};
+
+    function fetchData() {
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          studentData = data;
+          const classSelect = document.getElementById("classSelect");
+          classSelect.innerHTML = '<option value="">Select Class</option>';
+          Object.keys(data).forEach(cls => {
+            const option = document.createElement("option");
+            option.value = cls;
+            option.textContent = cls;
+            classSelect.appendChild(option);
+          });
+          generateReceiptNo();
+        });
     }
 
-    function loadStudents() {
-      const className = document.getElementById("classSelect").value;
-      const students = allData[className] || [];
+    function generateReceiptNo() {
+      document.getElementById("receiptNo").value = 'RCPT-' + Date.now();
+    }
+
+    document.getElementById("classSelect").addEventListener("change", function () {
+      const cls = this.value;
       const studentSelect = document.getElementById("studentSelect");
-      studentSelect.innerHTML = '<option disabled selected>Select Student</option>';
-      students.forEach(stu => {
-        studentSelect.innerHTML += `<option value="${stu.id}">${stu.name}</option>`;
-      });
-    }
+      studentSelect.innerHTML = '<option value="">Select Student</option>';
+      if (studentData[cls]) {
+        studentData[cls].forEach(student => {
+          const option = document.createElement("option");
+          option.value = student.name;
+          option.textContent = student.name;
+          option.dataset.id = student.id;
+          studentSelect.appendChild(option);
+        });
+      }
+    });
 
-    function fillStudentId() {
-      const className = document.getElementById("classSelect").value;
-      const selectedName = document.getElementById("studentSelect").value;
-      const student = (allData[className] || []).find(s => s.id === selectedName);
-      document.getElementById("studentId").value = student ? student.id : '';
-    }
+    document.getElementById("studentSelect").addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      document.getElementById("studentId").value = selectedOption.dataset.id || '';
+    });
 
-    function calcBalance() {
-      const total = parseFloat(document.getElementById("totalFee").value || 0);
-      const paid = parseFloat(document.getElementById("paidAmount").value || 0);
-      document.getElementById("balance").value = (total - paid).toFixed(2);
-    }
+    document.getElementById("paid").addEventListener("input", function () {
+      const total = parseFloat(document.getElementById("total").value) || 0;
+      const paid = parseFloat(this.value) || 0;
+      document.getElementById("balance").value = total - paid;
+    });
 
- async function submitData() {
+    function submitForm() {
       const data = {
-        receiptNo: Date.now(), // auto receipt no
+        receiptNo: document.getElementById("receiptNo").value,
         class: document.getElementById("classSelect").value,
-        name: document.getElementById("studentSelect").options[document.getElementById("studentSelect").selectedIndex].text,
+        name: document.getElementById("studentSelect").value,
         id: document.getElementById("studentId").value,
         plan: document.getElementById("feePlan").value,
         startDate: document.getElementById("startDate").value,
-        days: document.getElementById("daysPurchased").value,
-        total: document.getElementById("totalFee").value,
-        paid: document.getElementById("paidAmount").value,
+        days: document.getElementById("days").value,
+        total: document.getElementById("total").value,
+        paid: document.getElementById("paid").value,
         balance: document.getElementById("balance").value,
         mode: document.getElementById("mode").value,
         remarks: document.getElementById("remarks").value,
         status: document.getElementById("status").value,
       };
 
-      const res = await fetch(url, {
+      fetch(scriptURL, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      });
-
-      alert("Billing Submitted!");
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.result === "success") {
+          showSlip(data);
+        } else {
+          alert("Error: " + result.message);
+        }
+      })
+      .catch(err => alert("Submit Failed: " + err));
     }
+
+    function showSlip(data) {
+      const slip = `
+        <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
+        <p><strong>Name:</strong> ${data.name}</p>
+        <p><strong>Class:</strong> ${data.class}</p>
+        <p><strong>Student ID:</strong> ${data.id}</p>
+        <p><strong>Fee Plan:</strong> ${data.plan}</p>
+        <p><strong>Total:</strong> ${data.total}</p>
+        <p><strong>Paid:</strong> ${data.paid}</p>
+        <p><strong>Balance:</strong> ${data.balance}</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        <p><strong>Remarks:</strong> ${data.remarks}</p>
+      `;
+      document.getElementById("slipContent").innerHTML = slip;
+      document.getElementById("slipPopup").style.display = "block";
+    }
+
+    function closeSlip() {
+      document.getElementById("slipPopup").style.display = "none";
+    }
+
+    function downloadSlip() {
+      const content = document.getElementById("slipPopup").innerHTML;
+      const blob = new Blob([content], { type: "text/html" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "Fee_Slip.html";
+      a.click();
+    }
+
+    window.onload = fetchData;
   </script>
 </body>
 </html>
