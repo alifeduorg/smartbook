@@ -1,79 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Billing Panel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f8f9fa;
-      padding: 2rem;
+      background-color: #ffffff;
       color: #333;
-    }
-    h2 {
-      color: navy;
-    }
-    .billing-form {
-      background: white;
-      border: 2px solid #ffd700;
-      border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .panel {
+      background: linear-gradient(to right, #f9f6e8, #f9e7c1);
+      border: 2px solid navy;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
     label {
       display: block;
-      margin-top: 10px;
+      margin: 10px 0 5px;
       font-weight: bold;
     }
-    select, input {
+    input, select {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
+      padding: 8px;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
     }
     button {
-      margin-top: 20px;
-      background-color: navy;
-      color: white;
-      padding: 10px 15px;
+      margin-top: 15px;
+      padding: 10px 20px;
       border: none;
-      border-radius: 5px;
+      background-color: navy;
+      color: #fff;
+      border-radius: 8px;
       cursor: pointer;
     }
-    #slipPopup {
+    .dashboard-btn {
+      background-color: goldenrod;
+      margin-bottom: 20px;
+    }
+    .modal {
       display: none;
       position: fixed;
-      top: 10%;
-      left: 10%;
-      width: 80%;
-      background: white;
-      border: 3px solid #ffd700;
-      padding: 20px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-      z-index: 1000;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
     }
-    #slipPopup button {
-      margin-top: 10px;
-      background-color: goldenrod;
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 500px;
+      text-align: left;
     }
   </style>
 </head>
 <body>
-  <h2>Billing Panel</h2>
-  <div class="billing-form">
+  <button class="dashboard-btn" onclick="goToDashboard()">Dashboard</button>
+  <div class="panel">
+    <h2>Billing Panel</h2>
     <label>Receipt No</label>
-    <input id="receiptNo" type="text" readonly />
+    <input type="text" id="receiptNo">
 
     <label>Class</label>
-    <select id="classSelect"></select>
+    <select id="class" onchange="loadStudents()"></select>
 
     <label>Student Name</label>
-    <select id="studentSelect"></select>
+    <select id="student" onchange="fillStudentId()"></select>
 
     <label>Student ID</label>
-    <input id="studentId" type="text" readonly />
+    <input type="text" id="studentId" readonly>
 
     <label>Fee Plan</label>
     <select id="feePlan">
@@ -83,162 +85,156 @@
     </select>
 
     <label>Class Start Date</label>
-    <input id="startDate" type="date" />
+    <input type="date" id="startDate">
+
+    <label>Hourly Rate</label>
+    <input type="number" id="hourlyRate" oninput="calculateTotal()">
 
     <label>Days Purchased</label>
-    <input id="days" type="number" />
+    <input type="number" id="days" oninput="calculateTotal()">
 
     <label>Total Fee</label>
-    <input id="total" type="number" />
+    <input type="number" id="totalFee" readonly>
 
     <label>Paid Amount</label>
-    <input id="paid" type="number" />
+    <input type="number" id="paidAmount" oninput="updateBalance()">
 
     <label>Balance</label>
-    <input id="balance" type="number" readonly />
+    <input type="number" id="balance" readonly>
 
     <label>Payment Mode</label>
-    <select id="mode">
-      <option>Cash</option>
-      <option>Online</option>
-    </select>
+    <input type="text" id="mode">
 
     <label>Remarks</label>
-    <input id="remarks" type="text" />
+    <input type="text" id="remarks">
 
     <label>Payment Status</label>
     <select id="status">
       <option>Paid</option>
-      <option>Unpaid</option>
-      <option>Partial</option>
+      <option>Pending</option>
     </select>
 
     <button onclick="submitForm()">Submit</button>
   </div>
 
-  <div id="slipPopup">
-    <h3>Fee Slip</h3>
-    <div id="slipContent"></div>
-    <button onclick="downloadSlip()">Download</button>
-    <button onclick="closeSlip()">Close</button>
+  <div class="modal" id="feeSlipModal">
+    <div class="modal-content" id="feeSlipContent">
+      <h3>Fee Slip</h3>
+      <div id="slipDetails"></div>
+      <button onclick="downloadSlip()">Download as PDF</button>
+      <button onclick="closeModal()">Close</button>
+    </div>
   </div>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec'; // Replace with your deployed URL
+    let studentMap = {};
 
-    let studentData = {};
+    function goToDashboard() {
+      window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Replace if needed
+    }
 
-    function fetchData() {
-      fetch(scriptURL)
-        .then(res => res.json())
-        .then(data => {
-          studentData = data;
-          const classSelect = document.getElementById("classSelect");
-          classSelect.innerHTML = '<option value="">Select Class</option>';
-          Object.keys(data).forEach(cls => {
-            const option = document.createElement("option");
-            option.value = cls;
-            option.textContent = cls;
-            classSelect.appendChild(option);
-          });
-          generateReceiptNo();
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        studentMap = data;
+        const classDropdown = document.getElementById("class");
+        classDropdown.innerHTML = '<option value="">Select Class</option>';
+        Object.keys(data).forEach(cls => {
+          const opt = document.createElement("option");
+          opt.value = cls;
+          opt.textContent = cls;
+          classDropdown.appendChild(opt);
         });
-    }
+      });
 
-    function generateReceiptNo() {
-      document.getElementById("receiptNo").value = 'RCPT-' + Date.now();
-    }
-
-    document.getElementById("classSelect").addEventListener("change", function () {
-      const cls = this.value;
-      const studentSelect = document.getElementById("studentSelect");
-      studentSelect.innerHTML = '<option value="">Select Student</option>';
-      if (studentData[cls]) {
-        studentData[cls].forEach(student => {
-          const option = document.createElement("option");
-          option.value = student.name;
-          option.textContent = student.name;
-          option.dataset.id = student.id;
-          studentSelect.appendChild(option);
+    function loadStudents() {
+      const selectedClass = document.getElementById("class").value;
+      const studentDropdown = document.getElementById("student");
+      studentDropdown.innerHTML = '<option value="">Select Student</option>';
+      if (studentMap[selectedClass]) {
+        studentMap[selectedClass].forEach(st => {
+          const opt = document.createElement("option");
+          opt.value = st.name;
+          opt.dataset.id = st.id;
+          opt.textContent = st.name;
+          studentDropdown.appendChild(opt);
         });
       }
-    });
+    }
 
-    document.getElementById("studentSelect").addEventListener("change", function () {
-      const selectedOption = this.options[this.selectedIndex];
-      document.getElementById("studentId").value = selectedOption.dataset.id || '';
-    });
+    function fillStudentId() {
+      const selectedOption = document.getElementById("student").selectedOptions[0];
+      document.getElementById("studentId").value = selectedOption?.dataset.id || "";
+    }
 
-    document.getElementById("paid").addEventListener("input", function () {
-      const total = parseFloat(document.getElementById("total").value) || 0;
-      const paid = parseFloat(this.value) || 0;
+    function calculateTotal() {
+      const rate = parseFloat(document.getElementById("hourlyRate").value || 0);
+      const days = parseInt(document.getElementById("days").value || 0);
+      document.getElementById("totalFee").value = rate * days;
+      updateBalance();
+    }
+
+    function updateBalance() {
+      const total = parseFloat(document.getElementById("totalFee").value || 0);
+      const paid = parseFloat(document.getElementById("paidAmount").value || 0);
       document.getElementById("balance").value = total - paid;
-    });
+    }
 
     function submitForm() {
       const data = {
         receiptNo: document.getElementById("receiptNo").value,
-        class: document.getElementById("classSelect").value,
-        name: document.getElementById("studentSelect").value,
+        class: document.getElementById("class").value,
+        name: document.getElementById("student").value,
         id: document.getElementById("studentId").value,
         plan: document.getElementById("feePlan").value,
         startDate: document.getElementById("startDate").value,
         days: document.getElementById("days").value,
-        total: document.getElementById("total").value,
-        paid: document.getElementById("paid").value,
+        total: document.getElementById("totalFee").value,
+        paid: document.getElementById("paidAmount").value,
         balance: document.getElementById("balance").value,
         mode: document.getElementById("mode").value,
         remarks: document.getElementById("remarks").value,
-        status: document.getElementById("status").value,
+        status: document.getElementById("status").value
       };
 
-      fetch(scriptURL, {
+      fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
       })
-      .then(res => res.json())
-      .then(result => {
-        if (result.result === "success") {
+      .then(res => res.text())
+      .then(res => {
+        if (res.includes("Success")) {
           showSlip(data);
         } else {
-          alert("Error: " + result.message);
+          alert("Submit Failed: " + res);
         }
       })
       .catch(err => alert("Submit Failed: " + err));
     }
 
     function showSlip(data) {
-      const slip = `
-        <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
-        <p><strong>Name:</strong> ${data.name}</p>
-        <p><strong>Class:</strong> ${data.class}</p>
-        <p><strong>Student ID:</strong> ${data.id}</p>
-        <p><strong>Fee Plan:</strong> ${data.plan}</p>
-        <p><strong>Total:</strong> ${data.total}</p>
-        <p><strong>Paid:</strong> ${data.paid}</p>
-        <p><strong>Balance:</strong> ${data.balance}</p>
-        <p><strong>Status:</strong> ${data.status}</p>
-        <p><strong>Remarks:</strong> ${data.remarks}</p>
-      `;
-      document.getElementById("slipContent").innerHTML = slip;
-      document.getElementById("slipPopup").style.display = "block";
+      const slip = document.getElementById("slipDetails");
+      slip.innerHTML = Object.entries(data).map(([k,v]) => `<p><strong>${k}:</strong> ${v}</p>`).join('');
+      document.getElementById("feeSlipModal").style.display = 'flex';
     }
 
-    function closeSlip() {
-      document.getElementById("slipPopup").style.display = "none";
+    function closeModal() {
+      document.getElementById("feeSlipModal").style.display = 'none';
     }
 
     function downloadSlip() {
-      const content = document.getElementById("slipPopup").innerHTML;
-      const blob = new Blob([content], { type: "text/html" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "Fee_Slip.html";
-      a.click();
-    }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Fee Slip", 10, 10);
 
-    window.onload = fetchData;
+      const slipData = document.getElementById("slipDetails").innerText.split("\n");
+      slipData.forEach((line, index) => doc.text(line, 10, 20 + (index * 10)));
+      doc.save("fee-slip.pdf");
+    }
   </script>
 </body>
 </html>
