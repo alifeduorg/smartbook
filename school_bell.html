@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>3D School Bell System</title>
+  <title>Advanced School Bell System</title>
   <style>
     body {
-      background: linear-gradient(to right, #c9d6ff, #e2e2e2);
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
       padding: 20px;
     }
     #clock {
-      font-size: 64px;
+      font-size: 60px;
       font-weight: bold;
-      color: #333;
+      color: #222;
       text-shadow: 0 0 10px #aaa;
       margin-bottom: 20px;
     }
@@ -21,60 +21,74 @@
       padding: 10px;
       font-size: 16px;
     }
-    .mode-select {
-      margin-top: 20px;
+    h2 {
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
 
-  <h1>📢 Automatic School Bell System</h1>
+  <h1>📢 Advanced School Bell System</h1>
   <div id="clock">--:--:--</div>
 
-  <div class="mode-select">
-    <label for="mode">Select Mode:</label>
-    <select id="mode">
-      <option value="regular">Regular</option>
-      <option value="exam">Exam</option>
-      <option value="eid">Eid / Holiday</option>
-    </select>
-  </div>
+  <label><strong>Mode:</strong></label>
+  <select id="mode">
+    <option value="regular">Regular</option>
+    <option value="exam">Exam</option>
+    <option value="eid">Eid / Holiday</option>
+  </select>
 
+  <h2>🔊 Upload Bell Sounds</h2>
   <div>
-    <h3>Upload MP3 (replace existing):</h3>
-    <input type="file" accept=".mp3" onchange="uploadMP3(event)">
+    <label>Prayer Bell:</label>
+    <input type="file" accept=".mp3" onchange="uploadBell(event, 'prayer')"><br>
+    <label>Warning Bell:</label>
+    <input type="file" accept=".mp3" onchange="uploadBell(event, 'warning')"><br>
+    <label>Period Bell:</label>
+    <input type="file" accept=".mp3" onchange="uploadBell(event, 'period')"><br>
+    <label>Lunch Bell:</label>
+    <input type="file" accept=".mp3" onchange="uploadBell(event, 'lunch')"><br>
+    <label>National Anthem:</label>
+    <input type="file" accept=".mp3" onchange="uploadBell(event, 'anthem')"><br>
   </div>
 
-  <div>
-    <h3>Test Bell:</h3>
-    <button onclick="playBell()">🔔 Play Bell</button>
-  </div>
+  <h2>🧪 Test Bells</h2>
+  <button onclick="playBell('prayer')">Prayer 🔔</button>
+  <button onclick="playBell('warning')">Warning 🔔</button>
+  <button onclick="playBell('period')">Period 🔔</button>
+  <button onclick="playBell('lunch')">Lunch 🔔</button>
+  <button onclick="playBell('anthem')">Anthem 🔔</button>
 
-  <audio id="bellAudio"></audio>
+  <audio id="audioPlayer"></audio>
 
   <script>
-    const bellSchedule = {
+    const bellTimes = {
       regular: {
-        Monday: ["09:25", "09:28", "10:10", "10:50", "11:30", "11:40", "12:20", "13:00", "13:50", "14:00", "14:40", "15:20", "15:30", "15:58", "16:00"],
-        Tuesday: ["09:25", "09:28", "10:10", "10:50", "11:30", "11:40", "12:20", "13:00", "13:50", "14:00", "14:40", "15:20", "15:30", "15:58", "16:00"],
-        Wednesday: ["09:25", "09:28", "10:10", "10:50", "11:30", "11:40", "12:20", "13:00", "13:50", "14:00", "14:40", "15:20", "15:30", "15:58", "16:00"],
-        Thursday: ["09:25", "09:28", "10:10", "10:50", "11:30", "11:40", "12:20", "13:00", "13:50", "14:00", "14:40", "15:20", "15:30", "15:58", "16:00"],
-        Friday: ["09:25", "09:28", "10:05", "10:40", "11:15", "11:25", "12:00", "12:30", "13:50", "14:00", "14:40", "15:20", "15:30", "15:58", "16:00"],
-        Saturday: ["09:25", "09:28", "10:10", "10:50", "11:30", "11:40", "12:20", "13:00", "13:50", "14:00", "14:40", "15:20", "15:30", "15:58", "16:00"],
+        Monday: {
+          "09:25": "warning",
+          "09:28": "prayer",
+          "10:10": "period", "10:50": "period", "11:30": "period",
+          "11:40": "period", "12:20": "period",
+          "13:00": "lunch", "13:50": "warning",
+          "14:00": "period", "14:40": "period", "15:20": "period",
+          "15:30": "period", "15:58": "warning", "16:00": "anthem"
+        },
+        Friday: {
+          "09:25": "warning",
+          "09:28": "prayer",
+          "10:05": "period", "10:40": "period", "11:15": "period",
+          "11:25": "period", "12:00": "period",
+          "12:30": "lunch", "13:50": "warning",
+          "14:00": "period", "14:40": "period", "15:20": "period",
+          "15:30": "period", "15:58": "warning", "16:00": "anthem"
+        }
       },
       exam: {
-        // Add custom times if needed
-        Monday: ["09:00", "12:00", "15:00"],
-        Friday: ["09:00", "11:00", "13:00"]
+        Monday: { "09:00": "warning", "12:00": "period", "15:00": "lunch" },
+        Friday: { "09:00": "warning", "11:00": "period", "13:00": "lunch" }
       },
       eid: {
-        // No bells
-        Monday: [],
-        Tuesday: [],
-        Wednesday: [],
-        Thursday: [],
-        Friday: [],
-        Saturday: []
+        Monday: {}, Tuesday: {}, Wednesday: {}, Thursday: {}, Friday: {}, Saturday: {}
       }
     };
 
@@ -87,38 +101,35 @@
       const m = String(now.getMinutes()).padStart(2, '0');
       const s = String(now.getSeconds()).padStart(2, '0');
       const timeNow = `${h}:${m}`;
-
       document.getElementById('clock').textContent = `${h}:${m}:${s}`;
 
       const mode = document.getElementById('mode').value;
-      const todaySchedule = bellSchedule[mode][day] || [];
+      const todayBells = (bellTimes[mode][day] || {});
 
-      if (todaySchedule.includes(timeNow) && lastPlayed !== timeNow) {
-        playBell();
+      if (todayBells[timeNow] && lastPlayed !== timeNow) {
+        playBell(todayBells[timeNow]);
         lastPlayed = timeNow;
       }
     }
 
-    function playBell() {
-      const audio = document.getElementById('bellAudio');
-      const storedSound = localStorage.getItem("bellSound");
-      if (storedSound) {
-        audio.src = storedSound;
+    function playBell(type) {
+      const audio = document.getElementById('audioPlayer');
+      const sound = localStorage.getItem(`bell_${type}`);
+      if (sound) {
+        audio.src = sound;
+        audio.play();
       } else {
-        alert("No bell sound uploaded!");
-        return;
+        alert(`No "${type}" bell uploaded!`);
       }
-      audio.currentTime = 0;
-      audio.play();
     }
 
-    function uploadMP3(event) {
+    function uploadBell(event, type) {
       const file = event.target.files[0];
       if (file && file.type === "audio/mp3") {
         const reader = new FileReader();
         reader.onload = function(e) {
-          localStorage.setItem("bellSound", e.target.result);
-          alert("Bell sound uploaded and saved!");
+          localStorage.setItem(`bell_${type}`, e.target.result);
+          alert(`✅ ${type} bell uploaded!`);
         };
         reader.readAsDataURL(file);
       } else {
