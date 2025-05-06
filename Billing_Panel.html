@@ -2,223 +2,211 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fee Billing Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: #0a0f3d;
+      background: #0d1b2a;
       color: #fff;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
-      margin: 0;
     }
-
     h2 {
       text-align: center;
-      color: #ffd700;
+      margin-bottom: 20px;
     }
-
     form {
-      max-width: 800px;
-      margin: auto;
-      background: #10194e;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      background: #fff;
-      color: #000;
-    }
-
-    button {
-      margin-top: 25px;
-      padding: 12px 25px;
-      background: #ffd700;
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    #billSlip {
-      display: none;
-      background: #fff;
-      color: #000;
+      background: #1b263b;
       padding: 20px;
       border-radius: 12px;
-      margin-top: 30px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      background: gold;
+      color: #0d1b2a;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #dashboardBtn {
+      background: #fff;
+      color: #0d1b2a;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    .row {
-      display: flex;
-      gap: 10px;
+    /* Modal */
+    #pdfModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
     }
-
-    .row > div {
-      flex: 1;
+    #pdfContent {
+      background: white;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 12px;
+      position: relative;
+      text-align: center;
+      color: #000;
     }
-
-    @media(max-width: 768px) {
-      .row {
-        flex-direction: column;
-      }
+    #closeModal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #pdfContent img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+    #billData table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    #billData td {
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+    #billData td:first-child {
+      font-weight: bold;
+      width: 40%;
     }
   </style>
 </head>
 <body>
+
+  <div style="text-align: center;">
+    <button id="dashboardBtn" onclick="window.location.href='ADMIN_dashboard.html'">⬅ Back to Dashboard</button>
+  </div>
+
   <h2>Fee Billing Panel</h2>
 
   <form id="billingForm">
-    <label>Bill Date</label>
-    <input type="date" name="billDate" id="billDate" readonly>
-
-    <label>Receipt Number</label>
-    <input type="text" name="receiptNo" id="receiptNo" readonly>
-
-    <div class="row">
-      <div>
-        <label>Class</label>
-        <input type="text" name="class" required>
-      </div>
-      <div>
-        <label>Student ID</label>
-        <input type="text" name="studentId" required>
-      </div>
-    </div>
-
-    <label>Student Name</label>
-    <input type="text" name="studentName" required>
-
-    <label>Fee Plan</label>
-    <input type="text" name="feePlan" required>
-
-    <div class="row">
-      <div>
-        <label>Class Start Date</label>
-        <input type="date" name="startDate" required>
-      </div>
-      <div>
-        <label>Days Purchased</label>
-        <input type="number" name="daysPurchased" required>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Total Fee</label>
-        <input type="number" name="totalFee" required>
-      </div>
-      <div>
-        <label>Paid Amount</label>
-        <input type="number" name="paidAmount" required>
-      </div>
-      <div>
-        <label>Balance</label>
-        <input type="number" name="balance" required>
-      </div>
-    </div>
-
-    <label>Payment Mode</label>
-    <select name="paymentMode" required>
-      <option value="">Select</option>
-      <option value="Cash">Cash</option>
-      <option value="Online">Online</option>
-      <option value="Cheque">Cheque</option>
-    </select>
-
-    <label>Remarks</label>
-    <textarea name="remarks" rows="2"></textarea>
-
-    <label>Payment Status</label>
-    <select name="paymentStatus" required>
-      <option value="">Select</option>
-      <option value="Paid">Paid</option>
-      <option value="Partial">Partial</option>
-      <option value="Unpaid">Unpaid</option>
-    </select>
-
-    <button type="submit">Submit & Generate PDF</button>
+    <label>Class: <input type="text" name="class" required></label>
+    <label>Student ID: <input type="text" name="studentId" required></label>
+    <label>Student Name: <input type="text" name="studentName" required></label>
+    <label>Fee Plan: <input type="text" name="feePlan" required></label>
+    <label>Class Start Date: <input type="date" name="startDate" required></label>
+    <label>Days Purchased: <input type="number" name="daysPurchased" required></label>
+    <label>Total Fee: <input type="number" name="totalFee" required></label>
+    <label>Paid Amount: <input type="number" name="paidAmount" required></label>
+    <label>Payment Mode:
+      <select name="paymentMode" required>
+        <option value="">Select Mode</option>
+        <option>Cash</option>
+        <option>Online</option>
+        <option>Bank Transfer</option>
+      </select>
+    </label>
+    <label>Remarks: <input type="text" name="remarks"></label>
+    <label>Payment Status:
+      <select name="paymentStatus" required>
+        <option value="">Select</option>
+        <option>Paid</option>
+        <option>Partial</option>
+        <option>Unpaid</option>
+      </select>
+    </label>
+    <button type="submit">Submit & Generate Slip</button>
   </form>
 
-  <div id="billSlip"></div>
+  <!-- PDF Modal -->
+  <div id="pdfModal">
+    <div id="pdfContent">
+      <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'">✖</span>
+      <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" />
+      <h3>FEE RECEIPT</h3>
+      <div id="billData"></div>
+      <button id="downloadBtn">Download PDF</button>
+    </div>
+  </div>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
+    let receiptCounter = 1;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const today = new Date().toISOString().split("T")[0];
-      document.getElementById('billDate').value = today;
-
-      // Optional: simulate receipt no as timestamp
-      document.getElementById('receiptNo').value = "REC" + Date.now().toString().slice(-6);
-    });
-
-    document.getElementById('billingForm').addEventListener('submit', async (e) => {
+    document.getElementById("billingForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const form = e.target;
       const formData = new FormData(form);
+      const values = Object.fromEntries(formData.entries());
 
-      // Store data to Google Sheets
-      const response = await fetch(scriptURL, { method: 'POST', body: formData });
-      const result = await response.text();
-      alert("Billing data stored successfully!");
+      const balance = parseFloat(values.totalFee) - parseFloat(values.paidAmount);
+      const billDate = new Date().toLocaleDateString();
+      const receiptNo = `2025-${receiptCounter++}`;
 
-      // Show bill slip
-      const data = Object.fromEntries(formData.entries());
-      generatePDFBill(data);
+      // Update Modal Content
+      document.getElementById("billData").innerHTML = `
+        <table>
+          <tr><td>Bill Date:</td><td>${billDate}</td></tr>
+          <tr><td>Receipt No:</td><td>${receiptNo}</td></tr>
+          <tr><td>Class:</td><td>${values.class}</td></tr>
+          <tr><td>Student ID:</td><td>${values.studentId}</td></tr>
+          <tr><td>Student Name:</td><td>${values.studentName}</td></tr>
+          <tr><td>Fee Plan:</td><td>${values.feePlan}</td></tr>
+          <tr><td>Class Start Date:</td><td>${values.startDate}</td></tr>
+          <tr><td>Days Purchased:</td><td>${values.daysPurchased}</td></tr>
+          <tr><td>Total Fee:</td><td>₹${values.totalFee}</td></tr>
+          <tr><td>Paid Amount:</td><td>₹${values.paidAmount}</td></tr>
+          <tr><td>Balance:</td><td>₹${balance}</td></tr>
+          <tr><td>Payment Mode:</td><td>${values.paymentMode}</td></tr>
+          <tr><td>Remarks:</td><td>${values.remarks}</td></tr>
+          <tr><td>Payment Status:</td><td>${values.paymentStatus}</td></tr>
+        </table>
+      `;
+
+      document.getElementById("pdfModal").style.display = "flex";
+
+      // Optional: Send to Google Sheets
+      // await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec', { method: 'POST', body: formData });
     });
 
-    function generatePDFBill(data) {
-      const billDiv = document.getElementById('billSlip');
-      billDiv.innerHTML = `
-        <h3 style="text-align:center;">ALIF EDU FEE RECEIPT</h3>
-        <p><strong>Bill Date:</strong> ${data.billDate}</p>
-        <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
-        <p><strong>Student:</strong> ${data.studentName} (${data.studentId})</p>
-        <p><strong>Class:</strong> ${data.class}</p>
-        <p><strong>Fee Plan:</strong> ${data.feePlan}</p>
-        <p><strong>Class Start Date:</strong> ${data.startDate}</p>
-        <p><strong>Days Purchased:</strong> ${data.daysPurchased}</p>
-        <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
-        <p><strong>Paid Amount:</strong> ₹${data.paidAmount}</p>
-        <p><strong>Balance:</strong> ₹${data.balance}</p>
-        <p><strong>Payment Mode:</strong> ${data.paymentMode}</p>
-        <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
-        <p><strong>Remarks:</strong> ${data.remarks}</p>
-        <br><p style="text-align:right;">Recipient Signature</p>
-      `;
-      billDiv.style.display = 'block';
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const original = document.getElementById("pdfContent");
+      const clone = original.cloneNode(true);
+      clone.querySelector("#closeModal")?.remove();
+      clone.style.background = "#fff";
+      clone.style.color = "#000";
 
-      setTimeout(() => {
-        const billWindow = window.open('', '', 'width=800,height=600');
-        billWindow.document.write(`<html><head><title>Fee Receipt</title></head><body>${billDiv.innerHTML}</body></html>`);
-        billWindow.document.close();
-        billWindow.print();
-      }, 1000);
-    }
+      const opt = {
+        margin: 0.3,
+        filename: 'fee_receipt.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(clone).save();
+    });
   </script>
 </body>
 </html>
-
