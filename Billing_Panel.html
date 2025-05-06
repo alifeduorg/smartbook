@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fee Billing Panel</title>
- <style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
     body {
       background: #0d1b2a;
       color: #fff;
@@ -100,7 +101,238 @@
       font-weight: bold;
       width: 40%;
     }
-   </style>
+  </style>
+</head>
+<body>
+
+  <div style="text-align: center;">
+    <button id="dashboardBtn" onclick="window.location.href='ADMIN_dashboard.html'">⬅ Back to Dashboard</button>
+  </div>
+
+  <h2>Fee Billing Panel</h2>
+
+  <form id="billingForm">
+    <label>Class: <input type="text" name="class" required></label>
+    <label>Student ID: <input type="text" name="studentId" required></label>
+    <label>Student Name: <input type="text" name="studentName" required></label>
+    <label>Fee Plan: <input type="text" name="feePlan" required></label>
+    <label>Class Start Date: <input type="date" name="startDate" required></label>
+    <label>Days Purchased: <input type="number" name="daysPurchased" required></label>
+    <label>Total Fee: <input type="number" name="totalFee" required></label>
+    <label>Paid Amount: <input type="number" name="paidAmount" required></label>
+    <label>Payment Mode:
+      <select name="paymentMode" required>
+        <option value="">Select Mode</option>
+        <option>Cash</option>
+        <option>Online</option>
+        <option>Bank Transfer</option>
+      </select>
+    </label>
+    <label>Remarks: <input type="text" name="remarks"></label>
+    <label>Payment Status:
+      <select name="paymentStatus" required>
+        <option value="">Select</option>
+        <option>Paid</option>
+        <option>Partial</option>
+        <option>Unpaid</option>
+      </select>
+    </label>
+    <button type="submit">Submit & Generate Slip</button>
+  </form>
+
+  <!-- PDF Modal -->
+  <div id="pdfModal">
+    <div id="pdfContent">
+      <span id="closeModal" onclick="document.getElementById('pdfModal').style.display='none'">✖</span>
+      <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" />
+      <h3>FEE RECEIPT</h3>
+      <div id="billData"></div>
+      <button id="downloadBtn">Download PDF</button>
+    </div>
+  </div>
+
+  <script>
+    let receiptCounter = 1;
+
+    document.getElementById("billingForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const values = Object.fromEntries(formData.entries());
+
+      const balance = parseFloat(values.totalFee) - parseFloat(values.paidAmount);
+      const billDate = new Date().toLocaleDateString();
+      const receiptNo = `2025-${receiptCounter++}`;
+
+      // Update Modal Content
+      document.getElementById("billData").innerHTML = `
+        <table>
+          <tr><td>Bill Date:</td><td>${billDate}</td></tr>
+          <tr><td>Receipt No:</td><td>${receiptNo}</td></tr>
+          <tr><td>Class:</td><td>${values.class}</td></tr>
+          <tr><td>Student ID:</td><td>${values.studentId}</td></tr>
+          <tr><td>Student Name:</td><td>${values.studentName}</td></tr>
+          <tr><td>Fee Plan:</td><td>${values.feePlan}</td></tr>
+          <tr><td>Class Start Date:</td><td>${values.startDate}</td></tr>
+          <tr><td>Days Purchased:</td><td>${values.daysPurchased}</td></tr>
+          <tr><td>Total Fee:</td><td>₹${values.totalFee}</td></tr>
+          <tr><td>Paid Amount:</td><td>₹${values.paidAmount}</td></tr>
+          <tr><td>Balance:</td><td>₹${balance}</td></tr>
+          <tr><td>Payment Mode:</td><td>${values.paymentMode}</td></tr>
+          <tr><td>Remarks:</td><td>${values.remarks}</td></tr>
+          <tr><td>Payment Status:</td><td>${values.paymentStatus}</td></tr>
+        </table>
+      `;
+
+      document.getElementById("pdfModal").style.display = "flex";
+
+      // Optional: Send to Google Sheets
+      // await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec', { method: 'POST', body: formData });
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const original = document.getElementById("pdfContent");
+      const clone = original.cloneNode(true);
+      clone.querySelector("#closeModal")?.remove();
+      clone.style.background = "#fff";
+      clone.style.color = "#000";
+
+      const opt = {
+        margin: 0.3,
+        filename: 'fee_receipt.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(clone).save();
+    });
+  </script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fee Billing Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #002147;
+    }
+
+    form {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #002147;
+      color: #FFD700;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #pdfModal {
+      display: none;
+      position: fixed;
+      top: 5%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+    }
+
+    #pdfContent {
+      background: white;
+      margin: 5% auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    #pdfContent img {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+
+    #pdfContent h3 {
+      margin: 10px 0;
+    }
+
+    #closeModal {
+      float: right;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    #billTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    #billTable th, #billTable td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    #downloadBtn {
+      margin-top: 15px;
+      background-color: #FFD700;
+      color: #002147;
+    }
+
+    .back-btn {
+      margin: 20px auto;
+      display: block;
+      background: #FFD700;
+      color: #002147;
+      padding: 10px 15px;
+      text-align: center;
+      width: 150px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
 
@@ -114,17 +346,6 @@
     <option>LKG</option>
     <option>UKG</option>
     <option>Grade 1</option>
-    <option>Grade 2</option>
-    <option>Grade 3</option>
-    <option>Grade 4</option>
-    <option>Grade 5</option>
-    <option>Grade 6</option>
-    <option>Grade 7</option>
-    <option>Grade 8</option>
-    <option>Grade 9</option>
-    <option>Grade 10</option>
-    <option>Grade 11</option>
-    <option>Grade 12</option>
   </select>
 
   <label>Student ID</label>
@@ -133,16 +354,11 @@
   <label>Student Name</label>
   <input type="text" name="studentName" required />
 
-   <label>FEE PLAN</label>
-  <select name="FEEPLAN" required>
-    <option value="">Select</option>
-    <option>BASIC</option>
-    <option>STANDARD</option>
-    <option>PREMIUM</option>
+  <label>Fee Plan</label>
+  <input type="text" name="feePlan" required />
 
-  </select>
-  <label>Days Purchased</label>
-  <input type="number" name="classStart" required />
+  <label>Class Start Date / Days Purchased</label>
+  <input type="text" name="classStart" required />
 
   <label>Total Fee</label>
   <input type="number" name="totalFee" required />
@@ -168,7 +384,7 @@
     <option value="Unpaid">Unpaid</option>
   </select>
 
-  <button onclick="downloadPDF()">Download PDF</button>
+  <button type="submit">Submit & Generate Bill</button>
 </form>
 
 <!-- PDF Modal -->
@@ -181,7 +397,8 @@
     <button id="downloadBtn">Download PDF</button>
   </div>
 </div>
-<a href="admin-dashboard.html" class="back-btn">← Dashboard</a>
+
+<a href="admin_dashboard.html" class="back-btn">← Dashboard</a>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
@@ -218,7 +435,7 @@ form.addEventListener('submit', async function(e) {
           <tr><td>Class</td><td>${data.class}</td></tr>
           <tr><td>Student ID</td><td>${data.studentId}</td></tr>
           <tr><td>Name</td><td>${data.studentName}</td></tr>
-          <tr><td>FEEPLAN</td><td>${data.FEEPLAN}</td></tr>
+          <tr><td>Fee Plan</td><td>${data.feePlan}</td></tr>
           <tr><td>Start Date</td><td>${data.classStart}</td></tr>
           <tr><td>Total Fee</td><td>₹${data.totalFee}</td></tr>
           <tr><td>Paid</td><td>₹${data.paidAmount}</td></tr>
@@ -239,7 +456,6 @@ form.addEventListener('submit', async function(e) {
 downloadBtn.addEventListener('click', () => {
   html2pdf().from(document.getElementById('pdfContent')).save('Fee_Receipt.pdf');
 });
-
 </script>
 
 </body>
