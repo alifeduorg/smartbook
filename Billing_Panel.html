@@ -133,42 +133,22 @@
       document.getElementById("balance").value = (total - paid).toFixed(2);
     }
 
-  async function submitData() {
-  const data = {
-    receiptNo: Date.now(), // auto receipt no
-    class: document.getElementById("classSelect").value,
-    name: document.getElementById("studentSelect").options[document.getElementById("studentSelect").selectedIndex].text,
-    id: document.getElementById("studentId").value,
-    plan: document.getElementById("feePlan").value,
-    startDate: document.getElementById("startDate").value,
-    days: document.getElementById("daysPurchased").value,
-    total: document.getElementById("totalFee").value,
-    paid: document.getElementById("paidAmount").value,
-    balance: document.getElementById("balance").value,
-    mode: document.getElementById("mode").value,
-    remarks: document.getElementById("remarks").value,
-    status: document.getElementById("status").value,
-  };
-
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" }
-    });
-    const result = await res.json();
-
-    if (result.result === "success") {
-      alert("✅ Billing Submitted Successfully!");
-      document.querySelector("form")?.reset(); // or manually clear fields
-    } else {
-      alert("❌ Submission failed: " + result.message);
-    }
-  } catch (err) {
-    alert("❌ Network or Server Error: " + err.message);
-  }
-}
-
+ async function submitData() {
+      const data = {
+        receiptNo: Date.now(), // auto receipt no
+        class: document.getElementById("classSelect").value,
+        name: document.getElementById("studentSelect").options[document.getElementById("studentSelect").selectedIndex].text,
+        id: document.getElementById("studentId").value,
+        plan: document.getElementById("feePlan").value,
+        startDate: document.getElementById("startDate").value,
+        days: document.getElementById("daysPurchased").value,
+        total: document.getElementById("totalFee").value,
+        paid: document.getElementById("paidAmount").value,
+        balance: document.getElementById("balance").value,
+        mode: document.getElementById("mode").value,
+        remarks: document.getElementById("remarks").value,
+        status: document.getElementById("status").value,
+      };
 
       const res = await fetch(url, {
         method: "POST",
