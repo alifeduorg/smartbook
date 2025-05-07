@@ -1,231 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Billing Panel</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Billing Panel - Alif Edu</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: white;
-      color: black;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fefefe;
       margin: 0;
-      padding: 0;
-    }
-    .container {
-      width: 80%;
-      margin: 0 auto;
       padding: 20px;
-    }
-    h1 {
-      color: #2e3b4e;
-      text-align: center;
-    }
-    .form-container {
-      background-color: #f1f1f1;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    select, input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    .button {
-      background-color: #f5a623;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .button:hover {
-      background-color: #d47f1b;
-    }
-    .slip-container {
-      display: none;
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f8f8f8;
-      border-radius: 8px;
-    }
-    .slip-container h2 {
       color: #333;
     }
-    .slip-container p {
-      margin: 10px 0;
-    }
-    #dashboardBtn {
-      background-color: navy;
+    header {
+      background: navy;
       color: white;
-      padding: 10px 20px;
-      cursor: pointer;
-      border: none;
-      font-size: 18px;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 20px;
     }
-    #dashboardBtn:hover {
-      background-color: #333;
+    h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+    select, input, textarea {
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+    button {
+      background: gold;
+      color: navy;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #ffd700;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .fee-slip {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 500px;
+      background: white;
+      border: 2px solid navy;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 20px;
+      z-index: 1000;
+    }
+    .fee-slip h2 {
+      margin-top: 0;
+      text-align: center;
+      color: navy;
+    }
+    .slip-content {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      background: red;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 6px;
+      float: right;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Billing Panel</h1>
-    <div class="form-container">
-      <form id="billingForm">
-        <label for="classSelect">Select Class</label>
-        <select id="classSelect" onchange="fetchStudents()">
-          <option value="">--Select Class--</option>
-        </select>
+<header>
+  <h1>Billing Panel - Alif Edu</h1>
+</header>
 
-        <label for="studentSelect">Select Student</label>
-        <select id="studentSelect" onchange="fillStudentID()">
-          <option value="">--Select Student--</option>
-        </select>
-
-        <label for="feePlan">Fee Plan</label>
-        <select id="feePlan">
-          <option value="Basic">Basic</option>
-          <option value="Standard">Standard</option>
-          <option value="Premium">Premium</option>
-        </select>
-
-        <label for="daysPurchased">Days Purchased</label>
-        <input type="number" id="daysPurchased" placeholder="Enter number of days" required>
-
-        <label for="totalFee">Total Fee</label>
-        <input type="number" id="totalFee" placeholder="Auto-calculated" disabled>
-
-        <label for="paidAmount">Paid Amount</label>
-        <input type="number" id="paidAmount" placeholder="Enter paid amount" required>
-
-        <label for="balance">Balance</label>
-        <input type="number" id="balance" placeholder="Auto-calculated" disabled>
-
-        <label for="paymentMode">Payment Mode</label>
-        <input type="text" id="paymentMode" placeholder="Enter payment mode" required>
-
-        <button type="button" class="button" onclick="submitBillingData()">Submit</button>
-      </form>
-    </div>
-
-    <!-- Billing Slip -->
-    <div class="slip-container" id="slipContainer">
-      <h2>Fee Receipt</h2>
-      <p id="slipDetails"></p>
-      <button id="downloadBtn" onclick="downloadSlip()">Download Receipt</button>
-    </div>
-
-    <button id="dashboardBtn" onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+<div class="form-grid">
+  <div>
+    <label for="class">Class</label>
+    <select id="class" onchange="updateStudentOptions()"></select>
   </div>
+  <div>
+    <label for="student">Student Name</label>
+    <select id="student" onchange="fillStudentDetails()"></select>
+  </div>
+</div>
 
-  <script>
-    const classSelect = document.getElementById("classSelect");
-    const studentSelect = document.getElementById("studentSelect");
-    const feePlan = document.getElementById("feePlan");
-    const daysPurchased = document.getElementById("daysPurchased");
-    const totalFee = document.getElementById("totalFee");
-    const paidAmount = document.getElementById("paidAmount");
-    const balance = document.getElementById("balance");
+<div class="form-grid">
+  <div>
+    <label for="studentId">Student ID</label>
+    <input type="text" id="studentId" readonly />
+  </div>
+  <div>
+    <label for="plan">Fee Plan</label>
+    <input type="text" id="plan" placeholder="Basic / Standard / Premium" />
+  </div>
+</div>
 
-    // Fetching classes from Google Sheets
-    async function fetchClasses() {
-      const response = await fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec`);
-      const data = await response.json();
-      data.classes.forEach(classItem => {
-        let option = document.createElement("option");
-        option.value = classItem;
-        option.innerText = classItem;
-        classSelect.appendChild(option);
-      });
+<div class="form-grid">
+  <div>
+    <label for="hourlyRate">Hourly Rate</label>
+    <input type="number" id="hourlyRate" placeholder="e.g. 100" />
+  </div>
+  <div>
+    <label for="days">Number of Days</label>
+    <input type="number" id="days" placeholder="e.g. 30" oninput="calculateTotal()" />
+  </div>
+</div>
+
+<div class="form-grid">
+  <div>
+    <label for="total">Total</label>
+    <input type="number" id="total" readonly />
+  </div>
+  <div>
+    <label for="paid">Paid</label>
+    <input type="number" id="paid" oninput="calculateBalance()" />
+  </div>
+</div>
+
+<div class="form-grid">
+  <div>
+    <label for="balance">Balance</label>
+    <input type="number" id="balance" readonly />
+  </div>
+  <div>
+    <label for="mode">Payment Mode</label>
+    <input type="text" id="mode" placeholder="e.g. UPI, Cash" />
+  </div>
+</div>
+
+<label for="startDate">Start Date</label>
+<input type="date" id="startDate" />
+
+<label for="remarks">Remarks</label>
+<textarea id="remarks" placeholder="Any notes..."></textarea>
+
+<label for="status">Status</label>
+<select id="status">
+  <option value="Paid">Paid</option>
+  <option value="Partially Paid">Partially Paid</option>
+  <option value="Unpaid">Unpaid</option>
+</select>
+
+<button onclick="submitForm()">Submit & Generate Slip</button>
+
+<!-- Fee Slip Popup -->
+<div id="feeSlip" class="fee-slip">
+  <button class="close-btn" onclick="document.getElementById('feeSlip').style.display='none'">X</button>
+  <h2>Fee Slip</h2>
+  <div class="slip-content" id="slipContent"></div>
+  <button onclick="printSlip()">Print</button>
+</div>
+
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
+  let studentsByClass = {};
+  let receiptCounter = Math.floor(Math.random() * 10000) + 1;
+
+  window.onload = async () => {
+    const res = await fetch(scriptURL);
+    studentsByClass = await res.json();
+    const classSelect = document.getElementById("class");
+    classSelect.innerHTML = Object.keys(studentsByClass).map(cls => <option value="${cls}">${cls}</option>).join("");
+    updateStudentOptions();
+  };
+
+  function updateStudentOptions() {
+    const className = document.getElementById("class").value;
+    const students = studentsByClass[className] || [];
+    const studentSelect = document.getElementById("student");
+    studentSelect.innerHTML = students.map(stu => <option value="${stu.name}">${stu.name}</option>).join("");
+    fillStudentDetails();
+  }
+
+  function fillStudentDetails() {
+    const className = document.getElementById("class").value;
+    const studentName = document.getElementById("student").value;
+    const student = studentsByClass[className].find(s => s.name === studentName);
+    document.getElementById("studentId").value = student?.id || "";
+  }
+
+  function calculateTotal() {
+    const rate = +document.getElementById("hourlyRate").value;
+    const days = +document.getElementById("days").value;
+    document.getElementById("total").value = rate * days || 0;
+    calculateBalance();
+  }
+
+  function calculateBalance() {
+    const total = +document.getElementById("total").value;
+    const paid = +document.getElementById("paid").value;
+    document.getElementById("balance").value = total - paid;
+  }
+
+  async function submitForm() {
+    const payload = {
+      receiptNo: "R" + receiptCounter++,
+      class: document.getElementById("class").value,
+      name: document.getElementById("student").value,
+      id: document.getElementById("studentId").value,
+      plan: document.getElementById("plan").value,
+      startDate: document.getElementById("startDate").value,
+      days: document.getElementById("days").value,
+      total: document.getElementById("total").value,
+      paid: document.getElementById("paid").value,
+      balance: document.getElementById("balance").value,
+      mode: document.getElementById("mode").value,
+      remarks: document.getElementById("remarks").value,
+      status: document.getElementById("status").value
+    };
+
+    const options = {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" }
+    };
+
+    const response = await fetch(scriptURL, options);
+    if ((await response.text()) === "Success") {
+      generateSlip(payload);
+    } else {
+      alert("Failed to save data");
     }
+  }
 
-    // Fetching students for selected class
-    async function fetchStudents() {
-      const classValue = classSelect.value;
-      const response = await fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?class=${classValue}`);
-      const students = await response.json();
-      studentSelect.innerHTML = '<option value="">--Select Student--</option>'; // Reset
-      students.forEach(student => {
-        let option = document.createElement("option");
-        option.value = student.id;
-        option.innerText = student.name;
-        studentSelect.appendChild(option);
-      });
-    }
+  function generateSlip(data) {
+    const slip = `
+      <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
+      <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+      <p><strong>Name:</strong> ${data.name}</p>
+      <p><strong>Student ID:</strong> ${data.id}</p>
+      <p><strong>Class:</strong> ${data.class}</p>
+      <p><strong>Plan:</strong> ${data.plan}</p>
+      <p><strong>Start Date:</strong> ${data.startDate}</p>
+      <p><strong>Duration:</strong> ${data.days} days</p>
+      <p><strong>Total:</strong> ₹${data.total}</p>
+      <p><strong>Paid:</strong> ₹${data.paid}</p>
+      <p><strong>Balance:</strong> ₹${data.balance}</p>
+      <p><strong>Payment Mode:</strong> ${data.mode}</p>
+      <p><strong>Status:</strong> ${data.status}</p>
+      <p><strong>Remarks:</strong> ${data.remarks}</p>
+    `;
+    document.getElementById("slipContent").innerHTML = slip;
+    document.getElementById("feeSlip").style.display = "block";
+  }
 
-    // Fill student ID based on student name selection
-    function fillStudentID() {
-      const selectedStudentID = studentSelect.value;
-      const selectedStudentName = studentSelect.options[studentSelect.selectedIndex].innerText;
-      if (selectedStudentID && selectedStudentName) {
-        console.log("Selected Student ID:", selectedStudentID);
-      }
-    }
-
-    // Submit billing data
-    async function submitBillingData() {
-      const billDate = new Date().toLocaleDateString();
-      const receiptNo = Math.floor(Math.random() * 1000000); // Simple random receipt number
-      const studentID = studentSelect.value;
-      const studentName = studentSelect.options[studentSelect.selectedIndex].innerText;
-      const feeAmount = totalFee.value;
-      const paidAmt = paidAmount.value;
-      const remainingBalance = feeAmount - paidAmt;
-      const paymentModeValue = document.getElementById("paymentMode").value;
-      const feePlanValue = feePlan.value;
-      const classValue = classSelect.value;
-
-      // Firebase Firestore storage
-      const db = firebase.firestore();
-      db.collection("billingData").add({
-        billDate: billDate,
-        receiptNo: receiptNo,
-        studentName: studentName,
-        studentID: studentID,
-        feePlan: feePlanValue,
-        daysPurchased: daysPurchased.value,
-        totalFee: feeAmount,
-        paidAmount: paidAmt,
-        balance: remainingBalance,
-        paymentMode: paymentModeValue,
-        paymentStatus: paidAmt >= feeAmount ? "Paid" : "Pending",
-        class: classValue
-      });
-
-      // Display receipt slip
-      document.getElementById("slipDetails").innerHTML = `
-        <strong>Receipt No: </strong>${receiptNo}<br>
-        <strong>Student Name: </strong>${studentName}<br>
-        <strong>Class: </strong>${classValue}<br>
-        <strong>Fee Plan: </strong>${feePlanValue}<br>
-        <strong>Total Fee: </strong>${feeAmount}<br>
-        <strong>Paid Amount: </strong>${paidAmt}<br>
-        <strong>Balance: </strong>${remainingBalance}<br>
-        <strong>Payment Mode: </strong>${paymentModeValue}<br>
-        <strong>Payment Status: </strong>${paidAmt >= feeAmount ? "Paid" : "Pending"}
-      `;
-      document.getElementById("slipContainer").style.display = "block";
-    }
-
-    // Download the receipt
-    function downloadSlip() {
-      const slipContent = document.getElementById("slipContainer").innerHTML;
-      const a = document.createElement("a");
-      const blob = new Blob([slipContent], { type: 'application/octet-stream' });
-      a.href = URL.createObjectURL(blob);
-      a.download = `Receipt_${new Date().getTime()}.html`;
-      a.click();
-    }
-
-    // Initialize classes on page load
-    window.onload = () => {
-      fetchClasses();
-    }
-  </script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js"></script>
+  function printSlip() {
+    const content = document.getElementById("feeSlip").innerHTML;
+    const frame = window.open('', '', 'height=600,width=400');
+    frame.document.write('<html><head><title>Fee Slip</title></head><body>');
+    frame.document.write(content);
+    frame.document.write('</body></html>');
+    frame.document.close();
+    frame.print();
+  }
+</script>
 </body>
 </html>
