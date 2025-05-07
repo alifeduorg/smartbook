@@ -1,218 +1,163 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
+  <title>Billing Panel</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: white;
-      color: navy;
+      color: #333;
       padding: 20px;
     }
-
-    h1 {
-      background: navy;
-      color: gold;
-      padding: 10px;
-      border-radius: 8px;
+    .billing-container {
+      max-width: 800px;
+      margin: auto;
+      border-radius: 10px;
+      border: 2px solid gold;
+      padding: 20px;
+      background: #fdfdfd;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-
+    h2 {
+      color: navy;
+      text-align: center;
+    }
     label {
       font-weight: bold;
-      margin-top: 10px;
-      display: block;
+      color: #333;
     }
-
     input, select {
       width: 100%;
       padding: 8px;
-      margin: 5px 0 15px 0;
-      border: 2px solid navy;
+      margin-top: 4px;
+      margin-bottom: 12px;
       border-radius: 5px;
+      border: 1px solid #ccc;
     }
-
     button {
-      background: gold;
-      color: navy;
+      background: navy;
+      color: gold;
       padding: 10px 20px;
       border: none;
-      border-radius: 8px;
-      font-weight: bold;
+      border-radius: 6px;
       cursor: pointer;
     }
-
-    .slip-popup {
-      display: none;
-      position: fixed;
-      top: 10%;
-      left: 10%;
-      width: 80%;
-      background: white;
-      border: 3px solid navy;
-      padding: 20px;
-      z-index: 1000;
-    }
-
-    #dashboardBtn {
-      background: navy;
-      color: white;
-      padding: 5px 15px;
-      float: right;
-      margin-top: -40px;
+    button:hover {
+      background: #004080;
     }
   </style>
 </head>
 <body>
+  <div class="billing-container">
+    <h2>Billing Panel</h2>
+    <label>Class</label>
+    <select id="classSelect" onchange="loadStudents()"></select>
 
-<h1>Billing Panel</h1>
-<button id="dashboardBtn">Dashboard</button>
+    <label>Student Name</label>
+    <select id="studentSelect" onchange="fillStudentId()"></select>
 
-<form id="billingForm">
-  <label>Bill Date</label>
-  <input type="text" id="billDate" name="billDate" readonly>
+    <label>Student ID</label>
+    <input type="text" id="studentId" readonly>
 
-  <label>Receipt No</label>
-  <input type="text" id="receiptNo" name="receiptNo" readonly>
+    <label>Fee Plan</label>
+    <select id="feePlan">
+      <option>Basic</option>
+      <option>Standard</option>
+      <option>Premium</option>
+    </select>
 
-  <label>Class</label>
-  <select id="classSelect" required></select>
+    <label>Class Start Date</label>
+    <input type="date" id="startDate">
 
-  <label>Student Name</label>
-  <select id="studentSelect" required></select>
+    <label>Days Purchased</label>
+    <input type="number" id="daysPurchased">
 
-  <label>Student ID</label>
-  <input type="text" id="studentId" name="studentId" readonly>
+    <label>Total Fee</label>
+    <input type="number" id="totalFee">
 
-  <label>Fee Plan</label>
-  <select id="feePlan">
-    <option>Basic</option>
-    <option>Standard</option>
-    <option>Premium</option>
-  </select>
+    <label>Paid Amount</label>
+    <input type="number" id="paidAmount" oninput="calcBalance()">
 
-  <label>Class Start Date</label>
-  <input type="date" name="classStartDate" required>
+    <label>Balance</label>
+    <input type="number" id="balance" readonly>
 
-  <label>Days Purchased</label>
-  <input type="number" name="daysPurchased" id="daysPurchased" required>
+    <label>Payment Mode</label>
+    <input type="text" id="mode">
 
-  <label>Total Fee</label>
-  <input type="number" name="totalFee" id="totalFee" required>
+    <label>Remarks</label>
+    <input type="text" id="remarks">
 
-  <label>Paid Amount</label>
-  <input type="number" name="paidAmount" id="paidAmount" required>
+    <label>Payment Status</label>
+    <select id="status">
+      <option>Paid</option>
+      <option>Pending</option>
+    </select>
 
-  <label>Balance</label>
-  <input type="text" name="balance" id="balance" readonly>
+    <button onclick="submitData()">Submit</button>
+  </div>
 
-  <label>Payment Mode</label>
-  <select name="paymentMode">
-    <option>Cash</option>
-    <option>Online</option>
-    <option>UPI</option>
-    <option>Bank Transfer</option>
-  </select>
+  <script>
+    const url = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
+    let allData = {};
 
-  <label>Remarks</label>
-  <input type="text" name="remarks">
+    window.onload = async () => {
+      const res = await fetch(url);
+      allData = await res.json();
+      const classSelect = document.getElementById("classSelect");
+      classSelect.innerHTML = '<option disabled selected>Select Class</option>';
+      Object.keys(allData).forEach(cls => {
+        classSelect.innerHTML += `<option>${cls}</option>`;
+      });
+    }
 
-  <label>Payment Status</label>
-  <select name="paymentStatus">
-    <option>Paid</option>
-    <option>Partially Paid</option>
-    <option>Pending</option>
-  </select>
+    function loadStudents() {
+      const className = document.getElementById("classSelect").value;
+      const students = allData[className] || [];
+      const studentSelect = document.getElementById("studentSelect");
+      studentSelect.innerHTML = '<option disabled selected>Select Student</option>';
+      students.forEach(stu => {
+        studentSelect.innerHTML += `<option value="${stu.id}">${stu.name}</option>`;
+      });
+    }
 
-  <button type="submit">Submit & View Slip</button>
-</form>
+    function fillStudentId() {
+      const className = document.getElementById("classSelect").value;
+      const selectedName = document.getElementById("studentSelect").value;
+      const student = (allData[className] || []).find(s => s.id === selectedName);
+      document.getElementById("studentId").value = student ? student.id : '';
+    }
 
-<!-- POPUP -->
-<div class="slip-popup" id="slipPopup"></div>
+    function calcBalance() {
+      const total = parseFloat(document.getElementById("totalFee").value || 0);
+      const paid = parseFloat(document.getElementById("paidAmount").value || 0);
+      document.getElementById("balance").value = (total - paid).toFixed(2);
+    }
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('billDate').value = today;
+    async function submitData() {
+      const data = {
+        receiptNo: Date.now(), // auto receipt no
+        class: document.getElementById("classSelect").value,
+        name: document.getElementById("studentSelect").options[document.getElementById("studentSelect").selectedIndex].text,
+        id: document.getElementById("studentId").value,
+        plan: document.getElementById("feePlan").value,
+        startDate: document.getElementById("startDate").value,
+        days: document.getElementById("daysPurchased").value,
+        total: document.getElementById("totalFee").value,
+        paid: document.getElementById("paidAmount").value,
+        balance: document.getElementById("balance").value,
+        mode: document.getElementById("mode").value,
+        remarks: document.getElementById("remarks").value,
+        status: document.getElementById("status").value,
+      };
 
-    google.script.run.withSuccessHandler(fillClasses).getClassList();
-    google.script.run.withSuccessHandler(val => document.getElementById('receiptNo').value = val).getNextReceiptNumber();
-  });
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
 
-  document.getElementById('classSelect').addEventListener('change', e => {
-    google.script.run.withSuccessHandler(fillStudents).getStudentsByClass(e.target.value);
-  });
-
-  function fillClasses(classes) {
-    const select = document.getElementById('classSelect');
-    select.innerHTML = '';
-    classes.forEach(c => {
-      const opt = document.createElement('option');
-      opt.text = c;
-      select.add(opt);
-    });
-    google.script.run.withSuccessHandler(fillStudents).getStudentsByClass(select.value);
-  }
-
-  function fillStudents(students) {
-    const studentSelect = document.getElementById('studentSelect');
-    studentSelect.innerHTML = '';
-    students.forEach(stu => {
-      const opt = document.createElement('option');
-      opt.text = stu.name;
-      opt.value = stu.id;
-      studentSelect.add(opt);
-    });
-    document.getElementById('studentId').value = studentSelect.options[0]?.value || '';
-  }
-
-  document.getElementById('studentSelect').addEventListener('change', e => {
-    document.getElementById('studentId').value = e.target.value;
-  });
-
-  document.getElementById('paidAmount').addEventListener('input', calculateBalance);
-  document.getElementById('totalFee').addEventListener('input', calculateBalance);
-
-  function calculateBalance() {
-    const total = parseFloat(document.getElementById('totalFee').value) || 0;
-    const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
-    document.getElementById('balance').value = total - paid;
-  }
-
-  document.getElementById('billingForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target).entries());
-
-    google.script.run.withSuccessHandler(() => {
-      showSlip(formData);
-    }).submitBillingData(formData);
-  });
-
-  function showSlip(data) {
-    const popup = document.getElementById('slipPopup');
-    popup.innerHTML = `
-      <h2>Fee Receipt</h2>
-      <p><strong>Date:</strong> ${data.billDate}</p>
-      <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
-      <p><strong>Student:</strong> ${data.studentName} (${data.studentId})</p>
-      <p><strong>Class:</strong> ${data.class}</p>
-      <p><strong>Fee Plan:</strong> ${data.feePlan}</p>
-      <p><strong>Start Date:</strong> ${data.classStartDate}</p>
-      <p><strong>Total Fee:</strong> ₹${data.totalFee}</p>
-      <p><strong>Paid:</strong> ₹${data.paidAmount}</p>
-      <p><strong>Balance:</strong> ₹${data.balance}</p>
-      <p><strong>Status:</strong> ${data.paymentStatus}</p>
-      <button onclick="print()">Download Slip</button>
-    `;
-    popup.style.display = 'block';
-  }
-
-  function print() {
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write('<html><head><title>Slip</title></head><body>' + document.getElementById('slipPopup').innerHTML + '</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-  }
-</script>
-
+      alert("Billing Submitted!");
+    }
+  </script>
 </body>
 </html>
