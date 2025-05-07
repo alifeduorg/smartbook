@@ -9,216 +9,181 @@
             font-family: Arial, sans-serif;
             background-color: white;
             color: navy;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: gold;
-            padding: 20px;
-            text-align: center;
-            color: white;
         }
         .container {
             width: 80%;
-            margin: 30px auto;
-            background-color: #f9f9f9;
+            margin: 0 auto;
+            background-color: goldenrod;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
-        .button {
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        select, input[type="text"], input[type="number"], input[type="date"] {
+            padding: 10px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        button {
             background-color: navy;
             color: white;
             padding: 10px 20px;
-            text-align: center;
             border: none;
+            font-size: 16px;
             cursor: pointer;
-            border-radius: 5px;
-        }
-        .button:hover {
-            background-color: darkblue;
-        }
-        select, input, textarea {
-            padding: 8px;
-            margin: 5px;
-            width: 100%;
-            border-radius: 5px;
-            border: 1px solid #ccc;
         }
         .fee-slip {
             display: none;
-            background-color: gold;
             padding: 10px;
+            background-color: lightgray;
             margin-top: 20px;
         }
-        .fee-slip button {
-            background-color: navy;
-            color: white;
-            padding: 10px;
+        .fee-slip p {
+            font-weight: bold;
+        }
+        #dashboardBtn {
+            background-color: goldenrod;
+            color: navy;
+            padding: 10px 20px;
             border: none;
             cursor: pointer;
+            text-align: center;
+            display: block;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Billing Panel</h1>
-</header>
-
 <div class="container">
-    <button class="button" onclick="window.location.href='dashboard.html';">Go to Dashboard</button>
+    <div class="header">Billing Panel</div>
 
-    <form id="billingForm">
-        <label for="classSelect">Class:</label>
-        <select id="classSelect" onchange="fetchStudents()">
-            <option value="">Select Class</option>
-        </select>
+    <label for="classSelect">Class</label>
+    <select id="classSelect" onchange="fetchStudents()">
+        <option value="">Select Class</option>
+    </select>
 
-        <label for="studentSelect">Student Name:</label>
-        <select id="studentSelect" onchange="fillStudentDetails()">
-            <option value="">Select Student</option>
-        </select>
+    <label for="studentSelect">Student</label>
+    <select id="studentSelect" onchange="fillStudentId()">
+        <option value="">Select Student</option>
+    </select>
 
-        <label for="studentID">Student ID:</label>
-        <input type="text" id="studentID" readonly>
+    <input type="text" id="studentId" placeholder="Student ID" readonly>
+    <input type="text" id="feePlan" placeholder="Fee Plan (Basic/Standard/Premium)" readonly>
+    <input type="text" id="balance" placeholder="Balance" readonly>
 
-        <label for="feePlan">Fee Plan:</label>
-        <select id="feePlan">
-            <option value="Basic">Basic</option>
-            <option value="Standard">Standard</option>
-            <option value="Premium">Premium</option>
-        </select>
+    <button id="submitBtn" onclick="submitData()">Submit</button>
 
-        <label for="daysPurchased">Days Purchased:</label>
-        <input type="number" id="daysPurchased" min="1" required>
-
-        <label for="totalFee">Total Fee:</label>
-        <input type="number" id="totalFee" readonly>
-
-        <label for="paidAmount">Paid Amount:</label>
-        <input type="number" id="paidAmount" required>
-
-        <label for="balance">Balance:</label>
-        <input type="number" id="balance" readonly>
-
-        <label for="paymentMode">Payment Mode:</label>
-        <select id="paymentMode">
-            <option value="Cash">Cash</option>
-            <option value="Card">Card</option>
-            <option value="Online">Online</option>
-        </select>
-
-        <label for="remarks">Remarks:</label>
-        <textarea id="remarks"></textarea>
-
-        <button type="button" class="button" onclick="submitData()">Submit</button>
-    </form>
-
-    <div class="fee-slip" id="feeSlip">
-        <h3>Fee Slip</h3>
+    <div id="feeSlip" class="fee-slip">
+        <p>Fee Slip</p>
         <p id="feeDetails"></p>
-        <button onclick="downloadFeeSlip()">Download</button>
+        <button onclick="downloadSlip()">Download Fee Slip</button>
     </div>
+
+    <button id="dashboardBtn" onclick="goToDashboard()">Go to Dashboard</button>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
 <script>
-// Firebase Configuration
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore(app);
+    // Firebase configuration
+   const firebaseConfig = {
+  apiKey: "AIzaSyCmlx84oYqa_yBIHFNVa0lqiA-8Eq12ezw",  // Removed escape character
+  authDomain: "alifedubilling-72aca.firebaseapp.com",
+  projectId: "alifedubilling-72aca",
+  storageBucket: "alifedubilling-72aca.firebasestorage.app",
+  messagingSenderId: "689907023891",
+  appId: "1:689907023891:web:acb38eb8f158eb472affe6",
+  measurementId: "G-TDLC65EYFJ"
+};  
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
 
-// Fetch Classes from Google Sheets
-async function fetchClasses() {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec');
-    const data = await response.json();
-    const classSelect = document.getElementById("classSelect");
-    data.classes.forEach(cls => {
-        const option = document.createElement("option");
-        option.value = cls;
-        option.textContent = cls;
-        classSelect.appendChild(option);
-    });
-}
-
-// Fetch Students based on selected class
-async function fetchStudents() {
-    const classSelect = document.getElementById("classSelect");
-    const className = classSelect.value;
-    if (!className) return;
-
-    const response = await fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?class=${className}`);
-    const data = await response.json();
-    const studentSelect = document.getElementById("studentSelect");
-    studentSelect.innerHTML = '<option value="">Select Student</option>';
-    data.students.forEach(student => {
-        const option = document.createElement("option");
-        option.value = student.studentID;
-        option.textContent = student.studentName;
-        studentSelect.appendChild(option);
-    });
-}
-
-// Fill student details when a name is selected
-function fillStudentDetails() {
-    const studentSelect = document.getElementById("studentSelect");
-    const studentID = studentSelect.value;
-    if (!studentID) return;
-
-    document.getElementById("studentID").value = studentID;
-}
-
-// Submit data to Firebase Firestore
-async function submitData() {
-    const form = document.getElementById("billingForm");
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => {
-        data[key] = value;
-    });
-
-    // Save to Firebase
-    try {
-        await db.collection('billing_data').add(data);
-        alert('Data submitted successfully!');
-        showFeeSlip(data); // Show fee slip popup
-    } catch (error) {
-        alert('Error submitting data: ' + error.message);
+    async function fetchClasses() {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec');
+        const students = await response.json();
+        const classSelect = document.getElementById("classSelect");
+        let classes = [...new Set(students.map(student => student.class))];
+        
+        classes.forEach(className => {
+            const option = document.createElement("option");
+            option.value = className;
+            option.textContent = className;
+            classSelect.appendChild(option);
+        });
     }
-}
 
-// Show fee slip in popup
-function showFeeSlip(data) {
-    const feeSlip = document.getElementById("feeSlip");
-    const feeDetails = document.getElementById("feeDetails");
-    feeDetails.textContent = `Bill Date: ${new Date().toLocaleDateString()}, Student: ${data.studentName}, Fee Plan: ${data.feePlan}, Total Fee: ${data.totalFee}`;
-    feeSlip.style.display = 'block';
-}
+    async function fetchStudents() {
+        const classSelect = document.getElementById("classSelect");
+        const classValue = classSelect.value;
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?class=${classValue}`);
+        const students = await response.json();
+        const studentSelect = document.getElementById("studentSelect");
+        studentSelect.innerHTML = '<option value="">Select Student</option>';
 
-// Download Fee Slip as PDF
-function downloadFeeSlip() {
-    const feeSlip = document.getElementById("feeSlip");
-    const blob = new Blob([feeSlip.innerHTML], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "fee-slip.pdf";
-    a.click();
-}
+        students.forEach(student => {
+            const option = document.createElement("option");
+            option.value = student.id;
+            option.textContent = student.name;
+            studentSelect.appendChild(option);
+        });
+    }
 
-// Initialize classes on page load
-window.onload = fetchClasses;
+    function fillStudentId() {
+        const studentSelect = document.getElementById("studentSelect");
+        const studentId = studentSelect.value;
+        const studentName = studentSelect.options[studentSelect.selectedIndex].text;
+        
+        document.getElementById("studentId").value = studentId;
+        document.getElementById("feePlan").value = "Standard";  // Default or can be fetched
+        document.getElementById("balance").value = 1000;  // Default balance, modify as needed
+    }
+
+    async function submitData() {
+        const studentId = document.getElementById("studentId").value;
+        const studentName = document.getElementById("studentSelect").options[document.getElementById("studentSelect").selectedIndex].text;
+        const feePlan = document.getElementById("feePlan").value;
+        const balance = document.getElementById("balance").value;
+
+        const billData = {
+            studentId: studentId,
+            studentName: studentName,
+            feePlan: feePlan,
+            balance: balance,
+            billDate: new Date().toLocaleDateString(),
+        };
+
+        // Save to Firestore
+        await db.collection('BillingData').add(billData);
+        
+        // Show Fee Slip
+        document.getElementById("feeDetails").textContent = `Student: ${studentName}, Fee Plan: ${feePlan}, Balance: ${balance}`;
+        document.getElementById("feeSlip").style.display = "block";
+    }
+
+    function downloadSlip() {
+        const feeSlip = document.getElementById("feeSlip");
+        const element = document.createElement('a');
+        const feeSlipContent = feeSlip.innerHTML;
+        const blob = new Blob([feeSlipContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        element.href = url;
+        element.download = 'fee_slip.html';
+        document.body.appendChild(element);
+        element.click();
+    }
+
+    function goToDashboard() {
+        // Redirect to the dashboard page or your desired URL
+        window.location.href = 'YOUR_DASHBOARD_URL';
+    }
+
+    // Initial function to load class options
+    fetchClasses();
 </script>
-
 </body>
 </html>
