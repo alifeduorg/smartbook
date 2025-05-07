@@ -1,285 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing Panel</title>
-
-    <!-- Firebase SDK Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- For PDF download -->
-
-    <!-- Custom Styles -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            color: #333;
-            padding: 20px;
-            margin: 0;
-        }
-
-        h2 {
-            text-align: center;
-            color: #2f4f4f;
-        }
-
-        .container {
-            width: 60%;
-            margin: auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .button {
-            background-color: #2c3e50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 16px;
-        }
-
-        .button:hover {
-            background-color: #34495e;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        #feeSlip {
-            background-color: #f2f2f2;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        #feeSlip strong {
-            color: #2f4f4f;
-        }
-
-        .button-container {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .button-container button {
-            width: 48%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing Panel</title>
+  <style>
+    body {
+      background-color: #fff;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      padding-top: 50px;
+    }
+    .form-group {
+      margin: 20px 0;
+    }
+    select, input[type="text"], input[type="date"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      background-color: goldenrod;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: darkgoldenrod;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 400px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
-    <h2>Billing Panel</h2>
+  <div class="container">
+    <h1 style="color: #003366; text-align: center;">Billing Panel</h1>
 
-    <!-- Billing Form -->
-    <div class="container">
-        <form id="billingForm">
-            <div class="form-group">
-                <label for="student">Student Name:</label>
-                <input type="text" id="student" name="student">
-            </div>
-
-            <div class="form-group">
-                <label for="studentId">Student ID:</label>
-                <input type="text" id="studentId" name="studentId">
-            </div>
-
-            <div class="form-group">
-                <label for="plan">Fee Plan:</label>
-                <input type="text" id="plan" name="plan">
-            </div>
-
-            <div class="form-group">
-                <label for="total">Total Fee:</label>
-                <input type="number" id="total" name="total">
-            </div>
-
-            <div class="form-group">
-                <label for="paid">Paid Fee:</label>
-                <input type="number" id="paid" name="paid">
-            </div>
-
-            <div class="form-group">
-                <label for="balance">Balance:</label>
-                <input type="number" id="balance" name="balance">
-            </div>
-
-            <div class="form-group">
-                <label for="paymentMode">Payment Mode:</label>
-                <input type="text" id="paymentMode" name="paymentMode">
-            </div>
-
-            <div class="form-group">
-                <label for="date">Date of Payment:</label>
-                <input type="date" id="date" name="date">
-            </div>
-
-            <button type="button" class="button" onclick="submitForm()">Submit & Generate Slip</button>
-        </form>
+    <div class="form-group">
+      <label for="class-select">Class</label>
+      <select id="class-select">
+        <option value="">Select Class</option>
+        <!-- Dynamically populated -->
+      </select>
     </div>
 
-    <hr>
-
-    <!-- Fee Slip Display -->
-    <div class="container">
-        <h3>Generated Fee Slip</h3>
-        <div id="feeSlip"></div>
-        <div class="button-container">
-            <button class="button" onclick="viewSlip()">View Slip</button>
-            <button class="button" onclick="downloadSlip()">Download Fee Slip</button>
-        </div>
+    <div class="form-group">
+      <label for="student-select">Student Name</label>
+      <select id="student-select">
+        <option value="">Select Student</option>
+        <!-- Dynamically populated -->
+      </select>
     </div>
 
-    <!-- Dashboard Button -->
-    <div style="text-align:center; margin-top: 20px;">
-        <button class="button" id="dashboardBtn" onclick="goToDashboard()">Go to Dashboard</button>
+    <div class="form-group">
+      <label for="student-id">Student ID</label>
+      <input type="text" id="student-id" disabled />
     </div>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCmlx84oYqa_yBIHFNVa0lqiA-8Eq12ezw",
-            authDomain: "alifedubilling-72aca.firebaseapp.com",
-            projectId: "alifedubilling-72aca",
-            storageBucket: "alifedubilling-72aca.firebasestorage.app",
-            messagingSenderId: "689907023891",
-            appId: "1:689907023891:web:acb38eb8f158eb472affe6",
-            measurementId: "G-TDLC65EYFJ"
-        };
+    <div class="form-group">
+      <label for="fee-plan">Fee Plan</label>
+      <select id="fee-plan">
+        <option value="Basic">Basic</option>
+        <option value="Standard">Standard</option>
+        <option value="Premium">Premium</option>
+      </select>
+    </div>
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
+    <div class="form-group">
+      <label for="total-fee">Total Fee</label>
+      <input type="number" id="total-fee" />
+    </div>
 
-        // Fetch data from Google Sheets
-        const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
+    <div class="form-group">
+      <label for="paid-amount">Paid Amount</label>
+      <input type="number" id="paid-amount" />
+    </div>
 
-        async function fetchSheetData() {
-            try {
-                const response = await fetch(googleSheetsUrl);
-                const data = await response.json();
-                console.log(data);
+    <div class="form-group">
+      <label for="balance">Balance</label>
+      <input type="number" id="balance" disabled />
+    </div>
 
-                if (data && data.length > 0) {
-                    const student = data[0];
-                    document.getElementById("student").value = student.studentName;
-                    document.getElementById("studentId").value = student.studentId;
-                    document.getElementById("plan").value = student.feePlan;
-                    document.getElementById("total").value = student.totalFee;
-                    document.getElementById("paid").value = student.paidFee;
-                    document.getElementById("balance").value = student.balance;
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
+    <div class="form-group">
+      <label for="payment-mode">Payment Mode</label>
+      <input type="text" id="payment-mode" />
+    </div>
 
-        window.onload = fetchSheetData;
+    <div class="form-group">
+      <label for="remarks">Remarks</label>
+      <input type="text" id="remarks" />
+    </div>
 
-        // Submit Form
-        async function submitForm() {
-            const classValue = "Class 10";
-            const studentName = document.getElementById("student").value;
-            const studentId = document.getElementById("studentId").value;
-            const plan = document.getElementById("plan").value;
-            const total = document.getElementById("total").value;
-            const paid = document.getElementById("paid").value;
-            const balance = document.getElementById("balance").value;
-            const paymentMode = document.getElementById("paymentMode").value;
-            const date = document.getElementById("date").value;
+    <button onclick="submitData()">Submit</button>
+    <button onclick="showFeeSlip()">Show Fee Slip</button>
+  </div>
 
-            const formData = {
-                class: classValue,
-                name: studentName,
-                id: studentId,
-                plan: plan,
-                total: total,
-                paid: paid,
-                balance: balance,
-                paymentMode: paymentMode,
-                date: date
-            };
+  <!-- Fee Slip Popup -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <h2>Fee Slip</h2>
+      <p id="fee-slip-details"></p>
+      <button onclick="downloadFeeSlip()">Download</button>
+      <button onclick="closePopup()">Close</button>
+    </div>
+  </div>
 
-            try {
-                const docRef = await db.collection("billingRecords").add(formData);
-                console.log("Document written with ID: ", docRef.id);
-                alert("Data submitted successfully!");
-                generateSlip(formData);
-            } catch (e) {
-                console.error("Error adding document: ", e);
-                alert("Error submitting data.");
-            }
-        }
+  <script>
+    // Load classes dynamically from Google Sheets
+    fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec')
+      .then(response => response.json())
+      .then(data => {
+        const classSelect = document.getElementById('class-select');
+        data.classes.forEach(cls => {
+          const option = document.createElement('option');
+          option.value = cls;
+          option.innerText = cls;
+          classSelect.appendChild(option);
+        });
+      });
 
-        // Generate Fee Slip
-        function generateSlip(formData) {
-            const slipHtml = `
-                <strong>Student Name:</strong> ${formData.name}<br>
-                <strong>Class:</strong> ${formData.class}<br>
-                <strong>Student ID:</strong> ${formData.id}<br>
-                <strong>Fee Plan:</strong> ${formData.plan}<br>
-                <strong>Total Fee:</strong> ₹${formData.total}<br>
-                <strong>Paid Fee:</strong> ₹${formData.paid}<br>
-                <strong>Balance:</strong> ₹${formData.balance}<br>
-                <strong>Payment Mode:</strong> ${formData.paymentMode}<br>
-                <strong>Date of Payment:</strong> ${formData.date}<br>
-            `;
-            document.getElementById("feeSlip").innerHTML = slipHtml;
-        }
+    // Load students based on selected class
+    document.getElementById('class-select').addEventListener('change', function() {
+      const selectedClass = this.value;
+      fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?class=${selectedClass}`)
+        .then(response => response.json())
+        .then(data => {
+          const studentSelect = document.getElementById('student-select');
+          studentSelect.innerHTML = '<option value="">Select Student</option>';
+          data.students.forEach(student => {
+            const option = document.createElement('option');
+            option.value = student.name;
+            option.innerText = student.name;
+            studentSelect.appendChild(option);
+          });
+        });
+    });
 
-        // View Fee Slip
-        function viewSlip() {
-            const slipContent = document.getElementById("feeSlip").innerHTML;
-            if (slipContent) {
-                window.open().document.write(slipContent);
-            } else {
-                alert("No slip available to view.");
-            }
-        }
+    // Auto-fill student ID based on selected name
+    document.getElementById('student-select').addEventListener('change', function() {
+      const selectedStudent = this.value;
+      fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?student=${selectedStudent}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('student-id').value = data.studentId;
+        });
+    });
 
-        // Download Fee Slip as PDF
-        function downloadSlip() {
-            const slipContent = document.getElementById("feeSlip").innerHTML;
-            if (slipContent) {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.html(slipContent, {
-                    callback: function (doc) {
-                        doc.save('fee-slip.pdf');
-                    }
-                });
-            } else {
-                alert("No slip available to download.");
-            }
-        }
+    // Balance calculation
+    document.getElementById('paid-amount').addEventListener('input', function() {
+      const totalFee = parseFloat(document.getElementById('total-fee').value);
+      const paidAmount = parseFloat(this.value);
+      const balance = totalFee - paidAmount;
+      document.getElementById('balance').value = balance;
+    });
 
-        // Go to Dashboard
-        function goToDashboard() {
-            window.location.href = 'dashboard.html'; // Modify this URL as per your dashboard page
-        }
-    </script>
+    // Submit data
+    function submitData() {
+      const billDate = new Date().toISOString().split('T')[0];
+      const receiptNo = Math.floor(Math.random() * 10000);
+      const className = document.getElementById('class-select').value;
+      const studentName = document.getElementById('student-select').value;
+      const studentId = document.getElementById('student-id').value;
+      const feePlan = document.getElementById('fee-plan').value;
+      const totalFee = document.getElementById('total-fee').value;
+      const paidAmount = document.getElementById('paid-amount').value;
+      const balance = document.getElementById('balance').value;
+      const paymentMode = document.getElementById('payment-mode').value;
+      const remarks = document.getElementById('remarks').value;
 
+      // Send data to Firebase
+      firebase.firestore().collection("billingData").add({
+        billDate,
+        receiptNo,
+        className,
+        studentName,
+        studentId,
+        feePlan,
+        totalFee,
+        paidAmount,
+        balance,
+        paymentMode,
+        remarks
+      })
+      .then(() => {
+        alert('Data submitted successfully');
+      });
+    }
+
+    // Show fee slip
+    function showFeeSlip() {
+      const feeSlipDetails = `
+        <strong>Class:</strong> ${document.getElementById('class-select').value} <br>
+        <strong>Student:</strong> ${document.getElementById('student-select').value} <br>
+        <strong>Student ID:</strong> ${document.getElementById('student-id').value} <br>
+        <strong>Fee Plan:</strong> ${document.getElementById('fee-plan').value} <br>
+        <strong>Total Fee:</strong> ${document.getElementById('total-fee').value} <br>
+        <strong>Paid Amount:</strong> ${document.getElementById('paid-amount').value} <br>
+        <strong>Balance:</strong> ${document.getElementById('balance').value} <br>
+        <strong>Payment Mode:</strong> ${document.getElementById('payment-mode').value} <br>
+        <strong>Remarks:</strong> ${document.getElementById('remarks').value} <br>
+      `;
+      document.getElementById('fee-slip-details').innerHTML = feeSlipDetails;
+      document.getElementById('popup').style.display = 'flex';
+    }
+
+    // Download fee slip
+    function downloadFeeSlip() {
+      const doc = new jsPDF();
+      doc.text(document.getElementById('fee-slip-details').innerText, 10, 10);
+      doc.save('fee_slip.pdf');
+    }
+
+    // Close popup
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmlx84oYqa_yBIHFNVa0lqiA-8Eq12ezw",
+      authDomain: "alifedubilling-72aca.firebaseapp.com",
+      projectId: "alifedubilling-72aca",
+      storageBucket: "alifedubilling-72aca.firebasestorage.app",
+      messagingSenderId: "689907023891",
+      appId: "1:689907023891:web:acb38eb8f158eb472affe6",
+      measurementId: "G-TDLC65EYFJ"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
 </body>
 </html>
