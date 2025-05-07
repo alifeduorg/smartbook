@@ -214,22 +214,31 @@
     document.getElementById("balance").value = total - paid;
   }
 
- async function submitForm() {
-    const payload = {
-      receiptNo: "R" + receiptCounter++,
-      class: document.getElementById("class").value,
-      name: document.getElementById("student").value,
-      id: document.getElementById("studentId").value,
-      plan: document.getElementById("plan").value,
-      startDate: document.getElementById("startDate").value,
-      days: document.getElementById("days").value,
-      total: document.getElementById("total").value,
-      paid: document.getElementById("paid").value,
-      balance: document.getElementById("balance").value,
-      mode: document.getElementById("mode").value,
-      remarks: document.getElementById("remarks").value,
-      status: document.getElementById("status").value
-    };
+async function submitForm() {
+  const payload = {
+    receiptNo: "R" + receiptCounter++,
+    class: document.getElementById("class").value,
+    name: document.getElementById("student").value,
+    id: document.getElementById("studentId").value,
+    plan: document.getElementById("plan").value,
+    startDate: document.getElementById("startDate").value,
+    days: document.getElementById("days").value,
+    total: document.getElementById("total").value,
+    paid: document.getElementById("paid").value,
+    balance: document.getElementById("balance").value,
+    mode: document.getElementById("mode").value,
+    remarks: document.getElementById("remarks").value,
+    status: document.getElementById("status").value
+  };
+
+  // 🔍 Add this validation right after defining `payload`
+  if (!payload.name || !payload.plan || !payload.total || !payload.paid) {
+    alert("Please fill all required fields: Student Name, Plan, Total, and Paid.");
+    return;
+  }
+
+  // 🧠 Continue with your code here (send data, update table, etc.)
+}
 
 
     const options = {
@@ -266,6 +275,11 @@
     document.getElementById("slipContent").innerHTML = slip;
     document.getElementById("feeSlip").style.display = "block";
   }
+function clearForm() {
+  document.querySelectorAll("input, textarea").forEach(el => el.value = "");
+  document.getElementById("status").value = "Paid";
+  calculateTotal(); // re-calculates total after reset
+}
 
   function printSlip() {
     const content = document.getElementById("feeSlip").innerHTML;
