@@ -46,6 +46,28 @@
       background: #004080;
     }
   </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Initialization -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmlx84oYqa_yBIHFNVa0lqiA-8Eq12ezw",
+      authDomain: "alifedubilling-72aca.firebaseapp.com",
+      projectId: "alifedubilling-72aca",
+      storageBucket: "alifedubilling-72aca.appspot.com",
+      messagingSenderId: "689907023891",
+      appId: "1:689907023891:web:acb38eb8f158eb472affe6",
+      measurementId: "G-TDLC65EYFJ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    const db = firebase.firestore();
+  </script>
 </head>
 <body>
   <div class="billing-container">
@@ -122,8 +144,8 @@
 
     function fillStudentId() {
       const className = document.getElementById("classSelect").value;
-      const selectedName = document.getElementById("studentSelect").value;
-      const student = (allData[className] || []).find(s => s.id === selectedName);
+      const selectedId = document.getElementById("studentSelect").value;
+      const student = (allData[className] || []).find(s => s.id === selectedId);
       document.getElementById("studentId").value = student ? student.id : '';
     }
 
@@ -135,7 +157,8 @@
 
     async function submitData() {
       const data = {
-        receiptNo: Date.now(), // auto receipt no
+        timestamp: new Date(),
+        receiptNo: Date.now(),
         class: document.getElementById("classSelect").value,
         name: document.getElementById("studentSelect").options[document.getElementById("studentSelect").selectedIndex].text,
         id: document.getElementById("studentId").value,
@@ -147,16 +170,16 @@
         balance: document.getElementById("balance").value,
         mode: document.getElementById("mode").value,
         remarks: document.getElementById("remarks").value,
-        status: document.getElementById("status").value,
+        status: document.getElementById("status").value
       };
 
-      const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      });
-
-      alert("Billing Submitted!");
+      try {
+        await db.collection("billing_data").add(data);
+        alert("Billing submitted successfully to Firestore!");
+      } catch (error) {
+        console.error("Error submitting billing:", error);
+        alert("Failed to submit billing.");
+      }
     }
   </script>
 </body>
