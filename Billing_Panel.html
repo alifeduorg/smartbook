@@ -4,58 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billing Panel</title>
+
     <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- For PDF download -->
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2f4f4f;
+        }
+
+        .container {
+            width: 60%;
+            margin: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .button:hover {
+            background-color: #34495e;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #feeSlip {
+            background-color: #f2f2f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        #feeSlip strong {
+            color: #2f4f4f;
+        }
+
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button-container button {
+            width: 48%;
+        }
+    </style>
 </head>
 <body>
+
     <h2>Billing Panel</h2>
 
+    <!-- Billing Form -->
+    <div class="container">
+        <form id="billingForm">
+            <div class="form-group">
+                <label for="student">Student Name:</label>
+                <input type="text" id="student" name="student">
+            </div>
+
+            <div class="form-group">
+                <label for="studentId">Student ID:</label>
+                <input type="text" id="studentId" name="studentId">
+            </div>
+
+            <div class="form-group">
+                <label for="plan">Fee Plan:</label>
+                <input type="text" id="plan" name="plan">
+            </div>
+
+            <div class="form-group">
+                <label for="total">Total Fee:</label>
+                <input type="number" id="total" name="total">
+            </div>
+
+            <div class="form-group">
+                <label for="paid">Paid Fee:</label>
+                <input type="number" id="paid" name="paid">
+            </div>
+
+            <div class="form-group">
+                <label for="balance">Balance:</label>
+                <input type="number" id="balance" name="balance">
+            </div>
+
+            <div class="form-group">
+                <label for="paymentMode">Payment Mode:</label>
+                <input type="text" id="paymentMode" name="paymentMode">
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date of Payment:</label>
+                <input type="date" id="date" name="date">
+            </div>
+
+            <button type="button" class="button" onclick="submitForm()">Submit & Generate Slip</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <!-- Fee Slip Display -->
+    <div class="container">
+        <h3>Generated Fee Slip</h3>
+        <div id="feeSlip"></div>
+        <div class="button-container">
+            <button class="button" onclick="viewSlip()">View Slip</button>
+            <button class="button" onclick="downloadSlip()">Download Fee Slip</button>
+        </div>
+    </div>
+
     <!-- Dashboard Button -->
-    <button id="dashboardBtn" onclick="goToDashboard()">Go to Dashboard</button>
-
-    <hr>
-
-    <!-- Form to Submit Billing Data -->
-    <form id="billingForm">
-        <label for="student">Student Name:</label><br>
-        <input type="text" id="student" name="student"><br><br>
-
-        <label for="studentId">Student ID:</label><br>
-        <input type="text" id="studentId" name="studentId"><br><br>
-
-        <label for="plan">Fee Plan:</label><br>
-        <input type="text" id="plan" name="plan"><br><br>
-
-        <label for="total">Total Fee:</label><br>
-        <input type="number" id="total" name="total"><br><br>
-
-        <label for="paid">Paid Fee:</label><br>
-        <input type="number" id="paid" name="paid"><br><br>
-
-        <label for="balance">Balance:</label><br>
-        <input type="number" id="balance" name="balance"><br><br>
-
-        <label for="paymentMode">Payment Mode:</label><br>
-        <input type="text" id="paymentMode" name="paymentMode"><br><br>
-
-        <label for="date">Date of Payment:</label><br>
-        <input type="date" id="date" name="date"><br><br>
-
-        <button type="button" onclick="submitForm()">Submit & Generate Slip</button>
-    </form>
-
-    <hr>
-
-    <h3>Generated Fee Slip</h3>
-    <div id="feeSlip"></div>
-
-    <!-- View Fee Slip Button -->
-    <button onclick="viewSlip()">View Slip</button>
-
-    <!-- Download Fee Slip Button -->
-    <button onclick="downloadSlip()">Download Fee Slip</button>
+    <div style="text-align:center; margin-top: 20px;">
+        <button class="button" id="dashboardBtn" onclick="goToDashboard()">Go to Dashboard</button>
+    </div>
 
     <script>
         // Firebase Configuration
@@ -73,19 +173,17 @@
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(app);
 
-        // Google Sheets Web App URL (replace with your actual URL)
+        // Fetch data from Google Sheets
         const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
 
-        // Fetch data from Google Sheets
         async function fetchSheetData() {
             try {
                 const response = await fetch(googleSheetsUrl);
                 const data = await response.json();
-                console.log(data); // Log the data for testing
+                console.log(data);
 
-                // Display the data in the form (you can customize this)
                 if (data && data.length > 0) {
-                    const student = data[0]; // Example: fetch first student's data
+                    const student = data[0];
                     document.getElementById("student").value = student.studentName;
                     document.getElementById("studentId").value = student.studentId;
                     document.getElementById("plan").value = student.feePlan;
@@ -98,12 +196,11 @@
             }
         }
 
-        // Fetch the sheet data when the page loads
         window.onload = fetchSheetData;
 
-        // Submit form and save data to Firebase Firestore
+        // Submit Form
         async function submitForm() {
-            const classValue = "Class 10"; // For example, hardcoded or fetch from user input
+            const classValue = "Class 10";
             const studentName = document.getElementById("student").value;
             const studentId = document.getElementById("studentId").value;
             const plan = document.getElementById("plan").value;
@@ -136,7 +233,7 @@
             }
         }
 
-        // Function to generate and display the fee slip
+        // Generate Fee Slip
         function generateSlip(formData) {
             const slipHtml = `
                 <strong>Student Name:</strong> ${formData.name}<br>
@@ -178,10 +275,11 @@
             }
         }
 
-        // Dashboard Button (Simple redirect)
+        // Go to Dashboard
         function goToDashboard() {
             window.location.href = 'dashboard.html'; // Modify this URL as per your dashboard page
         }
     </script>
+
 </body>
 </html>
