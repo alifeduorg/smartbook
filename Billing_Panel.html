@@ -1,4 +1,166 @@
 <!DOCTYPE html>
+<html>
+<head>
+  <title>Billing Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: white;
+      color: #333;
+      padding: 20px;
+    }
+    .billing-container {
+      max-width: 800px;
+      margin: auto;
+      border-radius: 10px;
+      border: 2px solid gold;
+      padding: 20px;
+      background: #fdfdfd;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: navy;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      color: #333;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: navy;
+      color: gold;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #004080;
+    }
+  </style>
+</head>
+<body>
+  <div class="billing-container">
+    <h2>Billing Panel</h2>
+    <label>Class</label>
+    <select id="classSelect" onchange="loadStudents()"></select>
+
+    <label>Student Name</label>
+    <select id="studentSelect" onchange="fillStudentId()"></select>
+
+    <label>Student ID</label>
+    <input type="text" id="studentId" readonly>
+
+    <label>Fee Plan</label>
+    <select id="feePlan">
+      <option>Basic</option>
+      <option>Standard</option>
+      <option>Premium</option>
+    </select>
+
+    <label>Class Start Date</label>
+    <input type="date" id="startDate">
+
+    <label>Days Purchased</label>
+    <input type="number" id="daysPurchased">
+
+    <label>Total Fee</label>
+    <input type="number" id="totalFee">
+
+    <label>Paid Amount</label>
+    <input type="number" id="paidAmount" oninput="calcBalance()">
+
+    <label>Balance</label>
+    <input type="number" id="balance" readonly>
+
+    <label>Payment Mode</label>
+    <input type="text" id="mode">
+
+    <label>Remarks</label>
+    <input type="text" id="remarks">
+
+    <label>Payment Status</label>
+    <select id="status">
+      <option>Paid</option>
+      <option>Pending</option>
+    </select>
+
+    <button onclick="submitData()">Submit</button>
+  </div>
+
+  <script>
+    const url = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
+    let allData = {};
+
+    window.onload = async () => {
+      const res = await fetch(url);
+      allData = await res.json();
+      const classSelect = document.getElementById("classSelect");
+      classSelect.innerHTML = '<option disabled selected>Select Class</option>';
+      Object.keys(allData).forEach(cls => {
+        classSelect.innerHTML += `<option>${cls}</option>`;
+      });
+    }
+
+    function loadStudents() {
+      const className = document.getElementById("classSelect").value;
+      const students = allData[className] || [];
+      const studentSelect = document.getElementById("studentSelect");
+      studentSelect.innerHTML = '<option disabled selected>Select Student</option>';
+      students.forEach(stu => {
+        studentSelect.innerHTML += `<option value="${stu.id}">${stu.name}</option>`;
+      });
+    }
+
+    function fillStudentId() {
+      const className = document.getElementById("classSelect").value;
+      const selectedName = document.getElementById("studentSelect").value;
+      const student = (allData[className] || []).find(s => s.id === selectedName);
+      document.getElementById("studentId").value = student ? student.id : '';
+    }
+
+    function calcBalance() {
+      const total = parseFloat(document.getElementById("totalFee").value || 0);
+      const paid = parseFloat(document.getElementById("paidAmount").value || 0);
+      document.getElementById("balance").value = (total - paid).toFixed(2);
+    }
+
+    async function submitData() {
+      const data = {
+        receiptNo: Date.now(), // auto receipt no
+        class: document.getElementById("classSelect").value,
+        name: document.getElementById("studentSelect").options[document.getElementById("studentSelect").selectedIndex].text,
+        id: document.getElementById("studentId").value,
+        plan: document.getElementById("feePlan").value,
+        startDate: document.getElementById("startDate").value,
+        days: document.getElementById("daysPurchased").value,
+        total: document.getElementById("totalFee").value,
+        paid: document.getElementById("paidAmount").value,
+        balance: document.getElementById("balance").value,
+        mode: document.getElementById("mode").value,
+        remarks: document.getElementById("remarks").value,
+        status: document.getElementById("status").value,
+      };
+
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      alert("Billing Submitted!");
+    }
+  </script>
+</body>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
