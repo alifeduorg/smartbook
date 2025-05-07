@@ -38,7 +38,7 @@
         .button:hover {
             background-color: darkblue;
         }
-        select, input {
+        select, input, textarea {
             padding: 8px;
             margin: 5px;
             width: 100%;
@@ -122,92 +122,102 @@
     </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
 <script>
-    // Fetch Classes from Google Sheets
-    async function fetchClasses() {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec');
-        const data = await response.json();
-        const classSelect = document.getElementById("classSelect");
-        data.classes.forEach(cls => {
-            const option = document.createElement("option");
-            option.value = cls;
-            option.textContent = cls;
-            classSelect.appendChild(option);
-        });
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore(app);
+
+// Fetch Classes from Google Sheets
+async function fetchClasses() {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec');
+    const data = await response.json();
+    const classSelect = document.getElementById("classSelect");
+    data.classes.forEach(cls => {
+        const option = document.createElement("option");
+        option.value = cls;
+        option.textContent = cls;
+        classSelect.appendChild(option);
+    });
+}
+
+// Fetch Students based on selected class
+async function fetchStudents() {
+    const classSelect = document.getElementById("classSelect");
+    const className = classSelect.value;
+    if (!className) return;
+
+    const response = await fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?class=${className}`);
+    const data = await response.json();
+    const studentSelect = document.getElementById("studentSelect");
+    studentSelect.innerHTML = '<option value="">Select Student</option>';
+    data.students.forEach(student => {
+        const option = document.createElement("option");
+        option.value = student.studentID;
+        option.textContent = student.studentName;
+        studentSelect.appendChild(option);
+    });
+}
+
+// Fill student details when a name is selected
+function fillStudentDetails() {
+    const studentSelect = document.getElementById("studentSelect");
+    const studentID = studentSelect.value;
+    if (!studentID) return;
+
+    document.getElementById("studentID").value = studentID;
+}
+
+// Submit data to Firebase Firestore
+async function submitData() {
+    const form = document.getElementById("billingForm");
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+
+    // Save to Firebase
+    try {
+        await db.collection('billing_data').add(data);
+        alert('Data submitted successfully!');
+        showFeeSlip(data); // Show fee slip popup
+    } catch (error) {
+        alert('Error submitting data: ' + error.message);
     }
+}
 
-    // Fetch Students based on selected class
-    async function fetchStudents() {
-        const classSelect = document.getElementById("classSelect");
-        const className = classSelect.value;
-        if (!className) return;
+// Show fee slip in popup
+function showFeeSlip(data) {
+    const feeSlip = document.getElementById("feeSlip");
+    const feeDetails = document.getElementById("feeDetails");
+    feeDetails.textContent = `Bill Date: ${new Date().toLocaleDateString()}, Student: ${data.studentName}, Fee Plan: ${data.feePlan}, Total Fee: ${data.totalFee}`;
+    feeSlip.style.display = 'block';
+}
 
-        const response = await fetch(`https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec?class=${className}`);
-        const data = await response.json();
-        const studentSelect = document.getElementById("studentSelect");
-        studentSelect.innerHTML = '<option value="">Select Student</option>';
-        data.students.forEach(student => {
-            const option = document.createElement("option");
-            option.value = student.studentID;
-            option.textContent = student.studentName;
-            studentSelect.appendChild(option);
-        });
-    }
+// Download Fee Slip as PDF
+function downloadFeeSlip() {
+    const feeSlip = document.getElementById("feeSlip");
+    const blob = new Blob([feeSlip.innerHTML], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "fee-slip.pdf";
+    a.click();
+}
 
-    // Fill student details when a name is selected
-    function fillStudentDetails() {
-        const studentSelect = document.getElementById("studentSelect");
-        const studentID = studentSelect.value;
-        if (!studentID) return;
-
-        const studentDetails = students.find(s => s.studentID === studentID);
-        document.getElementById("studentID").value = studentDetails.studentID;
-    }
-
-    // Submit data to Firebase
-    async function submitData() {
-        const form = document.getElementById("billingForm");
-        const formData = new FormData(form);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-
-        // Send data to Firebase
-        const response = await fetch('https://your-firebase-endpoint.com', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const result = await response.json();
-        alert('Data submitted successfully');
-        showFeeSlip(data);  // Show fee slip popup
-    }
-
-    // Show fee slip in popup
-    function showFeeSlip(data) {
-        const feeSlip = document.getElementById("feeSlip");
-        const feeDetails = document.getElementById("feeDetails");
-        feeDetails.textContent = `Bill Date: ${data.billDate}, Student: ${data.studentName}, Fee Plan: ${data.feePlan}, Total Fee: ${data.totalFee}`;
-        feeSlip.style.display = 'block';
-    }
-
-    // Download Fee Slip as PDF
-    function downloadFeeSlip() {
-        const feeSlip = document.getElementById("feeSlip");
-        const blob = new Blob([feeSlip.innerHTML], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "fee-slip.pdf";
-        a.click();
-    }
-
-    // Initialize classes on page load
-    window.onload = fetchClasses;
+// Initialize classes on page load
+window.onload = fetchClasses;
 </script>
 
 </body>
