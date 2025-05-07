@@ -214,22 +214,36 @@
     document.getElementById("balance").value = total - paid;
   }
 
-  async function submitForm() {
-    const payload = {
-      receiptNo: "R" + receiptCounter++,
-      class: document.getElementById("class").value,
-      name: document.getElementById("student").value,
-      id: document.getElementById("studentId").value,
-      plan: document.getElementById("plan").value,
-      startDate: document.getElementById("startDate").value,
-      days: document.getElementById("days").value,
-      total: document.getElementById("total").value,
-      paid: document.getElementById("paid").value,
-      balance: document.getElementById("balance").value,
-      mode: document.getElementById("mode").value,
-      remarks: document.getElementById("remarks").value,
-      status: document.getElementById("status").value
-    };
+  import { getFirestore, collection, addDoc } from "firebase/firestore"; 
+
+const db = getFirestore(app); // Firestore database instance
+
+async function submitForm() {
+  const payload = {
+    receiptNo: "R" + receiptCounter++,  // Generate unique receipt number
+    class: document.getElementById("class").value,
+    name: document.getElementById("student").value,
+    id: document.getElementById("studentId").value,
+    plan: document.getElementById("plan").value,
+    startDate: document.getElementById("startDate").value,
+    days: document.getElementById("days").value,
+    total: document.getElementById("total").value,
+    paid: document.getElementById("paid").value,
+    balance: document.getElementById("balance").value,
+    mode: document.getElementById("mode").value,
+    remarks: document.getElementById("remarks").value,
+    status: document.getElementById("status").value
+  };
+
+  try {
+    // Add the form data to Firestore
+    await addDoc(collection(db, "billingRecords"), payload);
+    alert("Data submitted successfully!");
+    generateSlip(payload);
+  } catch (e) {
+    alert("Error adding document: " + e);
+  }
+}
 
     const options = {
       method: "POST",
