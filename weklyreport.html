@@ -24,10 +24,12 @@
             font-weight: 500;
             margin-bottom: 20px;
             transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         .dashboard-button:hover {
             background-color: #218838;
             transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
         }
         .form-container {
             background-color: #ffffff;
@@ -37,6 +39,7 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             max-width: 700px;
             margin: auto;
+            margin-bottom: 30px;
         }
         textarea, input[type="text"], input[type="date"] {
             width: 100%;
@@ -76,7 +79,7 @@
                 plansNextWeek: form.plansNextWeek.value
             };
 
-            fetch("https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec", {
+            fetch("https://script.google.com/macros/s/AKfycbxIGMCM61swWCeEhgGGp1gj4E5jpW-UbNeQ2pPkLpdSfZBlfwQqMJxn_tqsm-hoZ9Xd/execc", {
                 method: 'POST',
                 body: JSON.stringify(formData),
                 headers: { 'Content-Type': 'application/json' }
