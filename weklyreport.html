@@ -1,158 +1,158 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Principal Weekly Report</title>
-    <style>
-      body {
-        background-color: #f4f4f4;
-        font-family: 'Segoe UI', sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
+<head>
+  <title>Principal Weekly Report</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 25px;
+      padding: 30px 40px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #222;
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .button-group {
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 15px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #888;
+      transition: all 0.2s;
+    }
+
+    .submit-btn {
+      background-color: green;
+      color: goldenrod;
+    }
+
+    .dashboard-btn {
+      background-color: goldenrod;
+      color: green;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Principal Weekly Report</h2>
+    <form id="reportForm">
+      <label for="startDate">Start Date</label>
+      <input type="date" id="startDate" name="startDate" required>
+
+      <label for="endDate">End Date</label>
+      <input type="date" id="endDate" name="endDate" required>
+
+      <label for="reportTitle">Report Title</label>
+      <input type="text" id="reportTitle" name="reportTitle" required>
+
+      <label for="activitySummary">Activity Summary</label>
+      <textarea id="activitySummary" name="activitySummary" required></textarea>
+
+      <label for="achievements">Achievements</label>
+      <textarea id="achievements" name="achievements" required></textarea>
+
+      <label for="challenges">Challenges</label>
+      <textarea id="challenges" name="challenges" required></textarea>
+
+      <label for="plans">Plans for Next Week</label>
+      <textarea id="plans" name="plans" required></textarea>
+
+      <div class="button-group">
+        <button type="button" class="dashboard-btn" onclick="goToDashboard()">Dashboard</button>
+        <button type="submit" class="submit-btn">Submit Report</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec'; // Replace with your deployed Apps Script Web App URL
+
+    document.getElementById('reportForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const data = {};
+
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
       }
 
-      .form-container {
-        background-color: white;
-        padding: 30px 40px;
-        border-radius: 25px;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-        width: 90%;
-        max-width: 700px;
-      }
-
-      h2 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 25px;
-      }
-
-      label {
-        font-weight: 600;
-        display: block;
-        margin: 15px 0 5px;
-        color: #333;
-      }
-
-      input, textarea {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-sizing: border-box;
-        font-size: 14px;
-      }
-
-      textarea {
-        resize: vertical;
-        min-height: 80px;
-      }
-
-      .button-group {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 25px;
-      }
-
-      button {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 15px;
-        box-shadow: 0 5px 0 #888;
-        transition: all 0.2s;
-      }
-
-      .submit-btn {
-        background-color: green;
-        color: goldenrod;
-      }
-
-      .dashboard-btn {
-        background-color: goldenrod;
-        color: green;
-      }
-
-      button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="form-container">
-      <h2>Principal Weekly Report</h2>
-      <form id="reportForm">
-        <label>Start Date</label>
-        <input type="date" name="startDate" required>
-
-        <label>End Date</label>
-        <input type="date" name="endDate" required>
-
-        <label>Report Title</label>
-        <input type="text" name="reportTitle" required>
-
-        <label>Activity Summary</label>
-        <textarea name="activitySummary" required></textarea>
-
-        <label>Achievements</label>
-        <textarea name="achievements" required></textarea>
-
-        <label>Challenges</label>
-        <textarea name="challenges" required></textarea>
-
-        <label>Plans for Next Week</label>
-        <textarea name="plans" required></textarea>
-
-        <div class="button-group">
-          <button type="button" class="dashboard-btn" onclick="goToDashboard()">Dashboard</button>
-          <button type="submit" class="submit-btn">Submit Report</button>
-        </div>
-      </form>
-    </div>
-
-    <script>
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec'; // Replace this with your actual Apps Script Web App URL
-
-      document.getElementById('reportForm').addEventListener('submit', e => {
-        e.preventDefault();
-
-        const form = e.target;
-        const formData = new FormData(form);
-        const data = {};
-
-        formData.forEach((value, key) => {
-          data[key] = value;
-        });
-
-        fetch(scriptURL, {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(res => {
-          if (res.result === "success") {
-            alert("Report submitted successfully!");
-            form.reset();
-          } else {
-            alert("Error submitting report.");
-          }
-        })
-        .catch(error => {
-          console.error('Error!', error.message);
-          alert("Error! Try again.");
-        });
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(response => response.json())
+      .then(res => {
+        if (res.result === "success") {
+          alert("Report submitted successfully!");
+          e.target.reset();
+        } else {
+          alert("Submission failed. Please try again.");
+        }
+      })
+      .catch(error => {
+        console.error("Error!", error);
+        alert("Error! Try again.");
       });
+    });
 
-      function goToDashboard() {
-        window.location.href = 'https://your-dashboard-url.com'; // Replace with your dashboard page link
-      }
-    </script>
-  </body>
+    function goToDashboard() {
+      window.location.href = 'https://your-dashboard-link.com'; // Change to your dashboard URL
+    }
+  </script>
+</body>
 </html>
