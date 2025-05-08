@@ -1,172 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Principal Weekly Report Submission</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #ffffff;
-            color: #001f3f;
-            margin: 0;
-            padding: 20px;
-            position: relative;
-        }
-        .dashboard-button {
-            background-color: #28a745;
-            color: #ffffff;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-bottom: 20px;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .dashboard-button:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-        }
-        .report-table {
-            width: 100%;
-            margin-bottom: 20px;
-            border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-        .report-table th {
-            background-color: #f0c040;
-            color: #001f3f;
-            padding: 15px;
-            border-radius: 15px 15px 0 0;
-            text-align: left;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        .report-table td {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #001f3f;
-            text-align: left;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .scroll-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #001f3f;
-            color: #ffffff;
-            padding: 12px 18px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 18px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s, transform 0.3s;
-            z-index: 1000;
-            margin-bottom: 10px;
-        }
-        .scroll-button:hover {
-            background-color: #004080;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-        .popup {
-            background-color: #ffffff;
-            padding: 20px;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 20px;
-            border: 2px solid #001f3f;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-    </style>
-    <script>
-        function togglePopup(show) {
-            document.getElementById('popup-overlay').style.display = show ? 'flex' : 'none';
-        }
-        function submitReport(e) {
-            e.preventDefault();
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Principal Dashboard</title>
+  <style>
+    :root {
+      --navy: #0b1d3a;
+      --gold: #ffcc00;
+      --white: #ffffff;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
 
-            const formData = new FormData(e.target);
-            fetch('https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
-                togglePopup(false);
-                location.reload();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('There was an error submitting the report. Please try again.');
-            });
-        }
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        function scrollToBottom() {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-    </script>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--white);
+    }
+
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: var(--navy);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar .logo img {
+      width: 40px;
+    }
+
+    .sidebar h3 {
+      color: var(--gold);
+      font-size: 18px;
+    }
+
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar nav ul li {
+      margin-bottom: 15px;
+    }
+
+    .sidebar nav ul li a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 16px;
+      display: block;
+    }
+
+    .sidebar nav ul li a:hover {
+      color: var(--gold);
+    }
+
+    .logout {
+      background-color: var(--gold);
+      border: none;
+      color: var(--navy);
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      margin-top: 30px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .logout:hover {
+      background-color: #ffd633;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+      background-color: #f5f7fa;
+      transition: margin-left 0.3s ease;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-toggle {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: var(--navy);
+      cursor: pointer;
+      display: none;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .card {
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card h4 {
+      color: var(--navy);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -250px;
+        height: 100%;
+        z-index: 1000;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .main-content.open {
+        margin-left: 250px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <button class="dashboard-button" onclick="window.location.href='http://smartbook.alifedu.org/principal-dashboard.html'">Go to Dashboard</button>
-    <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
-    <table class="report-table">
-        <thead>
-            <tr>
-                <th>Report Title</th>
-                <th>Date Range</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody id="reportTableBody">
-            <tr><td colspan="3">No reports found. Connect to Google Sheets for live data.</td></tr>
-        </tbody>
-    </table>
-    <div id="popup-overlay" class="popup-overlay">
-        <div class="popup">
-            <h3>Add New Weekly Report</h3>
-            <form onsubmit="submitReport(event)">
-                <label>Start Date:</label>
-                <input type="date" name="startDate" required><br><br>
-                <label>End Date:</label>
-                <input type="date" name="endDate" required><br><br>
-                <label>Report Title:</label>
-                <input type="text" name="reportTitle" required><br><br>
-                <label>Summary of Activities:</label>
-                <textarea name="summaryActivities" required></textarea><br><br>
-                <label>Achievements:</label>
-                <textarea name="achievements" required></textarea><br><br>
-                <label>Challenges:</label>
-                <textarea name="challenges" required></textarea><br><br>
-                <label>Plans for Next Week:</label>
-                <textarea name="plansNextWeek" required></textarea><br><br>
-                <button type="submit">Submit</button>
-                <button type="button" onclick="togglePopup(false)">Close</button>
-            </form>
-        </div>
+
+<div class="dashboard-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">
+      <img src="1.png" alt="Logo">
+      <h3>Principal Panel</h3>
     </div>
-    <button class="scroll-button" onclick="scrollToTop()">↑</button>
-    <button class="scroll-button" onclick="scrollToBottom()">↓</button>
+    <nav>
+      <ul>
+        <li><a href="students-attendance.html">Student Attendance</a></li>
+        <li><a href="teacher_details.html">Teacher Attendance</a></li>
+        <li><a href="principal_logbook.html">Logbook Details</a></li>
+        <li><a href="timetable.html">Time Table</a></li>
+        <li><a href="teachers-details.html">Teacher Details</a></li>
+        <li><a href="student_detiles.html">Student Details</a></li>
+        <li><a href="submit-report.html">Submit Weekly Report</a></li>
+      </ul>
+      <button class="logout" onclick="logout()">Logout</button>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <div class="header">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <h2>Welcome Principal</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="card" onclick="goTo('students-attendance.html')">
+        <h4>Student Attendance</h4>
+      </div>
+      <div class="card" onclick="goTo('teacher_details.html')">
+        <h4>Teacher Attendance</h4>
+      </div>
+      <div class="card" onclick="goTo('principal_logbook.html')">
+        <h4>Logbook Details</h4>
+      </div>
+      <div class="card" onclick="goTo('timetable.html')">
+        <h4>Time Table</h4>
+      </div>
+      <div class="card" onclick="goTo('teachers-details.html')">
+        <h4>Teacher Details</h4>
+      </div>
+      <div class="card" onclick="goTo('student_detiles.html')">
+        <h4>Student Details</h4>
+      </div>
+      <div class="card" onclick="goTo('weklyreport.html')">
+        <h4>Submit Weekly Report</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    sidebar.classList.toggle("open");
+    mainContent.classList.toggle("open");
+  }
+
+  function goTo(page) {
+    window.location.href = page;
+  }
+
+  function logout() {
+    alert("Logging out...");
+    window.location.href = "index.html"; // Or your login page
+  }
+</script>
+
 </body>
 </html>
