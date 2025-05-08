@@ -7,274 +7,166 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #fefefe;
+      background-color: #fdfcfb;
       margin: 0;
-      padding: 20px;
-      color: #333;
+      padding: 0;
     }
     header {
-      background: navy;
-      color: white;
+      background-color: #0c1e3d;
+      color: #ffd700;
       padding: 20px;
-      border-radius: 12px;
       text-align: center;
-      margin-bottom: 20px;
+      font-size: 24px;
+      letter-spacing: 1px;
     }
-    h1 {
-      margin: 0;
-      font-size: 2em;
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
     label {
       font-weight: bold;
-      margin-top: 10px;
-      display: block;
+      color: #0c1e3d;
     }
-    select, input, textarea {
-      padding: 10px;
+    input, select {
       width: 100%;
-      border-radius: 8px;
+      padding: 10px;
+      margin: 8px 0 16px;
       border: 1px solid #ccc;
-      margin-top: 5px;
-      margin-bottom: 15px;
+      border-radius: 6px;
     }
     button {
-      background: gold;
-      color: navy;
+      background-color: #ffd700;
       border: none;
+      color: #0c1e3d;
       padding: 12px 20px;
-      border-radius: 10px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 16px;
       font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.3s;
     }
     button:hover {
-      background: #ffd700;
+      background-color: #e6c200;
     }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .fee-slip {
+    .slip {
       display: none;
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 500px;
-      background: white;
-      border: 2px solid navy;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-top: 40px;
       padding: 20px;
-      z-index: 1000;
+      border: 2px dashed #0c1e3d;
+      border-radius: 10px;
+      background-color: #fdf7e3;
     }
-    .fee-slip h2 {
-      margin-top: 0;
-      text-align: center;
-      color: navy;
-    }
-    .slip-content {
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
-    .close-btn {
-      background: red;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 6px;
-      float: right;
+    .slip h3 {
+      color: #0c1e3d;
       margin-bottom: 10px;
+    }
+    .actions {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Billing Panel - Alif Edu</h1>
-</header>
+<header>🧾 Alif Edu Billing Panel</header>
 
-<div class="form-grid">
-  <div>
-    <label for="class">Class</label>
-    <select id="class" onchange="updateStudentOptions()"></select>
-  </div>
-  <div>
-    <label for="student">Student Name</label>
-    <select id="student" onchange="fillStudentDetails()"></select>
-  </div>
-</div>
+<div class="container">
+  <form id="billingForm">
+    <label>Student Name:</label>
+    <input type="text" name="studentName" required>
 
-<div class="form-grid">
-  <div>
-    <label for="studentId">Student ID</label>
-    <input type="text" id="studentId" readonly />
-  </div>
-  <div>
-    <label for="plan">Fee Plan</label>
-    <input type="text" id="plan" placeholder="Basic / Standard / Premium" />
-  </div>
-</div>
+    <label>Student ID:</label>
+    <input type="text" name="studentId" required>
 
-<div class="form-grid">
-  <div>
-    <label for="hourlyRate">Hourly Rate</label>
-    <input type="number" id="hourlyRate" placeholder="e.g. 100" />
-  </div>
-  <div>
-    <label for="days">Number of Days</label>
-    <input type="number" id="days" placeholder="e.g. 30" oninput="calculateTotal()" />
-  </div>
-</div>
+    <label>Class:</label>
+    <input type="text" name="class" required>
 
-<div class="form-grid">
-  <div>
-    <label for="total">Total</label>
-    <input type="number" id="total" readonly />
-  </div>
-  <div>
-    <label for="paid">Paid</label>
-    <input type="number" id="paid" oninput="calculateBalance()" />
-  </div>
-</div>
+    <label>Subjects:</label>
+    <input type="text" name="subjects">
 
-<div class="form-grid">
-  <div>
-    <label for="balance">Balance</label>
-    <input type="number" id="balance" readonly />
-  </div>
-  <div>
-    <label for="mode">Payment Mode</label>
-    <input type="text" id="mode" placeholder="e.g. UPI, Cash" />
+    <label>Fee Plan:</label>
+    <select name="feePlan" required>
+      <option value="">--Select--</option>
+      <option value="Basic">Basic</option>
+      <option value="Standard">Standard</option>
+      <option value="Premium">Premium</option>
+    </select>
+
+    <label>Total Fee (₹):</label>
+    <input type="number" name="totalFee" required>
+
+    <label>Amount Paid (₹):</label>
+    <input type="number" name="paidAmount" required>
+
+    <label>Billing Date:</label>
+    <input type="date" name="billingDate" required>
+
+    <div class="actions">
+      <button type="submit">Submit & View Slip</button>
+    </div>
+  </form>
+
+  <div class="slip" id="feeSlip">
+    <h3>📄 Fee Slip</h3>
+    <p><strong>Student Name:</strong> <span id="sName"></span></p>
+    <p><strong>Student ID:</strong> <span id="sID"></span></p>
+    <p><strong>Class:</strong> <span id="sClass"></span></p>
+    <p><strong>Subjects:</strong> <span id="sSubjects"></span></p>
+    <p><strong>Fee Plan:</strong> <span id="sPlan"></span></p>
+    <p><strong>Total Fee:</strong> ₹<span id="sFee"></span></p>
+    <p><strong>Amount Paid:</strong> ₹<span id="sPaid"></span></p>
+    <p><strong>Balance:</strong> ₹<span id="sBalance"></span></p>
+    <p><strong>Date:</strong> <span id="sDate"></span></p>
+
+    <div class="actions">
+      <button onclick="downloadSlip()">📥 Download Slip</button>
+    </div>
   </div>
 </div>
 
-<label for="startDate">Start Date</label>
-<input type="date" id="startDate" />
-
-<label for="remarks">Remarks</label>
-<textarea id="remarks" placeholder="Any notes..."></textarea>
-
-<label for="status">Status</label>
-<select id="status">
-  <option value="Paid">Paid</option>
-  <option value="Partially Paid">Partially Paid</option>
-  <option value="Unpaid">Unpaid</option>
-</select>
-
-<button onclick="submitForm()">Submit & Generate Slip</button>
-
-<!-- Fee Slip Popup -->
-<div id="feeSlip" class="fee-slip">
-  <button class="close-btn" onclick="document.getElementById('feeSlip').style.display='none'">X</button>
-  <h2>Fee Slip</h2>
-  <div class="slip-content" id="slipContent"></div>
-  <button onclick="printSlip()">Print</button>
-</div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec";
-  let studentsByClass = {};
-  let receiptCounter = Math.floor(Math.random() * 10000) + 1;
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypn0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
+  const form = document.getElementById('billingForm');
+  const slip = document.getElementById('feeSlip');
 
-  window.onload = async () => {
-    const res = await fetch(scriptURL);
-    studentsByClass = await res.json();
-    const classSelect = document.getElementById("class");
-    classSelect.innerHTML = Object.keys(studentsByClass).map(cls => <option value="${cls}">${cls}</option>).join("");
-    updateStudentOptions();
-  };
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const obj = Object.fromEntries(data.entries());
+    const balance = obj.totalFee - obj.paidAmount;
 
-  function updateStudentOptions() {
-    const className = document.getElementById("class").value;
-    const students = studentsByClass[className] || [];
-    const studentSelect = document.getElementById("student");
-    studentSelect.innerHTML = students.map(stu => <option value="${stu.name}">${stu.name}</option>).join("");
-    fillStudentDetails();
-  }
+    // Update slip
+    document.getElementById('sName').textContent = obj.studentName;
+    document.getElementById('sID').textContent = obj.studentId;
+    document.getElementById('sClass').textContent = obj.class;
+    document.getElementById('sSubjects').textContent = obj.subjects;
+    document.getElementById('sPlan').textContent = obj.feePlan;
+    document.getElementById('sFee').textContent = obj.totalFee;
+    document.getElementById('sPaid').textContent = obj.paidAmount;
+    document.getElementById('sBalance').textContent = balance;
+    document.getElementById('sDate').textContent = obj.billingDate;
 
-  function fillStudentDetails() {
-    const className = document.getElementById("class").value;
-    const studentName = document.getElementById("student").value;
-    const student = studentsByClass[className].find(s => s.name === studentName);
-    document.getElementById("studentId").value = student?.id || "";
-  }
+    // Show slip
+    slip.style.display = 'block';
 
-  function calculateTotal() {
-    const rate = +document.getElementById("hourlyRate").value;
-    const days = +document.getElementById("days").value;
-    document.getElementById("total").value = rate * days || 0;
-    calculateBalance();
-  }
+    // Send to Google Sheet
+    fetch(scriptURL, {
+      method: 'POST',
+      body: data
+    })
+    .then(response => alert('✅ Billing data saved successfully!'))
+    .catch(error => alert('❌ Error! Billing data not saved.'));
+  });
 
-  function calculateBalance() {
-    const total = +document.getElementById("total").value;
-    const paid = +document.getElementById("paid").value;
-    document.getElementById("balance").value = total - paid;
-  }
-
-  async function submitForm() {
-    const payload = {
-      receiptNo: "R" + receiptCounter++,
-      class: document.getElementById("class").value,
-      name: document.getElementById("student").value,
-      id: document.getElementById("studentId").value,
-      plan: document.getElementById("plan").value,
-      startDate: document.getElementById("startDate").value,
-      days: document.getElementById("days").value,
-      total: document.getElementById("total").value,
-      paid: document.getElementById("paid").value,
-      balance: document.getElementById("balance").value,
-      mode: document.getElementById("mode").value,
-      remarks: document.getElementById("remarks").value,
-      status: document.getElementById("status").value
-    };
-
-    const options = {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" }
-    };
-
-    const response = await fetch(scriptURL, options);
-    if ((await response.text()) === "Success") {
-      generateSlip(payload);
-    } else {
-      alert("Failed to save data");
-    }
-  }
-
-  function generateSlip(data) {
-    const slip = `
-      <p><strong>Receipt No:</strong> ${data.receiptNo}</p>
-      <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-      <p><strong>Name:</strong> ${data.name}</p>
-      <p><strong>Student ID:</strong> ${data.id}</p>
-      <p><strong>Class:</strong> ${data.class}</p>
-      <p><strong>Plan:</strong> ${data.plan}</p>
-      <p><strong>Start Date:</strong> ${data.startDate}</p>
-      <p><strong>Duration:</strong> ${data.days} days</p>
-      <p><strong>Total:</strong> ₹${data.total}</p>
-      <p><strong>Paid:</strong> ₹${data.paid}</p>
-      <p><strong>Balance:</strong> ₹${data.balance}</p>
-      <p><strong>Payment Mode:</strong> ${data.mode}</p>
-      <p><strong>Status:</strong> ${data.status}</p>
-      <p><strong>Remarks:</strong> ${data.remarks}</p>
-    `;
-    document.getElementById("slipContent").innerHTML = slip;
-    document.getElementById("feeSlip").style.display = "block";
-  }
-
-  function printSlip() {
-    const content = document.getElementById("feeSlip").innerHTML;
-    const frame = window.open('', '', 'height=600,width=400');
-    frame.document.write('<html><head><title>Fee Slip</title></head><body>');
-    frame.document.write(content);
-    frame.document.write('</body></html>');
-    frame.document.close();
-    frame.print();
+  function downloadSlip() {
+    const element = document.getElementById('feeSlip');
+    html2pdf().from(element).save("AlifEdu_FeeSlip.pdf");
   }
 </script>
+
 </body>
 </html>
