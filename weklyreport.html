@@ -31,57 +31,13 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
         }
-        .report-table {
-            width: 100%;
-            margin-bottom: 20px;
-            border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-        .report-table th {
-            background-color: #f0c040;
-            color: #001f3f;
-            padding: 15px;
-            border-radius: 15px 15px 0 0;
-            text-align: left;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        .report-table td {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #001f3f;
-            text-align: left;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .scroll-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #001f3f;
-            color: #ffffff;
-            padding: 12px 18px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 18px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s, transform 0.3s;
-            z-index: 1000;
-            margin-bottom: 10px;
-        }
-        .scroll-button:hover {
-            background-color: #004080;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
         .popup-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.5);
             display: none;
             justify-content: center;
             align-items: center;
@@ -91,123 +47,76 @@
             background-color: #ffffff;
             padding: 20px;
             width: 90%;
-            max-width: 600px;
-            border-radius: 15px;
+            max-width: 500px;
+            border-radius: 20px;
             border: 2px solid #001f3f;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            max-height: 80vh;
             overflow-y: auto;
-            max-height: 80%;
-        }
-        .popup h3 {
-            margin-bottom: 20px;
         }
         textarea {
             width: 100%;
-            height: 100px;
             padding: 10px;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid #ccc;
-            margin-bottom: 10px;
-            resize: none;
+            margin-bottom: 15px;
+            font-size: 14px;
+            resize: vertical;
         }
-        input[type="text"], input[type="date"] {
-            width: 100%;
-            padding: 10px;
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
             border-radius: 10px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
         }
     </style>
     <script>
         function togglePopup(show) {
             document.getElementById('popup-overlay').style.display = show ? 'flex' : 'none';
         }
+
         function submitReport(e) {
             e.preventDefault();
+            const form = e.target;
 
-            const formData = new FormData(e.target);
-            fetch('https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec', {
+            const formData = {
+                startDate: form.startDate.value,
+                endDate: form.endDate.value,
+                reportTitle: form.reportTitle.value,
+                activitySummary: form.activitySummary.value,
+                achievements: form.achievements.value,
+                challenges: form.challenges.value,
+                plansNextWeek: form.plansNextWeek.value
+            };
+
+            fetch("https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec", {
                 method: 'POST',
-                body: formData
+                body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' }
             })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
+            .then(response => response.json())
+            .then(() => {
+                alert('Report submitted successfully!');
                 togglePopup(false);
-                loadReports();  // Reload reports after submission
+                location.reload();
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch(() => {
                 alert('There was an error submitting the report. Please try again.');
             });
         }
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        function scrollToBottom() {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-
-        function loadReports() {
-            fetch('https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec?action=view')
-                .then(response => response.json())
-                .then(data => {
-                    const reportTableBody = document.getElementById('reportTableBody');
-                    reportTableBody.innerHTML = '';  // Clear existing rows
-
-                    data.forEach(report => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${report.reportTitle}</td>
-                            <td>${report.startDate} - ${report.endDate}</td>
-                            <td><button onclick="viewReport(${report.rowId})">View</button></td>
-                        `;
-                        reportTableBody.appendChild(row);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading reports:', error);
-                });
-        }
-
-        function viewReport(rowId) {
-            // Fetch individual report data
-            fetch(`https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec?action=viewReport&rowId=${rowId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Display the data in a popup
-                    const report = data[0];
-                    document.getElementById('popup-overlay').style.display = 'flex';
-                    document.querySelector('#popup .popup h3').textContent = `Viewing Report: ${report.reportTitle}`;
-                    document.querySelector('textarea[name="summaryActivities"]').value = report.summaryActivities;
-                    document.querySelector('textarea[name="achievements"]').value = report.achievements;
-                    document.querySelector('textarea[name="challenges"]').value = report.challenges;
-                    document.querySelector('textarea[name="plansNextWeek"]').value = report.plansNextWeek;
-                })
-                .catch(error => {
-                    console.error('Error fetching report:', error);
-                    alert('Error fetching report details.');
-                });
-        }
     </script>
 </head>
-<body onload="loadReports()">
-    <button class="dashboard-button" onclick="window.location.href='DASHBOARD_URL'">Go to Dashboard</button>
+<body>
+    <button class="dashboard-button" onclick="window.location.href='http://smartbook.alifedu.org/principal-dashboard.html'">Go to Dashboard</button>
     <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
-    
-    <table class="report-table">
-        <thead>
-            <tr>
-                <th>Report Title</th>
-                <th>Date Range</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody id="reportTableBody">
-            <tr><td colspan="3">No reports found. Connect to Google Sheets for live data.</td></tr>
-        </tbody>
-    </table>
 
+    <!-- Popup for adding new report -->
     <div id="popup-overlay" class="popup-overlay">
         <div class="popup">
             <h3>Add New Weekly Report</h3>
@@ -218,8 +127,8 @@
                 <input type="date" name="endDate" required><br><br>
                 <label>Report Title:</label>
                 <input type="text" name="reportTitle" required><br><br>
-                <label>Summary of Activities:</label>
-                <textarea name="summaryActivities" required></textarea><br><br>
+                <label>Activity Summary:</label>
+                <textarea name="activitySummary" required></textarea><br><br>
                 <label>Achievements:</label>
                 <textarea name="achievements" required></textarea><br><br>
                 <label>Challenges:</label>
@@ -231,8 +140,5 @@
             </form>
         </div>
     </div>
-
-    <button class="scroll-button" onclick="scrollToTop()">↑</button>
-    <button class="scroll-button" onclick="scrollToBottom()">↓</button>
 </body>
 </html>
