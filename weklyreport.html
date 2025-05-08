@@ -31,30 +31,17 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
         }
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-        .popup {
+        .form-container {
             background-color: #ffffff;
-            padding: 20px;
-            width: 90%;
-            max-width: 500px;
+            padding: 30px;
             border-radius: 20px;
             border: 2px solid #001f3f;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            max-height: 80vh;
-            overflow-y: auto;
+            max-width: 700px;
+            margin: auto;
+            margin-bottom: 30px;
         }
-        textarea {
+        textarea, input[type="text"], input[type="date"] {
             width: 100%;
             padding: 10px;
             border-radius: 8px;
@@ -63,7 +50,7 @@
             font-size: 14px;
             resize: vertical;
         }
-        button {
+        button[type="submit"] {
             padding: 10px 20px;
             background-color: #28a745;
             color: #ffffff;
@@ -71,16 +58,13 @@
             border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
+            margin-top: 10px;
         }
-        button:hover {
+        button[type="submit"]:hover {
             background-color: #218838;
         }
     </style>
     <script>
-        function togglePopup(show) {
-            document.getElementById('popup-overlay').style.display = show ? 'flex' : 'none';
-        }
-
         function submitReport(e) {
             e.preventDefault();
             const form = e.target;
@@ -103,8 +87,7 @@
             .then(response => response.json())
             .then(() => {
                 alert('Report submitted successfully!');
-                togglePopup(false);
-                location.reload();
+                form.reset();
             })
             .catch(() => {
                 alert('There was an error submitting the report. Please try again.');
@@ -114,31 +97,26 @@
 </head>
 <body>
     <button class="dashboard-button" onclick="window.location.href='http://smartbook.alifedu.org/principal-dashboard.html'">Go to Dashboard</button>
-    <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
 
-    <!-- Popup for adding new report -->
-    <div id="popup-overlay" class="popup-overlay">
-        <div class="popup">
-            <h3>Add New Weekly Report</h3>
-            <form onsubmit="submitReport(event)">
-                <label>Start Date:</label>
-                <input type="date" name="startDate" required><br><br>
-                <label>End Date:</label>
-                <input type="date" name="endDate" required><br><br>
-                <label>Report Title:</label>
-                <input type="text" name="reportTitle" required><br><br>
-                <label>Activity Summary:</label>
-                <textarea name="activitySummary" required></textarea><br><br>
-                <label>Achievements:</label>
-                <textarea name="achievements" required></textarea><br><br>
-                <label>Challenges:</label>
-                <textarea name="challenges" required></textarea><br><br>
-                <label>Plans for Next Week:</label>
-                <textarea name="plansNextWeek" required></textarea><br><br>
-                <button type="submit">Submit</button>
-                <button type="button" onclick="togglePopup(false)">Close</button>
-            </form>
-        </div>
+    <div class="form-container">
+        <h2>Principal Weekly Report</h2>
+        <form onsubmit="submitReport(event)">
+            <label>Start Date:</label>
+            <input type="date" name="startDate" required><br>
+            <label>End Date:</label>
+            <input type="date" name="endDate" required><br>
+            <label>Report Title:</label>
+            <input type="text" name="reportTitle" required><br>
+            <label>Activity Summary:</label>
+            <textarea name="activitySummary" required></textarea><br>
+            <label>Achievements:</label>
+            <textarea name="achievements" required></textarea><br>
+            <label>Challenges:</label>
+            <textarea name="challenges" required></textarea><br>
+            <label>Plans for Next Week:</label>
+            <textarea name="plansNextWeek" required></textarea><br>
+            <button type="submit">Submit</button>
+        </form>
     </div>
 </body>
 </html>
