@@ -1,135 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Principal Weekly Report</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
-      display: flex;
-      justify-content: center;
-      padding: 50px;
-    }
+<html>
+  <head>
+    <title>Principal Weekly Report</title>
+    <style>
+      body {
+        background-color: #f4f4f4;
+        font-family: 'Segoe UI', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
 
-    .form-container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      width: 600px;
-      padding: 30px;
-    }
+      .form-container {
+        background-color: white;
+        padding: 30px 40px;
+        border-radius: 25px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        width: 90%;
+        max-width: 700px;
+      }
 
-    .form-header {
-      background-color: #FFD700; /* golden yellow */
-      color: #333;
-      padding: 15px;
-      font-size: 1.5rem;
-      text-align: center;
-      border-radius: 15px 15px 0 0;
-      font-weight: bold;
-    }
+      h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 25px;
+      }
 
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+      label {
+        font-weight: 600;
+        display: block;
+        margin: 15px 0 5px;
+        color: #333;
+      }
 
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-    }
+      input, textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
 
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
 
-    .submit-btn {
-      background: linear-gradient(to bottom, #4CAF50, #388E3C);
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 5px #2e7d32;
-      margin-top: 20px;
-      transition: all 0.2s ease;
-    }
+      .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+      }
 
-    .submit-btn:active {
-      box-shadow: 0 2px #2e7d32;
-      transform: translateY(3px);
-    }
-  </style>
-</head>
-<body>
-  <div class="form-container">
-    <div class="form-header">Weekly Report Submission</div>
-    <form id="reportForm">
-      <label>Start Date:</label>
-      <input type="date" name="startDate" required>
+      button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 15px;
+        box-shadow: 0 5px 0 #888;
+        transition: all 0.2s;
+      }
 
-      <label>End Date:</label>
-      <input type="date" name="endDate" required>
+      .submit-btn {
+        background-color: green;
+        color: goldenrod;
+      }
 
-      <label>Report Title:</label>
-      <input type="text" name="reportTitle" required>
+      .dashboard-btn {
+        background-color: goldenrod;
+        color: green;
+      }
 
-      <label>Activity Summary:</label>
-      <textarea name="activitySummary" required></textarea>
+      button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h2>Principal Weekly Report</h2>
+      <form id="reportForm">
+        <label>Start Date</label>
+        <input type="date" name="startDate" required>
 
-      <label>Achievements:</label>
-      <textarea name="achievements" required></textarea>
+        <label>End Date</label>
+        <input type="date" name="endDate" required>
 
-      <label>Challenges:</label>
-      <textarea name="challenges" required></textarea>
+        <label>Report Title</label>
+        <input type="text" name="reportTitle" required>
 
-      <label>Plans for Next Week:</label>
-      <textarea name="plans" required></textarea>
+        <label>Activity Summary</label>
+        <textarea name="activitySummary" required></textarea>
 
-      <button type="submit" class="submit-btn">Submit Report</button>
-    </form>
-  </div>
+        <label>Achievements</label>
+        <textarea name="achievements" required></textarea>
 
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec'; // Replace with your Web App URL
+        <label>Challenges</label>
+        <textarea name="challenges" required></textarea>
 
-    document.getElementById('reportForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = e.target;
+        <label>Plans for Next Week</label>
+        <textarea name="plans" required></textarea>
 
-      const data = {
-        startDate: form.startDate.value,
-        endDate: form.endDate.value,
-        reportTitle: form.reportTitle.value,
-        activitySummary: form.activitySummary.value,
-        achievements: form.achievements.value,
-        challenges: form.challenges.value,
-        plans: form.plans.value
-      };
+        <div class="button-group">
+          <button type="button" class="dashboard-btn" onclick="goToDashboard()">Dashboard</button>
+          <button type="submit" class="submit-btn">Submit Report</button>
+        </div>
+      </form>
+    </div>
 
-      fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => {
-        alert("Report submitted successfully!");
-        form.reset();
-      }).catch(error => {
-        alert("Error! Try again.");
-        console.error('Error!', error.message);
+    <script>
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec'; // Replace this with your actual Apps Script Web App URL
+
+      document.getElementById('reportForm').addEventListener('submit', e => {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const data = {};
+
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+
+        fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(res => {
+          if (res.result === "success") {
+            alert("Report submitted successfully!");
+            form.reset();
+          } else {
+            alert("Error submitting report.");
+          }
+        })
+        .catch(error => {
+          console.error('Error!', error.message);
+          alert("Error! Try again.");
+        });
       });
-    });
-  </script>
-</body>
+
+      function goToDashboard() {
+        window.location.href = 'https://your-dashboard-url.com'; // Replace with your dashboard page link
+      }
+    </script>
+  </body>
 </html>
