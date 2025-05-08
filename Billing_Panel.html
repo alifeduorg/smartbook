@@ -1,172 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Billing Panel - Alif Edu</title>
+  <meta charset="UTF-8">
+  <title>Billing Panel</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fdfcfb;
+      background-color: #ffffff;
+      font-family: Arial, sans-serif;
+      color: #1a1a1a;
       margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #0c1e3d;
-      color: #ffd700;
       padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      letter-spacing: 1px;
     }
     .container {
       max-width: 800px;
-      margin: 30px auto;
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin: auto;
+      padding: 20px;
+      border-radius: 20px;
+      background: linear-gradient(to right, #f7c948, #ffffff);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    h2 {
+      text-align: center;
+      color: #1a1a1a;
     }
     label {
+      display: block;
+      margin-top: 10px;
       font-weight: bold;
-      color: #0c1e3d;
     }
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 10px;
-      margin: 8px 0 16px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 10px;
+      margin-top: 5px;
     }
     button {
-      background-color: #ffd700;
+      background-color: #001f3f;
+      color: white;
       border: none;
-      color: #0c1e3d;
-      padding: 12px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #e6c200;
-    }
-    .slip {
-      display: none;
-      margin-top: 40px;
-      padding: 20px;
-      border: 2px dashed #0c1e3d;
+      padding: 10px 20px;
       border-radius: 10px;
-      background-color: #fdf7e3;
-    }
-    .slip h3 {
-      color: #0c1e3d;
-      margin-bottom: 10px;
-    }
-    .actions {
       margin-top: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #receiptView {
+      margin-top: 30px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 10px;
+      display: none;
+    }
+    .dashboard {
+      background-color: #f7c948;
+      color: #001f3f;
+      font-weight: bold;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 20px;
+      display: inline-block;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-
-<header>🧾 Alif Edu Billing Panel</header>
-
 <div class="container">
+  <a href="#" class="dashboard">⬅ Dashboard</a>
+  <h2>Billing Panel</h2>
   <form id="billingForm">
-    <label>Student Name:</label>
+    <label>Bill Date</label>
+    <input type="date" name="billDate" required>
+
+    <label>Receipt No</label>
+    <input type="text" name="receiptNo" required>
+
+    <label>Class</label>
+    <input type="text" name="className" required>
+
+    <label>Student Name</label>
     <input type="text" name="studentName" required>
 
-    <label>Student ID:</label>
+    <label>Student ID</label>
     <input type="text" name="studentId" required>
 
-    <label>Class:</label>
-    <input type="text" name="class" required>
-
-    <label>Subjects:</label>
-    <input type="text" name="subjects">
-
-    <label>Fee Plan:</label>
+    <label>Fee Plan</label>
     <select name="feePlan" required>
-      <option value="">--Select--</option>
       <option value="Basic">Basic</option>
       <option value="Standard">Standard</option>
       <option value="Premium">Premium</option>
     </select>
 
-    <label>Total Fee (₹):</label>
+    <label>Class Start Date</label>
+    <input type="date" name="classStartDate" required>
+
+    <label>Days Purchased</label>
+    <input type="number" name="daysPurchased" required>
+
+    <label>Total Fee</label>
     <input type="number" name="totalFee" required>
 
-    <label>Amount Paid (₹):</label>
+    <label>Paid Amount</label>
     <input type="number" name="paidAmount" required>
 
-    <label>Billing Date:</label>
-    <input type="date" name="billingDate" required>
+    <label>Balance</label>
+    <input type="number" name="balance" required>
 
-    <div class="actions">
-      <button type="submit">Submit & View Slip</button>
-    </div>
+    <label>Payment Mode</label>
+    <select name="paymentMode" required>
+      <option value="Cash">Cash</option>
+      <option value="Online">Online</option>
+      <option value="UPI">UPI</option>
+    </select>
+
+    <label>Remarks</label>
+    <textarea name="remarks"></textarea>
+
+    <label>Payment Status</label>
+    <select name="paymentStatus" required>
+      <option value="Paid">Paid</option>
+      <option value="Pending">Pending</option>
+      <option value="Partial">Partial</option>
+    </select>
+
+    <button type="submit">Submit</button>
   </form>
 
-  <div class="slip" id="feeSlip">
-    <h3>📄 Fee Slip</h3>
-    <p><strong>Student Name:</strong> <span id="sName"></span></p>
-    <p><strong>Student ID:</strong> <span id="sID"></span></p>
-    <p><strong>Class:</strong> <span id="sClass"></span></p>
-    <p><strong>Subjects:</strong> <span id="sSubjects"></span></p>
-    <p><strong>Fee Plan:</strong> <span id="sPlan"></span></p>
-    <p><strong>Total Fee:</strong> ₹<span id="sFee"></span></p>
-    <p><strong>Amount Paid:</strong> ₹<span id="sPaid"></span></p>
-    <p><strong>Balance:</strong> ₹<span id="sBalance"></span></p>
-    <p><strong>Date:</strong> <span id="sDate"></span></p>
-
-    <div class="actions">
-      <button onclick="downloadSlip()">📥 Download Slip</button>
-    </div>
-  </div>
+  <div id="receiptView"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypn0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
-  const form = document.getElementById('billingForm');
-  const slip = document.getElementById('feeSlip');
+const form = document.getElementById('billingForm');
+const receiptView = document.getElementById('receiptView');
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const data = new FormData(form);
-    const obj = Object.fromEntries(data.entries());
-    const balance = obj.totalFee - obj.paidAmount;
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+  fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.text())
+  .then(data => {
+    if (data === 'Success') {
+      const details = [...formData.entries()]
+        .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`) 
+        .join('');
+      receiptView.innerHTML = `
+        <h3>Fee Slip</h3>
+        ${details}
+        <button onclick="downloadSlip()">Download Slip</button>
+      `;
+      receiptView.style.display = 'block';
+      form.reset();
+    } else {
+      alert('Error: ' + data);
+    }
+  })
+  .catch(error => alert('Submission failed: ' + error));
+});
 
-    // Update slip
-    document.getElementById('sName').textContent = obj.studentName;
-    document.getElementById('sID').textContent = obj.studentId;
-    document.getElementById('sClass').textContent = obj.class;
-    document.getElementById('sSubjects').textContent = obj.subjects;
-    document.getElementById('sPlan').textContent = obj.feePlan;
-    document.getElementById('sFee').textContent = obj.totalFee;
-    document.getElementById('sPaid').textContent = obj.paidAmount;
-    document.getElementById('sBalance').textContent = balance;
-    document.getElementById('sDate').textContent = obj.billingDate;
-
-    // Show slip
-    slip.style.display = 'block';
-
-    // Send to Google Sheet
-    fetch(scriptURL, {
-      method: 'POST',
-      body: data
-    })
-    .then(response => alert('✅ Billing data saved successfully!'))
-    .catch(error => alert('❌ Error! Billing data not saved.'));
-  });
-
-  function downloadSlip() {
-    const element = document.getElementById('feeSlip');
-    html2pdf().from(element).save("AlifEdu_FeeSlip.pdf");
-  }
+function downloadSlip() {
+  const slipContent = document.getElementById('receiptView').innerHTML;
+  const newWindow = window.open('', '', 'width=800,height=600');
+  newWindow.document.write(`
+    <html><head><title>Download Slip</title></head><body>${slipContent}</body></html>
+  `);
+  newWindow.print();
+  newWindow.close();
+}
 </script>
-
 </body>
 </html>
