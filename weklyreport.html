@@ -85,9 +85,13 @@
                 headers: { 'Content-Type': 'application/json' }
             })
             .then(response => response.json())
-            .then(() => {
-                alert('Report submitted successfully!');
-                form.reset();
+            .then(data => {
+                if (data.status === "success") {
+                    alert('Report submitted successfully!');
+                    form.reset();
+                } else {
+                    alert('There was an error submitting the report. Please try again.');
+                }
             })
             .catch(() => {
                 alert('There was an error submitting the report. Please try again.');
