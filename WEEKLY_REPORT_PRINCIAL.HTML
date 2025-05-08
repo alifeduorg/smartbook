@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal Weekly Report Submission</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: #001f3f;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+        }
+        .dashboard-button {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .dashboard-button:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        .report-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        .report-table th {
+            background-color: #f0c040;
+            color: #001f3f;
+            padding: 15px;
+            border-radius: 15px 15px 0 0;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .report-table td {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #001f3f;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .scroll-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #001f3f;
+            color: #ffffff;
+            padding: 12px 18px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 1000;
+            margin-bottom: 10px;
+        }
+        .scroll-button:hover {
+            background-color: #004080;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .popup {
+            background-color: #ffffff;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            border: 2px solid #001f3f;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        function togglePopup(show) {
+            document.getElementById('popup-overlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function submitReport(e) {
+            e.preventDefault();
+            
+            var formData = new FormData();
+            formData.append('reportTitle', document.querySelector('input[name="reportTitle"]').value);
+            formData.append('startDate', document.querySelector('input[name="startDate"]').value);
+            formData.append('endDate', document.querySelector('input[name="endDate"]').value);
+            formData.append('summaryActivities', document.querySelector('textarea[name="summaryActivities"]').value);
+            formData.append('achievements', document.querySelector('textarea[name="achievements"]').value);
+            formData.append('challenges', document.querySelector('textarea[name="challenges"]').value);
+            formData.append('plansNextWeek', document.querySelector('textarea[name="plansNextWeek"]').value);
+
+            fetch('https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/execE', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert('Report submitted successfully!');
+                togglePopup(false);
+                location.reload(); // Refresh the page
+            })
+            .catch(error => {
+                alert('There was an error submitting the report. Please try again.');
+                console.error('Error:', error);
+            });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+    </script>
+</head>
+<body>
+    <button class="dashboard-button" onclick="window.location.href='DASHBOARD_URL'">Go to Dashboard</button>
+    <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Report Title</th>
+                <th>Date Range</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody id="reportTableBody">
+            <tr><td colspan="3">No reports found. Connect to Google Sheets for live data.</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Popup for Adding New Report -->
+    <div id="popup-overlay" class="popup-overlay">
+        <div class="popup">
+            <h3>Add New Weekly Report</h3>
+            <form onsubmit="submitReport(event)">
+                <label>Start Date:</label>
+                <input type="date" name="startDate" required><br><br>
+                <label>End Date:</label>
+                <input type="date" name="endDate" required><br><br>
+                <label>Report Title:</label>
+                <input type="text" name="reportTitle" required><br><br>
+                <label>Summary of Activities:</label>
+                <textarea name="summaryActivities" required></textarea><br><br>
+                <label>Achievements:</label>
+                <textarea name="achievements" required></textarea><br><br>
+                <label>Challenges Faced:</label>
+                <textarea name="challenges" required></textarea><br><br>
+                <label>Plans for Next Week:</label>
+                <textarea name="plansNextWeek" required></textarea><br><br>
+                <button type="submit">Submit</button>
+                <button type="button" onclick="togglePopup(false)">Close</button>
+            </form>
+        </div>
+    </div>
+
+    <button class="scroll-button" onclick="scrollToTop()">↑</button>
+    <button class="scroll-button" onclick="scrollToBottom()">↓</button>
+</body>
+</html>
