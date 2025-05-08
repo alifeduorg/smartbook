@@ -1,174 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Billing Panel</title>
   <style>
     body {
       background-color: #ffffff;
       font-family: Arial, sans-serif;
-      color: #1a1a1a;
       margin: 0;
       padding: 20px;
     }
     .container {
       max-width: 800px;
       margin: auto;
+      background: #fff;
       padding: 20px;
-      border-radius: 20px;
-      background: linear-gradient(to right, #f7c948, #ffffff);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
     }
-    h2 {
+    h1 {
       text-align: center;
-      color: #1a1a1a;
+      color: #333;
     }
     label {
       display: block;
       margin-top: 10px;
       font-weight: bold;
     }
-    input, select, textarea {
+    input, select {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+      padding: 8px;
       margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
     button {
-      background-color: #001f3f;
-      color: white;
+      margin-top: 15px;
+      padding: 10px 15px;
       border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      margin-top: 20px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: bold;
     }
-    #receiptView {
-      margin-top: 30px;
-      border: 1px solid #ccc;
-      padding: 15px;
-      border-radius: 10px;
+    button:hover {
+      background-color: #45a049;
+    }
+    #slipPopup {
       display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      z-index: 1000;
+      width: 80%;
+      max-width: 600px;
     }
-    .dashboard {
-      background-color: #f7c948;
-      color: #001f3f;
-      font-weight: bold;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 20px;
-      display: inline-block;
-      text-decoration: none;
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <a href="#" class="dashboard">⬅ Dashboard</a>
-  <h2>Billing Panel</h2>
-  <form id="billingForm">
-    <label>Bill Date</label>
-    <input type="date" name="billDate" required>
+  <div class="container">
+    <h1>Billing Panel</h1>
+    <form id="billingForm">
+      <label for="billDate">Bill Date</label>
+      <input type="date" id="billDate" name="billDate" required>
 
-    <label>Receipt No</label>
-    <input type="text" name="receiptNo" required>
+      <label for="receiptNo">Receipt No</label>
+      <input type="text" id="receiptNo" name="receiptNo" readonly>
 
-    <label>Class</label>
-    <input type="text" name="className" required>
+      <label for="className">Class</label>
+      <input type="text" id="className" name="className" required>
 
-    <label>Student Name</label>
-    <input type="text" name="studentName" required>
+      <label for="studentName">Student Name</label>
+      <input type="text" id="studentName" name="studentName" required>
 
-    <label>Student ID</label>
-    <input type="text" name="studentId" required>
+      <label for="studentId">Student ID</label>
+      <input type="text" id="studentId" name="studentId" required>
 
-    <label>Fee Plan</label>
-    <select name="feePlan" required>
-      <option value="Basic">Basic</option>
-      <option value="Standard">Standard</option>
-      <option value="Premium">Premium</option>
-    </select>
+      <label for="feePlan">Fee Plan</label>
+      <input type="text" id="feePlan" name="feePlan" required>
 
-    <label>Class Start Date</label>
-    <input type="date" name="classStartDate" required>
+      <label for="classStartDate">Class Start Date</label>
+      <input type="date" id="classStartDate" name="classStartDate" required>
 
-    <label>Days Purchased</label>
-    <input type="number" name="daysPurchased" required>
+      <label for="daysPurchased">Days Purchased</label>
+      <input type="number" id="daysPurchased" name="daysPurchased" required>
 
-    <label>Total Fee</label>
-    <input type="number" name="totalFee" required>
+      <label for="totalFee">Total Fee</label>
+      <input type="number" id="totalFee" name="totalFee" required>
 
-    <label>Paid Amount</label>
-    <input type="number" name="paidAmount" required>
+      <label for="paidAmount">Paid Amount</label>
+      <input type="number" id="paidAmount" name="paidAmount" required>
 
-    <label>Balance</label>
-    <input type="number" name="balance" required>
+      <label for="balance">Balance</label>
+      <input type="number" id="balance" name="balance" readonly>
 
-    <label>Payment Mode</label>
-    <select name="paymentMode" required>
-      <option value="Cash">Cash</option>
-      <option value="Online">Online</option>
-      <option value="UPI">UPI</option>
-    </select>
+      <label for="paymentMode">Payment Mode</label>
+      <input type="text" id="paymentMode" name="paymentMode" required>
 
-    <label>Remarks</label>
-    <textarea name="remarks"></textarea>
+      <label for="remarks">Remarks</label>
+      <input type="text" id="remarks" name="remarks">
 
-    <label>Payment Status</label>
-    <select name="paymentStatus" required>
-      <option value="Paid">Paid</option>
-      <option value="Pending">Pending</option>
-      <option value="Partial">Partial</option>
-    </select>
+      <label for="paymentStatus">Payment Status</label>
+      <input type="text" id="paymentStatus" name="paymentStatus" required>
 
-    <button type="submit">Submit</button>
-  </form>
+      <button type="submit">Submit</button>
+      <button type="button" onclick="viewSlip()">View Slip</button>
+      <button type="button" onclick="downloadSlip()">Download Slip</button>
+      <button type="button" onclick="goToDashboard()">Dashboard</button>
+    </form>
+  </div>
 
-  <div id="receiptView"></div>
-</div>
+  <div id="overlay"></div>
+  <div id="slipPopup">
+    <h2>Fee Slip</h2>
+    <div id="slipContent"></div>
+    <button onclick="closeSlip()">Close</button>
+  </div>
 
-<script>
-const form = document.getElementById('billingForm');
-const receiptView = document.getElementById('receiptView');
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set today's date
+      document.getElementById('billDate').valueAsDate = new Date();
 
-form.addEventListener('submit', function(e) {
-  e.preventDefault();
-  const formData = new FormData(form);
-  fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.text())
-  .then(data => {
-    if (data === 'Success') {
-      const details = [...formData.entries()]
-        .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`) 
-        .join('');
-      receiptView.innerHTML = `
-        <h3>Fee Slip</h3>
-        ${details}
-        <button onclick="downloadSlip()">Download Slip</button>
-      `;
-      receiptView.style.display = 'block';
-      form.reset();
-    } else {
-      alert('Error: ' + data);
+      // Generate unique receipt number
+      document.getElementById('receiptNo').value = 'R-' + Date.now();
+
+      // Calculate balance
+      document.getElementById('paidAmount').addEventListener('input', function() {
+        const total = parseFloat(document.getElementById('totalFee').value) || 0;
+        const paid = parseFloat(this.value) || 0;
+        document.getElementById('balance').value = (total - paid).toFixed(2);
+      });
+
+      // Handle form submission
+      document.getElementById('billingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec', {
+          method: 'POST',
+          body: new URLSearchParams(formData)
+        })
+        .then(response => response.text())
+        .then(data => {
+          alert('Data submitted successfully!');
+          viewSlip();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while submitting data.');
+        });
+      });
+    });
+
+    function viewSlip() {
+      const fields = ['billDate','receiptNo','className','studentName','studentId','feePlan','classStartDate','daysPurchased','totalFee','paidAmount','balance','paymentMode','remarks','paymentStatus'];
+      let content = '<ul>';
+      fields.forEach(id => {
+        const label = document.querySelector('label[for="'+id+'"]').innerText;
+        const value = document.getElementById(id).value;
+        content += '<li><strong>' + label + ':</strong> ' + value + '</li>';
+      });
+      content += '</ul>';
+      document.getElementById('slipContent').innerHTML = content;
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('slipPopup').style.display = 'block';
     }
-  })
-  .catch(error => alert('Submission failed: ' + error));
-});
 
-function downloadSlip() {
-  const slipContent = document.getElementById('receiptView').innerHTML;
-  const newWindow = window.open('', '', 'width=800,height=600');
-  newWindow.document.write(`
-    <html><head><title>Download Slip</title></head><body>${slipContent}</body></html>
-  `);
-  newWindow.print();
-  newWindow.close();
-}
-</script>
+    function closeSlip() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('slipPopup').style.display = 'none';
+    }
+
+    function downloadSlip() {
+      const content = document.getElementById('slipContent').innerHTML;
+      const printWindow = window.open('', '', 'height=600,width=800');
+      printWindow.document.write('<html><head><title>Fee Slip</title></head><body>');
+      printWindow.document.write(content);
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+      printWindow.print();
+    }
+
+    function goToDashboard() {
+      window.location.href = 'dashboard.html'; // Replace with your actual dashboard URL
+    }
+  </script>
 </body>
 </html>
