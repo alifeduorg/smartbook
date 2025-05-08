@@ -1,122 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Principal Weekly Report Submission</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #ffffff;
-            color: #001f3f;
-            margin: 0;
-            padding: 20px;
-            position: relative;
-        }
-        .dashboard-button {
-            background-color: #28a745;
-            color: #ffffff;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-bottom: 20px;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .dashboard-button:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-        }
-        .form-container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid #001f3f;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            max-width: 700px;
-            margin: auto;
-            margin-bottom: 30px;
-        }
-        textarea, input[type="text"], input[type="date"] {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            margin-bottom: 15px;
-            font-size: 14px;
-            resize: vertical;
-        }
-        button[type="submit"] {
-            padding: 10px 20px;
-            background-color: #28a75;
-            color: #ffff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        button[type="submit"]:hover {
-            background-color: #218838;
-        }
-    </style>
-    <script>
-        function submitReport(e) {
-            e.preventDefault();
-            const form = e.target;
-
-            const formData = {
-                startDate: form.startDate.value,
-                endDate: form.endDate.value,
-                reportTitle: form.reportTitle.value,
-                activitySummary: form.activitySummary.value,
-                achievements: form.achievements.value,
-                challenges: form.challenges.value,
-                plansNextWeek: form.plansNextWeek.value
-            };
-
-            fetch("https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec", {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(() => {
-                alert('Report submitted successfully!');
-                form.reset();
-            })
-            .catch(() => {
-                alert('There was an error submitting the report. Please try again.');
-            });
-        }
-    </script>
+  <meta charset="UTF-8">
+  <title>Principal Weekly Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f0f4f8;
+    }
+    h2 {
+      color: #1a237e;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 700px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #1a237e;
+      color: white;
+      padding: 12px 20px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #283593;
+    }
+    .success, .error {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
 </head>
 <body>
-    <button class="dashboard-button" onclick="window.location.href='DASHBOARD_URL'">Go to Dashboard</button>
+  <h2>Principal Weekly Report Submission</h2>
+  <form id="reportForm">
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" required>
 
-    <div class="form-container">
-        <h2>Principal Weekly Report</h2>
-        <form onsubmit="submitReport(event)">
-            <label>Start Date:</label>
-            <input type="date" name="startDate" required><br>
-            <label>End Date:</label>
-            <input type="date" name="endDate" required><br>
-            <label>Report Title:</label>
-            <input type="text" name="reportTitle" required><br>
-            <label>Activity Summary:</label>
-            <textarea name="activitySummary" required></textarea><br>
-            <label>Achievements:</label>
-            <textarea name="achievements" required></textarea><br>
-            <label>Challenges:</label>
-            <textarea name="challenges" required></textarea><br>
-            <label>Plans for Next Week:</label>
-            <textarea name="plansNextWeek" required></textarea><br>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" required>
+
+    <label for="title">Report Title:</label>
+    <input type="text" id="title" required>
+
+    <label for="summary">Activity Summary:</label>
+    <textarea id="summary" rows="4" required></textarea>
+
+    <label for="achievements">Achievements:</label>
+    <textarea id="achievements" rows="3" required></textarea>
+
+    <label for="challenges">Challenges:</label>
+    <textarea id="challenges" rows="3" required></textarea>
+
+    <label for="plans">Plans for Next Week:</label>
+    <textarea id="plans" rows="3" required></textarea>
+
+    <button type="submit">Submit Report</button>
+    <div id="message"></div>
+  </form>
+
+  <script>
+    document.getElementById("reportForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      const data = {
+        startDate: document.getElementById("startDate").value,
+        endDate: document.getElementById("endDate").value,
+        title: document.getElementById("title").value,
+        summary: document.getElementById("summary").value,
+        achievements: document.getElementById("achievements").value,
+        challenges: document.getElementById("challenges").value,
+        plans: document.getElementById("plans").value,
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.text())
+      .then(response => {
+        document.getElementById("message").innerHTML = "<div class='success'>Report submitted successfully!</div>";
+        document.getElementById("reportForm").reset();
+      })
+      .catch(err => {
+        document.getElementById("message").innerHTML = "<div class='error'>Failed to submit report.</div>";
+      });
+    });
+  </script>
 </body>
 </html>
