@@ -58,6 +58,43 @@
             background-color: #3e8e41;
             transform: translateY(-2px);
         }
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .popup {
+            background-color: #ffffff;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 20px;
+            border: 2px solid #001f3f;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        .close-btn {
+            background-color: #f5b800;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .close-btn:hover {
+            background-color: #d4a100;
+        }
     </style>
 </head>
 <body>
@@ -68,7 +105,7 @@
                 <tr>
                     <th>Date</th>
                     <th>Report Title</th>
-                    <th>View File</th>
+                    <th>View</th>
                 </tr>
             </thead>
             <tbody id="report-table">
@@ -76,25 +113,47 @@
             </tbody>
         </table>
     </div>
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="popup" id="popup">
+            <h2 id="popup-title"></h2>
+            <p id="popup-content"></p>
+            <button class="close-btn" onclick="closePopup()">Close</button>
+        </div>
+    </div>
     <script>
-        const sheetUrl = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec';
+        const sheetUrl = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec';  // Replace with your deployed Google Apps Script Web App URL
 
         async function loadReports() {
             try {
                 const response = await fetch(sheetUrl);
                 const data = await response.json();
                 const tableBody = document.getElementById('report-table');
-                data.forEach(report => {
+                data.forEach((report, index) => {
                     const row = `<tr>
-                        <td>${report.date}</td>
+                        <td>${report.startDate} - ${report.endDate}</td>
                         <td>${report.title}</td>
-                        <td><button class="view-btn" onclick="window.open('${report.fileUrl}', '_blank')">View File</button></td>
+                        <td><button class="view-btn" onclick="viewReport('${report.title}', '${report.activitySummary}', '${report.achievements}', '${report.challenges}', '${report.plansNextWeek}')">View</button></td>
                     </tr>`;
                     tableBody.insertAdjacentHTML('beforeend', row);
                 });
             } catch (error) {
                 console.error('Error loading reports:', error);
             }
+        }
+
+        function viewReport(title, activitySummary, achievements, challenges, plansNextWeek) {
+            document.getElementById('popup-title').innerText = title;
+            document.getElementById('popup-content').innerHTML = `
+                <strong>Activity Summary:</strong> ${activitySummary}<br><br>
+                <strong>Achievements:</strong> ${achievements}<br><br>
+                <strong>Challenges:</strong> ${challenges}<br><br>
+                <strong>Plans for Next Week:</strong> ${plansNextWeek}<br><br>
+            `;
+            document.getElementById('popup-overlay').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('popup-overlay').style.display = 'none';
         }
 
         window.onload = loadReports;
