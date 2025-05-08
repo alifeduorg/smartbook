@@ -1,53 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>Principal Weekly Report</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background-color: #f0f4f8;
-    }
-    h2 {
-      color: #1a237e;
-    }
+    body { font-family: Arial; background: #f0f4f8; padding: 30px; }
     form {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 700px;
-      margin: auto;
+      background: white; padding: 20px; border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 700px; margin: auto;
     }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+    label { display: block; margin-top: 15px; font-weight: bold; }
     input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      width: 100%; padding: 10px; border: 1px solid #ccc;
+      border-radius: 5px; margin-top: 5px;
     }
     button {
-      background-color: #1a237e;
-      color: white;
-      padding: 12px 20px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      background-color: #1a237e; color: white; padding: 12px 20px;
+      border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;
     }
-    button:hover {
-      background-color: #283593;
+    button:hover { background-color: #283593; }
+    #dashboardBtn {
+      background-color: #009688; margin-left: 10px;
     }
-    .success, .error {
-      margin-top: 20px;
-      font-weight: bold;
-    }
+    .success, .error { margin-top: 20px; font-weight: bold; }
     .success { color: green; }
     .error { color: red; }
   </style>
@@ -77,13 +52,19 @@
     <textarea id="plans" rows="3" required></textarea>
 
     <button type="submit">Submit Report</button>
+    <button id="dashboardBtn" type="button">View Dashboard</button>
     <div id="message"></div>
   </form>
 
   <script>
+    const dashboardURL = "https://docs.google.com/spreadsheets/d/xxxxxxxxxxxxx/edit"; // Replace with your sheet URL
+
+    document.getElementById("dashboardBtn").addEventListener("click", function() {
+      window.open(dashboardURL, "_blank");
+    });
+
     document.getElementById("reportForm").addEventListener("submit", function(e) {
       e.preventDefault();
-      
       const data = {
         startDate: document.getElementById("startDate").value,
         endDate: document.getElementById("endDate").value,
@@ -94,12 +75,104 @@
         plans: document.getElementById("plans").value,
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec", {
+      fetch("<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Principal Weekly Report</title>
+  <style>
+    body { font-family: Arial; background: #f0f4f8; padding: 30px; }
+    form {
+      background: white; padding: 20px; border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 700px; margin: auto;
+    }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input, textarea {
+      width: 100%; padding: 10px; border: 1px solid #ccc;
+      border-radius: 5px; margin-top: 5px;
+    }
+    button {
+      background-color: #1a237e; color: white; padding: 12px 20px;
+      border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;
+    }
+    button:hover { background-color: #283593; }
+    #dashboardBtn {
+      background-color: #009688; margin-left: 10px;
+    }
+    .success, .error { margin-top: 20px; font-weight: bold; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h2>Principal Weekly Report Submission</h2>
+  <form id="reportForm">
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" required>
+
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" required>
+
+    <label for="title">Report Title:</label>
+    <input type="text" id="title" required>
+
+    <label for="summary">Activity Summary:</label>
+    <textarea id="summary" rows="4" required></textarea>
+
+    <label for="achievements">Achievements:</label>
+    <textarea id="achievements" rows="3" required></textarea>
+
+    <label for="challenges">Challenges:</label>
+    <textarea id="challenges" rows="3" required></textarea>
+
+    <label for="plans">Plans for Next Week:</label>
+    <textarea id="plans" rows="3" required></textarea>
+
+    <button type="submit">Submit Report</button>
+    <button id="dashboardBtn" type="button">View Dashboard</button>
+    <div id="message"></div>
+  </form>
+
+  <script>
+    const dashboardURL = "http://smartbook.alifedu.org/principal-dashboard.html"; // Replace with your sheet URL
+
+    document.getElementById("dashboardBtn").addEventListener("click", function() {
+      window.open(dashboardURL, "_blank");
+    });
+
+    document.getElementById("reportForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = {
+        startDate: document.getElementById("startDate").value,
+        endDate: document.getElementById("endDate").value,
+        title: document.getElementById("title").value,
+        summary: document.getElementById("summary").value,
+        achievements: document.getElementById("achievements").value,
+        challenges: document.getElementById("challenges").value,
+        plans: document.getElementById("plans").value,
+      };
+
+      fetch("YOUR_WEB_APP_URL", {
         method: "POST",
         body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
-        }
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.text())
+      .then(response => {
+        document.getElementById("message").innerHTML = "<div class='success'>Report submitted successfully!</div>";
+        document.getElementById("reportForm").reset();
+      })
+      .catch(err => {
+        document.getElementById("message").innerHTML = "<div class='error'>Failed to submit report.</div>";
+      });
+    });
+  </script>
+</body>
+</html>
+", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
       })
       .then(res => res.text())
       .then(response => {
