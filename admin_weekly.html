@@ -91,29 +91,33 @@
         const sheetUrl = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec';
 
         // Function to load the reports from Google Sheets
-        async function loadReports() {
-            try {
-                const response = await fetch(sheetUrl);
-                const data = await response.json();
-
-                // Get table body element
-                const tableBody = document.getElementById('report-table').getElementsByTagName('tbody')[0];
-                tableBody.innerHTML = ''; // Clear existing table rows
-
-                // Add rows to table dynamically
-                data.forEach((report) => {
-                    const row = `<tr>
-                        <td>${report.startDate} - ${report.endDate}</td>
-                        <td>${report.title}</td>
-                        <td><button class="view-btn" onclick="viewReport('${report.title}', '${report.activitySummary}', '${report.achievements}', '${report.challenges}', '${report.plansNextWeek}')">View</button></td>
-                    </tr>`;
-                    tableBody.insertAdjacentHTML('beforeend', row);
-                });
-            } catch (error) {
-                console.error('Error loading reports:', error);
-                alert('There was an error fetching the data.');
-            }
+       async function loadReports() {
+    try {
+        const response = await fetch(sheetUrl);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
+        const data = await response.json();
+        const tableBody = document.getElementById('report-table').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; // Clear any existing rows
+
+        data.forEach((report) => {
+            const row = `<tr>
+                <td>${report.startDate} - ${report.endDate}</td>
+                <td>${report.title}</td>
+                <td><button class="view-btn" onclick="viewReport('${report.title}', '${report.activitySummary}', '${report.achievements}', '${report.challenges}', '${report.plansNextWeek}')">View</button></td>
+            </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+
+    } catch (error) {
+        console.error('Error loading reports:', error);
+        alert('There was an error fetching the data. Please try again later.');
+    }
+}
+
 
         // Function to view the full report
         function viewReport(title, activitySummary, achievements, challenges, plansNextWeek) {
