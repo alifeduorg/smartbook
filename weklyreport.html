@@ -84,15 +84,17 @@
     background-color: rgba(0, 0, 0, 0.7);
     display: none;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align to top for better scrolling */
     z-index: 999;
+    overflow-y: auto;
     backdrop-filter: blur(10px);
+    padding: 20px; /* Prevents clipping on small screens */
 }
 
 .popup {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 245, 0.85) 100%);
-    padding: 40px 30px;
-    width: 90%;
+    padding: 30px 25px;
+    width: 100%;
     max-width: 500px;
     border-radius: 25px;
     border: 2px solid #f5b800; /* Golden border */
@@ -103,6 +105,8 @@
     color: #001f3f;
     text-align: left;
     animation: popupFadeIn 0.4s ease-out;
+    overflow-y: auto;
+    max-height: 90vh; /* Prevents popup from exceeding screen height */
 }
 
 .popup h2 {
