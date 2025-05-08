@@ -79,29 +79,30 @@
                 plansNextWeek: form.plansNextWeek.value
             };
 
-           fetch("https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec", {
-    method: 'POST',
-    body: JSON.stringify(formData),
-    headers: { 'Content-Type': 'application/json' }
-})
-.then(response => response.json())
-.then(data => {
-    if (data.status === "success") {
-        alert('Report submitted successfully!');
-        form.reset();
-    } else {
-        alert('There was an error submitting the report. Please try again.');
-    }
-})
-.catch(() => {
-    alert('There was an error submitting the report. Please try again.');
-});
-
+            fetch("https://script.google.com/macros/s/AKfycbwTgpGQa97fsj8UWiRGLIwMF3gsCAUdUfyV2vRsKUqvOHkGtpnrVT0sbCLTN1B4puYhdA/exec", {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert('Report submitted successfully!');
+                    form.reset();
+                } else {
+                    console.error(data);
+                    alert('There was an error submitting the report. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert('There was an error submitting the report. Please try again.');
+            });
         }
     </script>
 </head>
 <body>
-    <button class="dashboard-button" onclick="window.location.href='http://smartbook.alifedu.org/principal-dashboard.html'">Go to Dashboard</button>
+    <button class="dashboard-button" onclick="window.location.href='DASHBOARD_URL'">Go to Dashboard</button>
 
     <div class="form-container">
         <h2>Principal Weekly Report</h2>
