@@ -75,7 +75,7 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
-  .popup-overlay {
+ .popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -101,7 +101,7 @@
                 inset 0 1px 15px rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(15px);
     color: #001f3f;
-    text-align: center;
+    text-align: left;
     animation: popupFadeIn 0.4s ease-out;
 }
 
@@ -112,6 +112,7 @@
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
+    text-align: center; /* Keep the title centered */
 }
 
 .popup p {
@@ -119,6 +120,7 @@
     font-size: 17px;
     margin-bottom: 25px;
     line-height: 1.6;
+    text-align: left; /* Left align for a professional look */
 }
 
 .popup button {
@@ -132,6 +134,8 @@
     transition: 0.3s;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3),
                 0 4px 20px rgba(245, 184, 0, 0.3);
+    margin-top: 20px;
+    width: 100%;
 }
 
 .popup button:hover {
@@ -152,6 +156,31 @@
     }
 }
 
+/* Form fields styling */
+.popup label {
+    color: #001f3f;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.popup input,
+.popup textarea {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.popup textarea {
+    resize: vertical;
+    min-height: 120px;
+}
 
     </style>
     <script>
