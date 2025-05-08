@@ -4,119 +4,159 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Principal Weekly Report Submission</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #ffffff;
-            color: #001f3f;
+            font-family: Arial, sans-serif;
+            background-color: #001f3d; /* Dark navy blue */
+            color: #fff;
             margin: 0;
-            padding: 20px;
-            position: relative;
+            padding: 0;
         }
-        .dashboard-button {
-            background-color: #28a745;
-            color: #ffffff;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-bottom: 20px;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .dashboard-button:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-        }
+
         .form-container {
-            background-color: #ffffff;
+            background-color: #fff;
+            color: #000;
+            width: 80%;
+            max-width: 600px;
+            margin: 50px auto;
             padding: 30px;
-            border-radius: 20px;
-            border: 2px solid #001f3f;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            max-width: 700px;
-            margin: auto;
-            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-        textarea, input[type="text"], input[type="date"] {
+
+        h2 {
+            color: #f5b800; /* Golden yellow */
+            font-size: 24px;
+        }
+
+        .input-field {
             width: 100%;
             padding: 10px;
+            margin: 10px 0;
             border-radius: 8px;
             border: 1px solid #ccc;
-            margin-bottom: 15px;
-            font-size: 14px;
-            resize: vertical;
-        }
-        button[type="submit"] {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
+            box-sizing: border-box;
             font-size: 16px;
-            margin-top: 10px;
         }
-        button[type="submit"]:hover {
-            background-color: #218838;
+
+        .submit-btn {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-header {
+            margin-bottom: 20px;
+            color: #f5b800; /* Golden yellow */
+        }
+
+        .form-wrapper {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 50px auto;
         }
     </style>
-    <script>
-        function submitReport(e) {
-            e.preventDefault();
-            const form = e.target;
-
-            const formData = {
-                startDate: form.startDate.value,
-                endDate: form.endDate.value,
-                reportTitle: form.reportTitle.value,
-                activitySummary: form.activitySummary.value,
-                achievements: form.achievements.value,
-                challenges: form.challenges.value,
-                plansNextWeek: form.plansNextWeek.value
-            };
-
-            fetch("https://script.google.com/macros/s/AKfycbxIGMCM61swWCeEhgGGp1gj4E5jpW-UbNeQ2pPkLpdSfZBlfwQqMJxn_tqsm-hoZ9Xd/execc", {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(() => {
-                alert('Report submitted successfully!');
-                form.reset();
-            })
-            .catch(() => {
-                alert('There was an error submitting the report. Please try again.');
-            });
-        }
-    </script>
 </head>
 <body>
-    <button class="dashboard-button" onclick="window.location.href='DASHBOARD_URL'">Go to Dashboard</button>
 
-    <div class="form-container">
-        <h2>Principal Weekly Report</h2>
-        <form onsubmit="submitReport(event)">
-            <label>Start Date:</label>
-            <input type="date" name="startDate" required><br>
-            <label>End Date:</label>
-            <input type="date" name="endDate" required><br>
-            <label>Report Title:</label>
-            <input type="text" name="reportTitle" required><br>
-            <label>Activity Summary:</label>
-            <textarea name="activitySummary" required></textarea><br>
-            <label>Achievements:</label>
-            <textarea name="achievements" required></textarea><br>
-            <label>Challenges:</label>
-            <textarea name="challenges" required></textarea><br>
-            <label>Plans for Next Week:</label>
-            <textarea name="plansNextWeek" required></textarea><br>
-            <button type="submit">Submit</button>
-        </form>
+    <div class="form-wrapper">
+        <div class="form-container">
+            <h2>Principal Weekly Report</h2>
+            <form id="reportForm">
+                <div class="form-section">
+                    <label for="startDate" class="form-header">Start Date:</label>
+                    <input type="date" id="startDate" name="startDate" class="input-field" required>
+                </div>
+                <div class="form-section">
+                    <label for="endDate" class="form-header">End Date:</label>
+                    <input type="date" id="endDate" name="endDate" class="input-field" required>
+                </div>
+                <div class="form-section">
+                    <label for="reportTitle" class="form-header">Report Title:</label>
+                    <input type="text" id="reportTitle" name="reportTitle" class="input-field" required>
+                </div>
+                <div class="form-section">
+                    <label for="activitySummary" class="form-header">Activity Summary:</label>
+                    <textarea id="activitySummary" name="activitySummary" class="input-field" rows="4" required></textarea>
+                </div>
+                <div class="form-section">
+                    <label for="achievements" class="form-header">Achievements:</label>
+                    <textarea id="achievements" name="achievements" class="input-field" rows="4" required></textarea>
+                </div>
+                <div class="form-section">
+                    <label for="challenges" class="form-header">Challenges:</label>
+                    <textarea id="challenges" name="challenges" class="input-field" rows="4" required></textarea>
+                </div>
+                <div class="form-section">
+                    <label for="plansNextWeek" class="form-header">Plans for Next Week:</label>
+                    <textarea id="plansNextWeek" name="plansNextWeek" class="input-field" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Submit Report</button>
+            </form>
+        </div>
     </div>
+
+    <script>
+        document.getElementById("reportForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            const reportTitle = document.getElementById("reportTitle").value;
+            const activitySummary = document.getElementById("activitySummary").value;
+            const achievements = document.getElementById("achievements").value;
+            const challenges = document.getElementById("challenges").value;
+            const plansNextWeek = document.getElementById("plansNextWeek").value;
+
+            // The URL of your deployed Web App
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxIGMCM61swWCeEhgGGp1gj4E5jpW-UbNeQ2pPkLpdSfZBlfwQqMJxn_tqsm-hoZ9Xd/exec';
+
+            // Create the data object
+            const data = {
+                startDate: startDate,
+                endDate: endDate,
+                reportTitle: reportTitle,
+                activitySummary: activitySummary,
+                achievements: achievements,
+                challenges: challenges,
+                plansNextWeek: plansNextWeek
+            };
+
+            // Send the data to the Google Apps Script web app using fetch
+            fetch(webAppUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert("Report submitted successfully!");
+                document.getElementById("reportForm").reset(); // Reset the form after submission
+            })
+            .catch(error => {
+                alert("Error submitting report: " + error);
+            });
+        });
+    </script>
+
 </body>
 </html>
