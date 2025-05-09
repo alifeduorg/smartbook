@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Report</title>
     <style>
-        /* Styles for modal */
+        /* Modal Styles */
         #reportModal {
             display: none;
             position: fixed;
@@ -19,11 +19,12 @@
 
         #modal-content {
             background-color: white;
-            margin: 15% auto;
+            margin: 10% auto;
             padding: 20px;
             width: 70%;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         .report-section {
@@ -70,10 +71,46 @@
         td {
             background-color: #ecf0f1;
         }
+
+        /* Modal Body Scroll */
+        #modal-body {
+            max-height: 400px; /* Set the maximum height of the modal body */
+            overflow-y: auto; /* Enable vertical scrolling */
+            margin-top: 20px;
+        }
+
+        /* Close Button */
+        .close-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Dashboard Button */
+        .dashboard-btn {
+            background-color: #2ecc71;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dashboard-btn:hover {
+            background-color: #27ae60;
+        }
     </style>
 </head>
 <body>
     <h1>Weekly Reports</h1>
+<button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
 
     <!-- Table to display reports -->
     <table id="reportTable">
@@ -96,8 +133,8 @@
             <div id="modal-body">
                 <!-- Report content will be displayed here -->
             </div>
-            <button onclick="closeModal()">Close</button>
-            <button onclick="goToDashboard()">Go to Dashboard</button>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+            <button class="dashboard-btn" onclick="goToDashboard()">Go to Dashboard</button>
         </div>
     </div>
 
