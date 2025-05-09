@@ -295,6 +295,7 @@
         }
     </style>
     <script>
+        
         function togglePopup(show) {
             document.getElementById('popup-overlay').style.display = show ? 'flex' : 'none';
         }
@@ -323,42 +324,6 @@
         function scrollToBottom() {
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
-    </script>
-</head>
-<body>
-    <button class="dashboard-button" onclick="window.location.href='http://smartbook.alifedu.org/principal-dashboard.html'">Go to Dashboard</button>
-    <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
-  <h1>Weekly Reports</h1>
-<button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
-    <!-- Table to display reports -->
-    <table id="reportTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Report Title</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be populated here -->
-        </tbody>
-    </table>
-
-    <!-- Modal to display detailed report -->
-    <div id="reportModal">
-        <div id="modal-content">
-            <h2 id="modalTitle"></h2>
-            <div id="modal-body">
-                <!-- Report content will be displayed here -->
-            </div>
-            <button class="close-btn" onclick="closeModal()">Close</button>
-            <button class="dashboard-btn" onclick="goToDashboard()">Go to Dashboard</button>
-        </div>
-    </div>
-
-    <button class="scroll-button" onclick="scrollToTop()">↑</button>
-    <button class="scroll-button" onclick="scrollToBottom()">↓</button>
- <script>
         const SHEET_URL = "https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec";
 
         // Fetch and display the table
@@ -423,7 +388,79 @@
             document.getElementById("reportModal").style.display = "none";
         }
 
-        
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = "admin_dashboard.html";  // Replace with your actual dashboard link
+        }
     </script>
+</head>
+<body>
+    <button class="dashboard-button" onclick="window.location.href='http://smartbook.alifedu.org/principal-dashboard.html'">Go to Dashboard</button>
+    <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Report Title</th>
+                <th>Date Range</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody id="reportTableBody">
+            <tr><td colspan="3">No reports found. Connect to Google Sheets for live data.</td></tr>
+        </tbody>
+    </table>
+    <div id="popup-overlay" class="popup-overlay">
+        <div class="popup">
+            <h3>Add New Weekly Report</h3>
+            <form onsubmit="submitReport(event)">
+                <label>Start Date:</label>
+                <input type="date" name="startDate" required><br><br>
+                <label>End Date:</label>
+                <input type="date" name="endDate" required><br><br>
+                <label>Report Title:</label>
+                <input type="text" name="reportTitle" required><br><br>
+                <label>Summary of Activities:</label>
+                <textarea name="summaryActivities" required></textarea><br><br>
+                <label>Achievements:</label>
+                <textarea name="achievements" required></textarea><br><br>
+                <label>Challenges:</label>
+                <textarea name="challenges" required></textarea><br><br>
+                <label>Plans for Next Week:</label>
+                <textarea name="plansNextWeek" required></textarea><br><br>
+                <button type="submit">Submit</button>
+                <button type="button" onclick="togglePopup(false)">Close</button>
+            </form>
+        </div>
+    </div>
+    <button class="scroll-button" onclick="scrollToTop()">↑</button>
+    <button class="scroll-button" onclick="scrollToBottom()">↓</button>
+      <h1>Weekly Reports</h1>
+<button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
+    <!-- Table to display reports -->
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Report Title</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+
+    <!-- Modal to display detailed report -->
+    <div id="reportModal">
+        <div id="modal-content">
+            <h2 id="modalTitle"></h2>
+            <div id="modal-body">
+                <!-- Report content will be displayed here -->
+            </div>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+            <button class="dashboard-btn" onclick="goToDashboard()">Go to Dashboard</button>
+        </div>
+    </div>
+
 </body>
 </html>
