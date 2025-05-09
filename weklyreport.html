@@ -185,7 +185,114 @@
     resize: vertical;
     min-height: 120px;
 }
+     /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;  /* Rounded corners for the entire table */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 3D shadow effect */
+        }
 
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color:#f0c040;  /* Golden yellow header */
+            color: white;
+            border-radius: 10px 10px 0 0; /* Rounded corners for table header */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  /* 3D shadow for the header */
+        }
+
+        td {
+            background-color: #ecf0f1;
+            border-radius: 0 0 10px 10px; /* Rounded corners for table cells */
+        }
+
+        td:hover {
+            background-color: #d5d8dc; /* Hover effect on table rows */
+            cursor: pointer;
+        }
+
+        /* View Button Styles */
+        .view-btn {
+            background-color: #f0c040;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  /* 3D effect */
+        }
+
+        .view-btn:hover {
+            background-color:f0c040;
+        }
+
+        /* Modal and other button styles */
+        #reportModal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 70%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .report-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f7f7f7;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal Body Scroll */
+        #modal-body {
+            max-height: 400px; /* Set the maximum height of the modal body */
+            overflow-y: auto; /* Enable vertical scrolling */
+            margin-top: 20px;
+        }
+
+        .close-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Dashboard Button */
+        .dashboard-btn {
+            background-color: #2ecc71;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dashboard-btn:hover {
+            background-color: #27ae60;
+        }
     </style>
     <script>
         function togglePopup(show) {
@@ -221,42 +328,102 @@
 <body>
     <button class="dashboard-button" onclick="window.location.href='http://smartbook.alifedu.org/principal-dashboard.html'">Go to Dashboard</button>
     <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
-    <table class="report-table">
+  <h1>Weekly Reports</h1>
+<button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
+    <!-- Table to display reports -->
+    <table id="reportTable">
         <thead>
             <tr>
+                <th>Date</th>
                 <th>Report Title</th>
-                <th>Date Range</th>
                 <th>View</th>
             </tr>
         </thead>
-        <tbody id="reportTableBody">
-            <tr><td colspan="3">No reports found. Connect to Google Sheets for live data.</td></tr>
+        <tbody>
+            <!-- Data will be populated here -->
         </tbody>
     </table>
-    <div id="popup-overlay" class="popup-overlay">
-        <div class="popup">
-            <h3>Add New Weekly Report</h3>
-            <form onsubmit="submitReport(event)">
-                <label>Start Date:</label>
-                <input type="date" name="startDate" required><br><br>
-                <label>End Date:</label>
-                <input type="date" name="endDate" required><br><br>
-                <label>Report Title:</label>
-                <input type="text" name="reportTitle" required><br><br>
-                <label>Summary of Activities:</label>
-                <textarea name="summaryActivities" required></textarea><br><br>
-                <label>Achievements:</label>
-                <textarea name="achievements" required></textarea><br><br>
-                <label>Challenges:</label>
-                <textarea name="challenges" required></textarea><br><br>
-                <label>Plans for Next Week:</label>
-                <textarea name="plansNextWeek" required></textarea><br><br>
-                <button type="submit">Submit</button>
-                <button type="button" onclick="togglePopup(false)">Close</button>
-            </form>
+
+    <!-- Modal to display detailed report -->
+    <div id="reportModal">
+        <div id="modal-content">
+            <h2 id="modalTitle"></h2>
+            <div id="modal-body">
+                <!-- Report content will be displayed here -->
+            </div>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+            <button class="dashboard-btn" onclick="goToDashboard()">Go to Dashboard</button>
         </div>
     </div>
+
     <button class="scroll-button" onclick="scrollToTop()">↑</button>
     <button class="scroll-button" onclick="scrollToBottom()">↓</button>
+ <script>
+        const SHEET_URL = "https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec";
+
+        // Fetch and display the table
+        fetch(SHEET_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tableBody = document.querySelector("#reportTable tbody");
+                data.forEach((row) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${formatDate(row.startDate)} to ${formatDate(row.endDate)}</td>
+                        <td>${row.reportTitle || "Untitled"}</td>
+                        <td><button class="view-btn" onclick='viewReport(${JSON.stringify(row)})'>View</button></td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            });
+
+        // Format date to DD MMM YYYY
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { day: '2-digit', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('en-GB', options);
+        }
+
+        // Show report in modal
+        function viewReport(report) {
+            document.getElementById("modalTitle").textContent = `Weekly Report: ${formatDate(report.startDate)} to ${formatDate(report.endDate)}`;
+
+            const modalBody = document.getElementById("modal-body");
+
+            const html = `
+                <div class="report-section">
+                    <h3>Start Date</h3><p>${formatDate(report.startDate)}</p>
+                </div>
+                <div class="report-section">
+                    <h3>End Date</h3><p>${formatDate(report.endDate)}</p>
+                </div>
+                <div class="report-section">
+                    <h3>Report Title</h3><p>${report.reportTitle || "Not provided"}</p>
+                </div>
+                <div class="report-section">
+                    <h3>Activity Summary</h3><p>${report.activitySummary || "Not provided"}</p>
+                </div>
+                <div class="report-section">
+                    <h3>Achievements</h3><p>${report.achievements || "Not provided"}</p>
+                </div>
+                <div class="report-section">
+                    <h3>Challenges</h3><p>${report.challenges || "Not provided"}</p>
+                </div>
+                <div class="report-section">
+                    <h3>Plans for Next Week</h3><p>${report.plansNextWeek || "Not provided"}</p>
+                </div>
+            `;
+
+            modalBody.innerHTML = html;
+            document.getElementById("reportModal").style.display = "block";
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById("reportModal").style.display = "none";
+        }
+
+        
+    </script>
 </body>
 </html>
