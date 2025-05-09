@@ -5,7 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Report</title>
     <style>
-        /* Modal Styles */
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;  /* Rounded corners for the entire table */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 3D shadow effect */
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 2px solid #2c3e50;  /* Navy blue border */
+        }
+
+        th {
+            background-color: #f39c12;  /* Golden yellow header */
+            color: white;
+            border-radius: 10px 10px 0 0; /* Rounded corners for table header */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  /* 3D shadow for the header */
+        }
+
+        td {
+            background-color: #ecf0f1;
+            border-radius: 0 0 10px 10px; /* Rounded corners for table cells */
+        }
+
+        td:hover {
+            background-color: #d5d8dc; /* Hover effect on table rows */
+            cursor: pointer;
+        }
+
+        /* View Button Styles */
+        .view-btn {
+            background-color: #f39c12;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  /* 3D effect */
+        }
+
+        .view-btn:hover {
+            background-color: #e67e22;
+        }
+
+        /* Modal and other button styles */
         #reportModal {
             display: none;
             position: fixed;
@@ -35,43 +81,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .view-btn {
-            background-color: #f39c12;
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .view-btn:hover {
-            background-color: #e67e22;
-        }
-
-        /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 2px solid #2c3e50;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f39c12;
-            color: white;
-        }
-
-        td {
-            background-color: #ecf0f1;
-        }
-
         /* Modal Body Scroll */
         #modal-body {
             max-height: 400px; /* Set the maximum height of the modal body */
@@ -79,7 +88,6 @@
             margin-top: 20px;
         }
 
-        /* Close Button */
         .close-btn {
             background-color: #e74c3c;
             color: white;
@@ -111,7 +119,6 @@
 <body>
     <h1>Weekly Reports</h1>
 <button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
-
     <!-- Table to display reports -->
     <table id="reportTable">
         <thead>
