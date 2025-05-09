@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Weekly Reports</title>
   <style>
+    <button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
   body {
     font-family: Arial, sans-serif;
     background: #f4f4f4;
@@ -51,15 +52,31 @@
     height: 100%;
     background: rgba(0,0,0,0.6);
   }
-  .modal-content::-webkit-scrollbar {
-  width: 8px;
+ .modal-content {
+  background: white;
+  margin: 5% auto;
+  padding: 30px;
+  border-radius: 15px;
+  width: 80%;
+  max-width: 850px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: navy #f1f1f1;
 }
-.modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+
+/* Scrollbar for Chrome/Edge */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
 }
 .modal-content::-webkit-scrollbar-thumb {
   background-color: navy;
+  border-radius: 10px;
+}
+.modal-content::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
   border-radius: 10px;
 }
 
@@ -82,20 +99,30 @@
     box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
   }
 
-  .report-box h4 {
-    margin: 0 0 8px;
-    color: #FFD700;
-    font-weight: bold;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 5px;
-  }
+  .report-section {
+  border: 2px solid navy;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
 
-  .report-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: navy;
-    margin-bottom: 10px;
-  }
+.report-section h3 {
+  background-color: #FFD700;
+  color: navy;
+  padding: 10px 15px;
+  border-radius: 10px 10px 0 0;
+  margin-top: 0;
+  font-size: 18px;
+}
+
+.report-section p {
+  margin: 10px 0 0 0;
+  padding: 0 5px;
+  color: #333;
+}
+
     .dashboard-btn {
   background-color: #FFD700;
   color: navy;
@@ -164,50 +191,77 @@
 </div>
 
 
-  <script>
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec";
+<script>
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec";
 
-    fetch(SHEET_URL)
-      .then(res => res.json())
-      .then(data => {
-        const tableBody = document.querySelector("#reportTable tbody");
-        data.forEach((row, index) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row.startDate} to ${row.endDate}</td>
-            <td>${row.reportTitle}</td>
-            <td><button class="view-btn" onclick='viewReport(${JSON.stringify(row)})'>View</button></td>
-          `;
-          tableBody.appendChild(tr);
-        });
+  // Fetch and display the table
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(data => {
+      const tableBody = document.querySelector("#reportTable tbody");
+      data.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${formatDate(row.startDate)} to ${formatDate(row.endDate)}</td>
+          <td>${row.reportTitle || "Untitled"}</td>
+          <td><button class="view-btn" onclick='viewReport(${JSON.stringify(row)})'>View</button></td>
+        `;
+        tableBody.appendChild(tr);
       });
+    });
 
- function formatDate(dateStr) {
-  const date = new Date(dateStr);
-  const options = { day: '2-digit', month: 'short', year: 'numeric' };
-  return date.toLocaleDateString('en-GB', options);
-}
-
-function viewReport(report) {
-  document.getElementById("modalTitle").textContent = `Weekly Report: ${formatDate(report.startDate)} to ${formatDate(report.endDate)}`;
-  document.getElementById("modalStart").textContent = formatDate(report.startDate);
-  document.getElementById("modalEnd").textContent = formatDate(report.endDate);
-  document.getElementById("modalActivity").textContent = report.activitySummary || "Not provided";
-  document.getElementById("modalAchievements").textContent = report.achievements || "Not provided";
-  document.getElementById("modalChallenges").textContent = report.challenges || "Not provided";
-  document.getElementById("modalPlans").textContent = report.plansNextWeek || "Not provided";
-  document.getElementById("reportModal").style.display = "block";
-}
-
-
-    function closeModal() {
-      document.getElementById("reportModal").style.display = "none";
-       function goToDashboard() {
-    // Replace with your actual dashboard link
-    window.location.href = "admin_dashboard.html"; 
+  // Format date to DD MMM YYYY
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    return date.toLocaleDateString('en-GB', options);
   }
-    }
-  </script>
+
+  // Show report in modal
+  function viewReport(report) {
+    document.getElementById("modalTitle").textContent = `Weekly Report: ${formatDate(report.startDate)} to ${formatDate(report.endDate)}`;
+
+    const modalBody = document.getElementById("modal-body");
+
+    const html = `
+      <div class="report-section">
+        <h3>Start Date</h3><p>${formatDate(report.startDate)}</p>
+      </div>
+      <div class="report-section">
+        <h3>End Date</h3><p>${formatDate(report.endDate)}</p>
+      </div>
+      <div class="report-section">
+        <h3>Report Title</h3><p>${report.reportTitle || "Not provided"}</p>
+      </div>
+      <div class="report-section">
+        <h3>Activity Summary</h3><p>${report.activitySummary || "Not provided"}</p>
+      </div>
+      <div class="report-section">
+        <h3>Achievements</h3><p>${report.achievements || "Not provided"}</p>
+      </div>
+      <div class="report-section">
+        <h3>Challenges</h3><p>${report.challenges || "Not provided"}</p>
+      </div>
+      <div class="report-section">
+        <h3>Plans for Next Week</h3><p>${report.plansNextWeek || "Not provided"}</p>
+      </div>
+    `;
+
+    modalBody.innerHTML = html;
+    document.getElementById("reportModal").style.display = "block";
+  }
+
+  // Close modal
+  function closeModal() {
+    document.getElementById("reportModal").style.display = "none";
+  }
+
+  // Go to Dashboard
+  function goToDashboard() {
+    window.location.href = "admin_dashboard.html";
+  }
+</script>
+
 </body>
-<button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
+
 </html>
