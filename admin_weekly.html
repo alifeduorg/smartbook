@@ -51,16 +51,18 @@
     height: 100%;
     background: rgba(0,0,0,0.6);
   }
-  .modal-content {
-    background: white;
-    margin: 5% auto;
-    padding: 20px;
-    border-radius: 15px;
-    width: 80%;
-    max-width: 800px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    position: relative;
-  }
+  .modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: navy;
+  border-radius: 10px;
+}
+
   .close-btn {
     position: absolute;
     right: 20px;
@@ -94,6 +96,23 @@
     color: navy;
     margin-bottom: 10px;
   }
+    .dashboard-btn {
+  background-color: #FFD700;
+  color: navy;
+  border: 2px solid navy;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 4px 8px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+.dashboard-btn:hover {
+  background-color: navy;
+  color: #FFD700;
+}
+
 </style>
 
 </head>
@@ -183,7 +202,12 @@ function viewReport(report) {
 
     function closeModal() {
       document.getElementById("reportModal").style.display = "none";
+       function goToDashboard() {
+    // Replace with your actual dashboard link
+    window.location.href = "admin_dashboard.html"; 
+  }
     }
   </script>
 </body>
+<button class="dashboard-btn" onclick="goToDashboard()">← Dashboard</button>
 </html>
