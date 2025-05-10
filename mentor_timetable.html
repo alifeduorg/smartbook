@@ -147,7 +147,7 @@
         section.innerHTML = `<h3>${day}</h3><table id="table-${day}">
           <tr><th>Time</th><th>Subject</th><th>Teacher</th><th>Meeting Link</th><th>Action</th></tr>
         </table>
-        <button class="add-slot-btn" onclick="addRow('${day}', ${JSON.stringify(subjects).replace(/"/g, '&quot;')})">Add Slot</button>;
+       \<button onclick="addRow('\${day}', \${JSON.stringify(subjects).replace(/"/g, '"')})">Add Slot</button>\`;
 
         timetableContainer.appendChild(section);
       });
