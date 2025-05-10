@@ -1,151 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Details from Google Sheets</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Timetable (Firebase)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7fc;
+      margin: 0;
+      padding: 20px;
+    }
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.9.0/firebase-firestore.js"></script>
+    h1 {
+      text-align: center;
+      color: #1d3557;
+    }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
+    select, input, button {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
 
-        h1 {
-            color: #333;
-            text-align: center;
-        }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
 
-        #students-list {
-            margin-top: 20px;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
 
-        li {
-            background-color: #fff;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    th {
+      background-color: #457b9d;
+      color: white;
+    }
 
-        .add-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    tr:nth-child(even) {
+      background-color: #f1f1f1;
+    }
 
-        .add-btn:hover {
-            background-color: #45a049;
-        }
+    button {
+      background-color: #1d3557;
+      color: white;
+      cursor: pointer;
+    }
 
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .loading {
-            text-align: center;
-            font-size: 18px;
-            color: #333;
-        }
-
-    </style>
+    button:hover {
+      background-color: #457b9d;
+    }
+  </style>
 </head>
 <body>
-    <h1>Student Details from Google Sheets</h1>
 
-    <!-- Display the student list -->
-    <div id="students-list" class="loading">Loading student data...</div>
+  <h1>Student Timetable Manager (Firebase)</h1>
+  <div class="container">
 
-    <!-- Firebase Config (optional, if you need to use Firebase later) -->
-    <script>
-        // Your Firebase configuration (Optional)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBbpphH9wQ53Jo4evl8m4oNsaOXvombJVA",
-            authDomain: "timetable-d0e77.firebaseapp.com",
-            projectId: "timetable-d0e77",
-            storageBucket: "timetable-d0e77.appspot.com",
-            messagingSenderId: "550695601869",
-            appId: "1:550695601869:web:655c568a1290ae582bcb84",
-            measurementId: "G-PCM44PV4CY"
-        };
+    <label for="studentSelect">Select Student:</label>
+    <select id="studentSelect" onchange="showSubjects()">
+      <option value="">-- Choose --</option>
+    </select>
 
-        // Initialize Firebase (Optional)
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
-    </script>
+    <div id="subjectList"></div>
 
-    <!-- Fetch data from Google Sheet using Apps Script -->
-    <script>
-        // Google Apps Script URL to fetch data from the Google Sheet
-        const googleSheetDataURL = "https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec";
+    <h3>Add Weekly Timetable Entry</h3>
+    <form id="timetableForm">
+      <label>Week Start (YYYY-MM-DD): <input type="date" name="weekStart" required></label><br/>
+      <label>Day: 
+        <select name="day" required>
+          <option value="">--Select Day--</option>
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+          <option>Saturday</option>
+        </select>
+      </label>
+      <label>Time: <input type="time" name="time" required></label><br/>
+      <label>Subject: <input type="text" name="subject" required></label>
+      <label>Teacher: <input type="text" name="teacher" required></label>
+      <label>Class Link: <input type="url" name="link"></label><br/>
+      <button type="submit">Submit Timetable Entry</button>
+    </form>
 
-        // Function to fetch student data from Google Sheets and display it
-        async function fetchStudentData() {
-            try {
-                const response = await fetch(googleSheetDataURL);
-                const data = await response.json();
+    <div id="statusMessage"></div>
+  </div>
 
-                if (data.length > 0) {
-                    displayStudentTable(data);
-                } else {
-                    document.getElementById("students-list").innerHTML = "No student data available.";
-                }
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-                document.getElementById("students-list").innerHTML = "Error loading student data.";
-            }
-        }
+  <!-- Firebase App -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-        // Function to display student data in a table
-        function displayStudentTable(data) {
-            let tableHTML = "<table>";
-            tableHTML += "<thead><tr><th>Student ID</th><th>Student Name</th><th>Subject</th><th>Teacher Name</th><th>Teacher ID</th></tr></thead>";
-            tableHTML += "<tbody>";
+  <script>
+    // ✅ Replace with your own Firebase config:
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbpphH9wQ53Jo4evl8m4oNsaOXvombJVA",
+  authDomain: "timetable-d0e77.firebaseapp.com",
+  projectId: "timetable-d0e77",
+  storageBucket: "timetable-d0e77.firebasestorage.app",
+  messagingSenderId: "550695601869",
+  appId: "1:550695601869:web:655c568a1290ae582bcb84",
+  measurementId: "G-PCM44PV4CY"
+    };
 
-            data.forEach(student => {
-                tableHTML += `<tr>
-                    <td>${student['Student ID']}</td>
-                    <td>${student['Student Name']}</td>
-                    <td>${student['Subject']}</td>
-                    <td>${student['Teacher Name']}</td>
-                    <td>${student['Teacher ID']}</td>
-                </tr>`;
-            });
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
 
-            tableHTML += "</tbody></table>";
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec";
+    let studentsData = {};
 
-            // Replace loading text with the student data table
-            document.getElementById("students-list").innerHTML = tableHTML;
-        }
+    async function fetchStudents() {
+      try {
+        const res = await fetch(apiUrl);
+        const json = await res.json();
+        studentsData = json.students;
 
-        // Call the fetchStudentData function on page load
-        fetchStudentData();
-    </script>
+        const studentSelect = document.getElementById("studentSelect");
+        Object.keys(studentsData).forEach(id => {
+          const option = document.createElement("option");
+          option.value = id;
+          option.text = `${studentsData[id].name} (${id})`;
+          studentSelect.add(option);
+        });
+      } catch (err) {
+        alert("Failed to load student data");
+        console.error(err);
+      }
+    }
+
+    function showSubjects() {
+      const id = document.getElementById("studentSelect").value;
+      const subjectList = document.getElementById("subjectList");
+      subjectList.innerHTML = "";
+
+      if (!id || !studentsData[id]) return;
+
+      const student = studentsData[id];
+      let table = `<h3>Subjects for ${student.name}</h3><table><tr><th>Subject</th><th>Teacher</th><th>Teacher ID</th></tr>`;
+
+      student.subjects.forEach(sub => {
+        table += `<tr>
+                    <td>${sub.subject}</td>
+                    <td>${sub.teacher}</td>
+                    <td>${sub.teacherId}</td>
+                  </tr>`;
+      });
+
+      table += "</table>";
+      subjectList.innerHTML = table;
+    }
+
+    document.getElementById("timetableForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const studentId = document.getElementById("studentSelect").value;
+      if (!studentId) return alert("Select a student first");
+
+      const studentName = studentsData[studentId].name;
+      const form = e.target;
+
+      const timetableEntry = {
+        weekStart: form.weekStart.value,
+        studentId,
+        studentName,
+        day: form.day.value,
+        time: form.time.value,
+        subject: form.subject.value,
+        teacher: form.teacher.value,
+        link: form.link.value
+      };
+
+      try {
+        await db.collection("Weekly_Timetable").add(timetableEntry);
+        document.getElementById("statusMessage").innerText = "Timetable entry saved to Firestore!";
+        form.reset();
+      } catch (error) {
+        console.error("Firestore error:", error);
+        document.getElementById("statusMessage").innerText = "Error saving to Firebase.";
+      }
+    });
+
+    fetchStudents();
+  </script>
+
 </body>
 </html>
