@@ -60,6 +60,24 @@
     }
   </style>
   <script type="module">
+    function sendToGoogleSheet(studentId, studentName, weekStart, entries) {
+  fetch("https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      studentId,
+      studentName,
+      weekStart,
+      entries
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.text())
+  .then(result => console.log("✅ Google Sheet response:", result))
+  .catch(error => console.error("❌ Error sending to sheet:", error));
+}
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -200,16 +218,44 @@
         return;
       }
 
-      await addDoc(collection(db, 'Timetables'), {
-        weekStart,
-        studentId,
-        studentName,
-        entries
-      });
+     try {
+    await addDoc(collection(db, 'Timetables'), {
+      weekStart,
+      studentId,
+      studentName,
+      entries
+    });
 
-      alert("Timetable submitted successfully.");
-      location.reload();
+    console.log("✅ Timetable saved to Firestore.");
+  } catch (error) {
+    console.error("❌ Error saving to Firestore:", error);
+  }
+
+  // Save to Google Sheets
+  sendToGoogleSheet(studentId, studentName, weekStart, entries);
+
+  alert("Timetable submitted successfully.");
+  location.reload();
+}
+
+// Google Sheets API function
+function sendToGoogleSheet(studentId, studentName, weekStart, entries) {
+  fetch("https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      studentId,
+      studentName,
+      weekStart,
+      entries
+    }),
+    headers: {
+      "Content-Type": "application/json"
     }
+  })
+  .then(res => res.text())
+  .then(result => console.log("✅ Google Sheet response:", result))
+  .catch(error => console.error("❌ Error sending to sheet:", error));
+}
 
     fetchStudentSubjectData();
   </script>
