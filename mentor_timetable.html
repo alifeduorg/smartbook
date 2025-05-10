@@ -169,47 +169,53 @@
       actionCell.innerHTML = `<button onclick="this.parentElement.parentElement.remove()">Remove</button>`;
     }
 
-    window.submitTimetable = async function() {
-      const weekStart = document.getElementById('weekStart').value;
-      const studentId = document.getElementById('student').value;
-      if (!weekStart || !studentId) {
-        alert("Please select week start date and student.");
-        return;
+   window.submitTimetable = async function () {
+  const weekStart = document.getElementById('weekStart').value;
+  const studentId = document.getElementById('student').value;
+  if (!weekStart || !studentId) {
+    alert("Please select week start date and student.");
+    return;
+  }
+
+  const studentName = window.studentMap[studentId].name;
+  const entries = [];
+
+  days.forEach(day => {
+    const table = document.getElementById(`table-${day}`);
+    if (!table) return;
+    [...table.rows].slice(1).forEach(row => {
+      const [time, subjectSel, teacher, link] = row.cells;
+      const timeVal = time.querySelector('input').value;
+      const subjectVal = subjectSel.querySelector('select').value;
+      const teacherVal = teacher.querySelector('input').value;
+      const linkVal = link.querySelector('input').value;
+      if (timeVal && subjectVal && teacherVal) {
+        entries.push({ day, time: timeVal, subject: subjectVal, teacher: teacherVal, link: linkVal });
       }
+    });
+  });
 
-      const studentName = window.studentMap[studentId].name;
-      const entries = [];
+  if (entries.length === 0) {
+    alert("Please fill at least one timetable entry.");
+    return;
+  }
 
-      days.forEach(day => {
-        const table = document.getElementById(`table-${day}`);
-        if (!table) return;
-        [...table.rows].slice(1).forEach(row => {
-          const [time, subjectSel, teacher, link] = row.cells;
-          const timeVal = time.querySelector('input').value;
-          const subjectVal = subjectSel.querySelector('select').value;
-          const teacherVal = teacher.querySelector('input').value;
-          const linkVal = link.querySelector('input').value;
-          if (timeVal && subjectVal && teacherVal) {
-            entries.push({ day, time: timeVal, subject: subjectVal, teacher: teacherVal, link: linkVal });
-          }
-        });
-      });
+  // Save to Firebase
+  await addDoc(collection(db, 'Timetables'), {
+    weekStart,
+    studentId,
+    studentName,
+    entries,
+    timestamp: new Date()
+  });
 
-      if (entries.length === 0) {
-        alert("Please fill at least one timetable entry.");
-        return;
-      }
+  // Send to Google Sheets
+  await sendToGoogleSheet(studentId, studentName, entries);
 
-      await addDoc(collection(db, 'Timetables'), {
-        weekStart,
-        studentId,
-        studentName,
-        entries
-      });
+  alert("Timetable submitted to Firebase and Google Sheet.");
+  location.reload();
+}
 
-      alert("Timetable submitted successfully.");
-      location.reload();
-    }
 
     fetchStudentSubjectData();
   </script>
