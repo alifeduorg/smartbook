@@ -58,6 +58,22 @@
       margin-top: 2rem;
       padding: 0.75rem 2rem;
     }
+.add-slot-btn {
+  background-color: #000080; /* Navy Blue */
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s;
+}
+
+.add-slot-btn:hover {
+  background-color: #003366; /* Darker shade on hover */
+}
+
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -131,7 +147,7 @@
         section.innerHTML = `<h3>${day}</h3><table id="table-${day}">
           <tr><th>Time</th><th>Subject</th><th>Teacher</th><th>Meeting Link</th><th>Action</th></tr>
         </table>
-        <button onclick="addRow('${day}', ${JSON.stringify(subjects).replace(/"/g, '&quot;')})">Add Slot</button>`;
+        <button class="add-slot-btn" onclick="addRow('${day}', ${JSON.stringify(subjects).replace(/"/g, '&quot;')})">Add Slot</button>;
 
         timetableContainer.appendChild(section);
       });
