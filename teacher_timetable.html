@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teacher Timetable Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-white">
+
+  <!-- Header -->
+  <header class="bg-yellow-400 text-center p-4 text-2xl font-bold border-b-4 border-blue-900">
+    Teacher Timetable Panel
+  </header>
+
+  <!-- Main -->
+  <main class="p-6">
+    <!-- View Button -->
+    <div class="mb-4 text-center">
+      <button id="viewTimetableBtn" class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800">
+        View My Timetable
+      </button>
+    </div>
+
+    <!-- Timetable Output -->
+    <div id="timetableContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+  </main>
+
+  <!-- Firebase & Script -->
+  <script>
+    // 🔐 Your Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbpphH9wQ53Jo4evl8m4oNsaOXvombJVA",
+      authDomain: "timetable-d0e77.firebaseapp.com",
+      projectId: "timetable-d0e77",
+      storageBucket: "timetable-d0e77.firebasestorage.app",
+      messagingSenderId: "550695601869",
+      appId: "1:550695601869:web:655c568a1290ae582bcb84",
+      measurementId: "G-PCM44PV4CY"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const teacherId = "T001"; // 🧑‍🏫 Change this as needed
+
+    document.getElementById('viewTimetableBtn').addEventListener('click', async () => {
+      const container = document.getElementById('timetableContainer');
+      container.innerHTML = "";
+
+      try {
+        const snapshot = await db.collection("Timetables").get();
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const entries = data.entries || [];
+
+          entries.forEach(entry => {
+            if (entry.teacherId === teacherId) {
+              const card = document.createElement("div");
+              card.className = "border border-blue-900 rounded-lg p-4 shadow-md bg-white";
+              card.innerHTML = `
+                <h3 class="text-lg font-bold mb-1">${entry.subject}</h3>
+                <p><strong>Day:</strong> ${entry.day}</p>
+                <p><strong>Time:</strong> ${entry.time}</p>
+              `;
+              container.appendChild(card);
+            }
+          });
+        });
+
+        if (container.innerHTML === "") {
+          container.innerHTML = "<p class='text-center col-span-3 text-gray-500'>No timetable found for this teacher.</p>";
+        }
+      } catch (error) {
+        console.error("Error fetching timetable:", error);
+        alert("Failed to fetch timetable.");
+      }
+    });
+  </script>
+</body>
+</html>
