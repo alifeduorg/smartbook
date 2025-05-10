@@ -104,22 +104,6 @@
     margin-top: 0;
     color: #000080;
   }
-.add-slot-btn {
-  background-color: #000080; /* Navy Blue */
-  color: white;
-  font-weight: bold;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: background-color 0.3s;
-}
-
-.add-slot-btn:hover {
-  background-color: #003366; /* Darker shade on hover */
-}
-
 </style>
 
   <script type="module">
@@ -148,7 +132,7 @@
         const data = await response.json();
 
         const studentSelect = document.getElementById('student');
-        studentSelect.innerHTML = `<option value="">Select Student</option>`;
+        studentSelect.innerHTML = <option value="">Select Student</option>;
 
         const studentMap = {};
 
@@ -160,7 +144,7 @@
             };
             const option = document.createElement('option');
             option.value = entry.studentId;
-            option.textContent = `${entry.studentName} (${entry.studentId})`;
+            option.textContent = ${entry.studentName} (${entry.studentId});
             studentSelect.appendChild(option);
           }
           studentMap[entry.studentId].subjects.push({
@@ -194,14 +178,14 @@
         section.innerHTML = `<h3>${day}</h3><table id="table-${day}">
           <tr><th>Time</th><th>Subject</th><th>Teacher</th><th>Meeting Link</th><th>Action</th></tr>
         </table>
-        <button class="add-slot-btn" onclick="addRow('${day}', ${JSON.stringify(subjects).replace(/"/g, '&quot;')})">Add Slot</button>
+        <button onclick="addRow('${day}', ${JSON.stringify(subjects).replace(/"/g, '&quot;')})">Add Slot</button>`;
 
         timetableContainer.appendChild(section);
       });
     }
 
     window.addRow = function(day, subjects) {
-      const table = document.getElementById(`table-${day}`);
+      const table = document.getElementById(table-${day});
       const row = table.insertRow();
 
       const timeCell = row.insertCell(0);
@@ -210,12 +194,12 @@
       const linkCell = row.insertCell(3);
       const actionCell = row.insertCell(4);
 
-      timeCell.innerHTML = `<input type="time" required>`;
+      timeCell.innerHTML = <input type="time" required>;
 
       const subjectSelect = document.createElement('select');
       subjectSelect.required = true;
-      subjectSelect.innerHTML = `<option value="">Select</option>` +
-        subjects.map(s => `<option value="${s.subject}">${s.subject}</option>`).join('');
+      subjectSelect.innerHTML = <option value="">Select</option> +
+        subjects.map(s => <option value="${s.subject}">${s.subject}</option>).join('');
       subjectCell.appendChild(subjectSelect);
 
       const teacherInput = document.createElement('input');
@@ -228,8 +212,8 @@
         teacherInput.value = selected ? selected.teacherName : '';
       });
 
-      linkCell.innerHTML = `<input type="url" placeholder="https://...">`;
-      actionCell.innerHTML = `<button onclick="this.parentElement.parentElement.remove()">Remove</button>`;
+      linkCell.innerHTML = <input type="url" placeholder="https://...">;
+      actionCell.innerHTML = <button onclick="this.parentElement.parentElement.remove()">Remove</button>;
     }
 
     window.submitTimetable = async function() {
@@ -244,7 +228,7 @@
       const entries = [];
 
       days.forEach(day => {
-        const table = document.getElementById(`table-${day}`);
+        const table = document.getElementById(table-${day});
         if (!table) return;
         [...table.rows].slice(1).forEach(row => {
           const [time, subjectSel, teacher, link] = row.cells;
