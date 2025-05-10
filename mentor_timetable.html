@@ -85,7 +85,7 @@
         const data = await response.json();
 
         const studentSelect = document.getElementById('student');
-        studentSelect.innerHTML = <option value="">Select Student</option>;
+        studentSelect.innerHTML = `<option value="">Select Student</option>`;
 
         const studentMap = {};
 
@@ -97,7 +97,7 @@
             };
             const option = document.createElement('option');
             option.value = entry.studentId;
-            option.textContent = ${entry.studentName} (${entry.studentId});
+            option.textContent = `${entry.studentName} (${entry.studentId})`;
             studentSelect.appendChild(option);
           }
           studentMap[entry.studentId].subjects.push({
@@ -138,7 +138,7 @@
     }
 
     window.addRow = function(day, subjects) {
-      const table = document.getElementById(table-${day});
+      const table = document.getElementById(`table-${day}`);
       const row = table.insertRow();
 
       const timeCell = row.insertCell(0);
@@ -147,12 +147,12 @@
       const linkCell = row.insertCell(3);
       const actionCell = row.insertCell(4);
 
-      timeCell.innerHTML = <input type="time" required>;
+      timeCell.innerHTML = `<input type="time" required>`;
 
       const subjectSelect = document.createElement('select');
       subjectSelect.required = true;
-      subjectSelect.innerHTML = <option value="">Select</option> +
-        subjects.map(s => <option value="${s.subject}">${s.subject}</option>).join('');
+      subjectSelect.innerHTML = `<option value="">Select</option>` +
+        subjects.map(s => `<option value="${s.subject}">${s.subject}</option>`).join('');
       subjectCell.appendChild(subjectSelect);
 
       const teacherInput = document.createElement('input');
@@ -165,8 +165,8 @@
         teacherInput.value = selected ? selected.teacherName : '';
       });
 
-      linkCell.innerHTML = <input type="url" placeholder="https://...">;
-      actionCell.innerHTML = <button onclick="this.parentElement.parentElement.remove()">Remove</button>;
+      linkCell.innerHTML = `<input type="url" placeholder="https://...">`;
+      actionCell.innerHTML = `<button onclick="this.parentElement.parentElement.remove()">Remove</button>`;
     }
 
     window.submitTimetable = async function() {
@@ -181,7 +181,7 @@
       const entries = [];
 
       days.forEach(day => {
-        const table = document.getElementById(table-${day});
+        const table = document.getElementById(`table-${day}`);
         if (!table) return;
         [...table.rows].slice(1).forEach(row => {
           const [time, subjectSel, teacher, link] = row.cells;
