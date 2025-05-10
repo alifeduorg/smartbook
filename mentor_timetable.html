@@ -220,52 +220,75 @@
       btn.closest("table").insertBefore(row, btn.closest("tr"));
     }
 
-    function submitTimetable() {
-      const weekStart = document.getElementById("weekStart").value;
-      const studentId = document.getElementById("studentSelect").value;
-      const studentName = studentData[studentId].name;
+   function submitTimetable() {
+  const weekStart = document.getElementById("weekStart").value;
+  const studentId = document.getElementById("studentSelect").value;
+  const studentName = studentData[studentId]?.name;
 
-      if (!weekStart || !studentId) {
-        alert("Please select week and student");
-        return;
+  // Validate inputs
+  if (!weekStart || !studentId || !studentName) {
+    alert("Please select a valid week and student");
+    return;
+  }
+
+  const entries = [];
+
+  const tables = document.querySelectorAll("#timetable table");
+  tables.forEach(table => {
+    const day = table.querySelector(".day-title").textContent;
+    const rows = table.querySelectorAll("tr");
+
+    for (let i = 2; i < rows.length - 1; i++) {
+      const time = rows[i].querySelector(".time-input").value;
+      const subject = rows[i].querySelector(".subject-select").value;
+      const teacher = rows[i].querySelector(".teacher-input").value;
+      const link = rows[i].querySelector(".link-input").value;
+
+      if (time && subject && teacher && link) {
+        entries.push({
+          day, time, subject, teacher, link
+        });
       }
+    });
+  });
 
-      const entries = [];
+  if (entries.length === 0) {
+    alert("Please fill in at least one timetable entry.");
+    return;
+  }
 
-      const tables = document.querySelectorAll("#timetable table");
-      tables.forEach(table => {
-        const day = table.querySelector(".day-title").textContent;
-        const rows = table.querySelectorAll("tr");
+  // Prepare the data to send
+  const dataToSubmit = {
+    weekStart,
+    studentId,
+    studentName,
+    entries
+  };
 
-        for (let i = 2; i < rows.length - 1; i++) {
-          const time = rows[i].querySelector(".time-input").value;
-          const subject = rows[i].querySelector(".subject-select").value;
-          const teacher = rows[i].querySelector(".teacher-input").value;
-          const link = rows[i].querySelector(".link-input").value;
+  console.log("Submitting data:", dataToSubmit); // Log data before submitting
 
-          if (time && subject && teacher && link) {
-            entries.push({
-              day, time, subject, teacher, link
-            });
-          }
-        }
-      });
-
-      fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify({
-          weekStart, studentId, studentName, entries
-        }),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) alert("Timetable submitted successfully!");
-        else alert("Error submitting timetable.");
-      });
+  // Send the data via POST request
+  fetch(scriptURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dataToSubmit)
+  })
+  .then(response => response.json())
+  .then(res => {
+    console.log("Response from server:", res); // Log the server response
+    if (res.success) {
+      alert("Timetable submitted successfully!");
+    } else {
+      alert("Error submitting timetable. Please try again.");
     }
+  })
+  .catch(error => {
+    console.error("Error during submission:", error); // Log any errors
+    alert("Error during submission. Check the console for more details.");
+  });
+}
   </script>
 
 </body>
