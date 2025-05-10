@@ -2,212 +2,262 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Timetable Panel</title>
+  <title>Mentor Timetable Planner</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fdfdfd;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #1d3557;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    h2 {
+      color: #1d3557;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
       padding: 20px;
     }
 
-    h1 {
-      text-align: center;
-      color: navy;
-    }
-
-    .input-section, #timetable, button {
-      max-width: 900px;
-      margin: 20px auto;
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
     }
 
     label {
-      margin-right: 10px;
+      font-weight: bold;
     }
 
-    select, input[type="date"], input[type="text"] {
-      margin-bottom: 10px;
-      padding: 6px;
+    select, input[type="text"], input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 40px;
-      box-shadow: 0 0 10px #ccc;
+      margin-bottom: 10px;
     }
 
     th, td {
-      border: 1px solid #999;
       padding: 8px;
-      text-align: center;
+      border: 1px solid #ccc;
     }
 
-    .add-row-btn {
-      background: #4caf50;
-      color: white;
-      padding: 5px 10px;
-      margin: 5px;
+    th {
+      background-color: #f1c40f;
+      color: #1d3557;
+    }
+
+    .btn {
+      background-color: #f1c40f;
+      color: #1d3557;
+      padding: 10px 15px;
       border: none;
+      border-radius: 5px;
       cursor: pointer;
-    }
-
-    .submit-btn {
-      display: block;
-      margin: 0 auto;
-      padding: 10px 30px;
-      font-size: 16px;
-      background: navy;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .day-title {
       font-weight: bold;
-      background: #eee;
+    }
+
+    .btn:hover {
+      background-color: #d4ac0d;
+    }
+
+    .day-table {
+      margin-bottom: 30px;
     }
   </style>
 </head>
 <body>
-
-  <h1>Student Timetable Panel</h1>
-
-  <div class="input-section">
-    <label for="weekStart">Select Week Starting:</label>
-    <input type="date" id="weekStart" required>
+  <header>
+    <h1>Mentor Timetable Planner</h1>
+  </header>
+  <div class="container card">
+    <label for="weekStart">Week Starting Date:</label>
+    <input type="date" id="weekStart">
 
     <label for="studentSelect">Select Student:</label>
-    <select id="studentSelect" required>
-      <option value="">--Choose Student--</option>
+    <select id="studentSelect">
+      <option value="">-- Select Student --</option>
     </select>
   </div>
 
-  <div id="timetable"></div>
+  <div id="timetableContainer" class="container"></div>
 
-  <button class="submit-btn" onclick="submitTimetable()">Submit Timetable</button>
+  <div class="container">
+    <button class="btn" onclick="submitTimetable()">Submit Timetable</button>
+  </div>
 
   <script>
-    // Firebase config
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBbpphH9wQ53Jo4evl8m4oNsaOXvombJVA",
       authDomain: "timetable-d0e77.firebaseapp.com",
       projectId: "timetable-d0e77",
-      storageBucket: "timetable-d0e77.appspot.com",
+      storageBucket: "timetable-d0e77.firebasestorage.app",
       messagingSenderId: "550695601869",
       appId: "1:550695601869:web:655c568a1290ae582bcb84",
       measurementId: "G-PCM44PV4CY"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Fetch student data from Google Apps Script URL
-    async function fetchStudents() {
-      try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec');
-        const data = await response.json();
+    let studentData = [];
 
-        // Populate the student select dropdown
-        const studentSelect = document.getElementById("studentSelect");
-        data.students.forEach(student => {
-          const option = document.createElement("option");
-          option.value = student.id;
-          option.textContent = `${student.name} (${student.id})`;
-          studentSelect.appendChild(option);
-        });
-      } catch (error) {
-        console.error("Error fetching students:", error);
-      }
+    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    // Fetch student-subject-teacher data
+    fetch("https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec")
+      .then(res => res.json())
+      .then(data => {
+        studentData = data.data;
+        populateStudents();
+      });
+
+    function populateStudents() {
+      const studentSelect = document.getElementById("studentSelect");
+      const studentIds = [...new Set(studentData.map(d => d["Student ID"]))];
+      studentIds.forEach(id => {
+        const name = studentData.find(d => d["Student ID"] === id)["Student Name"];
+        const option = document.createElement("option");
+        option.value = id;
+        option.text = `${name} (${id})`;
+        studentSelect.add(option);
+      });
     }
 
-    fetchStudents(); // Call function to fetch students when the page loads
+    document.getElementById("studentSelect").addEventListener("change", renderTimetable);
 
-    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    function renderTimetable() {
+      const container = document.getElementById("timetableContainer");
+      const studentId = document.getElementById("studentSelect").value;
+      container.innerHTML = "";
 
-    // Generate timetable tables
-    const timetableDiv = document.getElementById("timetable");
-    daysOfWeek.forEach(day => {
-      const table = document.createElement("table");
-      table.innerHTML = `
-        <thead>
-          <tr><th colspan="5" class="day-title">${day}</th></tr>
-          <tr>
-            <th>Time</th>
-            <th>Subject</th>
-            <th>Teacher</th>
-            <th>Class Link</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><input type="text" class="time-input" placeholder="e.g. 10:00 AM" /></td>
-            <td><input type="text" class="subject-select" placeholder="Subject" /></td>
-            <td><input type="text" class="teacher-input" placeholder="Teacher Name" /></td>
-            <td><input type="text" class="link-input" placeholder="https://..." /></td>
-            <td><button class="add-row-btn" onclick="addRow(this)">+</button></td>
-          </tr>
-        </tbody>
+      if (!studentId) return;
+
+      const studentName = studentData.find(d => d["Student ID"] === studentId)["Student Name"];
+      const subjects = [...new Set(studentData.filter(d => d["Student ID"] === studentId).map(d => d["Subject"]))];
+
+      weekdays.forEach(day => {
+        const dayDiv = document.createElement("div");
+        dayDiv.className = "card day-table";
+        const heading = document.createElement("h2");
+        heading.textContent = day;
+        dayDiv.appendChild(heading);
+
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Subject</th>
+              <th>Teacher</th>
+              <th>Link</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="${day}-tbody"></tbody>
+        `;
+        dayDiv.appendChild(table);
+
+        const addRowBtn = document.createElement("button");
+        addRowBtn.textContent = "Add Row";
+        addRowBtn.className = "btn";
+        addRowBtn.onclick = () => addRow(day, subjects, studentId);
+        dayDiv.appendChild(addRowBtn);
+
+        container.appendChild(dayDiv);
+
+        // Initial one row
+        addRow(day, subjects, studentId);
+      });
+    }
+
+    function addRow(day, subjects, studentId) {
+      const tbody = document.getElementById(`${day}-tbody`);
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td><input type="text" placeholder="10:00 AM - 11:00 AM"></td>
+        <td>
+          <select onchange="updateTeacher(this, '${studentId}')">
+            <option value="">Select</option>
+            ${subjects.map(s => `<option value="${s}">${s}</option>`).join("")}
+          </select>
+        </td>
+        <td><input type="text" readonly></td>
+        <td><input type="text" placeholder="https://..."></td>
+        <td><button class="btn" onclick="this.closest('tr').remove()">Remove</button></td>
       `;
-      timetableDiv.appendChild(table);
-    });
-
-    function addRow(button) {
-      const row = button.closest("tr");
-      const clone = row.cloneNode(true);
-      clone.querySelectorAll("input").forEach(input => input.value = "");
-      row.parentNode.insertBefore(clone, row.nextSibling);
+      tbody.appendChild(tr);
     }
 
-    async function submitTimetable() {
+    function updateTeacher(selectEl, studentId) {
+      const subject = selectEl.value;
+      const teacherField = selectEl.parentElement.nextElementSibling.firstElementChild;
+      const entry = studentData.find(d => d["Student ID"] === studentId && d["Subject"] === subject);
+      teacherField.value = entry ? entry["Teacher Name"] : "";
+    }
+
+    function submitTimetable() {
       const weekStart = document.getElementById("weekStart").value;
       const studentId = document.getElementById("studentSelect").value;
+      const studentName = studentData.find(d => d["Student ID"] === studentId)?.["Student Name"];
 
       if (!weekStart || !studentId) {
-        alert("Please select week and student");
+        alert("Please select week and student.");
         return;
       }
 
-      const entries = [];
-      const tables = document.querySelectorAll("#timetable table");
+      const timetable = {
+        weekStart,
+        studentId,
+        studentName,
+        schedule: []
+      };
 
-      tables.forEach(table => {
-        const day = table.querySelector(".day-title").textContent;
-        const rows = table.querySelectorAll("tbody tr");
-
+      weekdays.forEach(day => {
+        const rows = document.querySelectorAll(`#${day}-tbody tr`);
         rows.forEach(row => {
-          const time = row.querySelector(".time-input").value;
-          const subject = row.querySelector(".subject-select").value;
-          const teacher = row.querySelector(".teacher-input").value;
-          const link = row.querySelector(".link-input").value;
+          const [timeEl, subjectEl, teacherEl, linkEl] = row.querySelectorAll("input, select");
+          const time = timeEl.value.trim();
+          const subject = subjectEl.value.trim();
+          const teacher = teacherEl.value.trim();
+          const link = linkEl.value.trim();
 
           if (time && subject && teacher && link) {
-            entries.push({ day, time, subject, teacher, link });
+            timetable.schedule.push({ day, time, subject, teacher, link });
           }
         });
       });
 
-      try {
-        // Store timetable in Firebase
-        await db.collection("timetables").add({
-          weekStart,
-          studentId,
-          entries,
-          timestamp: new Date()
+      db.collection("Timetables").add(timetable)
+        .then(() => {
+          alert("Timetable submitted successfully!");
+        })
+        .catch(err => {
+          alert("Error submitting timetable.");
+          console.error(err);
         });
-        alert("Timetable saved to Firebase successfully!");
-      } catch (err) {
-        console.error("Error saving to Firebase:", err);
-        alert("Failed to save timetable.");
-      }
     }
   </script>
 </body>
