@@ -226,19 +226,30 @@
       }
     });
 
+    // Debugging - log the data to verify everything is collected correctly
+    console.log({
+      weekStart, studentId, studentName, entries
+    });
+
+    // Change fetch to a simpler POST request with form data
+    const formData = new FormData();
+    formData.append("weekStart", weekStart);
+    formData.append("studentId", studentId);
+    formData.append("studentName", studentName);
+    formData.append("entries", JSON.stringify(entries));
+
     fetch(scriptURL, {
       method: "POST",
-      body: JSON.stringify({
-        weekStart, studentId, studentName, entries
-      }),
-      headers: {
-        "Content-Type": "application/json"
-      }
+      body: formData
     })
     .then(res => res.json())
     .then(res => {
+      console.log(res); // Log the response from the server
       if (res.success) alert("Timetable submitted successfully!");
       else alert("Error submitting timetable.");
+    })
+    .catch(error => {
+      console.error("Error submitting timetable:", error);
     });
   }
 </script>
