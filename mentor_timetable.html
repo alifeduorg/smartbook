@@ -85,7 +85,7 @@
         const data = await response.json();
 
         const studentSelect = document.getElementById('student');
-        studentSelect.innerHTML = `<option value="">Select Student</option>`;
+        studentSelect.innerHTML = <option value="">Select Student</option>;
 
         const studentMap = {};
 
@@ -97,7 +97,7 @@
             };
             const option = document.createElement('option');
             option.value = entry.studentId;
-            option.textContent = `${entry.studentName} (${entry.studentId})`;
+            option.textContent = ${entry.studentName} (${entry.studentId});
             studentSelect.appendChild(option);
           }
           studentMap[entry.studentId].subjects.push({
@@ -138,7 +138,7 @@
     }
 
     window.addRow = function(day, subjects) {
-      const table = document.getElementById(`table-${day}`);
+      const table = document.getElementById(table-${day});
       const row = table.insertRow();
 
       const timeCell = row.insertCell(0);
@@ -147,12 +147,12 @@
       const linkCell = row.insertCell(3);
       const actionCell = row.insertCell(4);
 
-      timeCell.innerHTML = `<input type="time" required>`;
+      timeCell.innerHTML = <input type="time" required>;
 
       const subjectSelect = document.createElement('select');
       subjectSelect.required = true;
-      subjectSelect.innerHTML = `<option value="">Select</option>` +
-        subjects.map(s => `<option value="${s.subject}">${s.subject}</option>`).join('');
+      subjectSelect.innerHTML = <option value="">Select</option> +
+        subjects.map(s => <option value="${s.subject}">${s.subject}</option>).join('');
       subjectCell.appendChild(subjectSelect);
 
       const teacherInput = document.createElement('input');
@@ -165,61 +165,54 @@
         teacherInput.value = selected ? selected.teacherName : '';
       });
 
-      linkCell.innerHTML = `<input type="url" placeholder="https://...">`;
-      actionCell.innerHTML = `<button onclick="this.parentElement.parentElement.remove()">Remove</button>`;
+      linkCell.innerHTML = <input type="url" placeholder="https://...">;
+      actionCell.innerHTML = <button onclick="this.parentElement.parentElement.remove()">Remove</button>;
     }
 
-   window.submitTimetable = async function () {
-  const weekStart = document.getElementById('weekStart').value;
-  const studentId = document.getElementById('student').value;
-  if (!weekStart || !studentId) {
-    alert("Please select week start date and student.");
-    return;
-  }
-
-  const studentName = window.studentMap[studentId].name;
-  const entries = [];
-
-  days.forEach(day => {
-    const table = document.getElementById(`table-${day}`);
-    if (!table) return;
-    [...table.rows].slice(1).forEach(row => {
-      const [time, subjectSel, teacher, link] = row.cells;
-      const timeVal = time.querySelector('input').value;
-      const subjectVal = subjectSel.querySelector('select').value;
-      const teacherVal = teacher.querySelector('input').value;
-      const linkVal = link.querySelector('input').value;
-      if (timeVal && subjectVal && teacherVal) {
-        entries.push({ day, time: timeVal, subject: subjectVal, teacher: teacherVal, link: linkVal });
+    window.submitTimetable = async function() {
+      const weekStart = document.getElementById('weekStart').value;
+      const studentId = document.getElementById('student').value;
+      if (!weekStart || !studentId) {
+        alert("Please select week start date and student.");
+        return;
       }
-    });
-  });
 
-  if (entries.length === 0) {
-    alert("Please fill at least one timetable entry.");
-    return;
-  }
+      const studentName = window.studentMap[studentId].name;
+      const entries = [];
 
-  // Save to Firebase
-  await addDoc(collection(db, 'Timetables'), {
-    weekStart,
-    studentId,
-    studentName,
-    entries,
-    timestamp: new Date()
-  });
+      days.forEach(day => {
+        const table = document.getElementById(table-${day});
+        if (!table) return;
+        [...table.rows].slice(1).forEach(row => {
+          const [time, subjectSel, teacher, link] = row.cells;
+          const timeVal = time.querySelector('input').value;
+          const subjectVal = subjectSel.querySelector('select').value;
+          const teacherVal = teacher.querySelector('input').value;
+          const linkVal = link.querySelector('input').value;
+          if (timeVal && subjectVal && teacherVal) {
+            entries.push({ day, time: timeVal, subject: subjectVal, teacher: teacherVal, link: linkVal });
+          }
+        });
+      });
 
-  // Send to Google Sheets
-  await sendToGoogleSheet(studentId, studentName, entries);
+      if (entries.length === 0) {
+        alert("Please fill at least one timetable entry.");
+        return;
+      }
 
-  alert("Timetable submitted to Firebase and Google Sheet.");
-  location.reload();
-}
+      await addDoc(collection(db, 'Timetables'), {
+        weekStart,
+        studentId,
+        studentName,
+        entries
+      });
 
+      alert("Timetable submitted successfully.");
+      location.reload();
+    }
 
     fetchStudentSubjectData();
   </script>
-  <script type="module" src="./timetable.js"></script>
 </head>
 <body>
   <header>
