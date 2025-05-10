@@ -1,91 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Mentor Timetable Entry</title>
-  <script type="module">
-    // Firebase SDK
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDYIyQzr54GA43x_cufpagOP2ok241XMH0",
-      authDomain: "timetable-33ed7.firebaseapp.com",
-      projectId: "timetable-33ed7",
-      storageBucket: "timetable-33ed7.appspot.com",
-      messagingSenderId: "836762615251",
-      appId: "1:836762615251:web:609f528ba981f563a28326",
-      measurementId: "G-EMN5PXSQK1"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Fetch student data
-    async function fetchStudentData() {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec");
-      const students = await response.json();
-      const dropdown = document.getElementById("studentSelect");
-      dropdown.innerHTML = `<option value="">Select Student</option>`;
-      students.forEach(stud => {
-        const option = document.createElement("option");
-        option.value = JSON.stringify(stud);
-        option.text = `${stud["Student Name"]} (${stud["Student ID"]})`;
-        dropdown.appendChild(option);
-      });
-    }
-
-    window.onload = () => {
-      fetchStudentData();
-
-      document.getElementById("submitBtn").addEventListener("click", async () => {
-        const selectedData = JSON.parse(document.getElementById("studentSelect").value || "{}");
-        const date = document.getElementById("date").value;
-        const time = document.getElementById("time").value;
-        const topic = document.getElementById("topic").value;
-
-        if (!selectedData["Student ID"] || !date || !time || !topic) {
-          alert("Please fill all fields.");
-          return;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Submission</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
         }
-
-        try {
-          await addDoc(collection(db, "Mentor_Timetable"), {
-            studentID: selectedData["Student ID"],
-            studentName: selectedData["Student Name"],
-            subject: selectedData["Subject"],
-            teacherName: selectedData["Teacher Name"],
-            teacherID: selectedData["Teacher ID"],
-            date: date,
-            time: time,
-            topic: topic,
-            timestamp: new Date().toISOString()
-          });
-          alert("Timetable submitted successfully!");
-          document.getElementById("timetableForm").reset();
-        } catch (error) {
-          console.error("Error submitting timetable:", error);
-          alert("Error submitting timetable.");
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
         }
-      });
-    };
-  </script>
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-size: 14px;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-  <h2>Mentor Timetable Entry</h2>
-  <form id="timetableForm">
-    <label for="studentSelect">Student:</label><br>
-    <select id="studentSelect" required></select><br><br>
 
-    <label for="date">Date:</label><br>
-    <input type="date" id="date" required><br><br>
+    <div class="container">
+        <h1>Submit Timetable</h1>
+        <form id="timetable-form">
+            <div class="form-group">
+                <label for="studentId">Student ID</label>
+                <input type="text" id="studentId" name="studentId" required />
+            </div>
+            <div class="form-group">
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" name="studentName" required />
+            </div>
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" required />
+            </div>
+            <div class="form-group">
+                <label for="teacherName">Teacher Name</label>
+                <input type="text" id="teacherName" name="teacherName" required />
+            </div>
+            <div class="form-group">
+                <label for="teacherId">Teacher ID</label>
+                <input type="text" id="teacherId" name="teacherId" required />
+            </div>
+            <button type="submit">Submit Timetable</button>
+        </form>
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
+    </div>
 
-    <label for="time">Time:</label><br>
-    <input type="time" id="time" required><br><br>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYIyQzr54GA43x_cufpagOP2ok241XMH0",
+    authDomain: "timetable-33ed7.firebaseapp.com",
+    projectId: "timetable-33ed7",
+    storageBucket: "timetable-33ed7.appspot.com",
+    messagingSenderId: "836762615251",
+    appId: "1:836762615251:web:609f528ba981f563a28326",
+    measurementId: "G-EMN5PXSQK1"
+        };
 
-    <label for="topic">Topic:</label><br>
-    <input type="text" id="topic" required><br><br>
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
 
-    <button type="button" id="submitBtn">Submit Timetable</button>
-  </form>
+        // Handle form submission
+        document.getElementById("timetable-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const studentId = document.getElementById("studentId").value;
+            const studentName = document.getElementById("studentName").value;
+            const subject = document.getElementById("subject").value;
+            const teacherName = document.getElementById("teacherName").value;
+            const teacherId = document.getElementById("teacherId").value;
+
+            // Clear previous messages
+            document.getElementById("error-message").textContent = "";
+            document.getElementById("success-message").textContent = "";
+
+            // Add data to Firestore
+            db.collection("Timetable").add({
+                studentId: studentId,
+                studentName: studentName,
+                subject: subject,
+                teacherName: teacherName,
+                teacherId: teacherId
+            })
+            .then(() => {
+                document.getElementById("success-message").textContent = "Timetable submitted successfully!";
+                document.getElementById("timetable-form").reset();
+            })
+            .catch((error) => {
+                document.getElementById("error-message").textContent = "Error submitting timetable: " + error.message;
+            });
+        });
+    </script>
 </body>
 </html>
