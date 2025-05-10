@@ -196,6 +196,7 @@
       });
 
       try {
+        // Store timetable in Firebase
         await db.collection("timetables").add({
           weekStart,
           studentId,
