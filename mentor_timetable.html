@@ -60,24 +60,6 @@
     }
   </style>
   <script type="module">
-    function sendToGoogleSheet(studentId, studentName, weekStart, entries) {
-  fetch("https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec", {
-    method: "POST",
-    body: JSON.stringify({
-      studentId,
-      studentName,
-      weekStart,
-      entries
-    }),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-  .then(res => res.text())
-  .then(result => console.log("✅ Google Sheet response:", result))
-  .catch(error => console.error("❌ Error sending to sheet:", error));
-}
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -218,20 +200,18 @@
         return;
       }
 
-        await addDoc(collection(db, 'Timetables'), {
+      await addDoc(collection(db, 'Timetables'), {
         weekStart,
         studentId,
         studentName,
         entries
       });
-sendToGoogleSheet(studentId, studentName, weekStart, entries);
 
       alert("Timetable submitted successfully.");
       location.reload();
     }
 
     fetchStudentSubjectData();
-
   </script>
 </head>
 <body>
