@@ -3,148 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timetable Submission</title>
-    
+    <title>Student Details from Google Sheets</title>
+
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.9.0/firebase-firestore.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        #students-list {
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style-type: none;
             padding: 0;
         }
-        .container {
-            width: 80%;
-            margin: 50px auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            font-size: 14px;
-            color: #333;
-        }
-        input, select {
-            width: 100%;
+
+        li {
+            background-color: #fff;
+            margin: 10px 0;
             padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #28a745;
-            border: none;
+
+        .add-btn {
+            background-color: #4CAF50;
             color: white;
-            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            border-radius: 4px;
+            font-size: 16px;
         }
-        button:hover {
-            background-color: #218838;
+
+        .add-btn:hover {
+            background-color: #45a049;
         }
-        .error-message {
-            color: red;
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .loading {
             text-align: center;
-            margin-top: 15px;
+            font-size: 18px;
+            color: #333;
         }
-        .success-message {
-            color: green;
-            text-align: center;
-            margin-top: 15px;
-        }
+
     </style>
 </head>
 <body>
+    <h1>Student Details from Google Sheets</h1>
 
-    <div class="container">
-        <h1>Submit Timetable</h1>
-        <form id="timetable-form">
-            <div class="form-group">
-                <label for="studentId">Student ID</label>
-                <input type="text" id="studentId" name="studentId" required />
-            </div>
-            <div class="form-group">
-                <label for="studentName">Student Name</label>
-                <input type="text" id="studentName" name="studentName" required />
-            </div>
-            <div class="form-group">
-                <label for="subject">Subject</label>
-                <input type="text" id="subject" name="subject" required />
-            </div>
-            <div class="form-group">
-                <label for="teacherName">Teacher Name</label>
-                <input type="text" id="teacherName" name="teacherName" required />
-            </div>
-            <div class="form-group">
-                <label for="teacherId">Teacher ID</label>
-                <input type="text" id="teacherId" name="teacherId" required />
-            </div>
-            <button type="submit">Submit Timetable</button>
-        </form>
-        <div class="error-message" id="error-message"></div>
-        <div class="success-message" id="success-message"></div>
-    </div>
+    <!-- Display the student list -->
+    <div id="students-list" class="loading">Loading student data...</div>
 
+    <!-- Firebase Config (optional, if you need to use Firebase later) -->
     <script>
-        // Firebase configuration
+        // Your Firebase configuration (Optional)
         const firebaseConfig = {
-            apiKey: "AIzaSyDYIyQzr54GA43x_cufpagOP2ok241XMH0",
-    authDomain: "timetable-33ed7.firebaseapp.com",
-    projectId: "timetable-33ed7",
-    storageBucket: "timetable-33ed7.appspot.com",
-    messagingSenderId: "836762615251",
-    appId: "1:836762615251:web:609f528ba981f563a28326",
-    measurementId: "G-EMN5PXSQK1"
+            apiKey: "AIzaSyBbpphH9wQ53Jo4evl8m4oNsaOXvombJVA",
+            authDomain: "timetable-d0e77.firebaseapp.com",
+            projectId: "timetable-d0e77",
+            storageBucket: "timetable-d0e77.appspot.com",
+            messagingSenderId: "550695601869",
+            appId: "1:550695601869:web:655c568a1290ae582bcb84",
+            measurementId: "G-PCM44PV4CY"
         };
 
-        // Initialize Firebase
+        // Initialize Firebase (Optional)
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(app);
+    </script>
 
-        // Handle form submission
-        document.getElementById("timetable-form").addEventListener("submit", function(event) {
-            event.preventDefault();
+    <!-- Fetch data from Google Sheet using Apps Script -->
+    <script>
+        // Google Apps Script URL to fetch data from the Google Sheet
+        const googleSheetDataURL = "https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec";
 
-            const studentId = document.getElementById("studentId").value;
-            const studentName = document.getElementById("studentName").value;
-            const subject = document.getElementById("subject").value;
-            const teacherName = document.getElementById("teacherName").value;
-            const teacherId = document.getElementById("teacherId").value;
+        // Function to fetch student data from Google Sheets and display it
+        async function fetchStudentData() {
+            try {
+                const response = await fetch(googleSheetDataURL);
+                const data = await response.json();
 
-            // Clear previous messages
-            document.getElementById("error-message").textContent = "";
-            document.getElementById("success-message").textContent = "";
+                if (data.length > 0) {
+                    displayStudentTable(data);
+                } else {
+                    document.getElementById("students-list").innerHTML = "No student data available.";
+                }
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+                document.getElementById("students-list").innerHTML = "Error loading student data.";
+            }
+        }
 
-            // Add data to Firestore
-            db.collection("Timetable").add({
-                studentId: studentId,
-                studentName: studentName,
-                subject: subject,
-                teacherName: teacherName,
-                teacherId: teacherId
-            })
-            .then(() => {
-                document.getElementById("success-message").textContent = "Timetable submitted successfully!";
-                document.getElementById("timetable-form").reset();
-            })
-            .catch((error) => {
-                document.getElementById("error-message").textContent = "Error submitting timetable: " + error.message;
+        // Function to display student data in a table
+        function displayStudentTable(data) {
+            let tableHTML = "<table>";
+            tableHTML += "<thead><tr><th>Student ID</th><th>Student Name</th><th>Subject</th><th>Teacher Name</th><th>Teacher ID</th></tr></thead>";
+            tableHTML += "<tbody>";
+
+            data.forEach(student => {
+                tableHTML += `<tr>
+                    <td>${student['Student ID']}</td>
+                    <td>${student['Student Name']}</td>
+                    <td>${student['Subject']}</td>
+                    <td>${student['Teacher Name']}</td>
+                    <td>${student['Teacher ID']}</td>
+                </tr>`;
             });
-        });
+
+            tableHTML += "</tbody></table>";
+
+            // Replace loading text with the student data table
+            document.getElementById("students-list").innerHTML = tableHTML;
+        }
+
+        // Call the fetchStudentData function on page load
+        fetchStudentData();
     </script>
 </body>
 </html>
