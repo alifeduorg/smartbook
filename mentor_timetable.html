@@ -39,12 +39,13 @@
       margin-top: 1rem;
     }
     th, td {
-      border: 1px solid #ccc;
+      border: 2px solid navy;
       padding: 0.5rem;
       text-align: left;
     }
     th {
-      background: #f5f5f5;
+      background: goldenrod;
+      color: white;
     }
     .day-section {
       margin-top: 2rem;
@@ -68,11 +69,8 @@
     <label for="weekStart">Select Week Start Date:</label>
     <input type="date" id="weekStart" required />
 
-    <label for="student">Select Student:</label>
-    <select id="student" required>
-      <option value="">Select Student</option>
-      <!-- Mentors can manually type the names here -->
-    </select>
+    <label for="studentName">Enter Student Name:</label>
+    <input type="text" id="studentName" placeholder="Enter Student Name" required />
 
     <div id="timetableContainer"></div>
 
@@ -83,24 +81,9 @@
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const timetableContainer = document.getElementById('timetableContainer');
 
-    // Add mentor manually (can be extended to dynamic fetching from API if needed)
-    const mentors = [
-      { id: 1, name: 'Mentor 1' },
-      { id: 2, name: 'Mentor 2' },
-      { id: 3, name: 'Mentor 3' }
-    ];
-
-    const studentSelect = document.getElementById('student');
-    mentors.forEach(mentor => {
-      const option = document.createElement('option');
-      option.value = mentor.id;
-      option.textContent = mentor.name;
-      studentSelect.appendChild(option);
-    });
-
     function generateTimetable() {
-      const studentId = document.getElementById('student').value;
-      if (!studentId) return;
+      const studentName = document.getElementById('studentName').value;
+      if (!studentName) return;
 
       timetableContainer.innerHTML = '';
 
@@ -136,13 +119,12 @@
 
     async function submitTimetable() {
       const weekStart = document.getElementById('weekStart').value;
-      const studentId = document.getElementById('student').value;
-      if (!weekStart || !studentId) {
-        alert("Please select week start date and student.");
+      const studentName = document.getElementById('studentName').value;
+      if (!weekStart || !studentName) {
+        alert("Please select week start date and student name.");
         return;
       }
 
-      const studentName = mentors.find(mentor => mentor.id === parseInt(studentId)).name;
       const entries = [];
 
       days.forEach(day => {
@@ -187,7 +169,7 @@
     }
 
     // Initialize the timetable
-    studentSelect.addEventListener('change', generateTimetable);
+    document.getElementById('studentName').addEventListener('input', generateTimetable);
   </script>
 </body>
 </html>
