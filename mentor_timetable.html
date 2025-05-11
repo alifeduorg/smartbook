@@ -59,39 +59,99 @@
       padding: 0.75rem 2rem;
     }
   </style>
-  <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec'; // Replace with your Web App URL
+</head>
+<body>
+  <header>
+    <h1>Mentor Timetable Planner</h1>
+  </header>
+  <div class="container">
+    <label for="weekStart">Select Week Start Date:</label>
+    <input type="date" id="weekStart" required />
 
-    async function testConnection() {
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify({ test: "hello" }),
-          headers: { "Content-Type": "application/json" }
-        });
-        const result = await res.json();
-        alert("✅ Success: " + result.message);
-      } catch (err) {
-        alert("❌ Error: " + err.message);
-      }
+    <label for="student">Select Student:</label>
+    <select id="student" required>
+      <option value="">Select Student</option>
+      <!-- Mentors can manually type the names here -->
+    </select>
+
+    <div id="timetableContainer"></div>
+
+    <button class="submit-btn" onclick="submitTimetable()">Submit Timetable</button>
+  </div>
+
+  <script>
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const timetableContainer = document.getElementById('timetableContainer');
+
+    // Add mentor manually (can be extended to dynamic fetching from API if needed)
+    const mentors = [
+      { id: 1, name: 'Mentor 1' },
+      { id: 2, name: 'Mentor 2' },
+      { id: 3, name: 'Mentor 3' }
+    ];
+
+    const studentSelect = document.getElementById('student');
+    mentors.forEach(mentor => {
+      const option = document.createElement('option');
+      option.value = mentor.id;
+      option.textContent = mentor.name;
+      studentSelect.appendChild(option);
+    });
+
+    function generateTimetable() {
+      const studentId = document.getElementById('student').value;
+      if (!studentId) return;
+
+      timetableContainer.innerHTML = '';
+
+      days.forEach(day => {
+        const section = document.createElement('div');
+        section.className = 'day-section';
+
+        section.innerHTML = `<h3>${day}</h3><table id="table-${day}">
+          <tr><th>Time</th><th>Subject</th><th>Teacher</th><th>Meeting Link</th><th>Action</th></tr>
+        </table>
+        <button onclick="addRow('${day}')">Add Slot</button>`;
+
+        timetableContainer.appendChild(section);
+      });
+    }
+
+    function addRow(day) {
+      const table = document.getElementById(`table-${day}`);
+      const row = table.insertRow();
+
+      const timeCell = row.insertCell(0);
+      const subjectCell = row.insertCell(1);
+      const teacherCell = row.insertCell(2);
+      const linkCell = row.insertCell(3);
+      const actionCell = row.insertCell(4);
+
+      timeCell.innerHTML = `<input type="time" required>`;
+      subjectCell.innerHTML = `<input type="text" placeholder="Subject" required>`;
+      teacherCell.innerHTML = `<input type="text" placeholder="Teacher" required>`;
+      linkCell.innerHTML = `<input type="url" placeholder="https://..." required>`;
+      actionCell.innerHTML = `<button onclick="this.parentElement.parentElement.remove()">Remove</button>`;
     }
 
     async function submitTimetable() {
       const weekStart = document.getElementById('weekStart').value;
-      const studentName = document.getElementById('studentName').value;
-      if (!weekStart || !studentName) {
-        alert("Please enter Week Start Date and Student Name.");
+      const studentId = document.getElementById('student').value;
+      if (!weekStart || !studentId) {
+        alert("Please select week start date and student.");
         return;
       }
 
+      const studentName = mentors.find(mentor => mentor.id === parseInt(studentId)).name;
       const entries = [];
-      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
       days.forEach(day => {
         const table = document.getElementById(`table-${day}`);
+        if (!table) return;
         [...table.rows].slice(1).forEach(row => {
           const [time, subject, teacher, link] = row.cells;
           const timeVal = time.querySelector('input').value;
-          const subjectVal = subject.querySelector('select').value;
+          const subjectVal = subject.querySelector('input').value;
           const teacherVal = teacher.querySelector('input').value;
           const linkVal = link.querySelector('input').value;
           if (timeVal && subjectVal && teacherVal) {
@@ -105,43 +165,29 @@
         return;
       }
 
-      const data = { weekStart, studentName, entries };
+      const response = await fetch('https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          weekStart,
+          studentName,
+          entries
+        })
+      });
 
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" }
-        });
-        const result = await res.json();
-        if (result.success) {
-          alert("✅ Timetable submitted successfully!");
-        } else {
-          alert("❌ Error: " + result.message);
-        }
-      } catch (error) {
-        alert("❌ Error submitting timetable: " + error.message);
+      const result = await response.json();
+      if (result.success) {
+        alert("Timetable submitted successfully.");
+        location.reload();
+      } else {
+        alert("Error: " + result.message);
       }
     }
+
+    // Initialize the timetable
+    studentSelect.addEventListener('change', generateTimetable);
   </script>
-</head>
-<body>
-  <header>
-    <h1>Mentor Timetable Planner</h1>
-  </header>
-  <div class="container">
-    <label for="weekStart">Select Week Start Date:</label>
-    <input type="date" id="weekStart" required />
-
-    <label for="studentName">Student Name:</label>
-    <input type="text" id="studentName" required />
-
-    <div id="timetableContainer">
-      <!-- Add your timetable generation logic here. Each day of the week will have a table. -->
-    </div>
-
-    <button onclick="testConnection()">Test Connection</button>
-    <button class="submit-btn" onclick="submitTimetable()">Submit Timetable</button>
-  </div>
 </body>
 </html>
