@@ -34,7 +34,8 @@
       padding: 2rem;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
-      height: 80vh;
+      height: 70vh;
+      margin-top: 20px;
     }
     label {
       font-weight: bold;
@@ -112,6 +113,33 @@
       background: #005f8d;
       transform: translateY(-2px);
     }
+    .success-message {
+      background: #4caf50;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+    }
+    .dashboard-btn {
+      background: #1e3a8a;
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      margin-top: 2rem;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .dashboard-btn:hover {
+      background: #ffcc00;
+      color: #1e3a8a;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -128,11 +156,14 @@
     <div id="timetableContainer"></div>
 
     <button class="submit-btn" onclick="submitTimetable()">Submit Timetable</button>
+    <div class="success-message" id="successMessage">Timetable Submitted Successfully!</div>
+    <a href="/dashboard" class="dashboard-btn">Go to Dashboard</a>
   </div>
 
   <script>
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const timetableContainer = document.getElementById('timetableContainer');
+    const successMessage = document.getElementById('successMessage');
 
     function generateTimetable() {
       const studentName = document.getElementById('studentName').value;
@@ -214,8 +245,11 @@
 
       const result = await response.json();
       if (result.success) {
-        alert("Timetable submitted successfully.");
-        location.reload();
+        successMessage.style.display = 'block';
+        setTimeout(() => {
+          successMessage.style.display = 'none';
+          location.reload(); // Reload the page to clear the form
+        }, 3000);
       } else {
         alert("Error: " + result.message);
       }
