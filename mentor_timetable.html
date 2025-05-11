@@ -1,230 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mentor Timetable Planner</title>
+  <meta charset="UTF-8">
+  <title>Weekly Timetable Submission</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fefefe;
-      color: #1a1a1a;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: navy;
-      color: gold;
-      padding: 1rem;
-      text-align: center;
-    }
-    .container {
-      padding: 2rem;
-    }
-    select, input, button {
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 1rem;
+      font-family: Arial;
+      background: #f9f9f9;
+      padding: 20px;
     }
     table {
       width: 100%;
+      margin-top: 10px;
       border-collapse: collapse;
-      margin-top: 1rem;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
+    table, th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
     }
-    th {
-      background: #f5f5f5;
+    input[type="text"], input[type="date"], input[type="time"], input[type="url"] {
+      width: 100%;
+      padding: 6px;
+      box-sizing: border-box;
     }
-    .day-section {
-      margin-top: 2rem;
-    }
-    .submit-btn {
-      background: gold;
-      color: navy;
-      font-weight: bold;
+    .btn {
+      background-color: #0056b3;
+      color: white;
+      padding: 10px 15px;
       border: none;
+      margin-top: 10px;
       cursor: pointer;
-      margin-top: 2rem;
-      padding: 0.75rem 2rem;
+    }
+    .btn:hover {
+      background-color: #003d80;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Mentor Timetable Planner</h1>
-  </header>
-  <div class="container">
-    <label for="weekStart">Select Week Start Date:</label>
-    <input type="date" id="weekStart" required />
 
-    <label for="student">Select Student:</label>
-    <select id="student" required>
-      <option value="">Loading...</option>
-    </select>
+  <h2>Weekly Timetable Submission</h2>
+  
+  <form id="timetableForm">
+    <label>Week Starting Date:</label><br>
+    <input type="date" id="weekStart" required><br><br>
+    
+    <label>Student ID:</label><br>
+    <input type="text" id="studentId" required><br><br>
+    
+    <label>Student Name:</label><br>
+    <input type="text" id="studentName" required><br><br>
 
-    <div id="timetableContainer"></div>
+    <table id="entryTable">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Time</th>
+          <th>Subject</th>
+          <th>Teacher</th>
+          <th>Link</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="entryBody">
+        <!-- Timetable rows will be added here -->
+      </tbody>
+    </table>
 
-    <button class="submit-btn" onclick="submitTimetable()">Submit Timetable</button>
-  </div>
+    <button type="button" class="btn" onclick="addRow()">Add Row</button><br><br>
+    <button type="submit" class="btn">Submit Timetable</button>
+  </form>
+
+  <p id="statusMsg"></p>
 
   <script>
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    const timetableContainer = document.getElementById('timetableContainer');
-    const GOOGLE_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec";
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxJ-IGsjzrqUlykZEgK_BtLtz4O7BCF8tv8_Hus1dOENrN_Wnr0NzTAT38KMGamy-XJlQ/exec';
 
-    async function fetchStudentSubjectData() {
-      try {
-        const response = await fetch(GOOGLE_SCRIPT_WEB_APP_URL);
-        const data = await response.json();
+    function addRow() {
+      const tbody = document.getElementById("entryBody");
+      const row = document.createElement("tr");
 
-        const studentSelect = document.getElementById('student');
-        studentSelect.innerHTML = `<option value="">Select Student</option>`;
+      row.innerHTML = `
+        <td><input type="text" name="day" required></td>
+        <td><input type="time" name="time" required></td>
+        <td><input type="text" name="subject" required></td>
+        <td><input type="text" name="teacher" required></td>
+        <td><input type="url" name="link"></td>
+        <td><button type="button" onclick="removeRow(this)">Delete</button></td>
+      `;
 
-        const studentMap = {};
-        data.forEach(entry => {
-          if (!studentMap[entry.studentId]) {
-            studentMap[entry.studentId] = {
-              name: entry.studentName,
-              subjects: []
-            };
-            const option = document.createElement('option');
-            option.value = entry.studentId;
-            option.textContent = `${entry.studentName} (${entry.studentId})`;
-            studentSelect.appendChild(option);
-          }
-          studentMap[entry.studentId].subjects.push({
-            subject: entry.subject,
-            teacherName: entry.teacherName,
-            teacherId: entry.teacherId
-          });
-        });
-
-        window.studentMap = studentMap;
-        window.studentSubjectData = data;
-      } catch (error) {
-        alert("Error loading student list.");
-        console.error(error);
-      }
+      tbody.appendChild(row);
     }
 
-    document.getElementById('student').addEventListener('change', generateTimetable);
-
-    function generateTimetable() {
-      const studentId = document.getElementById('student').value;
-      if (!studentId || !window.studentMap) return;
-
-      const subjects = window.studentMap[studentId].subjects;
-      timetableContainer.innerHTML = '';
-
-      days.forEach(day => {
-        const section = document.createElement('div');
-        section.className = 'day-section';
-
-        section.innerHTML = `<h3>${day}</h3><table id="table-${day}">
-          <tr><th>Time</th><th>Subject</th><th>Teacher</th><th>Meeting Link</th><th>Action</th></tr>
-        </table>
-        <button onclick="addRow('${day}', ${JSON.stringify(subjects).replace(/"/g, '&quot;')})">Add Slot</button>`;
-
-        timetableContainer.appendChild(section);
-      });
+    function removeRow(button) {
+      button.closest("tr").remove();
     }
 
-    window.addRow = function(day, subjects) {
-      const table = document.getElementById(`table-${day}`);
-      const row = table.insertRow();
+    document.getElementById("timetableForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const weekStart = document.getElementById("weekStart").value;
+      const studentId = document.getElementById("studentId").value;
+      const studentName = document.getElementById("studentName").value;
 
-      const timeCell = row.insertCell(0);
-      const subjectCell = row.insertCell(1);
-      const teacherCell = row.insertCell(2);
-      const linkCell = row.insertCell(3);
-      const actionCell = row.insertCell(4);
-
-      timeCell.innerHTML = `<input type="time" required>`;
-      const subjectSelect = document.createElement('select');
-      subjectSelect.required = true;
-      subjectSelect.innerHTML = `<option value="">Select</option>` +
-        subjects.map(s => `<option value="${s.subject}">${s.subject}</option>`).join('');
-      subjectCell.appendChild(subjectSelect);
-
-      const teacherInput = document.createElement('input');
-      teacherInput.type = 'text';
-      teacherInput.readOnly = true;
-      teacherCell.appendChild(teacherInput);
-
-      subjectSelect.addEventListener('change', () => {
-        const selected = subjects.find(s => s.subject === subjectSelect.value);
-        teacherInput.value = selected ? selected.teacherName : '';
-      });
-
-      linkCell.innerHTML = `<input type="url" placeholder="https://...">`;
-      actionCell.innerHTML = `<button onclick="this.parentElement.parentElement.remove()">Remove</button>`;
-    };
-
-    async function submitTimetable() {
-      const weekStart = document.getElementById('weekStart').value;
-      const studentId = document.getElementById('student').value;
-      if (!weekStart || !studentId) {
-        alert("Please select week start and student.");
-        return;
-      }
-
-      const studentName = window.studentMap[studentId].name;
       const entries = [];
+      const rows = document.querySelectorAll("#entryBody tr");
 
-      days.forEach(day => {
-        const table = document.getElementById(`table-${day}`);
-        if (!table) return;
-        [...table.rows].slice(1).forEach(row => {
-          const [time, subjectSel, teacher, link] = row.cells;
-          const timeVal = time.querySelector('input').value;
-          const subjectVal = subjectSel.querySelector('select').value;
-          const teacherVal = teacher.querySelector('input').value;
-          const linkVal = link.querySelector('input').value;
-          if (timeVal && subjectVal && teacherVal) {
-            entries.push({ day, time: timeVal, subject: subjectVal, teacher: teacherVal, link: linkVal });
-          }
-        });
+      rows.forEach(row => {
+        const entry = {
+          day: row.querySelector('[name="day"]').value,
+          time: row.querySelector('[name="time"]').value,
+          subject: row.querySelector('[name="subject"]').value,
+          teacher: row.querySelector('[name="teacher"]').value,
+          link: row.querySelector('[name="link"]').value
+        };
+        entries.push(entry);
       });
 
-      if (entries.length === 0) {
-        alert("Please fill at least one timetable entry.");
-        return;
-      }
+      const payload = {
+        weekStart,
+        studentId,
+        studentName,
+        entries
+      };
 
-      const payload = { weekStart, studentId, studentName, entries };
-
-      try {
-        const response = await fetch(GOOGLE_SCRIPT_WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          alert("Timetable submitted successfully.");
-          location.reload();
-        } else {
-          throw new Error("Submission failed.");
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json'
         }
-      } catch (err) {
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          document.getElementById("statusMsg").innerText = "Timetable submitted successfully!";
+          document.getElementById("timetableForm").reset();
+          document.getElementById("entryBody").innerHTML = "";
+        } else {
+          document.getElementById("statusMsg").innerText = "Error: " + result.error;
+        }
+      })
+      .catch(err => {
+        document.getElementById("statusMsg").innerText = "Error submitting timetable.";
         console.error(err);
-        alert("Error submitting timetable.");
-      }
-    }
+      });
+    });
 
-    fetchStudentSubjectData();
+    // Add one row by default
+    window.onload = () => addRow();
   </script>
+
 </body>
 </html>
