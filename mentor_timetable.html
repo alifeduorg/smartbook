@@ -1,165 +1,154 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Timetable Panel</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: #f4f4f4;
     }
     h2 {
-      color: #2c3e50;
+      color: #003366;
     }
-    input, select, button {
-      padding: 8px;
+    label, input, select, button {
       margin: 5px;
-      border-radius: 4px;
+    }
+    .slot {
       border: 1px solid #ccc;
+      padding: 10px;
+      margin: 5px 0;
+    }
+    #timetableView {
+      margin-top: 20px;
+      display: none;
     }
     table {
-      width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
-      background: white;
+      width: 100%;
+      margin-top: 10px;
     }
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
-      text-align: center;
-    }
-    button {
-      background: #2c3e50;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #34495e;
-    }
-    .btn-danger {
-      background: #e74c3c;
-    }
-    .btn-danger:hover {
-      background: #c0392b;
-    }
-    .controls {
-      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h2>📘 Timetable Panel</h2>
+<h2>Timetable Panel</h2>
 
-  <div class="controls">
-    <label>Week Start Date:</label>
-    <input type="date" id="weekStart" required>
-    <label>Student Name:</label>
-    <input type="text" id="studentName" required>
-    <label>Classroom:</label>
-    <input type="text" id="classRoom">
-    <button onclick="addRow()">➕ Add Slot</button>
-  </div>
+<label>Week Start Date: <input type="date" id="weekStart"></label><br>
+<label>Student Name: <input type="text" id="studentName"></label><br>
+<label>Student ID: <input type="text" id="studentId"></label><br>
+<label>Classroom Name: <input type="text" id="classroomName"></label><br>
 
-  <table id="timetableTable">
+<div id="slots"></div>
+
+<button onclick="addSlot()">Add Slot</button>
+<button onclick="submitData()">Submit</button>
+<button onclick="toggleView()">View Timetable</button>
+
+<div id="timetableView">
+  <h3>View Timetable</h3>
+  <label>Enter Student Name: <input type="text" id="filterStudentName"></label>
+  <button onclick="loadTimetable()">Load</button>
+  <table id="viewTable">
     <thead>
-      <tr>
-        <th>Day</th>
-        <th>Time</th>
-        <th>Subject</th>
-        <th>Teacher</th>
-        <th>Student ID</th>
-        <th>Remove</th>
-      </tr>
+      <tr><th>Day</th><th>Time</th><th>Subject</th><th>Teacher</th></tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
   </table>
+</div>
 
-  <br>
-  <button onclick="submitData()">✅ Submit</button>
-  <button onclick="window.location.href='dashboard.html'">🏠 Dashboard</button>
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec";
 
-  <script>
-    function addRow() {
-      const tbody = document.getElementById('timetableTable').querySelector('tbody');
-      const row = document.createElement('tr');
+function addSlot() {
+  const div = document.createElement("div");
+  div.className = "slot";
+  div.innerHTML = `
+    <label>Day: <select>
+      <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+      <option>Thursday</option><option>Friday</option><option>Saturday</option>
+    </select></label>
+    <label>Time: <input type="time"></label>
+    <label>Subject: <input type="text"></label>
+    <label>Teacher: <input type="text"></label>
+    <button onclick="removeSlot(this)">Remove</button>
+  `;
+  document.getElementById("slots").appendChild(div);
+}
 
-      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+function removeSlot(btn) {
+  btn.parentElement.remove();
+}
 
-      row.innerHTML = `
-        <td>
-          <select>
-            ${days.map(day => `<option value="${day}">${day}</option>`).join('')}
-          </select>
-        </td>
-        <td><input type="time"></td>
-        <td><input type="text" placeholder="Subject"></td>
-        <td><input type="text" placeholder="Teacher"></td>
-        <td><input type="text" placeholder="Student ID"></td>
-        <td><button class="btn-danger" onclick="removeRow(this)">Remove</button></td>
-      `;
-      tbody.appendChild(row);
-    }
+function submitData() {
+  const weekStart = document.getElementById("weekStart").value;
+  const studentName = document.getElementById("studentName").value;
+  const studentId = document.getElementById("studentId").value;
+  const slots = document.querySelectorAll(".slot");
+  const data = [];
 
-    function removeRow(btn) {
-      const row = btn.parentElement.parentElement;
-      row.remove();
-    }
+  slots.forEach(slot => {
+    const inputs = slot.querySelectorAll("select, input");
+    data.push({
+      weekStart,
+      studentName,
+      studentId,
+      day: inputs[0].value,
+      time: inputs[1].value,
+      subject: inputs[2].value,
+      teacher: inputs[3].value
+    });
+  });
 
-    function submitData() {
-      const weekStart = document.getElementById('weekStart').value;
-      const studentName = document.getElementById('studentName').value;
-      const table = document.getElementById('timetableTable').querySelector('tbody');
-      const rows = table.querySelectorAll('tr');
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  }).then(res => res.text()).then(response => {
+    alert("Data Submitted Successfully!");
+    document.getElementById("slots").innerHTML = "";
+  }).catch(err => {
+    alert("Error: " + err);
+  });
+}
 
-      if (!weekStart || !studentName) {
-        alert('Please fill Week Start Date and Student Name.');
-        return;
+function toggleView() {
+  const view = document.getElementById("timetableView");
+  view.style.display = view.style.display === "none" ? "block" : "none";
+}
+
+function loadTimetable() {
+  const name = document.getElementById("filterStudentName").value.trim().toLowerCase();
+  fetch(
+    "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SHEET_ID/gviz/tq?tqx=out:json&tq=SELECT%20*"
+  )
+  .then(res => res.text())
+  .then(data => {
+    const json = JSON.parse(data.substr(47).slice(0, -2));
+    const rows = json.table.rows;
+    const tbody = document.querySelector("#viewTable tbody");
+    tbody.innerHTML = "";
+
+    rows.forEach(row => {
+      const student = row.c[1]?.v?.toLowerCase();
+      if (student === name) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.c[3]?.v || ""}</td>
+          <td>${row.c[4]?.v || ""}</td>
+          <td>${row.c[5]?.v || ""}</td>
+          <td>${row.c[6]?.v || ""}</td>
+        `;
+        tbody.appendChild(tr);
       }
-
-      const data = [];
-
-      rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const day = cells[0].querySelector('select').value;
-        const time = cells[1].querySelector('input').value;
-        const subject = cells[2].querySelector('input').value;
-        const teacher = cells[3].querySelector('input').value;
-        const studentId = cells[4].querySelector('input').value;
-
-        if (time && subject && teacher && studentId) {
-          data.push({
-            weekStart,
-            studentName,
-            day,
-            time,
-            subject,
-            teacher,
-            studentId
-          });
-        }
-      });
-
-      // Send to Google Apps Script Web App
-      fetch("https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => res.text())
-      .then(response => {
-        alert("Timetable submitted successfully!");
-        location.reload();
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Error submitting data.");
-      });
-    }
-  </script>
+    });
+  });
+}
+</script>
 
 </body>
 </html>
