@@ -6,149 +6,182 @@
   <title>Timetable Panel</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0;
+      padding: 40px;
+      background: linear-gradient(135deg, #fdfbfb, #ebedee);
+      font-family: 'Segoe UI', sans-serif;
     }
+
     h2 {
-      color: #003366;
+      color: #002147;
+      font-size: 2em;
+      text-shadow: 1px 1px 2px #aaa;
     }
-    label, input, select, button {
-      margin: 5px;
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 600;
+      color: #444;
     }
-    .slot {
-      border: 1px solid #ccc;
+
+    input, select, button {
       padding: 10px;
-      margin: 5px 0;
-    }
-    #timetableView {
-      margin-top: 20px;
-      display: none;
-    }
-    table {
-      border-collapse: collapse;
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      font-size: 1em;
+      margin-bottom: 15px;
       width: 100%;
-      margin-top: 10px;
+      max-width: 400px;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+
+    button {
+      background: linear-gradient(145deg, #002147, #003366);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      background: linear-gradient(145deg, #003366, #002147);
+    }
+
+    #slots .slot {
+      background: white;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    #slots .slot:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .dashboard-button {
+      background: linear-gradient(to right, #ff9966, #ff5e62);
     }
   </style>
 </head>
 <body>
 
-<h2>Timetable Panel</h2>
+  <h2>📘 Timetable Panel</h2>
 
-<label>Week Start Date: <input type="date" id="weekStart"></label><br>
-<label>Student Name: <input type="text" id="studentName"></label><br>
-<label>Student ID: <input type="text" id="studentId"></label><br>
-<label>Classroom Name: <input type="text" id="classroomName"></label><br>
+  <label>📅 Week Start Date</label>
+  <input type="date" id="weekStart">
 
-<div id="slots"></div>
+  <label>👤 Student Name</label>
+  <input type="text" id="studentName">
 
-<button onclick="addSlot()">Add Slot</button>
-<button onclick="submitData()">Submit</button>
-<button onclick="toggleView()">View Timetable</button>
+  <label>🆔 Student ID</label>
+  <input type="text" id="studentId">
 
-<div id="timetableView">
-  <h3>View Timetable</h3>
-  <label>Enter Student Name: <input type="text" id="filterStudentName"></label>
-  <button onclick="loadTimetable()">Load</button>
-  <table id="viewTable">
-    <thead>
-      <tr><th>Day</th><th>Time</th><th>Subject</th><th>Teacher</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+  <label>🏫 Classroom Name</label>
+  <input type="text" id="classroomName">
 
-<script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec";
+  <div id="slots"></div>
 
-function addSlot() {
-  const div = document.createElement("div");
-  div.className = "slot";
-  div.innerHTML = `
-    <label>Day: <select>
-      <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
-      <option>Thursday</option><option>Friday</option><option>Saturday</option>
-    </select></label>
-    <label>Time: <input type="time"></label>
-    <label>Subject: <input type="text"></label>
-    <label>Teacher: <input type="text"></label>
-    <button onclick="removeSlot(this)">Remove</button>
-  `;
-  document.getElementById("slots").appendChild(div);
-}
+  <div class="buttons">
+    <button onclick="addSlot()">➕ Add Slot</button>
+    <button onclick="submitData()">✅ Submit</button>
+    <button class="dashboard-button" onclick="goToDashboard()">🏠 Dashboard</button>
+  </div>
 
-function removeSlot(btn) {
-  btn.parentElement.remove();
-}
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec";
 
-function submitData() {
-  const weekStart = document.getElementById("weekStart").value;
-  const studentName = document.getElementById("studentName").value;
-  const studentId = document.getElementById("studentId").value;
-  const slots = document.querySelectorAll(".slot");
-  const data = [];
+    function addSlot() {
+      const div = document.createElement("div");
+      div.className = "slot";
+      div.innerHTML = `
+        <label>📆 Day
+          <select>
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option>
+          </select>
+        </label>
+        <label>⏰ Time
+          <input type="time">
+        </label>
+        <label>📚 Subject
+          <input type="text">
+        </label>
+        <label>👨‍🏫 Teacher
+          <input type="text">
+        </label>
+        <button onclick="removeSlot(this)" style="background: #ff4d4d;">🗑 Remove</button>
+      `;
+      document.getElementById("slots").appendChild(div);
+    }
 
-  slots.forEach(slot => {
-    const inputs = slot.querySelectorAll("select, input");
-    data.push({
-      weekStart,
-      studentName,
-      studentId,
-      day: inputs[0].value,
-      time: inputs[1].value,
-      subject: inputs[2].value,
-      teacher: inputs[3].value
-    });
-  });
+    function removeSlot(btn) {
+      btn.parentElement.remove();
+    }
 
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  }).then(res => res.text()).then(response => {
-    alert("Data Submitted Successfully!");
-    document.getElementById("slots").innerHTML = "";
-  }).catch(err => {
-    alert("Error: " + err);
-  });
-}
+    function submitData() {
+      const weekStart = document.getElementById("weekStart").value;
+      const studentName = document.getElementById("studentName").value;
+      const studentId = document.getElementById("studentId").value;
 
-function toggleView() {
-  const view = document.getElementById("timetableView");
-  view.style.display = view.style.display === "none" ? "block" : "none";
-}
-
-function loadTimetable() {
-  const name = document.getElementById("filterStudentName").value.trim().toLowerCase();
-  fetch(
-    "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SHEET_ID/gviz/tq?tqx=out:json&tq=SELECT%20*"
-  )
-  .then(res => res.text())
-  .then(data => {
-    const json = JSON.parse(data.substr(47).slice(0, -2));
-    const rows = json.table.rows;
-    const tbody = document.querySelector("#viewTable tbody");
-    tbody.innerHTML = "";
-
-    rows.forEach(row => {
-      const student = row.c[1]?.v?.toLowerCase();
-      if (student === name) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.c[3]?.v || ""}</td>
-          <td>${row.c[4]?.v || ""}</td>
-          <td>${row.c[5]?.v || ""}</td>
-          <td>${row.c[6]?.v || ""}</td>
-        `;
-        tbody.appendChild(tr);
+      if (!weekStart || !studentName || !studentId) {
+        alert("❗ Please fill all required fields.");
+        return;
       }
-    });
-  });
-}
-</script>
 
+      const slots = document.querySelectorAll(".slot");
+      if (slots.length === 0) {
+        alert("❗ Please add at least one slot.");
+        return;
+      }
+
+      const data = [];
+
+      slots.forEach(slot => {
+        const inputs = slot.querySelectorAll("select, input");
+        data.push({
+          weekStart,
+          studentName,
+          studentId,
+          day: inputs[0].value,
+          time: inputs[1].value,
+          subject: inputs[2].value,
+          teacher: inputs[3].value
+        });
+      });
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      })
+      .then(res => res.text())
+      .then(response => {
+        alert("✅ Timetable submitted successfully!");
+        document.getElementById("slots").innerHTML = "";
+      })
+      .catch(err => {
+        alert("❌ Error: " + err);
+      });
+    }
+
+    function goToDashboard() {
+      // Replace below with your real dashboard link
+      window.location.href = "https://yourdashboardlink.com";
+    }
+
+    // Auto add 1 slot on page load
+    window.onload = () => addSlot();
+  </script>
 </body>
 </html>
