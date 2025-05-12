@@ -177,9 +177,13 @@
     function downloadPDF() {
       const startDate = document.getElementById('startDate').value;
       const endDate = document.getElementById('endDate').value;
-      const table = document.getElementById('timetable');
-      const doc = new jsPDF();
 
+      if (!startDate || !endDate) {
+        alert("Please select a start and end date.");
+        return;
+      }
+
+      const doc = new jsPDF();
       const filteredData = timetableData.filter(entry => {
         const weekStart = new Date(entry["Week Start"]);
         const start = new Date(startDate);
@@ -187,7 +191,11 @@
         return weekStart >= start && weekStart <= end;
       });
 
-      // Generate PDF table
+      if (filteredData.length === 0) {
+        alert("No data found for the selected date range.");
+        return;
+      }
+
       let rowIndex = 10; // Start at a vertical offset from the top of the page
       filteredData.forEach(row => {
         doc.text(formatDate(row["Week Start"]), 10, rowIndex);
