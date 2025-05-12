@@ -212,7 +212,28 @@
   // Add Title
   doc.setFontSize(16);
   doc.setTextColor(16, 37, 66);
-  doc.text(`Timetable for Student ID: ${selectedID}`, 14, 20);
+  const student = studentData.find(s => s['Student ID'] === selectedID);
+const studentDetails = [
+  `Student Name: ${student?.['Student Full Name'] || ''}`,
+  `Class: ${student?.['Class Admitted To'] || ''}`,
+  `Fee Plan: ${student?.['Fee Plan'] || ''}`,
+  `Subjects: ${student?.['Subjects Opted'] || ''}`,
+  `Date Range: ${startDateInput} to ${endDateInput}`
+];
+
+// Add student details
+doc.setFontSize(14);
+doc.setTextColor(16, 37, 66);
+doc.text(`Timetable for Student ID: ${selectedID}`, 14, 20);
+
+doc.setFontSize(10);
+doc.setTextColor(60);
+studentDetails.forEach((line, index) => {
+  doc.text(line, 14, 28 + index * 6);
+});
+
+const startTableY = 28 + studentDetails.length * 6 + 6; // Push table below the details
+
 
   const tableData = filtered.map(row => [
     formatDate(row["Week Start"]),
@@ -223,7 +244,7 @@
   ]);
 
   doc.autoTable({
-    startY: 30,
+   startY: startTableY,
     head: [['Week Start', 'Day', 'Time', 'Subject', 'Teacher']],
     body: tableData,
     theme: 'grid',
