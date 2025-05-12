@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Timetable</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    select, table {
+      margin: 10px 0;
+      padding: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: navy;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h2>Teacher Timetable Viewer</h2>
+
+  <!-- Dropdown to Select Teacher -->
+  <label for="teacherSelect">Select Teacher:</label>
+  <select id="teacherSelect">
+    <option value="">--Choose Teacher--</option>
+  </select>
+
+  <!-- Timetable Table -->
+  <table id="timetable">
+    <thead>
+      <tr>
+        <th>Week Start</th>
+        <th>Student Name</th>
+        <th>Student ID</th>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Subject</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec'; // <-- Replace with your Web App URL
+
+    let timetableData = [];
+
+    // Fetch Data From Google Sheet
+    fetch(sheetURL)
+      .then(response => response.json())
+      .then(data => {
+        timetableData = data;
+        populateTeacherDropdown(data);
+      });
+
+    // Populate Teacher Dropdown
+    function populateTeacherDropdown(data) {
+      const teachers = [...new Set(data.map(row => row.Teacher))];
+      const dropdown = document.getElementById('teacherSelect');
+      teachers.forEach(teacher => {
+        const option = document.createElement('option');
+        option.value = teacher;
+        option.textContent = teacher;
+        dropdown.appendChild(option);
+      });
+    }
+
+    // Filter and Display Timetable
+    document.getElementById('teacherSelect').addEventListener('change', function () {
+      const selected = this.value;
+      const filtered = timetableData.filter(row => row.Teacher === selected);
+      const tbody = document.querySelector('#timetable tbody');
+      tbody.innerHTML = '';
+
+      filtered.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row['Week Start']}</td>
+          <td>${row['Student Name']}</td>
+          <td>${row['Student ID']}</td>
+          <td>${row['Day']}</td>
+          <td>${row['Time']}</td>
+          <td>${row['Subject']}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html>
