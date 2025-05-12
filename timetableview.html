@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Timetable Viewer</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -113,7 +114,7 @@
       </thead>
       <tbody></tbody>
     </table>
-    <button class="download-btn" onclick="downloadTable()">Download Timetable</button>
+    <button class="download-btn" onclick="downloadPDF()">Download Timetable as PDF</button>
   </div>
 
   <script>
@@ -173,20 +174,12 @@
       });
     });
 
-    function downloadTable() {
+    function downloadPDF() {
       const startDate = document.getElementById('startDate').value;
       const endDate = document.getElementById('endDate').value;
       const table = document.getElementById('timetable');
-      let csv = [];
-      const rows = table.querySelectorAll('tr');
-      
-      for (let row of rows) {
-        const cols = row.querySelectorAll('th, td');
-        const rowData = Array.from(cols).map(cell => '"' + cell.textContent + '"');
-        csv.push(rowData.join(","));
-      }
+      const doc = new jsPDF();
 
-      // Apply date range filter
       const filteredData = timetableData.filter(entry => {
         const weekStart = new Date(entry["Week Start"]);
         const start = new Date(startDate);
@@ -194,23 +187,18 @@
         return weekStart >= start && weekStart <= end;
       });
 
-      // Generate CSV for filtered data
-      let filteredCsv = [];
+      // Generate PDF table
+      let rowIndex = 10; // Start at a vertical offset from the top of the page
       filteredData.forEach(row => {
-        filteredCsv.push([
-          formatDate(row["Week Start"]),
-          row["Day"],
-          formatTime(row["Time"]),
-          row["Subject"],
-          row["Teacher"]
-        ].join(','));
+        doc.text(formatDate(row["Week Start"]), 10, rowIndex);
+        doc.text(row["Day"], 40, rowIndex);
+        doc.text(formatTime(row["Time"]), 80, rowIndex);
+        doc.text(row["Subject"], 120, rowIndex);
+        doc.text(row["Teacher"], 160, rowIndex);
+        rowIndex += 10; // Move to the next row
       });
 
-      const csvBlob = new Blob([filteredCsv.join("\n")], { type: 'text/csv' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(csvBlob);
-      link.download = 'timetable.csv';
-      link.click();
+      doc.save('timetable.pdf');
     }
   </script>
 </body>
