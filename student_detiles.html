@@ -219,7 +219,7 @@
   </header>
 
   <div class="container">
-    <button class="dashboard-btn" onclick="goToDashboard()">🏠 Go to Dashboard</button>
+    <button class="dashboard-button" onclick="goToDashboard()">Back to Dashboard</button>
 
     <table id="studentTable">
       <thead>
@@ -386,9 +386,10 @@ function downloadPDF() {
   };
   html2pdf().set(opt).from(element).save();
 }
-    function goToDashboard() {
-      window.location.href = 'http://smartbook.alifedu.org/admin-dashboard.html'; // Change this URL if needed
-    }
+function goToDashboard() {
+  window.history.back();
+}
+
   </script>
     <script>
     function printPage() {
