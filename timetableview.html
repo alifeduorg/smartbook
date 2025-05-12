@@ -41,8 +41,6 @@
     }
     .container {
       padding: 1rem;
-      max-width: 1200px;
-      margin: auto;
     }
     select, input[type="date"] {
       padding: 0.5rem;
@@ -61,17 +59,15 @@
       border-radius: 16px;
       overflow: hidden;
       background: white;
-      margin-top: 20px;
     }
     thead {
-      background: #fdbb2d;
+      background: #102542;
       color: white;
-      text-align: center;
     }
     th, td {
       padding: 0.8rem;
       text-align: left;
-      border: 1px solid #102542;
+      border-bottom: 1px solid #eee;
     }
     tbody tr:hover {
       background-color: #f0f8ff;
@@ -88,8 +84,6 @@
       transition: 0.3s;
       width: 100%;
       max-width: 400px;
-      display: block;
-      margin-bottom: 2rem;
     }
     .download-btn:hover {
       background-color: #1b3a63;
@@ -215,7 +209,6 @@
 
       let y = 20;
       doc.setFontSize(12);
-      doc.setTextColor(16, 37, 66); // Navy Blue
       doc.text(`Student ID: ${selectedID}`, 10, y);
       y += 10;
       filtered.forEach(row => {
