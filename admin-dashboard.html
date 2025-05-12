@@ -3,244 +3,190 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard</title>
+  <title>Teacher Timetable</title>
   <style>
     :root {
-      --navy: #0b1d3a;
-      --gold: #ffcc00;
-      --white: #ffffff;
-      --shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    * {
-      box-sizing: border-box;
+      --primary: #1e3a8a;
+      --accent: #facc15;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1f2937;
     }
 
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: var(--white);
-    }
-
-    .dashboard-wrapper {
-      display: flex;
-      min-height: 100vh;
-      transition: all 0.3s ease;
-    }
-
-    .sidebar {
-      width: 250px;
-      background-color: var(--navy);
-      color: var(--white);
+      background-color: var(--bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
-      padding: 20px;
-      box-shadow: var(--shadow);
-      transition: transform 0.3s ease;
+      min-height: 100vh;
     }
 
-    .sidebar .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-
-    .sidebar .logo img {
-      width: 40px;
-    }
-
-    .sidebar h3 {
-      color: var(--gold);
-      font-size: 18px;
-    }
-
-    .sidebar nav ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .sidebar nav ul li {
-      margin-bottom: 15px;
-    }
-
-    .sidebar nav ul li a {
-      color: var(--white);
-      text-decoration: none;
-      font-size: 16px;
-      display: block;
-    }
-
-    .sidebar nav ul li a:hover {
-      color: var(--gold);
-    }
-
-    .logout {
-      background-color: var(--gold);
-      border: none;
-      color: var(--navy);
-      padding: 10px 20px;
-      font-weight: bold;
-      border-radius: 8px;
-      margin-top: 30px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .logout:hover {
-      background-color: #ffd633;
-    }
-
-    .main-content {
-      flex-grow: 1;
-      padding: 20px;
-      background-color: #f5f7fa;
-      transition: margin-left 0.3s ease;
-    }
-
-    .header {
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .menu-toggle {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: var(--navy);
-      cursor: pointer;
-      display: none;
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
     }
 
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
+    .dashboard-btn {
+      background-color: var(--accent);
+      color: black;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
     }
 
     .card {
-      background-color: var(--white);
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: var(--shadow);
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s ease;
+      background-color: var(--card);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
     }
 
-    .card:hover {
-      transform: scale(1.05);
+    .card h2 {
+      margin-bottom: 1rem;
     }
 
-    .card h4 {
-      color: var(--navy);
+    select {
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      width: 100%;
+      max-width: 300px;
     }
 
-    /* Responsive handling */
-    @media (max-width: 768px) {
-      .sidebar {
-        position: fixed;
-        top: 0;
-        left: -250px;
-        height: 100%;
-        z-index: 1000;
-      }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
 
-      .sidebar.open {
-        left: 0;
-      }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 0.75rem;
+      text-align: left;
+    }
 
-      .menu-toggle {
+    th {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f5f9;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
         display: block;
       }
-
-      .main-content.open {
-        margin-left: 250px;
+      th {
+        display: none;
+      }
+      td {
+        border: none;
+        padding: 1rem;
+        position: relative;
+      }
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="dashboard-wrapper">
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="logo">
-      <img src="1.png" alt="Logo">
-      <h3>Admin Panel</h3>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="students-attendance.html">Student Attendance</a></li>
-        <li><a href="teachers-attendance.html">Teacher Attendance</a></li>
-        <li><a href="admin-logbook.html">Logbook Details</a></li>
-        <li><a href="timetableview.html">Time Table</a></li>
-        <li><a href="teacher_details.html">Teacher Details</a></li>
-        <li><a href="student_detiles.html">Student Details</a></li>
-        <li><a href="principal-reports.html">Principal Weekly Reports</a></li>
-      </ul>
-      <button class="logout" onclick="logout()">Logout</button>
-    </nav>
-  </aside>
+<header>
+  <h1>Teacher Timetable</h1>
+  <button class="dashboard-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
+</header>
 
-  <!-- Main Content -->
-  <div class="main-content" id="mainContent">
-    <div class="header">
-      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-      <h2>Welcome Admin</h2>
-    </div>
-    <div class="card-grid">
-      <div class="card" onclick="goTo('students-attendance.html')">
-        <h4>Student Attendance</h4>
-      </div>
-      <div class="card" onclick="goTo('teachers-attendance.html')">
-        <h4>Teacher Attendance</h4>
-      </div>
-      <div class="card" onclick="goTo('admin-logbook.html')">
-        <h4>Logbook Details</h4>
-      </div>
-      <div class="card" onclick="goTo('timetableview.html')">
-        <h4>Time Table</h4>
-      </div>
-      <div class="card" onclick="goTo('teacher_details.html')">
-        <h4>Teacher Details</h4>
-      </div>
-      <div class="card" onclick="goTo('student_detiles.html')">
-        <h4>Student Details</h4>
-      </div>
-      <div class="card" onclick="goTo('admin_weekly.html')">
-        <h4>Principal Weekly Reports</h4>
-      </div>
- <div class="card" onclick="goTo('Fee_Reports.html')">
-        <h4>Fee Reports</h4>
-      </div>
- <div class="card" onclick="goTo('Billing_Panel.html')">
-        <h4>Billing Panel</h4>
-      </div> <div class="card" onclick="goTo('Salary_Reports.html')">
-        <h4>Salary Reports</h4>
-      </div>
-    </div>
+<main>
+  <div class="card">
+    <h2>Select Teacher</h2>
+    <select id="teacherSelect">
+      <option value="">-- Choose a Teacher --</option>
+    </select>
+
+    <table id="timetable">
+      <thead>
+        <tr>
+          <th>Week Start</th>
+          <th>Student</th>
+          <th>Student ID</th>
+          <th>Day</th>
+          <th>Time</th>
+          <th>Subject</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-</div>
+</main>
 
 <script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const mainContent = document.getElementById("mainContent");
-    sidebar.classList.toggle("open");
-    mainContent.classList.toggle("open");
+  const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
+  let timetableData = [];
+
+  // Fetch timetable data
+  fetch(sheetURL)
+    .then(res => res.json())
+    .then(data => {
+      timetableData = data;
+      populateTeachers(data);
+    });
+
+  function populateTeachers(data) {
+    const teachers = [...new Set(data.map(row => row.Teacher))];
+    const dropdown = document.getElementById('teacherSelect');
+    teachers.forEach(teacher => {
+      const option = document.createElement('option');
+      option.value = teacher;
+      option.textContent = teacher;
+      dropdown.appendChild(option);
+    });
   }
 
-  function goTo(page) {
-    window.location.href = page;
-  }
+  document.getElementById('teacherSelect').addEventListener('change', function () {
+    const selectedTeacher = this.value;
+    const filtered = timetableData.filter(entry => entry.Teacher === selectedTeacher);
+    const tbody = document.querySelector('#timetable tbody');
+    tbody.innerHTML = '';
 
-  function logout() {
-    alert("Logging out...");
-    window.location.href = "index.html"; // Or your login page
-  }
+    filtered.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Week Start">${row["Week Start"]}</td>
+        <td data-label="Student">${row["Student Name"]}</td>
+        <td data-label="Student ID">${row["Student ID"]}</td>
+        <td data-label="Day">${row["Day"]}</td>
+        <td data-label="Time">${row["Time"]}</td>
+        <td data-label="Subject">${row["Subject"]}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
 </script>
 
 </body>
