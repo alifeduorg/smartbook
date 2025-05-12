@@ -18,6 +18,10 @@
       border-collapse: collapse;
       padding: 5px;
     }
+    table {
+      margin-top: 20px;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -25,12 +29,10 @@
   <h2>Student Log Filter</h2>
 
   <!-- Filters -->
-  <label for="studentSelect">Select Student:</label>
+  <label for="studentSelect">Student ID:</label>
   <select id="studentSelect">
     <option value="">-- Select Student --</option>
-    <option value="S101">Amina (S101)</option>
-    <option value="S102">Bilal (S102)</option>
-    <option value="S103">Fatima (S103)</option>
+    <!-- Options populated dynamically -->
   </select>
 
   <label for="startDate">Start Date:</label>
@@ -41,8 +43,6 @@
 
   <button id="filterBtn">Filter</button>
   <button id="downloadBtn">Download PDF</button>
-
-  <hr>
 
   <!-- Filtered Table -->
   <table id="studentTable">
@@ -63,21 +63,37 @@
   </table>
 
   <script>
-    // Mock logbook entries
-    const logbookEntries = [
-      { date: '2024-05-01', studentID: 'S101', studentName: 'Amina', subject: 'Math', teacher: 'Mr. Ali', taught: 'Addition', homework: 'Page 10' },
-      { date: '2024-05-02', studentID: 'S102', studentName: 'Bilal', subject: 'Science', teacher: 'Ms. Sara', taught: 'Plants', homework: 'Draw diagram' },
-      { date: '2024-05-03', studentID: 'S101', studentName: 'Amina', subject: 'English', teacher: 'Ms. Noor', taught: 'Grammar', homework: 'Exercise 2' },
-      { date: '2024-05-04', studentID: 'S103', studentName: 'Fatima', subject: 'Math', teacher: 'Mr. Ali', taught: 'Subtraction', homework: 'Page 11' }
-    ];
+    const sheetURL = "https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec";
+    let allData = [];
+    let filtered = [];
 
     const studentSelect = document.getElementById('studentSelect');
     const startInput = document.getElementById('startDate');
     const endInput = document.getElementById('endDate');
     const tableBody = document.querySelector('#studentTable tbody');
 
-    let filtered = [];
+    // Fetch logbook data
+    async function fetchData() {
+      try {
+        const response = await fetch(sheetURL);
+        const data = await response.json();
+        allData = data;
 
+        // Populate student select
+        const uniqueIDs = [...new Set(allData.map(entry => entry.studentID))];
+        uniqueIDs.forEach(id => {
+          const option = document.createElement("option");
+          option.value = id;
+          option.textContent = id;
+          studentSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert("Failed to fetch data.");
+      }
+    }
+
+    // Filter logic
     document.getElementById('filterBtn').addEventListener('click', () => {
       const selectedID = studentSelect.value;
       const startDate = new Date(startInput.value);
@@ -88,13 +104,14 @@
         return;
       }
 
-      filtered = logbookEntries.filter(entry => {
+      filtered = allData.filter(entry => {
         const entryDate = new Date(entry.date);
-        return entry.studentID === selectedID && entryDate >= startDate && entryDate <= endDate;
+        return entry.studentID === selectedID &&
+               entryDate >= startDate &&
+               entryDate <= endDate;
       });
 
       tableBody.innerHTML = '';
-
       if (filtered.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="7">No data found.</td></tr>`;
       } else {
@@ -114,24 +131,24 @@
       }
     });
 
-    document.getElementById('downloadBtn').addEventListener('click', async () => {
+    // PDF download logic
+    document.getElementById('downloadBtn').addEventListener('click', () => {
       const jsPDF = window.jspdf.jsPDF;
       const doc = new jsPDF();
 
       if (filtered.length === 0) {
-        alert("Please filter data first before downloading.");
+        alert("Please filter data first.");
         return;
       }
 
       doc.setFontSize(14);
       doc.text("Student Log Report", 10, 10);
-
       let y = 20;
 
       filtered.forEach((entry, index) => {
         doc.setFontSize(10);
         doc.text(`Date: ${entry.date}`, 10, y);
-        doc.text(`Student ID: ${entry.studentID}`, 60, y);
+        doc.text(`ID: ${entry.studentID}`, 60, y);
         doc.text(`Name: ${entry.studentName}`, 120, y);
         y += 6;
         doc.text(`Subject: ${entry.subject}`, 10, y);
@@ -142,7 +159,6 @@
         doc.text(`Homework: ${entry.homework}`, 10, y);
         y += 10;
 
-        // Check for page break
         if (y > 270 && index !== filtered.length - 1) {
           doc.addPage();
           y = 10;
@@ -151,6 +167,9 @@
 
       doc.save("Student_Log_Report.pdf");
     });
+
+    // Initialize
+    fetchData();
   </script>
 
 </body>
