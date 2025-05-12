@@ -2,224 +2,227 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Timetable Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f9f9f9;
-      padding: 30px;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+      color: #333;
     }
-
-    h2 {
-      color: navy;
-      margin-bottom: 20px;
-    }
-
-    .filter-box {
-      background: #fff;
-      border: 2px solid navy;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-    }
-
-    label {
-      margin-right: 10px;
-      color: navy;
-    }
-
-    select, input[type="date"], button {
-      padding: 10px;
-      margin-right: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-    button {
-      background-color: goldenrod;
+    header {
+      padding: 1rem 2rem;
+      background: #102542;
       color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    header h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    .dashboard-button {
+      background: #fdbb2d;
+      color: #102542;
       border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: 0.3s;
     }
-
-    button:hover {
-      background-color: #e6b800;
+    .dashboard-button:hover {
+      background: #fcb900;
     }
-
+    .container {
+      padding: 1rem;
+    }
+    select, input[type="date"] {
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      width: 100%;
+      max-width: 400px;
+      display: block;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background-color: white;
-      box-shadow: 1px 1px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      border-radius: 16px;
+      overflow: hidden;
+      background: white;
     }
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
-
-    th {
-      background-color: navy;
+    thead {
+      background: #102542;
       color: white;
     }
-
-    td {
-      font-size: 14px;
+    th, td {
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+    .download-btn {
+      margin-top: 1.5rem;
+      padding: 0.7rem 1.5rem;
+      background-color: #102542;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 100%;
+      max-width: 400px;
+    }
+    .download-btn:hover {
+      background-color: #1b3a63;
     }
   </style>
 </head>
 <body>
-
-  <h2>Student Timetable Viewer</h2>
-
-  <div class="filter-box">
-    <label for="studentSelect">Select Student:</label>
+  <header>
+    <h1>Student Timetable</h1>
+    <button class="dashboard-button" onclick="location.href='dashboard.html'">Back to Dashboard</button>
+  </header>
+  <div class="container">
     <select id="studentSelect">
-      <option value="">-- Choose --</option>
+      <option value="">Select Student</option>
     </select>
+    <label for="startDate">Start Date</label>
+    <input type="date" id="startDate" />
+    <label for="endDate">End Date</label>
+    <input type="date" id="endDate" />
 
-    <label for="startDate">From:</label>
-    <input type="date" id="startDate">
+    <table id="timetable">
+      <thead>
+        <tr>
+          <th>Week Start</th>
+          <th>Day</th>
+          <th>Time</th>
+          <th>Subject</th>
+          <th>Teacher</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-    <label for="endDate">To:</label>
-    <input type="date" id="endDate">
-
-    <button id="downloadBtn">Download Filtered Log</button>
+    <button class="download-btn" id="downloadBtn">Download Timetable as PDF</button>
   </div>
 
-  <table id="logTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Student ID</th>
-        <th>Student Name</th>
-        <th>Subject</th>
-        <th>Teacher</th>
-        <th>What Was Taught</th>
-        <th>Homework</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="7" style="text-align:center;">Select a student to view timetable.</td></tr>
-    </tbody>
-  </table>
-
   <script>
-    const sheetURL = "https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec";
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
+    let timetableData = [];
 
-    let allData = [];
-    let filteredData = [];
+    fetch(sheetURL)
+      .then(res => res.json())
+      .then(data => {
+        timetableData = data.sort((a, b) => new Date(b["Week Start"]) - new Date(a["Week Start"]));
+        populateStudents(timetableData);
+      });
 
-    const studentSelect = document.getElementById("studentSelect");
-    const logTableBody = document.querySelector("#logTable tbody");
-    const startDateInput = document.getElementById("startDate");
-    const endDateInput = document.getElementById("endDate");
-
-    // Fetch Data
-    async function fetchData() {
-      try {
-        const response = await fetch(sheetURL);
-        const data = await response.json();
-        allData = data;
-
-        const studentNames = [...new Set(data.map(entry => entry.studentName))];
-        studentNames.sort().forEach(name => {
-          const option = document.createElement("option");
-          option.value = name;
-          option.textContent = name;
-          studentSelect.appendChild(option);
-        });
-      } catch (error) {
-        alert("Error fetching data");
-        console.error(error);
-      }
+    function formatDate(isoString) {
+      if (!isoString) return '';
+      const date = new Date(isoString);
+      return date.toISOString().split('T')[0];
     }
 
-    // Display timetable for selected student
-    studentSelect.addEventListener("change", () => {
-      const selectedName = studentSelect.value;
-      if (!selectedName) return;
+    function formatTime(isoString) {
+      if (!isoString) return '';
+      const date = new Date(isoString);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
 
-      filteredData = allData.filter(entry => entry.studentName === selectedName);
-      renderTable(filteredData);
-    });
+    function populateStudents(data) {
+      const dropdown = document.getElementById('studentSelect');
+      const studentMap = new Map();
 
-    // Render table rows
-    function renderTable(dataArray) {
-      logTableBody.innerHTML = "";
-      if (dataArray.length === 0) {
-        logTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No records found.</td></tr>`;
-        return;
-      }
+      data.forEach(row => {
+        const id = row["Student ID"]?.trim();
+        const name = row["Student Name"]?.trim();
+        if (id && !studentMap.has(id)) {
+          studentMap.set(id, name);
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = `${id} - ${name}`;
+          dropdown.appendChild(option);
+        }
+      });
+    }
 
-      dataArray.forEach(entry => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${entry.date}</td>
-          <td>${entry.studentID}</td>
-          <td>${entry.studentName}</td>
-          <td>${entry.subject}</td>
-          <td>${entry.teacher}</td>
-          <td>${entry.taught}</td>
-          <td>${entry.homework}</td>
+    document.getElementById('studentSelect').addEventListener('change', renderTimetable);
+
+    function renderTimetable() {
+      const selectedID = document.getElementById('studentSelect').value;
+      const tbody = document.querySelector('#timetable tbody');
+      tbody.innerHTML = '';
+
+      const filtered = timetableData.filter(entry => entry["Student ID"] === selectedID);
+
+      filtered.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatDate(row["Week Start"] || '')}</td>
+          <td>${row["Day"] || ''}</td>
+          <td>${formatTime(row["Time"] || '')}</td>
+          <td>${row["Subject"] || ''}</td>
+          <td>${row["Teacher"] || ''}</td>
         `;
-        logTableBody.appendChild(row);
+        tbody.appendChild(tr);
       });
     }
 
-    // Download Filtered PDF
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const selectedName = studentSelect.value;
-      const startDate = new Date(startDateInput.value);
-      const endDate = new Date(endDateInput.value);
-
-      if (!selectedName || !startDateInput.value || !endDateInput.value) {
-        alert("Please select student and date range.");
-        return;
-      }
-
-      const exportData = filteredData.filter(entry => {
-        const date = new Date(entry.date);
-        return date >= startDate && date <= endDate;
-      });
-
-      if (exportData.length === 0) {
-        alert("No data found in selected range.");
-        return;
-      }
-
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFontSize(12);
-      doc.text(`Student Log Report - ${selectedName}`, 10, 10);
+
+      const selectedID = document.getElementById('studentSelect').value;
+      const startDateInput = document.getElementById('startDate').value;
+      const endDateInput = document.getElementById('endDate').value;
+      const startDate = new Date(startDateInput);
+      const endDate = new Date(endDateInput);
+
+      if (!selectedID || !startDateInput || !endDateInput || isNaN(startDate) || isNaN(endDate)) {
+        alert("Please select student and a valid date range.");
+        return;
+      }
+
+      const filtered = timetableData.filter(entry => {
+        const weekStart = new Date(entry["Week Start"]);
+        return entry["Student ID"] === selectedID && weekStart >= startDate && weekStart <= endDate;
+      });
+
+      if (filtered.length === 0) {
+        alert("No data for selected period.");
+        return;
+      }
 
       let y = 20;
-      exportData.forEach((entry, index) => {
-        doc.text(`Date: ${entry.date} | Subject: ${entry.subject}`, 10, y);
-        y += 6;
-        doc.text(`Taught: ${entry.taught}`, 10, y);
-        y += 6;
-        doc.text(`Homework: ${entry.homework}`, 10, y);
-        y += 10;
-
+      doc.setFontSize(12);
+      doc.text(`Student ID: ${selectedID}`, 10, y);
+      y += 10;
+      filtered.forEach(row => {
+        const line = `${formatDate(row["Week Start"])} | ${row["Day"]} | ${formatTime(row["Time"])} | ${row["Subject"]} | ${row["Teacher"]}`;
+        doc.text(line, 10, y);
+        y += 8;
         if (y > 270) {
           doc.addPage();
           y = 20;
         }
       });
 
-      doc.save(`${selectedName}_Log_Report.pdf`);
+      doc.save(`Timetable_${selectedID}_${startDateInput}_to_${endDateInput}.pdf`);
     });
-
-    fetchData();
   </script>
-
 </body>
 </html>
