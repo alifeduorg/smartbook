@@ -1,100 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Teacher Timetable</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Timetable Viewer</title>
   <style>
+    :root {
+      --primary: #1e3a8a;
+      --accent: #facc15;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1f2937;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    select, table {
-      margin: 10px 0;
-      padding: 5px;
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .dashboard-btn {
+      background-color: var(--accent);
+      color: black;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .card {
+      background-color: var(--card);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card h2 {
+      margin-bottom: 1rem;
+    }
+
+    select {
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      width: 100%;
+      max-width: 400px;
+      font-size: 1rem;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 1rem;
     }
+
     th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
+      border: 1px solid #e5e7eb;
+      padding: 0.75rem;
+      text-align: left;
     }
+
     th {
-      background-color: navy;
+      background-color: var(--primary);
       color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f5f9;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      th {
+        display: none;
+      }
+
+      td {
+        border: none;
+        padding: 1rem;
+        position: relative;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Teacher Timetable Viewer</h2>
 
-  <!-- Dropdown to Select Teacher -->
-  <label for="teacherSelect">Select Teacher:</label>
-  <select id="teacherSelect">
-    <option value="">--Choose Teacher--</option>
-  </select>
+<header>
+  <h1>📘 Timetable Viewer</h1>
+  <button class="dashboard-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
+</header>
 
-  <!-- Timetable Table -->
-  <table id="timetable">
-    <thead>
-      <tr>
-        <th>Week Start</th>
-        <th>Student Name</th>
-        <th>Student ID</th>
-        <th>Day</th>
-        <th>Time</th>
-        <th>Subject</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<main>
+  <div class="card">
+    <h2>👩‍🏫 Select a student to view timetable</h2>
+    <select id="studentSelect">
+      <option value="">-- Choose Student --</option>
+    </select>
 
-  <script>
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec'; // <-- Replace with your Web App URL
+    <table id="timetable">
+      <thead>
+        <tr>
+          <th>Week Start</th>
+          <th>Day</th>
+          <th>Time</th>
+          <th>Subject</th>
+          <th>Teacher</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
 
-    let timetableData = [];
+<script>
+  const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
+  let timetableData = [];
 
-    // Fetch Data From Google Sheet
-    fetch(sheetURL)
-      .then(response => response.json())
-      .then(data => {
-        timetableData = data;
-        populateTeacherDropdown(data);
-      });
-
-    // Populate Teacher Dropdown
-    function populateTeacherDropdown(data) {
-      const teachers = [...new Set(data.map(row => row.Teacher))];
-      const dropdown = document.getElementById('teacherSelect');
-      teachers.forEach(teacher => {
-        const option = document.createElement('option');
-        option.value = teacher;
-        option.textContent = teacher;
-        dropdown.appendChild(option);
-      });
-    }
-
-    // Filter and Display Timetable
-    document.getElementById('teacherSelect').addEventListener('change', function () {
-      const selected = this.value;
-      const filtered = timetableData.filter(row => row.Teacher === selected);
-      const tbody = document.querySelector('#timetable tbody');
-      tbody.innerHTML = '';
-
-      filtered.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${row['Week Start']}</td>
-          <td>${row['Student Name']}</td>
-          <td>${row['Student ID']}</td>
-          <td>${row['Day']}</td>
-          <td>${row['Time']}</td>
-          <td>${row['Subject']}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+  fetch(sheetURL)
+    .then(res => res.json())
+    .then(data => {
+      timetableData = data;
+      populateStudents(data);
     });
-  </script>
+
+  function populateStudents(data) {
+    const dropdown = document.getElementById('studentSelect');
+    const studentMap = new Map();
+
+    data.forEach(row => {
+      const id = row["Student ID"];
+      const name = row["Student Name"];
+      if (!studentMap.has(id)) {
+        studentMap.set(id, name);
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = `${id} - ${name}`;
+        dropdown.appendChild(option);
+      }
+    });
+  }
+
+  document.getElementById('studentSelect').addEventListener('change', function () {
+    const selectedID = this.value;
+    const filtered = timetableData.filter(entry => entry["Student ID"] === selectedID);
+    const tbody = document.querySelector('#timetable tbody');
+    tbody.innerHTML = '';
+
+    filtered.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Week Start">${row["Week Start"]}</td>
+        <td data-label="Day">${row["Day"]}</td>
+        <td data-label="Time">${row["Time"]}</td>
+        <td data-label="Subject">${row["Subject"]}</td>
+        <td data-label="Teacher">${row["Teacher"]}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+</script>
+
 </body>
 </html>
