@@ -6,8 +6,6 @@
   <title>Student Timetable Viewer</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
   <style>
     body {
       margin: 0;
@@ -95,7 +93,7 @@
 <body>
   <header>
     <h1>Student Timetable</h1>
-    <button class="dashboard-button" onclick="location.href='window.history.back()'">Back to Dashboard</button>
+    <button class="dashboard-button" onclick="location.href='dashboard.html'">Back to Dashboard</button>
   </header>
   <div class="container">
     <select id="studentSelect">
@@ -184,91 +182,25 @@
       });
     }
 
-  document.getElementById('downloadBtn').addEventListener('click', async () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-  const selectedID = document.getElementById('studentSelect').value;
-  const startDateInput = document.getElementById('startDate').value;
-  const endDateInput = document.getElementById('endDate').value;
-  const startDate = new Date(startDateInput);
-  const endDate = new Date(endDateInput);
+      const selectedID = document.getElementById('studentSelect').value;
+      const startDateInput = document.getElementById('startDate').value;
+      const endDateInput = document.getElementById('endDate').value;
+      const startDate = new Date(startDateInput);
+      const endDate = new Date(endDateInput);
 
-  if (!selectedID || !startDateInput || !endDateInput || isNaN(startDate) || isNaN(endDate)) {
-    alert("Please select student and a valid date range.");
-    return;
-  }
+      if (!selectedID || !startDateInput || !endDateInput || isNaN(startDate) || isNaN(endDate)) {
+        alert("Please select student and a valid date range.");
+        return;
+      }
 
-  const filtered = timetableData.filter(entry => {
-    const weekStart = new Date(entry["Week Start"]);
-    return entry["Student ID"] === selectedID && weekStart >= startDate && weekStart <= endDate;
-  });
-
-  if (filtered.length === 0) {
-    alert("No data for selected period.");
-    return;
-  }
-
-  // Add Title
-  doc.setFontSize(16);
-  doc.setTextColor(16, 37, 66);
-  const student = studentData.find(s => s['Student ID'] === selectedID);
-const studentDetails = [
-  `Student Name: ${student?.['Student Full Name'] || ''}`,
-  `Class: ${student?.['Class Admitted To'] || ''}`,
-  `Fee Plan: ${student?.['Fee Plan'] || ''}`,
-  `Subjects: ${student?.['Subjects Opted'] || ''}`,
-  `Date Range: ${startDateInput} to ${endDateInput}`
-];
-
-// Add student details
-doc.setFontSize(14);
-doc.setTextColor(16, 37, 66);
-doc.text(`Timetable for Student ID: ${selectedID}`, 14, 20);
-
-doc.setFontSize(10);
-doc.setTextColor(60);
-studentDetails.forEach((line, index) => {
-  doc.text(line, 14, 28 + index * 6);
-});
-
-const startTableY = 28 + studentDetails.length * 6 + 6; // Push table below the details
-
-
-  const tableData = filtered.map(row => [
-    formatDate(row["Week Start"]),
-    row["Day"] || '',
-    formatTime(row["Time"]),
-    row["Subject"] || '',
-    row["Teacher"] || ''
-  ]);
-
-  doc.autoTable({
-   startY: startTableY,
-    head: [['Week Start', 'Day', 'Time', 'Subject', 'Teacher']],
-    body: tableData,
-    theme: 'grid',
-    headStyles: {
-      fillColor: [253, 187, 45], // golden yellow
-      textColor: [0, 0, 0],
-      halign: 'center',
-      fontStyle: 'bold',
-    },
-    styles: {
-      lineColor: [16, 37, 66], // navy blue border
-      lineWidth: 0.3,
-      fontSize: 10,
-      cellPadding: 3
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245]
-    }
-  });
-
-  const filename = `Timetable_${selectedID}_${startDateInput}_to_${endDateInput}.pdf`;
-  doc.save(filename);
-});
-
+      const filtered = timetableData.filter(entry => {
+        const weekStart = new Date(entry["Week Start"]);
+        return entry["Student ID"] === selectedID && weekStart >= startDate && weekStart <= endDate;
+      });
 
       if (filtered.length === 0) {
         alert("No data for selected period.");
