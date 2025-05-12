@@ -130,7 +130,7 @@
 
   <script>
     function goToDashboard() {
-      window.location.href = "dashboard.html";
+      window.location.href = "teacher-dashboard.html";
     }
 
     // Auto-fill today's date
@@ -155,7 +155,7 @@
         revision: document.getElementById("revision").checked ? "Yes" : "No",
       };
 
-      fetch("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL", {
+      fetch("https://script.google.com/macros/s/AKfycbx0Q9zgxmmAxJxO4WWk4o7t44I2vRKIK8xYfRq1GottkjvQJ3TUFNYmkv2gDBfnemOo/exec", {
         method: "POST",
         mode: "cors",
         headers: {
