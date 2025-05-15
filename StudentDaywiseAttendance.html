@@ -204,17 +204,35 @@
       document.getElementById('summary').innerHTML = `Showing attendance for ${year}-${String(month).padStart(2, '0')}`;
     }
 
-    function downloadPDF() {
-      const element = document.getElementById('printArea');
-      const opt = {
-        margin: 0.3,
-        filename: 'Full_Attendance_Report.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-      };
-      html2pdf().from(element).set(opt).save();
-    }
+  function downloadPDF() {
+    const element = document.getElementById('printArea');
+
+    // Temporarily scale the element to full width for wide tables
+    const originalWidth = element.style.width;
+    element.style.width = '2000px'; // Force wider layout
+
+    const opt = {
+      margin: 0.3,
+      filename: 'Full_Attendance_Report.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        scrollY: 0,
+        useCORS: true
+      },
+      jsPDF: {
+        unit: 'px',
+        format: 'a3', // Wider than a4
+        orientation: 'landscape'
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      // Restore original width after export
+      element.style.width = originalWidth;
+    });
+  }
   </script>
 </body>
 </html>
