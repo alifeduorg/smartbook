@@ -9,7 +9,7 @@
       padding: 20px;
       max-width: 700px;
       margin: auto;
-      background: #f1f1f1;
+      background: #f9f9f9;
     }
     label {
       display: block;
@@ -41,19 +41,12 @@
     #tuitionFields, #amountGroup {
       display: none;
     }
-    #receiptSlip {
-      margin-top: 30px;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      border: 2px solid #007bff;
-      display: none;
-    }
-    #receiptSlip p {
-      margin: 6px 0;
+    #message {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -73,15 +66,15 @@
     <input type="date" id="date" required />
 
     <label>Class</label>
-    <input type="text" id="className" placeholder="e.g., 10th A, 11th Commerce" required />
+    <input type="text" id="className" placeholder="e.g., 10th A" required />
 
     <label>Fee Type</label>
     <select id="feeType" required onchange="handleFeeType()">
       <option value="">Select Fee Type</option>
-      <option value="tuition">Tuition Fee</option>
-      <option value="admission">Admission Fee</option>
-      <option value="exam">Exam Fee</option>
-      <option value="book">Book Fee</option>
+      <option value="Tuition Fee">Tuition Fee</option>
+      <option value="Admission Fee">Admission Fee</option>
+      <option value="Exam Fee">Exam Fee</option>
+      <option value="Book Fee">Book Fee</option>
     </select>
 
     <div id="tuitionFields">
@@ -97,7 +90,7 @@
       <input type="number" id="amount" readonly />
     </div>
 
-    <label>Discount (if any)</label>
+    <label>Discount</label>
     <input type="number" id="discount" min="0" value="0" onchange="calculateTotal()" />
 
     <label>Payment Status</label>
@@ -108,61 +101,54 @@
       <option value="Partial">Partial</option>
     </select>
 
-    <button type="submit">Submit & Generate Slip</button>
+    <button type="submit">Submit</button>
   </form>
 
-  <div id="receiptSlip">
-    <h3>Fee Receipt</h3>
-    <p><strong>Receipt No:</strong> <span id="slipNo"></span></p>
-    <p><strong>Name:</strong> <span id="slipName"></span></p>
-    <p><strong>ID:</strong> <span id="slipID"></span></p>
-    <p><strong>Date:</strong> <span id="slipDate"></span></p>
-    <p><strong>Class:</strong> <span id="slipClass"></span></p>
-    <p><strong>Fee Type:</strong> <span id="slipType"></span></p>
-    <p><strong>Hours:</strong> <span id="slipHours"></span></p>
-    <p><strong>Rate/hr:</strong> <span id="slipRate"></span></p>
-    <p><strong>Discount:</strong> <span id="slipDiscount"></span></p>
-    <p><strong>Total:</strong> <span id="slipTotal"></span></p>
-    <p><strong>Status:</strong> <span id="slipStatus"></span></p>
-    <button onclick="downloadPDF()">Download PDF</button>
-  </div>
+  <div id="message"></div>
 
   <script>
-    // Initialize receipt number and date
-    window.onload = () => {
-      const stored = localStorage.getItem("lastReceipt") || "1000";
-      document.getElementById("receiptNo").value = stored;
-      document.getElementById("date").value = new Date().toISOString().split('T')[0];
-    };
+    const currentYear = new Date().getFullYear();
+
+    function generateReceiptNo() {
+      const last = localStorage.getItem("lastReceipt") || "0";
+      const nextNumber = String(parseInt(last) + 1).padStart(4, '0');
+      const newReceipt = `RCPT-${currentYear}-${nextNumber}`;
+      document.getElementById("receiptNo").value = newReceipt;
+    }
 
     function handleFeeType() {
       const type = document.getElementById("feeType").value;
       const tuitionFields = document.getElementById("tuitionFields");
       const amountGroup = document.getElementById("amountGroup");
+      const amountInput = document.getElementById("amount");
 
-      if (type === "tuition") {
+      if (type === "Tuition Fee") {
         tuitionFields.style.display = "block";
-        document.getElementById("amount").readOnly = true;
+        amountGroup.style.display = "block";
+        amountInput.readOnly = true;
       } else {
         tuitionFields.style.display = "none";
-        document.getElementById("amount").readOnly = false;
         amountGroup.style.display = "block";
-        document.getElementById("amount").value = "";
+        amountInput.readOnly = false;
       }
     }
 
     function calculateTotal() {
-      const type = document.getElementById("feeType").value;
-      let amount = 0;
-      if (type === "tuition") {
+      const feeType = document.getElementById("feeType").value;
+      let total = 0;
+
+      if (feeType === "Tuition Fee") {
         const hours = parseFloat(document.getElementById("hours").value) || 0;
         const rate = parseFloat(document.getElementById("rate").value) || 0;
-        amount = hours * rate;
+        total = hours * rate;
       } else {
-        amount = parseFloat(document.getElementById("amount").value) || 0;
+        total = parseFloat(document.getElementById("amount").value) || 0;
       }
+
       const discount = parseFloat(document.getElementById("discount").value) || 0;
-      document.getElementById("amount").value = Math.max(0, amount - discount).toFixed(2);
+      total = total - discount;
+
+      document.getElementById("amount").value = total.toFixed(2);
     }
 
     function submitBilling(e) {
@@ -181,57 +167,50 @@
       const discount = document.getElementById("discount").value;
       const paymentStatus = document.getElementById("paymentStatus").value;
 
-      // Save to Google Sheets
       const payload = {
-        receiptNo, studentName, studentId, date, className,
-        feeType, hours, rate, discount, totalAmount: amount, paymentStatus
+        receiptNo,
+        studentName,
+        studentId,
+        date,
+        className,
+        feeType,
+        hours,
+        rate,
+        discount,
+        totalAmount: amount,
+        paymentStatus
       };
 
       fetch("https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec", {
         method: "POST",
         body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" }
-      }).then(res => res.json()).then(data => {
+      })
+      .then(res => res.json())
+      .then(data => {
         if (data.status === "success") {
-          showReceipt(payload);
-          // Increment receipt number
-          const next = parseInt(receiptNo) + 1;
-          localStorage.setItem("lastReceipt", next);
-          document.getElementById("receiptNo").value = next;
+          document.getElementById("message").textContent = "✅ Successfully submitted!";
+          const receiptNumber = parseInt(localStorage.getItem("lastReceipt") || "0") + 1;
+          localStorage.setItem("lastReceipt", receiptNumber);
+          generateReceiptNo();
           document.getElementById("billingForm").reset();
           document.getElementById("amount").readOnly = false;
+          document.getElementById("amountGroup").style.display = "none";
           document.getElementById("tuitionFields").style.display = "none";
         } else {
-          alert("Failed to save: " + data.message);
+          document.getElementById("message").textContent = "❌ Submission failed.";
         }
+      })
+      .catch(() => {
+        document.getElementById("message").textContent = "❌ Error connecting to server.";
       });
     }
 
-    function showReceipt(data) {
-      document.getElementById("receiptSlip").style.display = "block";
-      document.getElementById("slipNo").textContent = data.receiptNo;
-      document.getElementById("slipName").textContent = data.studentName;
-      document.getElementById("slipID").textContent = data.studentId;
-      document.getElementById("slipDate").textContent = data.date;
-      document.getElementById("slipClass").textContent = data.className;
-      document.getElementById("slipType").textContent = data.feeType;
-      document.getElementById("slipHours").textContent = data.hours;
-      document.getElementById("slipRate").textContent = data.rate;
-      document.getElementById("slipDiscount").textContent = data.discount;
-      document.getElementById("slipTotal").textContent = data.totalAmount;
-      document.getElementById("slipStatus").textContent = data.paymentStatus;
-    }
-
-    function downloadPDF() {
-      const element = document.getElementById("receiptSlip");
-      html2pdf().set({
-        filename: `Receipt_${document.getElementById("slipNo").textContent}.pdf`,
-        html2canvas: { scale: 2 },
-        jsPDF: { format: 'a4' }
-      }).from(element).save();
-    }
+    window.onload = () => {
+      generateReceiptNo();
+      document.getElementById("date").value = new Date().toISOString().split("T")[0];
+    };
   </script>
 
 </body>
 </html>
-
