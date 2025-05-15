@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Alif Edu Attendance Form</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f9f9f9; }
+  h2 { text-align: center; color: #003366; }
+  label { display: block; margin-top: 15px; font-weight: bold; }
+  select, input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+  button { margin-top: 20px; background: #003366; color: white; padding: 10px; border: none; width: 100%; cursor: pointer; font-size: 16px; }
+  button:hover { background: #0055a5; }
+  .status { margin-top: 20px; text-align: center; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h2>Alif Edu Attendance</h2>
+<form id="attendanceForm">
+  <label for="date">Date</label>
+  <input type="date" id="date" required />
+
+  <label for="time">Time</label>
+  <input type="time" id="time" required />
+
+  <label for="student">Student</label>
+  <select id="student" required><option value="">Loading...</option></select>
+
+  <label for="subject">Subject</label>
+  <input type="text" id="subject" placeholder="Enter Subject" required />
+
+  <label for="teacher">Teacher</label>
+  <select id="teacher" required><option value="">Loading...</option></select>
+
+  <label for="classIn">Class In (Start Time)</label>
+  <input type="time" id="classIn" required />
+
+  <label for="classOut">Class Out (End Time)</label>
+  <input type="time" id="classOut" required />
+
+  <label for="duration">Duration (hours)</label>
+  <input type="number" id="duration" step="0.01" min="0" required />
+
+  <label for="mentor">Mentor</label>
+  <select id="mentor" required><option value="">Loading...</option></select>
+
+  <label for="status">Status</label>
+  <select id="status" required>
+    <option value="Present">Present</option>
+    <option value="Absent">Absent</option>
+  </select>
+
+  <label for="remarks">Remarks</label>
+  <textarea id="remarks" rows="3" placeholder="Optional"></textarea>
+
+  <button type="submit">Submit Attendance</button>
+</form>
+
+<div class="status" id="statusMessage"></div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec";  // Replace this
+
+  // Elements
+  const studentSelect = document.getElementById("student");
+  const teacherSelect = document.getElementById("teacher");
+  const mentorSelect = document.getElementById("mentor");
+  const form = document.getElementById("attendanceForm");
+  const statusMessage = document.getElementById("statusMessage");
+
+  let students = [], teachers = [], mentors = [];
+
+  // Load dropdown data from Google Apps Script
+  async function loadDropdowns() {
+    statusMessage.textContent = "Loading data...";
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=getData`);
+      const data = await res.json();
+      students = data.students;
+      teachers = data.teachers;
+      mentors = data.mentors;
+
+      populateSelect(studentSelect, students, "Select Student");
+      populateSelect(teacherSelect, teachers, "Select Teacher");
+      populateSelect(mentorSelect, mentors, "Select Mentor");
+      statusMessage.textContent = "";
+    } catch (e) {
+      statusMessage.textContent = "Failed to load data.";
+    }
+  }
+
+  function populateSelect(selectElem, items, placeholder) {
+    selectElem.innerHTML = `<option value="">${placeholder}</option>`;
+    items.forEach(item => {
+      // Use unique id as value and display name as text
+      selectElem.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+    });
+  }
+
+  // When form submitted
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    statusMessage.textContent = "Submitting attendance...";
+
+    // Get selected data
+    const studentId = studentSelect.value;
+    const teacherId = teacherSelect.value;
+    const mentorId = mentorSelect.value;
+    if (!studentId || !teacherId || !mentorId) {
+      statusMessage.textContent = "Please select student, teacher and mentor.";
+      return;
+    }
+
+    const studentName = students.find(s => s.id === studentId)?.name || "";
+    const teacherName = teachers.find(t => t.id === teacherId)?.name || "";
+    const mentorName = mentors.find(m => m.id === mentorId)?.name || "";
+
+    const formData = {
+      date: document.getElementById("date").value,
+      time: document.getElementById("time").value,
+      studentName,
+      studentId,
+      subject: document.getElementById("subject").value.trim(),
+      teacherName,
+      teacherId,
+      classIn: document.getElementById("classIn").value,
+      classOut: document.getElementById("classOut").value,
+      duration: document.getElementById("duration").value,
+      mentorName,
+      mentorId,
+      status: document.getElementById("status").value,
+      remarks: document.getElementById("remarks").value.trim(),
+    };
+
+    // Validate required
+    if(!formData.date || !formData.time || !formData.subject || !formData.classIn || !formData.classOut || !formData.duration) {
+      statusMessage.textContent = "Please fill all required fields.";
+      return;
+    }
+
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {"Content-Type": "application/json"}
+      });
+      const result = await response.json();
+      if(result.result === "success") {
+        statusMessage.textContent = "Attendance submitted successfully!";
+        form.reset();
+      } else {
+        statusMessage.textContent = "Error: " + (result.message || "Unknown error");
+      }
+    } catch(err) {
+      statusMessage.textContent = "Submission failed. Please try again.";
+    }
+  });
+
+  loadDropdowns();
+</script>
+
+</body>
+</html>
