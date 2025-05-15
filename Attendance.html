@@ -2,213 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Attendance Entry - Alif Edu</title>
+  <title>Alif Edu Attendance Panel</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 720px;
-      margin: 30px auto;
-      background: #e0e7ff;
-      padding: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
+      background: white;
       border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      padding: 30px;
     }
-    h2 {
+
+    h1 {
       text-align: center;
       color: #1e3a8a;
-      margin-bottom: 25px;
-      text-shadow: 1px 1px 5px #93c5fd;
+      margin-bottom: 30px;
     }
-    label {
-      display: block;
-      font-weight: 600;
-      color: #1e40af;
-      margin-top: 18px;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px 14px;
-      margin-top: 6px;
-      border-radius: 10px;
-      border: 2px solid #60a5fa;
-      font-size: 1rem;
-      color: #1e3a8a;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 10px #2563eb;
-    }
-    button {
-      margin-top: 30px;
-      background: linear-gradient(135deg, #2563eb, #1e40af);
+
+    .dashboard-button {
+      background: #1e40af;
       color: white;
+      padding: 10px 20px;
       border: none;
-      padding: 14px 30px;
-      font-size: 1.2rem;
-      border-radius: 15px;
+      border-radius: 10px;
       cursor: pointer;
-      width: 100%;
-      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.7);
-      transition: background 0.3s ease;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-    button:hover {
-      background: linear-gradient(135deg, #1e40af, #2563eb);
-    }
-    #statusMsg {
-      margin-top: 20px;
-      text-align: center;
-      font-weight: 600;
-      display: none;
-    }
-    #dashboardBtn {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      background: #facc15;
-      color: #1e3a8a;
-      border: none;
-      padding: 10px 16px;
-      font-size: 1rem;
-      border-radius: 12px;
       font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(234, 179, 8, 0.6);
-      transition: background 0.3s ease;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
-    #dashboardBtn:hover {
-      background: #fde047;
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #111827;
+    }
+
+    input, select, textarea {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+
+    .full-width {
+      grid-column: 1 / 3;
+    }
+
+    .submit-btn {
+      background-color: #10b981;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      grid-column: 1 / 3;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <button id="dashboardBtn" onclick="location.href='YOUR_DASHBOARD_LINK_HERE'">Dashboard</button>
-  <h2>Alif Edu Attendance Entry</h2>
-
-  <form id="attendanceForm">
-    <label for="date">Date</label>
-    <input type="date" id="date" required />
-
-    <label for="time">Time</label>
-    <input type="time" id="time" required />
-
-    <label for="studentName">Student Full Name</label>
-    <input type="text" id="studentName" placeholder="Enter full student name" required />
-
-    <label for="studentID">Student ID</label>
-    <input type="text" id="studentID" placeholder="Enter student ID (e.g. ST001)" required />
-
-    <label for="subject">Subject</label>
-    <input type="text" id="subject" placeholder="Enter subject" required />
-
-    <label for="teacherName">Teacher Full Name</label>
-    <input type="text" id="teacherName" placeholder="Enter full teacher name" required />
-
-    <label for="teacherID">Teacher ID</label>
-    <input type="text" id="teacherID" placeholder="Enter teacher ID (e.g. T001)" required />
-
-    <label for="classIn">Class In (Start Time)</label>
-    <input type="time" id="classIn" required />
-
-    <label for="classOut">Class Out (End Time)</label>
-    <input type="time" id="classOut" required />
-
-    <label for="mentorName">Mentor Name</label>
-    <input type="text" id="mentorName" placeholder="Enter mentor full name" required />
-
-    <label for="mentorID">Mentor ID</label>
-    <input type="text" id="mentorID" placeholder="Enter mentor ID (e.g. M001)" required />
-
-    <label for="status">Status</label>
-    <select id="status" required>
-      <option value="">-- Select Status --</option>
-      <option value="Present">Present</option>
-      <option value="Late">Late</option>
-      <option value="Absent">Absent</option>
-    </select>
-
-    <label for="remarks">Remarks</label>
-    <input type="text" id="remarks" placeholder="Optional remarks" />
-
-    <button type="submit">Submit Attendance</button>
-  </form>
-
-  <div id="statusMsg"></div>
+  <div class="container">
+    <button class="dashboard-button" onclick="window.location.href='dashboard.html'">📊 Dashboard</button>
+    <h1>📘 Alif Edu Attendance</h1>
+    <form id="attendanceForm">
+      <div>
+        <label>Date</label>
+        <input type="date" name="Date" required />
+      </div>
+      <div>
+        <label>Time</label>
+        <input type="time" name="Time" required />
+      </div>
+      <div>
+        <label>Student Full Name</label>
+        <input type="text" name="Student Full Name" required />
+      </div>
+      <div>
+        <label>Student ID</label>
+        <input type="text" name="Student ID" required />
+      </div>
+      <div>
+        <label>Subject</label>
+        <input type="text" name="Subject" required />
+      </div>
+      <div>
+        <label>Teacher Full Name</label>
+        <input type="text" name="Teacher Full Name" required />
+      </div>
+      <div>
+        <label>Teacher ID</label>
+        <input type="text" name="Teacher ID" required />
+      </div>
+      <div>
+        <label>Class In</label>
+        <input type="time" name="Class In" required />
+      </div>
+      <div>
+        <label>Class Out</label>
+        <input type="time" name="Class Out" required />
+      </div>
+      <div>
+        <label>Duration (hrs)</label>
+        <input type="number" name="Duration (hrs)" step="0.1" required />
+      </div>
+      <div>
+        <label>Mentor Name</label>
+        <input type="text" name="Mentor Name" required />
+      </div>
+      <div>
+        <label>Mentor ID</label>
+        <input type="text" name="Mentor ID" required />
+      </div>
+      <div>
+        <label>Status</label>
+        <select name="Status" required>
+          <option value="Present">Present</option>
+          <option value="Late">Late</option>
+          <option value="Absent">Absent</option>
+        </select>
+      </div>
+      <div class="full-width">
+        <label>Remarks</label>
+        <textarea name="Remarks" rows="2"></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Submit Attendance ✅</button>
+    </form>
+    <div class="message" id="msg"></div>
+  </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec';
+    const form = document.getElementById("attendanceForm");
+    const msg = document.getElementById("msg");
 
-    document.getElementById('attendanceForm').addEventListener('submit', async function(e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
-      const studentName = document.getElementById('studentName').value.trim();
-      const studentID = document.getElementById('studentID').value.trim().toUpperCase();
-      const subject = document.getElementById('subject').value.trim();
-      const teacherName = document.getElementById('teacherName').value.trim();
-      const teacherID = document.getElementById('teacherID').value.trim().toUpperCase();
-      const classIn = document.getElementById('classIn').value;
-      const classOut = document.getElementById('classOut').value;
-      const mentorName = document.getElementById('mentorName').value.trim();
-      const mentorID = document.getElementById('mentorID').value.trim().toUpperCase();
-      const status = document.getElementById('status').value;
-      const remarks = document.getElementById('remarks').value.trim();
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
 
-      if (classOut <= classIn) {
-        alert('Class Out time must be after Class In time.');
-        return;
-      }
-
-      const diffMs = new Date(`1970-01-01T${classOut}:00`) - new Date(`1970-01-01T${classIn}:00`);
-      const durationHrs = (diffMs / (1000 * 60 * 60)).toFixed(2);
-
-      const attendanceRecord = {
-        Date: date,
-        Time: time,
-        'Student Full Name': studentName,
-        'Student ID': studentID,
-        Subject: subject,
-        'Teacher Full Name': teacherName,
-        'Teacher ID': teacherID,
-        'Class In': classIn,
-        'Class Out': classOut,
-        'Duration (hrs)': durationHrs,
-        'Mentor Name': mentorName,
-        'Mentor ID': mentorID,
-        Status: status,
-        Remarks: remarks
-      };
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec";
 
       try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(attendanceRecord),
-          headers: {
-            'Content-Type': 'application/json'
-          }
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" },
         });
 
-        const result = await response.json();
-        const statusMsg = document.getElementById('statusMsg');
-        if (result.result === 'success') {
-          statusMsg.style.color = '#047857';
-          statusMsg.textContent = '✅ Attendance recorded successfully!';
-          statusMsg.style.display = 'block';
-          this.reset();
+        const result = await res.json();
+        if (result.result === "success") {
+          msg.textContent = "✅ Attendance recorded successfully!";
+          form.reset();
         } else {
-          throw new Error('Failed to save attendance');
+          msg.textContent = "❌ Error: " + result.message;
         }
       } catch (error) {
-        const statusMsg = document.getElementById('statusMsg');
-        statusMsg.style.color = '#b91c1c';
-        statusMsg.textContent = '❌ Error saving attendance: ' + error.message;
-        statusMsg.style.display = 'block';
+        msg.textContent = "❌ Failed to connect. Please check your internet or script permissions.";
       }
     });
   </script>
