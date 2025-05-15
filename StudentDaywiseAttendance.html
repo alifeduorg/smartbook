@@ -1,263 +1,229 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Student Attendance Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Attendance Logbook</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 0; background: #e0e7ff;
-      display: flex; flex-direction: column; align-items: center;
-      min-height: 100vh;
-      perspective: 1000px;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      color: #333;
     }
+
     header {
-      background: linear-gradient(135deg, #4f46e5, #3b82f6);
-      width: 100%; color: white;
-      text-align: center; padding: 1rem 0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      font-size: 1.8rem; font-weight: 700;
-      letter-spacing: 2px;
-      user-select: none;
+      background: navy;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    main {
+
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .btn {
+      background-color: #FFD700;
+      color: navy;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #e6c200;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
       background: white;
       border-radius: 12px;
-      padding: 1rem;
-      margin: 1rem;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-      width: 95%;
-      max-width: 1000px;
-      transform-style: preserve-3d;
-      transition: transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    main:hover {
-      transform: rotateY(10deg) rotateX(5deg);
-      box-shadow: 0 20px 30px rgba(0,0,0,0.25);
-    }
+
     select {
-      font-size: 1rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 8px;
+      padding: 10px;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      margin-bottom: 1rem;
-      width: 180px;
+      margin-right: 10px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      overflow-x: auto;
-      display: block;
-      max-width: 100%;
+      margin-top: 20px;
     }
-    th, td {
+
+    table th, table td {
+      padding: 10px;
+      text-align: left;
       border: 1px solid #ddd;
-      padding: 6px 10px;
+    }
+
+    table th {
+      background: #003366;
+      color: white;
+    }
+
+    #loading {
+      font-size: 1.2rem;
+      color: gray;
       text-align: center;
-      font-size: 0.85rem;
-      user-select: none;
-    }
-    th {
-      background: #6366f1;
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-    tr:nth-child(even) {
-      background: #f3f4f6;
-    }
-    tr:hover {
-      background: #e0e7ff;
-    }
-    .buttons {
-      margin-top: 1rem;
-      text-align: right;
-    }
-    button {
-      background: #4f46e5;
-      color: white;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(79,70,229,0.4);
-      transition: background 0.3s ease;
-      margin-left: 0.5rem;
-      user-select: none;
-    }
-    button:hover {
-      background: #4338ca;
-    }
-    @media (max-width: 768px) {
-      main {
-        padding: 0.5rem;
-        width: 100%;
-        overflow-x: auto;
-      }
-      table {
-        font-size: 0.75rem;
-      }
-      th, td {
-        padding: 4px 6px;
-      }
-      select {
-        width: 100%;
-      }
-      .buttons {
-        text-align: center;
-      }
+      margin: 20px 0;
     }
   </style>
 </head>
 <body>
-  <header>Student Daily Attendance Dashboard</header>
-  <main>
-    <label for="monthSelect">Select Month:</label>
-    <select id="monthSelect"></select>
-    
-    <div id="tableContainer">Loading attendance data...</div>
-
-    <div class="buttons">
-      <button onclick="printPage()">Print</button>
-      <button onclick="downloadCSV()">Download CSV</button>
+  <header>
+    <button class="btn" onclick="history.back()">Dashboard</button>
+    <h1>Student Attendance Logbook</h1>
+    <div>
+      <select id="monthSelect" onchange="onMonthChange()"></select>
+      <button class="btn" onclick="downloadCSV()">Download CSV</button>
+      <button class="btn" onclick="printPDF()">Download PDF</button>
     </div>
-  </main>
+  </header>
+
+  <div class="container">
+    <div id="loading">Loading data...</div>
+    <table id="attendanceTable" style="display: none;">
+      <thead><tr></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
-    // Fetch available months from the backend (you may want to hardcode months if API doesn't provide)
-    // For demo, let's create last 6 months dynamically
-
     const monthSelect = document.getElementById('monthSelect');
-    const tableContainer = document.getElementById('tableContainer');
+    const loading = document.getElementById('loading');
+    const table = document.getElementById('attendanceTable');
+    const tableHead = table.querySelector('thead tr');
+    const tableBody = table.querySelector('tbody');
 
-    function getLastSixMonths() {
-      const months = [];
-      const today = new Date();
-      for (let i = 0; i < 6; i++) {
-        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-        const yyyy = d.getFullYear();
-        const mm = (d.getMonth() + 1).toString().padStart(2, '0');
-        months.push({label: d.toLocaleString('default', {month:'long', year:'numeric'}), value: `${yyyy}-${mm}`});
+    function fetchAvailableMonths() {
+      if (typeof google !== 'undefined' && google.script) {
+        google.script.run.withSuccessHandler(loadMonthDropdown).getAvailableMonths();
+      } else {
+        // For direct browser use, use public URL fallback
+        fetch("https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec?action=months")
+          .then(res => res.json())
+          .then(loadMonthDropdown)
+          .catch(err => {
+            loading.textContent = "Failed to load months.";
+            console.error(err);
+          });
       }
-      return months;
     }
 
-    function populateMonths() {
-      const months = getLastSixMonths();
+    function loadMonthDropdown(months) {
+      monthSelect.innerHTML = "";
       months.forEach(m => {
-        const option = document.createElement('option');
-        option.value = m.value;
-        option.textContent = m.label;
-        monthSelect.appendChild(option);
+        const opt = document.createElement("option");
+        opt.value = m.value;
+        opt.textContent = m.name;
+        monthSelect.appendChild(opt);
       });
+      if (months.length > 0) {
+        fetchAttendance(months[0].value);
+      }
+    }
+
+    function onMonthChange() {
+      fetchAttendance(monthSelect.value);
     }
 
     function fetchAttendance(month) {
-      tableContainer.textContent = "Loading attendance data...";
-      google.script.run.withSuccessHandler(renderTable).withFailureHandler(err => {
-        tableContainer.textContent = "Error loading data: " + err.message;
-      }).getAttendanceByMonth(month);
+      loading.style.display = 'block';
+      table.style.display = 'none';
+      if (typeof google !== 'undefined' && google.script) {
+        google.script.run.withSuccessHandler(displayData).getAttendanceByMonth(month);
+      } else {
+        fetch(`https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec?month=${month}`)
+          .then(res => res.json())
+          .then(displayData)
+          .catch(err => {
+            loading.textContent = "Failed to load data.";
+            console.error(err);
+          });
+      }
     }
 
-    function renderTable(data) {
-      if (data.error) {
-        tableContainer.innerHTML = `<p style="color:red;">${data.error}</p>`;
+    function displayData(data) {
+      if (!data || data.length === 0) {
+        loading.textContent = "No data available.";
         return;
       }
 
-      const dates = data.dates;
-      const students = data.students;
+      loading.style.display = 'none';
+      table.style.display = 'table';
+      tableHead.innerHTML = "";
+      tableBody.innerHTML = "";
 
-      if (!dates.length || !students.length) {
-        tableContainer.innerHTML = "<p>No attendance data available.</p>";
-        return;
-      }
-
-      // Build HTML table
-      let html = '<table><thead><tr><th>Student Name</th>';
-      dates.forEach(d => html += `<th>${d}</th>`);
-      html += '<th>Total Present</th></tr></thead><tbody>';
-
-      students.forEach(s => {
-        html += `<tr><td>${s.name}</td>`;
-        s.attendance.forEach(a => {
-          let mark = '';
-          let color = '';
-          if (a === "Present" || a === "✔️") {
-            mark = '✔️';
-            color = 'green';
-          } else if (a === "Absent" || a === "✘") {
-            mark = '✘';
-            color = 'red';
-          } else {
-            mark = a || '';
-          }
-          html += `<td style="color:${color}; font-weight:bold;">${mark}</td>`;
-        });
-        html += `<td style="font-weight:bold; text-align:center;">${s.totalPresent}</td></tr>`;
+      Object.keys(data[0]).forEach(key => {
+        const th = document.createElement("th");
+        th.textContent = key;
+        tableHead.appendChild(th);
       });
 
-      html += '</tbody></table>';
-      tableContainer.innerHTML = html;
-    }
-
-    monthSelect.addEventListener('change', e => {
-      fetchAttendance(e.target.value);
-    });
-
-    function printPage() {
-      window.print();
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        Object.values(row).forEach(val => {
+          const td = document.createElement("td");
+          td.textContent = val;
+          tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+      });
     }
 
     function downloadCSV() {
-      // Get current table
-      const table = tableContainer.querySelector('table');
-      if (!table) return alert("No table data to download");
+      const rows = [Array.from(tableHead.children).map(th => th.textContent)];
+      Array.from(tableBody.children).forEach(tr => {
+        const row = Array.from(tr.children).map(td => `"${td.textContent}"`);
+        rows.push(row);
+      });
 
-      let csv = '';
-      for (let row of table.rows) {
-        let rowData = [];
-        for (let cell of row.cells) {
-          // Escape commas
-          let text = cell.textContent.replace(/,/g, '');
-          rowData.push(`"${text}"`);
-        }
-        csv += rowData.join(',') + '\n';
-      }
-
-      const blob = new Blob([csv], {type: 'text/csv'});
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = url;
+      const csv = rows.map(r => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
       a.download = `Attendance_${monthSelect.value}.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      URL.revokeObjectURL(url);
     }
 
-    // Initialize
-    populateMonths();
-    monthSelect.value = getLastSixMonths()[0].value;
-    fetchAttendance(monthSelect.value);
-
-  </script>
-  <script>
-    // Load google.script.run when running in GAS environment
-    if(typeof google === 'undefined' || !google.script) {
-      window.google = {script: {run: {
-        withSuccessHandler: (cb) => ({withFailureHandler: (failCb) => { 
-          fetch('https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec?month=' + monthSelect.value)
-            .then(r => r.json())
-            .then(cb)
-            .catch(failCb);
-          return this;
-        }})
-      }}};
+    function printPDF() {
+      const content = document.querySelector(".container").innerHTML;
+      const win = window.open("", "", "height=700,width=1000");
+      win.document.write(`
+        <html><head><title>Attendance PDF</title>
+        <style>
+          body { font-family: sans-serif; padding: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+          th { background: #003366; color: white; }
+        </style>
+        </head><body>
+          <h2>Attendance Report – ${monthSelect.options[monthSelect.selectedIndex].text}</h2>
+          ${content}
+        </body></html>
+      `);
+      win.document.close();
+      win.print();
     }
+
+    fetchAvailableMonths();
   </script>
 </body>
 </html>
