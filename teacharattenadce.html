@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teacher Attendance Sheet</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .dashboard-btn, .action-btn {
+      background: #007bff;
+      color: white;
+      padding: 10px 18px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .dashboard-btn:hover, .action-btn:hover {
+      background-color: #0056b3;
+    }
+    h2 {
+      text-align: center;
+    }
+    input[type="month"] {
+      padding: 8px;
+      font-size: 16px;
+      margin-left: 5px;
+      border-radius: 6px;
+    }
+    table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #e9ecef;
+    }
+    .present { color: green; font-weight: bold; }
+    .absent { color: red; font-weight: bold; }
+    .late { color: orange; font-weight: bold; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <div id="printArea">
+    <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
+    <h2>Teacher Attendance Report</h2>
+
+    <label>Select Month:
+      <input type="month" id="monthPicker" />
+      <button class="action-btn" onclick="loadTeacherData()">Load</button>
+      <button class="action-btn" onclick="downloadPDF()">📄 Download PDF</button>
+    </label>
+
+    <div id="attendanceContainer"></div>
+  </div>
+
+  <script>
+    const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec'; // Replace with your Apps Script web app URL
+
+    function goToDashboard() {
+      window.location.href = 'dashboard.html';
+    }
+
+    function getStatusSymbol(status) {
+      if (!status) return '-';
+      switch (status.toLowerCase()) {
+        case 'present': return '✔️';
+        case 'absent': return '❌';
+        case 'late': return '⏰';
+        default: return status;
+      }
+    }
+
+    async function loadTeacherData() {
+      const monthInput = document.getElementById('monthPicker').value;
+      if (!monthInput) return alert('Please select a month');
+
+      const [year, month] = monthInput.split('-').map(Number);
+      const res = await fetch(sheetAPI);
+      const data = await res.json();
+
+      const filtered = data.filter(row => {
+        const d = new Date(row.Date);
+        return d.getFullYear() === year && d.getMonth() === month - 1;
+      });
+
+      const teachers = {};
+
+      filtered.forEach(row => {
+        const id = row.TeacherID;
+        if (!teachers[id]) {
+          teachers[id] = {
+            name: row.TeacherName,
+            days: {},
+            totalHours: 0
+          };
+        }
+
+        const day = new Date(row.Date).getDate();
+        const hours = parseFloat(row.Duration) || 0;
+        teachers[id].days[day] = {
+          status: row.Status,
+          duration: hours
+        };
+        teachers[id].totalHours += hours;
+      });
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      let html = '<table><tr><th>Teacher Name</th><th>Teacher ID</th>';
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        html += `<th>${d}<br>Hrs</th>`;
+      }
+      html += '<th>Total Hrs</th></tr>';
+
+      for (const [id, info] of Object.entries(teachers)) {
+        html += `<tr><td>${info.name}</td><td>${id}</td>`;
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dayData = info.days[d];
+          if (dayData) {
+            html += `<td>${getStatusSymbol(dayData.status)}<br>${dayData.duration}</td>`;
+          } else {
+            html += `<td>-</td>`;
+          }
+        }
+        html += `<td><strong>${info.totalHours.toFixed(2)}</strong></td></tr>`;
+      }
+
+      html += '</table>';
+      document.getElementById('attendanceContainer').innerHTML = html;
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById('printArea');
+      const originalWidth = element.style.width;
+      element.style.width = '3500px';
+
+      html2pdf().set({
+        margin: 0,
+        filename: 'Teacher_Attendance_Report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: {
+          unit: 'px',
+          format: [3500, 2000],
+          orientation: 'landscape'
+        }
+      }).from(element).save().then(() => {
+        element.style.width = originalWidth;
+      });
+    }
+  </script>
+</body>
+</html>
