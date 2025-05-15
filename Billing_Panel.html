@@ -1,194 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Billing Panel</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
-      background: #f3f3f3;
-      padding: 20px;
-    }
-    h2 {
-      text-align: center;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      margin-bottom: 10px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px;
-      font-size: 16px;
-      width: 100%;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    #tuitionFields, #amountGroup {
-      display: none;
-    }
-    #message {
-      margin-top: 15px;
-      font-weight: bold;
-      color: green;
-      text-align: center;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Billing Panel</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f7f9fc;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+  input[type=text], input[type=number], input[type=date], select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  input[readonly] {
+    background-color: #e9ecef;
+  }
+  .flex-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  .flex-row > div {
+    flex: 1;
+  }
+  button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  #message {
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+  }
+  #receiptArea {
+    margin-top: 30px;
+    background: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+    font-family: monospace;
+    white-space: pre-wrap;
+    display: none;
+  }
+</style>
 </head>
 <body>
+  <h1>Billing Panel</h1>
 
-  <h2>Billing Panel</h2>
-  <form id="billingForm" onsubmit="submitBilling(event)">
-    <label>Receipt No (Auto)</label>
-    <input type="text" id="receiptNo" readonly />
+  <form id="billingForm">
 
-    <label>Student Name</label>
-    <input type="text" id="studentName" required>
+    <label for="receiptNo">Receipt Number</label>
+    <input type="text" id="receiptNo" name="receiptNo" readonly />
 
-    <label>Student ID</label>
-    <input type="text" id="studentId" required>
+    <label for="date">Date</label>
+    <input type="date" id="date" name="date" readonly />
 
-    <label>Date</label>
-    <input type="date" id="date" required>
+    <label for="studentName">Student Name</label>
+    <input type="text" id="studentName" name="studentName" required />
 
-    <label>Class</label>
-    <input type="text" id="className" required>
+    <label for="studentId">Student ID</label>
+    <input type="text" id="studentId" name="studentId" required />
 
-    <label>Fee Type</label>
-    <select id="feeType" required onchange="handleFeeType()">
-      <option value="">Select</option>
+    <label for="className">Class</label>
+    <input type="text" id="className" name="className" placeholder="Type or select class" list="classList" required />
+    <datalist id="classList">
+      <option value="Math"></option>
+      <option value="Science"></option>
+      <option value="English"></option>
+      <option value="History"></option>
+    </datalist>
+
+    <label for="feeType">Fee Type</label>
+    <select id="feeType" name="feeType" required>
+      <option value="">-- Select Fee Type --</option>
       <option value="Tuition Fee">Tuition Fee</option>
       <option value="Admission Fee">Admission Fee</option>
       <option value="Exam Fee">Exam Fee</option>
       <option value="Book Fee">Book Fee</option>
     </select>
 
-    <div id="tuitionFields">
-      <label>Hours</label>
-      <input type="number" id="hours" min="0" onchange="calculateTotal()">
-
-      <label>Rate per Hour</label>
-      <input type="number" id="rate" min="0" onchange="calculateTotal()">
+    <div id="tuitionFields" style="display:none; margin-top: 10px;">
+      <div class="flex-row">
+        <div>
+          <label for="hours">Hours</label>
+          <input type="number" id="hours" name="hours" min="0" step="0.5" value="0" />
+        </div>
+        <div>
+          <label for="perHourRate">Per Hour Rate</label>
+          <input type="number" id="perHourRate" name="perHourRate" min="0" step="0.01" value="0" />
+        </div>
+      </div>
     </div>
 
-    <div id="amountGroup">
-      <label>Total Amount</label>
-      <input type="number" id="amount" min="0" onchange="calculateTotal()">
+    <div id="otherFeeAmountDiv" style="display:none; margin-top: 10px;">
+      <label for="otherAmount">Amount</label>
+      <input type="number" id="otherAmount" name="otherAmount" min="0" step="0.01" />
     </div>
 
-    <label>Discount</label>
-    <input type="number" id="discount" value="0" onchange="calculateTotal()">
-
-    <label>Payment Status</label>
-    <select id="paymentStatus" required>
-      <option value="">Select</option>
+    <label for="paymentStatus">Payment Status</label>
+    <select id="paymentStatus" name="paymentStatus" required>
+      <option value="">-- Select Payment Status --</option>
       <option value="Paid">Paid</option>
       <option value="Pending">Pending</option>
-      <option value="Partial">Partial</option>
+      <option value="Discounted">Discounted</option>
     </select>
+
+    <label for="discount">Discount (if any)</label>
+    <input type="number" id="discount" name="discount" min="0" step="0.01" value="0" />
+
+    <label for="totalAmount">Total Amount</label>
+    <input type="number" id="totalAmount" name="totalAmount" readonly />
 
     <button type="submit">Submit</button>
   </form>
 
   <div id="message"></div>
 
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec";
+  <div id="receiptArea"></div>
 
-    function handleFeeType() {
-      const type = document.getElementById("feeType").value;
-      const tuition = document.getElementById("tuitionFields");
-      const amountGroup = document.getElementById("amountGroup");
+<script>
+  const webAppUrl = "https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec"; // <-- Replace with your Apps Script web app URL
 
-      if (type === "Tuition Fee") {
-        tuition.style.display = "block";
-        amountGroup.style.display = "block";
-        document.getElementById("amount").readOnly = true;
-      } else if (type) {
-        tuition.style.display = "none";
-        amountGroup.style.display = "block";
-        document.getElementById("amount").readOnly = false;
-      } else {
-        tuition.style.display = "none";
-        amountGroup.style.display = "none";
+  const receiptNoInput = document.getElementById('receiptNo');
+  const dateInput = document.getElementById('date');
+  const feeTypeSelect = document.getElementById('feeType');
+  const tuitionFields = document.getElementById('tuitionFields');
+  const otherFeeAmountDiv = document.getElementById('otherFeeAmountDiv');
+  const hoursInput = document.getElementById('hours');
+  const perHourRateInput = document.getElementById('perHourRate');
+  const otherAmountInput = document.getElementById('otherAmount');
+  const discountInput = document.getElementById('discount');
+  const totalAmountInput = document.getElementById('totalAmount');
+  const paymentStatusSelect = document.getElementById('paymentStatus');
+  const messageDiv = document.getElementById('message');
+  const receiptArea = document.getElementById('receiptArea');
+
+  // Set today's date on load
+  function setTodayDate() {
+    const today = new Date().toISOString().substr(0,10);
+    dateInput.value = today;
+  }
+
+  // Fetch last receipt number from server, then set next
+  async function fetchReceiptNumber() {
+    try {
+      const res = await fetch(webAppUrl + "?action=getLastReceipt");
+      if (!res.ok) throw new Error("Failed to fetch receipt number");
+      const data = await res.json();
+
+      let lastReceipt = data.lastReceipt; // e.g. "RCPT-2025-0005"
+      let nextReceiptNo = "RCPT-" + new Date().getFullYear() + "-0001";
+      if (lastReceipt) {
+        const parts = lastReceipt.split("-");
+        if(parts.length === 3 && parts[1] == new Date().getFullYear()) {
+          const lastNum = parseInt(parts[2],10);
+          const newNum = (lastNum + 1).toString().padStart(4,"0");
+          nextReceiptNo = `RCPT-${parts[1]}-${newNum}`;
+        }
       }
+      receiptNoInput.value = nextReceiptNo;
+    } catch (err) {
+      receiptNoInput.value = "RCPT-" + new Date().getFullYear() + "-0001";
+      console.error(err);
     }
+  }
 
-    function calculateTotal() {
-      const feeType = document.getElementById("feeType").value;
-      let total = 0;
-
-      if (feeType === "Tuition Fee") {
-        const hours = parseFloat(document.getElementById("hours").value) || 0;
-        const rate = parseFloat(document.getElementById("rate").value) || 0;
-        total = hours * rate;
-      } else {
-        total = parseFloat(document.getElementById("amount").value) || 0;
-      }
-
-      const discount = parseFloat(document.getElementById("discount").value) || 0;
-      total -= discount;
-
-      document.getElementById("amount").value = total.toFixed(2);
-    }
-
-    function submitBilling(e) {
-      e.preventDefault();
+  // Show/hide inputs based on fee type
+  feeTypeSelect.addEventListener('change', () => {
+    const val = feeTypeSelect.value;
+    if(val === "Tuition Fee") {
+      tuitionFields.style.display = "block";
+      otherFeeAmountDiv.style.display = "none";
+      otherAmountInput.value = "";
       calculateTotal();
+    } else if(val) {
+      tuitionFields.style.display = "none";
+      otherFeeAmountDiv.style.display = "block";
+      hoursInput.value = 0;
+      perHourRateInput.value = 0;
+      calculateTotal();
+    } else {
+      tuitionFields.style.display = "none";
+      otherFeeAmountDiv.style.display = "none";
+      totalAmountInput.value = "";
+    }
+  });
 
-      const data = {
-        studentName: document.getElementById("studentName").value,
-        studentId: document.getElementById("studentId").value,
-        date: document.getElementById("date").value,
-        className: document.getElementById("className").value,
-        feeType: document.getElementById("feeType").value,
-        hours: document.getElementById("hours").value || "-",
-        rate: document.getElementById("rate").value || "-",
-        discount: document.getElementById("discount").value || 0,
-        totalAmount: document.getElementById("amount").value,
-        paymentStatus: document.getElementById("paymentStatus").value
-      };
+  // Calculate total amount
+  function calculateTotal() {
+    let total = 0;
+    const discount = parseFloat(discountInput.value) || 0;
 
-      fetch(scriptURL, {
+    if(feeTypeSelect.value === "Tuition Fee") {
+      const hours = parseFloat(hoursInput.value) || 0;
+      const rate = parseFloat(perHourRateInput.value) || 0;
+      total = hours * rate;
+    } else {
+      total = parseFloat(otherAmountInput.value) || 0;
+    }
+
+    total = total - discount;
+    if(total < 0) total = 0;
+
+    totalAmountInput.value = total.toFixed(2);
+  }
+
+  // Event listeners for dynamic calculation
+  hoursInput.addEventListener('input', calculateTotal);
+  perHourRateInput.addEventListener('input', calculateTotal);
+  otherAmountInput.addEventListener('input', calculateTotal);
+  discountInput.addEventListener('input', calculateTotal);
+
+  // Submit form data
+  document.getElementById('billingForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    messageDiv.textContent = "Submitting...";
+    receiptArea.style.display = "none";
+
+    const data = {
+      receiptNo: receiptNoInput.value,
+      date: dateInput.value,
+      studentName: document.getElementById('studentName').value.trim(),
+      studentId: document.getElementById('studentId').value.trim(),
+      className: document.getElementById('className').value.trim(),
+      feeType: feeTypeSelect.value,
+      hours: feeTypeSelect.value === "Tuition Fee" ? (parseFloat(hoursInput.value) || 0) : 0,
+      perHourRate: feeTypeSelect.value === "Tuition Fee" ? (parseFloat(perHourRateInput.value) || 0) : 0,
+      amount: parseFloat(totalAmountInput.value) || 0,
+      paymentStatus: paymentStatusSelect.value,
+      discount: parseFloat(discountInput.value) || 0,
+    };
+
+    // Basic validation
+    if(!data.studentName || !data.studentId || !data.className || !data.feeType || !data.paymentStatus){
+      messageDiv.textContent = "Please fill all required fields.";
+      return;
+    }
+
+    try {
+      const response = await fetch(webAppUrl, {
         method: "POST",
         body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.status === "success") {
-          document.getElementById("message").textContent = `✅ Submitted! Receipt: ${res.receiptNo}`;
-          document.getElementById("receiptNo").value = res.receiptNo;
-          document.getElementById("billingForm").reset();
-          handleFeeType();
-        } else {
-          document.getElementById("message").textContent = "❌ Submission failed.";
+        headers: {
+          "Content-Type": "application/json"
         }
-      })
-      .catch(() => {
-        document.getElementById("message").textContent = "❌ Error connecting to server.";
       });
-    }
 
-    // Auto-fill today's date
-    window.onload = () => {
-      const today = new Date().toISOString().split("T")[0];
-      document.getElementById("date").value = today;
-    };
-  </script>
+      if(!response.ok) throw new Error("Server error " + response.status);
+      const resData = await response.json();
+
+      if(resData.success) {
+        messageDiv.style.color = "green";
+        messageDiv.textContent = "Billing data saved successfully!";
+
+        // Show receipt
+        showReceipt(data);
+
+        // Reset form except receipt number and date
+        document.getElementById('billingForm').reset();
+        discountInput.value = "0";
+        totalAmountInput.value = "";
+        tuitionFields.style.display = "none";
+        otherFeeAmountDiv.style.display = "none";
+
+        // Fetch next receipt number
+        await fetchReceiptNumber();
+      } else {
+        messageDiv.style.color = "red";
+        messageDiv.textContent = "Error: " + (resData.message || "Unknown error");
+      }
+    } catch(err) {
+      messageDiv.style.color = "red";
+      messageDiv.textContent = "Error: " + err.message;
+    }
+  });
+
+  // Show receipt text with download option
+  function showReceipt(data) {
+    receiptArea.style.display = "block";
+    const receiptText = `
+*** Billing Receipt ***
+
+Receipt No: ${data.receiptNo}
+Date: ${data.date}
+
+Student Name: ${data.studentName}
+Student ID: ${data.studentId}
+Class: ${data.className}
+
+Fee Type: ${data.feeType}
+${data.feeType === "Tuition Fee" ? `Hours: ${data.hours}\nPer Hour Rate: ${data.perHourRate.toFixed(2)}` : ""}
+Amount: ${data.amount.toFixed(2)}
+
+Discount: ${data.discount.toFixed(2)}
+Payment Status: ${data.paymentStatus}
+
+Thank you for your payment!
+    `.trim();
+
+    receiptArea.textContent = receiptText;
+  }
+
+  // Init
+  setTodayDate();
+  fetchReceiptNumber();
+</script>
 
 </body>
 </html>
