@@ -204,33 +204,31 @@
       document.getElementById('summary').innerHTML = `Showing attendance for ${year}-${String(month).padStart(2, '0')}`;
     }
 
-  function downloadPDF() {
+ function downloadPDF() {
     const element = document.getElementById('printArea');
 
-    // Temporarily scale up width to allow full rendering
+    // Widen content temporarily to fit full data
     const originalWidth = element.style.width;
-    element.style.width = '2500px'; // Wider for more columns
+    element.style.width = '3500px'; // Very wide page to fit all columns
 
     const opt = {
-      margin: 0.2,
+      margin: 0,
       filename: 'Full_Attendance_Report.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg', quality: 1 },
       html2canvas: {
-        scale: 1.2, // Reduce this to zoom out more
-        scrollY: 0,
+        scale: 2,       // High-res render
         useCORS: true
       },
       jsPDF: {
         unit: 'px',
-        format: 'a2', // Wider than a3/a4
+        format: [3500, 2000], // 🟢 Custom wide format
         orientation: 'landscape'
       },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     html2pdf().set(opt).from(element).save().then(() => {
-      // Restore original width after PDF
-      element.style.width = originalWidth;
+      element.style.width = originalWidth; // Reset width
     });
   }
   </script>
