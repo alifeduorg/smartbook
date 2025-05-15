@@ -1,152 +1,261 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Billing Panel</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: navy;
-      font-family: Arial, sans-serif;
-      color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafb;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
     }
-
-    .container {
-      background: white;
-      margin: 40px auto;
-      padding: 30px;
-      width: 600px;
-      border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
     }
-
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
     input, select {
       width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 6px;
+      padding: 8px;
+      margin-top: 6px;
+      border-radius: 5px;
       border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
     }
-
+    .inline-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .inline-group > * {
+      flex: 1;
+    }
     button {
-      background: navy;
+      margin-top: 25px;
+      background-color: #007bff;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    .dashboard-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #fff;
-      color: navy;
-      padding: 10px 20px;
+      padding: 12px;
+      font-size: 16px;
       border-radius: 8px;
-      font-weight: bold;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
       cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
     }
-
-    .popup {
+    button:hover {
+      background-color: #0056b3;
+    }
+    #totalAmount {
+      font-weight: 700;
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    #slip {
+      margin-top: 30px;
+      padding: 15px;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      background: white;
       display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 400px;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-      z-index: 999;
     }
-
-    .popup h3 {
-      margin-top: 0;
+    #slip h3 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    #slip p {
+      margin: 5px 0;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-<div class="dashboard-btn" onclick="goToDashboard()">Dashboard</div>
-
-<div class="container">
   <h2>Billing Panel</h2>
-  <input type="text" id="class" placeholder="Class">
-  <input type="text" id="studentName" placeholder="Student Name">
-  <input type="text" id="studentID" placeholder="Student ID">
-  <input type="text" id="feePlan" placeholder="Fee Plan">
-  <input type="date" id="classStartDate" placeholder="Class Start Date">
-  <input type="number" id="daysPurchased" placeholder="Days Purchased">
-  <input type="number" id="totalFee" placeholder="Total Fee">
-  <input type="number" id="paidAmount" placeholder="Paid Amount">
-  <input type="number" id="balance" placeholder="Balance">
-  <input type="text" id="paymentMode" placeholder="Payment Mode">
-  <input type="text" id="remarks" placeholder="Remarks">
-  <select id="paymentStatus">
-    <option value="Paid">Paid</option>
-    <option value="Pending">Pending</option>
-  </select>
-  <button onclick="submitData()">Submit</button>
-</div>
 
-<div class="popup" id="slipPopup">
-  <h3>Fee Slip</h3>
-  <p><strong>Receipt No:</strong> <span id="slipReceipt"></span></p>
-  <p><strong>Student:</strong> <span id="slipStudent"></span></p>
-  <p><strong>Amount:</strong> ₹<span id="slipAmount"></span></p>
-  <button onclick="downloadSlip()">Download</button>
-  <button onclick="document.getElementById('slipPopup').style.display='none'">Close</button>
-</div>
+  <form id="billingForm" onsubmit="return submitForm(event)">
+    <label>Receipt No (auto-generated)</label>
+    <input type="text" id="receiptNo" name="receiptNo" readonly />
 
-<script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhVD_GWLlE1JeMScnEKBSsWypN0_rUKvANrfqw_NUPfk9wuRoq5tEuViz-OwZO3DjBhQ/exec';
+    <label>Student Name</label>
+    <input type="text" id="studentName" name="studentName" required />
 
-  function submitData() {
-    const data = {
-      class: document.getElementById('class').value,
-      studentName: document.getElementById('studentName').value,
-      studentID: document.getElementById('studentID').value,
-      feePlan: document.getElementById('feePlan').value,
-      classStartDate: document.getElementById('classStartDate').value,
-      daysPurchased: document.getElementById('daysPurchased').value,
-      totalFee: document.getElementById('totalFee').value,
-      paidAmount: document.getElementById('paidAmount').value,
-      balance: document.getElementById('balance').value,
-      paymentMode: document.getElementById('paymentMode').value,
-      remarks: document.getElementById('remarks').value,
-      paymentStatus: document.getElementById('paymentStatus').value
-    };
+    <label>Student ID</label>
+    <input type="text" id="studentId" name="studentId" required />
 
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(res => res.json())
-    .then(response => {
-      document.getElementById('slipReceipt').innerText = response.receiptNo;
-      document.getElementById('slipStudent').innerText = data.studentName;
-      document.getElementById('slipAmount').innerText = data.paidAmount;
-      document.getElementById('slipPopup').style.display = 'block';
-    })
-    .catch(err => alert('Error: ' + err.message));
-  }
+    <label>Date</label>
+    <input type="date" id="date" name="date" required />
 
-  function goToDashboard() {
-    alert("Redirect to dashboard page.");
-  }
+    <label>Class</label>
+    <select id="classSelect" name="classSelect" required>
+      <option value="">Select Class</option>
+      <option>Class 1</option>
+      <option>Class 2</option>
+      <option>Class 3</option>
+      <option>Class 4</option>
+      <option>Class 5</option>
+    </select>
 
-  function downloadSlip() {
-    window.print(); // You can enhance this to download a PDF
-  }
-</script>
+    <label>Fee Type</label>
+    <select id="feeType" name="feeType" required onchange="feeTypeChanged()">
+      <option value="">Select Fee Type</option>
+      <option value="tuition">Tuition Fee</option>
+      <option value="admission">Admission Fee</option>
+      <option value="exam">Exam Fee</option>
+      <option value="book">Book Fee</option>
+    </select>
 
-</body>
-</html>
+    <div id="tuitionDetails" style="display:none; margin-top:10px;">
+      <label>Number of Hours</label>
+      <input type="number" id="numHours" min="1" step="0.1" value="1" onchange="calculateTotal()" />
+
+      <label>Subject Teacher</label>
+      <select id="subjectTeacher" onchange="calculateTotal()">
+        <option value="">Select Teacher</option>
+        <option value="30">Math - $30/hr</option>
+        <option value="25">English - $25/hr</option>
+        <option value="35">Science - $35/hr</option>
+        <option value="20">History - $20/hr</option>
+      </select>
+    </div>
+
+    <label>Amount</label>
+    <input type="number" id="amount" name="amount" readonly />
+
+    <label>Discount (if any)</label>
+    <input type="number" id="discount" name="discount" min="0" step="0.01" value="0" onchange="calculateTotal()" />
+
+    <label>Payment Status</label>
+    <select id="paymentStatus" name="paymentStatus" required>
+      <option value="">Select Status</option>
+      <option>Paid</option>
+      <option>Pending</option>
+      <option>Partial</option>
+    </select>
+
+    <button type="submit">Submit & Generate Slip</button>
+  </form>
+
+  <div id="slip">
+    <h3>Fee Receipt</h3>
+    <p><strong>Receipt No:</strong> <span id="slipReceiptNo"></span></p>
+    <p><strong>Student Name:</strong> <span id="slipStudentName"></span></p>
+    <p><strong>Student ID:</strong> <span id="slipStudentId"></span></p>
+    <p><strong>Date:</strong> <span id="slipDate"></span></p>
+    <p><strong>Class:</strong> <span id="slipClass"></span></p>
+    <p><strong>Fee Type:</strong> <span id="slipFeeType"></span></p>
+    <p><strong>Hours:</strong> <span id="slipHours"></span></p>
+    <p><strong>Rate per Hour:</strong> $<span id="slipRate"></span></p>
+    <p><strong>Discount:</strong> $<span id="slipDiscount"></span></p>
+    <p><strong>Total Amount:</strong> $<span id="slipTotal"></span></p>
+    <p><strong>Payment Status:</strong> <span id="slipPaymentStatus"></span></p>
+    <button onclick="downloadSlip()">Download Receipt PDF</button>
+  </div>
+
+  <script>
+    // Initialize receipt number from localStorage or start at 1000
+    function initReceiptNo() {
+      let receiptNo = localStorage.getItem('receiptNo');
+      if (!receiptNo) {
+        receiptNo = 1000;
+        localStorage.setItem('receiptNo', receiptNo);
+      }
+      document.getElementById('receiptNo').value = receiptNo;
+    }
+
+    function feeTypeChanged() {
+      const feeType = document.getElementById('feeType').value;
+      const tuitionDetails = document.getElementById('tuitionDetails');
+      if (feeType === 'tuition') {
+        tuitionDetails.style.display = 'block';
+        calculateTotal();
+      } else {
+        tuitionDetails.style.display = 'none';
+        document.getElementById('amount').value = getFlatFee(feeType);
+      }
+    }
+
+    function getFlatFee(feeType) {
+      switch (feeType) {
+        case 'admission': return 100; // flat admission fee
+        case 'exam': return 50;
+        case 'book': return 75;
+        default: return 0;
+      }
+    }
+
+    function calculateTotal() {
+      const feeType = document.getElementById('feeType').value;
+      let amount = 0;
+      if (feeType === 'tuition') {
+        const hours = parseFloat(document.getElementById('numHours').value) || 0;
+        const rate = parseFloat(document.getElementById('subjectTeacher').value) || 0;
+        amount = hours * rate;
+      } else {
+        amount = getFlatFee(feeType);
+      }
+
+      const discount = parseFloat(document.getElementById('discount').value) || 0;
+      amount = amount - discount;
+      if (amount < 0) amount = 0;
+      document.getElementById('amount').value = amount.toFixed(2);
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+
+      // Gather form data
+      const receiptNo = document.getElementById('receiptNo').value;
+      const studentName = document.getElementById('studentName').value.trim();
+      const studentId = document.getElementById('studentId').value.trim();
+      const date = document.getElementById('date').value;
+      const className = document.getElementById('classSelect').value;
+      const feeType = document.getElementById('feeType').value;
+      const hours = feeType === 'tuition' ? parseFloat(document.getElementById('numHours').value) : 0;
+      const rate = feeType === 'tuition' ? parseFloat(document.getElementById('subjectTeacher').value) : 0;
+      const discount = parseFloat(document.getElementById('discount').value) || 0;
+      const totalAmount = parseFloat(document.getElementById('amount').value);
+      const paymentStatus = document.getElementById('paymentStatus').value;
+
+      // Validate minimum fields again
+      if (!studentName || !studentId || !date || !className || !feeType || !paymentStatus) {
+        alert('Please fill all required fields.');
+        return;
+      }
+      if (feeType === 'tuition' && (!hours || !rate)) {
+        alert('Please select subject teacher and hours for tuition fee.');
+        return;
+      }
+
+      // Store in Google Sheet via Google Apps Script API (replace YOUR_WEB_APP_URL)
+      const payload = {
+        receiptNo, studentName, studentId, date, className,
+        feeType, hours, rate, discount, totalAmount, paymentStatus
+      };
+
+      fetch('https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('Billing info saved successfully!');
+          showSlip(payload);
+          incrementReceiptNo();
+          document.getElementById('billingForm').reset();
+          document.getElementById('amount').value = '';
+          document.getElementById('tuitionDetails').style.display = 'none';
+        } else {
+          alert('Failed to save billing info.');
+        }
+      })
+      .catch(err => {
+       
