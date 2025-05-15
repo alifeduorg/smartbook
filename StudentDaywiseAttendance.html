@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Monthly Attendance Dashboard</title>
 
-  <!-- Styles -->
+  <!-- Style -->
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -71,7 +71,7 @@
     }
 
     th, td {
-      padding: 12px;
+      padding: 10px;
       text-align: center;
       border: 1px solid #ccc;
     }
@@ -94,38 +94,49 @@
     .status-absent { color: red; font-size: 18px; }
     .status-late { color: orange; font-size: 18px; }
     .status-empty { color: #aaa; }
+
+    #summary {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 
-  <!-- PDF Library -->
+  <!-- PDF library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-  <!-- Dashboard Button -->
-  <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
-
-  <!-- Page Title -->
-  <h2>Monthly Attendance Viewer</h2>
-
-  <!-- Filters -->
-  <label>
-    Select Month:
-    <input type="month" id="monthPicker">
-    <button class="action-btn" onclick="loadAttendance()">Load Attendance</button>
-    <button class="action-btn" onclick="downloadPDF()">⬇️ Download as PDF</button>
-  </label>
-
-  <!-- Attendance Table -->
   <div id="printArea">
+
+    <!-- Dashboard Button -->
+    <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
+
+    <!-- Page Title -->
+    <h2>Monthly Attendance Viewer</h2>
+
+    <!-- Filters -->
+    <label>
+      Select Month:
+      <input type="month" id="monthPicker">
+      <button class="action-btn" onclick="loadAttendance()">Load Attendance</button>
+      <button class="action-btn" onclick="downloadPDF()">⬇️ Download Full Page as PDF</button>
+    </label>
+
+    <!-- Attendance Table -->
     <div id="attendanceContainer"></div>
+
+    <!-- Summary -->
+    <div id="summary"></div>
+
   </div>
 
   <!-- Script -->
   <script>
-    const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec'; // 🔁 Replace with your deployed Google Apps Script URL
+    const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec'; // 🔁 Replace with your Google Apps Script Web App URL
 
     function goToDashboard() {
-      window.location.href = 'dashboard.html'; // 🔁 Replace with your dashboard/home page
+      window.location.href = 'dashboard.html'; // 🔁 Replace with your actual dashboard URL
     }
 
     function getStatusSymbol(status) {
@@ -158,11 +169,15 @@
         if (!students[key]) {
           students[key] = {
             name: row.StudentName,
-            days: {}
+            days: {},
+            totalPresent: 0
           };
         }
         const day = new Date(row.Date).getDate();
         students[key].days[day] = row.Status;
+        if (row.Status && row.Status.toLowerCase() === 'present') {
+          students[key].totalPresent++;
+        }
       });
 
       const daysInMonth = new Date(year, month, 0).getDate();
@@ -170,7 +185,9 @@
       for (let d = 1; d <= daysInMonth; d++) {
         html += `<th>${d}</th>`;
       }
-      html += '</tr>';
+      html += `<th>Total Present</th></tr>`;
+
+      let summary = '';
 
       for (const [id, info] of Object.entries(students)) {
         html += `<tr><td>${info.name}</td><td>${id}</td>`;
@@ -178,18 +195,20 @@
           const rawStatus = info.days[d] || '';
           html += `<td>${getStatusSymbol(rawStatus)}</td>`;
         }
-        html += '</tr>';
+        html += `<td><strong>${info.totalPresent}</strong></td></tr>`;
       }
 
       html += '</table>';
       document.getElementById('attendanceContainer').innerHTML = html;
+
+      document.getElementById('summary').innerHTML = `Showing attendance for ${year}-${String(month).padStart(2, '0')}`;
     }
 
     function downloadPDF() {
       const element = document.getElementById('printArea');
       const opt = {
         margin: 0.3,
-        filename: 'Attendance_Report.pdf',
+        filename: 'Full_Attendance_Report.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
