@@ -2,25 +2,36 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Premium Student Billing Panel</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #fff8dc, #fdfdfd);
     }
+
     .card-3d {
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
       transform: perspective(1000px) rotateX(2deg) rotateY(-2deg);
       transition: all 0.3s ease-in-out;
     }
+
     .card-3d:hover {
       transform: perspective(1000px) rotateX(0) rotateY(0);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     }
+
     .popup {
       background: #fff;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -35,10 +46,10 @@
 
     <form id="billingForm" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="date" id="date" class="border p-2 rounded" required>
-        <input type="text" id="studentName" placeholder="Student Name" class="border p-2 rounded" required>
-        <input type="text" id="studentID" placeholder="Student ID" class="border p-2 rounded" required>
-        <input type="text" id="className" placeholder="Class Name" class="border p-2 rounded" required>
+        <input type="date" id="date" class="border p-2 rounded" required />
+        <input type="text" id="studentName" placeholder="Student Name" class="border p-2 rounded" required />
+        <input type="text" id="studentID" placeholder="Student ID" class="border p-2 rounded" required />
+        <input type="text" id="className" placeholder="Class Name" class="border p-2 rounded" required />
       </div>
 
       <select id="feeType" class="border p-2 rounded w-full" required>
@@ -55,10 +66,10 @@
       </div>
 
       <div id="amountField" class="hidden">
-        <input type="number" step="0.01" id="simpleAmount" placeholder="Amount" class="border p-2 rounded w-full">
+        <input type="number" step="0.01" id="simpleAmount" placeholder="Amount" class="border p-2 rounded w-full" />
       </div>
 
-      <input type="number" step="0.01" id="discount" placeholder="Discount" class="border p-2 rounded w-full">
+      <input type="number" step="0.01" id="discount" placeholder="Discount" class="border p-2 rounded w-full" />
 
       <select id="paymentStatus" class="border p-2 rounded w-full" required>
         <option value="">Select Payment Status</option>
@@ -67,7 +78,7 @@
         <option value="Discounted">Discounted</option>
       </select>
 
-      <input type="text" id="totalAmount" placeholder="Total Amount" class="border p-2 rounded w-full bg-gray-100" readonly>
+      <input type="number" step="0.01" id="totalAmount" placeholder="Total Amount" class="border p-2 rounded w-full bg-gray-100" readonly />
 
       <button type="submit" class="bg-blue-800 hover:bg-blue-900 text-white w-full py-2 px-4 rounded shadow">Submit</button>
     </form>
@@ -110,9 +121,9 @@
       const div = document.createElement("div");
       div.className = "grid grid-cols-3 gap-2";
       div.innerHTML = `
-        <input type="text" placeholder="Teacher Name" class="teacherName border p-2 rounded" required>
-        <input type="number" step="0.1" placeholder="Hours" class="hours border p-2 rounded" required>
-        <input type="number" step="0.1" placeholder="Hourly Rate" class="rate border p-2 rounded" required>
+        <input type="text" placeholder="Teacher Name" class="teacherName border p-2 rounded" required />
+        <input type="number" step="0.1" placeholder="Hours" class="hours border p-2 rounded" required />
+        <input type="number" step="0.1" placeholder="Hourly Rate" class="rate border p-2 rounded" required />
       `;
       document.getElementById("teacherContainer").appendChild(div);
     }
@@ -152,31 +163,38 @@
         hourlyRate: rates,
         discount: discount.value,
         totalAmount: totalAmount.value,
-        paymentStatus: document.getElementById("paymentStatus").value
+        paymentStatus: document.getElementById("paymentStatus").value,
       };
 
-      const response = await fetch("https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec", {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
+      try {
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec",
+          {
+            method: "POST",
+            body: JSON.stringify(data),
+          }
+        );
 
-      const result = await response.json();
-      if (result.success) {
-        document.getElementById("slipContent").innerHTML = `
-          <p><strong>Date:</strong> ${data.date}</p>
-          <p><strong>Student:</strong> ${data.studentName} (${data.studentID})</p>
-          <p><strong>Class:</strong> ${data.className}</p>
-          <p><strong>Fee Type:</strong> ${data.feeType}</p>
-          ${data.feeType === "Tuition Fee" ? `<p><strong>Teachers:</strong> ${data.teacherName}</p>` : ""}
-          <p><strong>Discount:</strong> ${data.discount}</p>
-          <p><strong>Status:</strong> ${data.paymentStatus}</p>
-          <p><strong>Total:</strong> ₹${data.totalAmount}</p>
-        `;
-        document.getElementById("popupSlip").classList.remove("hidden");
-        form.reset();
-        calculateTotal();
-      } else {
-        alert("Error: " + result.error);
+        const result = await response.json();
+        if (result.success) {
+          document.getElementById("slipContent").innerHTML = `
+            <p><strong>Date:</strong> ${data.date}</p>
+            <p><strong>Student:</strong> ${data.studentName} (${data.studentID})</p>
+            <p><strong>Class:</strong> ${data.className}</p>
+            <p><strong>Fee Type:</strong> ${data.feeType}</p>
+            ${data.feeType === "Tuition Fee" ? `<p><strong>Teachers:</strong> ${data.teacherName}</p>` : ""}
+            <p><strong>Discount:</strong> ${data.discount}</p>
+            <p><strong>Status:</strong> ${data.paymentStatus}</p>
+            <p><strong>Total:</strong> ₹${data.totalAmount}</p>
+          `;
+          document.getElementById("popupSlip").classList.remove("hidden");
+          form.reset();
+          calculateTotal();
+        } else {
+          alert("Error: " + result.error);
+        }
+      } catch (error) {
+        alert("Network error or invalid response");
       }
     });
 
@@ -184,13 +202,73 @@
       document.getElementById("popupSlip").classList.add("hidden");
     }
 
-    function downloadSlip() {
-      const element = document.createElement("a");
-      const content = document.getElementById("slipContent").innerText;
-      const file = new Blob([content], { type: 'text/plain' });
-      element.href = URL.createObjectURL(file);
-      element.download = "fee-slip.txt";
-      element.click();
+    async function downloadSlip() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Helper to get text by label from slipContent paragraphs
+      function getText(label) {
+        const el = Array.from(document.querySelectorAll("#slipContent p"))
+          .find((p) => p.innerText.startsWith(label));
+        return el ? el.innerText.replace(label, "").trim() : "";
+      }
+
+      const date = getText("Date:");
+      const student = getText("Student:");
+      const className = getText("Class:");
+      const feeType = getText("Fee Type:");
+      const teachers = getText("Teachers:");
+      const discount = getText("Discount:");
+      const status = getText("Status:");
+      const total = getText("Total:");
+
+      // PDF styling and content
+      doc.setFillColor(255, 235, 59); // Yellow header background
+      doc.rect(0, 0, 210, 25, "F"); // Full width header
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text("Student Fee Receipt", 105, 15, { align: "center" });
+
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.5);
+      doc.line(10, 30, 200, 30);
+
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+
+      let y = 40;
+      const lineHeight = 8;
+
+      function addLine(label, value) {
+        doc.setFont(undefined, "bold");
+        doc.text(label, 15, y);
+        doc.setFont(undefined, "normal");
+        doc.text(value, 60, y);
+        y += lineHeight;
+      }
+
+      addLine("Date:", date);
+      addLine("Student:", student);
+      addLine("Class:", className);
+      addLine("Fee Type:", feeType);
+      if (feeType === "Tuition Fee" && teachers) {
+        addLine("Teachers:", teachers);
+      }
+      addLine("Discount:", discount);
+      addLine("Payment Status:", status);
+
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(33, 33, 33);
+      doc.text("Total Amount: ₹" + total, 15, y + 10);
+
+      doc.setFontSize(10);
+      doc.setTextColor(150);
+      doc.text("Thank you for your payment!", 105, 280, { align: "center" });
+
+      doc.save("fee-receipt.pdf");
     }
   </script>
 </body>
