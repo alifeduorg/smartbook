@@ -1,45 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Billing Panel</title>
-  <script defer src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Billing Panel with Teacher Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen p-8 font-sans">
-  <div class="max-w-2xl mx-auto bg-white shadow-2xl rounded-2xl p-8">
-    <h2 class="text-2xl font-bold text-center text-indigo-700 mb-6">Student Billing Panel</h2>
 
-    <form id="billingForm" class="space-y-4">
+  <div class="max-w-3xl mx-auto bg-white shadow-2xl rounded-3xl p-8 space-y-6">
+    <h1 class="text-3xl font-extrabold text-indigo-700 text-center mb-6 select-none">Student Billing Panel</h1>
+
+    <form id="billingForm" class="space-y-5">
+
       <div>
-        <label class="block font-semibold">Receipt No</label>
-        <input type="text" id="receiptNo" name="receiptNo" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner" readonly>
+        <label class="block font-semibold mb-1" for="date">Date</label>
+        <input type="date" id="date" name="date" class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" readonly />
       </div>
 
       <div>
-        <label class="block font-semibold">Date</label>
-        <input type="date" id="date" name="date" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner" readonly>
+        <label class="block font-semibold mb-1" for="studentName">Student Name</label>
+        <input type="text" id="studentName" name="studentName" required class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" />
       </div>
 
       <div>
-        <label class="block font-semibold">Student Name</label>
-        <input type="text" id="studentName" name="studentName" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner" required>
+        <label class="block font-semibold mb-1" for="studentId">Student ID</label>
+        <input type="text" id="studentId" name="studentId" required class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" />
       </div>
 
       <div>
-        <label class="block font-semibold">Student ID</label>
-        <input type="text" id="studentId" name="studentId" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner" required>
+        <label class="block font-semibold mb-1" for="class">Class</label>
+        <input type="text" id="class" name="class" required class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" />
       </div>
 
       <div>
-        <label class="block font-semibold">Class</label>
-        <input type="text" id="class" name="class" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner" required>
-      </div>
-
-      <div>
-        <label class="block font-semibold">Fee Type</label>
-        <select id="feeType" name="feeType" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner">
-          <option value="">Select</option>
+        <label class="block font-semibold mb-1" for="feeType">Fee Type</label>
+        <select id="feeType" name="feeType" class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" required>
+          <option value="">Select Fee Type</option>
           <option value="Tuition Fee">Tuition Fee</option>
           <option value="Admission Fee">Admission Fee</option>
           <option value="Exam Fee">Exam Fee</option>
@@ -47,150 +44,269 @@
         </select>
       </div>
 
-      <div id="teacherSection" class="hidden">
-        <label class="block font-semibold">Add Teacher Details</label>
-        <div id="teacherList" class="space-y-2"></div>
-        <button type="button" id="addTeacherBtn" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Add Teacher</button>
+      <!-- Tuition Fee Details: Show only if Tuition Fee selected -->
+      <div id="tuitionDetails" class="hidden space-y-4 p-4 rounded-xl bg-indigo-50 shadow-inner border border-indigo-200">
+
+        <div>
+          <label class="block font-semibold mb-1" for="teacherSelect">Teacher Name</label>
+          <div class="flex gap-3">
+            <select id="teacherSelect" name="teacherSelect" class="flex-grow rounded-2xl p-3 bg-gray-100 shadow-inner">
+              <option value="">Select Teacher</option>
+            </select>
+            <input type="text" id="newTeacherName" placeholder="Add new teacher" class="flex-grow rounded-2xl p-3 border border-indigo-300" />
+            <button type="button" id="addTeacherBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-2xl shadow-md transition">Add</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1" for="hours">Number of Hours</label>
+          <input type="number" min="0" step="0.1" id="hours" name="hours" class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" />
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1" for="perHourRate">Per Hour Rate</label>
+          <input type="number" min="0" step="0.01" id="perHourRate" name="perHourRate" class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" readonly />
+        </div>
       </div>
 
-      <div id="amountGroup">
-        <label class="block font-semibold">Amount</label>
-        <input type="number" id="amount" name="amount" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner">
+      <!-- For other fee types: show amount input -->
+      <div id="amountGroup" class="hidden">
+        <label class="block font-semibold mb-1" for="amount">Amount</label>
+        <input type="number" min="0" step="0.01" id="amount" name="amount" class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" />
       </div>
 
       <div>
-        <label class="block font-semibold">Discount</label>
-        <input type="number" id="discount" name="discount" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner">
+        <label class="block font-semibold mb-1" for="discount">Discount</label>
+        <input type="number" min="0" step="0.01" id="discount" name="discount" value="0" class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner" />
       </div>
 
       <div>
-        <label class="block font-semibold">Payment Status</label>
-        <select id="status" name="status" class="w-full rounded-xl p-2 bg-gray-100 shadow-inner">
+        <label class="block font-semibold mb-1" for="status">Payment Status</label>
+        <select id="status" name="status" class="w-full rounded-2xl p-3 bg-gray-100 shadow-inner">
           <option value="Paid">Paid</option>
           <option value="Pending">Pending</option>
           <option value="Discounted">Discounted</option>
         </select>
       </div>
 
-      <button type="submit" class="w-full mt-4 bg-indigo-600 text-white font-semibold py-2 rounded-xl hover:bg-indigo-700 transition">Submit</button>
+      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-3xl shadow-lg transition duration-300">Submit</button>
     </form>
 
-    <div id="confirmation" class="text-center text-green-600 font-bold mt-4 hidden">Form submitted successfully!</div>
+    <div id="confirmation" class="hidden text-center text-green-600 font-bold text-lg mt-4 select-none">Form submitted successfully!</div>
 
-    <div id="receipt" class="mt-8 p-6 rounded-xl bg-white shadow-xl hidden">
-      <h3 class="text-xl font-bold text-center text-indigo-700 mb-4">Receipt</h3>
-      <div id="receiptContent" class="text-gray-800 space-y-1"></div>
-      <button onclick="downloadPDF()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Download PDF</button>
+    <div id="receipt" class="hidden mt-8 p-6 rounded-xl bg-white shadow-xl select-none">
+      <h3 class="text-2xl font-bold text-indigo-700 mb-4 text-center">Receipt</h3>
+      <div id="receiptContent" class="text-gray-800 space-y-2"></div>
+      <div class="mt-4 text-right text-xl font-semibold">Total: <span id="receiptTotal"></span></div>
+      <button onclick="downloadPDF()" class="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-2xl shadow-md transition">Download PDF</button>
     </div>
   </div>
 
   <script>
+    // Replace this with your actual Google Apps Script Web App URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec';
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("date").value = today;
+    // Teacher list stored client-side for demo
+    let teachers = [];
 
-      fetch(`${scriptURL}?action=getNextReceiptNo`)
-        .then(res => res.json())
-        .then(data => document.getElementById("receiptNo").value = data.receiptNo)
-        .catch(err => alert("Error fetching receipt number."));
+    const feeTypeEl = document.getElementById('feeType');
+    const tuitionDetailsEl = document.getElementById('tuitionDetails');
+    const amountGroupEl = document.getElementById('amountGroup');
+    const teacherSelectEl = document.getElementById('teacherSelect');
+    const newTeacherNameEl = document.getElementById('newTeacherName');
+    const addTeacherBtn = document.getElementById('addTeacherBtn');
+    const perHourRateEl = document.getElementById('perHourRate');
+    const hoursEl = document.getElementById('hours');
+    const amountEl = document.getElementById('amount');
+    const discountEl = document.getElementById('discount');
+    const confirmationEl = document.getElementById('confirmation');
+    const receiptEl = document.getElementById('receipt');
+    const receiptContentEl = document.getElementById('receiptContent');
+    const receiptTotalEl = document.getElementById('receiptTotal');
+    const dateEl = document.getElementById('date');
+
+    // Initialize date input with today (readonly)
+    dateEl.value = new Date().toISOString().split('T')[0];
+
+    // Update tuition details visibility based on fee type
+    feeTypeEl.addEventListener('change', () => {
+      if (feeTypeEl.value === 'Tuition Fee') {
+        tuitionDetailsEl.classList.remove('hidden');
+        amountGroupEl.classList.add('hidden');
+        // Clear amount when tuition fee
+        amountEl.value = '';
+      } else if (feeTypeEl.value) {
+        tuitionDetailsEl.classList.add('hidden');
+        amountGroupEl.classList.remove('hidden');
+        // Clear tuition fields when other fee
+        hoursEl.value = '';
+        perHourRateEl.value = '';
+        teacherSelectEl.value = '';
+      } else {
+        tuitionDetailsEl.classList.add('hidden');
+        amountGroupEl.classList.add('hidden');
+        hoursEl.value = '';
+        perHourRateEl.value = '';
+        amountEl.value = '';
+        teacherSelectEl.value = '';
+      }
     });
 
-    document.getElementById("feeType").addEventListener("change", function () {
-      const isTuition = this.value === "Tuition Fee";
-      document.getElementById("teacherSection").style.display = isTuition ? "block" : "none";
-      document.getElementById("amountGroup").style.display = isTuition ? "none" : "block";
+    // Add teacher button handler
+    addTeacherBtn.addEventListener('click', () => {
+      const newTeacher = newTeacherNameEl.value.trim();
+      if (!newTeacher) {
+        alert('Please enter a teacher name');
+        return;
+      }
+      if (teachers.includes(newTeacher)) {
+        alert('Teacher already exists');
+        return;
+      }
+      teachers.push(newTeacher);
+      refreshTeacherDropdown();
+      teacherSelectEl.value = newTeacher;
+      newTeacherNameEl.value = '';
+      // Trigger change event to update rate for new teacher
+      teacherSelectEl.dispatchEvent(new Event('change'));
     });
 
-    document.getElementById("addTeacherBtn").addEventListener("click", function () {
-      const container = document.createElement("div");
-      container.className = "bg-gray-50 p-4 rounded-xl shadow-inner space-y-2";
-      container.innerHTML = `
-        <div>
-          <label class="block font-semibold">Teacher Name</label>
-          <input type="text" class="teacherName w-full rounded-xl p-2 bg-gray-100" required>
-        </div>
-        <div>
-          <label class="block font-semibold">Hours</label>
-          <input type="number" class="teacherHours w-full rounded-xl p-2 bg-gray-100" required>
-        </div>
-        <div>
-          <label class="block font-semibold">Per Hour Rate</label>
-          <input type="number" class="teacherRate w-full rounded-xl p-2 bg-gray-100" required>
-        </div>
-      `;
-      document.getElementById("teacherList").appendChild(container);
+    // Refresh teacher dropdown options
+    function refreshTeacherDropdown() {
+      teacherSelectEl.innerHTML = '<option value="">Select Teacher</option>';
+      teachers.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        teacherSelectEl.appendChild(opt);
+      });
+    }
+
+    // Set hourly rate based on teacher name (example logic)
+    // You can customize this with a map or fetch from backend
+    teacherSelectEl.addEventListener('change', () => {
+      const teacher = teacherSelectEl.value;
+      let rate = '';
+      switch (teacher.toLowerCase()) {
+        case 'senior': rate = 100; break;
+        case 'junior': rate = 70; break;
+        case 'guest': rate = 50; break;
+        case '': rate = ''; break;
+        default: rate = 80; // default hourly rate for new teachers
+      }
+      perHourRateEl.value = rate;
     });
 
-    document.getElementById("billingForm").addEventListener("submit", function (e) {
+    // Form submission handler
+    document.getElementById('billingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      let amount = parseFloat(document.getElementById("amount").value);
-      const isTuition = document.getElementById("feeType").value === "Tuition Fee";
+      // Gather form data
+      const studentName = document.getElementById('studentName').value.trim();
+      const studentId = document.getElementById('studentId').value.trim();
+      const studentClass = document.getElementById('class').value.trim();
+      const feeType = feeTypeEl.value;
+      const date = dateEl.value;
+      const discount = parseFloat(discountEl.value) || 0;
+      const status = document.getElementById('status').value;
 
-      let teacherData = [];
-      if (isTuition) {
-        amount = 0;
-        document.querySelectorAll("#teacherList > div").forEach(el => {
-          const name = el.querySelector(".teacherName").value;
-          const hours = parseFloat(el.querySelector(".teacherHours").value);
-          const rate = parseFloat(el.querySelector(".teacherRate").value);
-          const subtotal = hours * rate;
-          amount += subtotal;
-          teacherData.push({ name, hours, rate, subtotal });
-        });
+      let amount = 0;
+      let teacherName = '';
+      let hours = 0;
+      let perHourRate = 0;
+
+      if (feeType === 'Tuition Fee') {
+        teacherName = teacherSelectEl.value;
+        if (!teacherName) {
+          alert('Please select a teacher for Tuition Fee');
+          return;
+        }
+        hours = parseFloat(hoursEl.value);
+        perHourRate = parseFloat(perHourRateEl.value);
+
+        if (isNaN(hours) || hours <= 0) {
+          alert('Please enter a valid number of hours');
+          return;
+        }
+        amount = hours * perHourRate;
+      } else {
+        amount = parseFloat(amountEl.value);
+        if (isNaN(amount) || amount <= 0) {
+          alert('Please enter a valid amount');
+          return;
+        }
       }
 
-      const discount = parseFloat(document.getElementById("discount").value || 0);
-      const totalAmount = amount - discount;
+      // Apply discount
+      const finalAmount = Math.max(0, amount - discount);
 
-      const formData = {
-        receiptNo: document.getElementById("receiptNo").value,
-        date: document.getElementById("date").value,
-        studentName: document.getElementById("studentName").value,
-        studentId: document.getElementById("studentId").value,
-        class: document.getElementById("class").value,
-        feeType: document.getElementById("feeType").value,
-        teacherDetails: teacherData,
-        amount: amount,
-        discount: discount,
-        totalAmount: totalAmount,
-        status: document.getElementById("status").value
+      // Prepare payload for backend (adjust keys if needed)
+      const payload = {
+        receiptNo: '',  // Receipt number to be handled by backend
+        date,
+        studentName,
+        studentId,
+        className: studentClass,
+        feeType,
+        teacherName,
+        hours: feeType === 'Tuition Fee' ? hours : '',
+        rate: feeType === 'Tuition Fee' ? perHourRate : '',
+        discount,
+        amount: finalAmount,
+        status
       };
 
-      fetch(scriptURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById("confirmation").classList.remove("hidden");
-          document.getElementById("receipt").classList.remove("hidden");
-          document.getElementById("receiptContent").innerHTML = `
-            <p><strong>Receipt No:</strong> ${formData.receiptNo}</p>
-            <p><strong>Date:</strong> ${formData.date}</p>
-            <p><strong>Student Name:</strong> ${formData.studentName}</p>
-            <p><strong>Student ID:</strong> ${formData.studentId}</p>
-            <p><strong>Class:</strong> ${formData.class}</p>
-            <p><strong>Fee Type:</strong> ${formData.feeType}</p>
-            <p><strong>Amount:</strong> ${formData.amount}</p>
-            <p><strong>Discount:</strong> ${formData.discount}</p>
-            <p><strong>Total:</strong> ${formData.totalAmount}</p>
-            <p><strong>Status:</strong> ${formData.status}</p>
-          `;
+      try {
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          confirmationEl.classList.remove('hidden');
+          showReceipt(payload);
+          e.target.reset();
+          tuitionDetailsEl.classList.add('hidden');
+          amountGroupEl.classList.add('hidden');
+          // Reset date to today after clear
+          dateEl.value = new Date().toISOString().split('T')[0];
         } else {
-          alert("Submission failed.");
+          alert('Failed to submit form. Please try again.');
         }
-      })
-      .catch(err => alert("Error submitting form."));
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Error submitting form. See console for details.');
+      }
     });
 
-    function downloadPDF() {
-      window.print();
+    function showReceipt(data) {
+      receiptEl.classList.remove('hidden');
+      receiptContentEl.innerHTML = `
+        <div><strong>Date:</strong> ${data.date}</div>
+        <div><strong>Student Name:</strong> ${data.studentName}</div>
+        <div><strong>Student ID:</strong> ${data.studentId}</div>
+        <div><strong>Class:</strong> ${data.className}</div>
+        <div><strong>Fee Type:</strong> ${data.feeType}</div>
+        ${data.feeType === 'Tuition Fee' ? `<div><strong>Teacher:</strong> ${data.teacherName}</div>
+        <div><strong>Hours:</strong> ${data.hours}</div>
+        <div><strong>Rate per hour:</strong> $${data.rate.toFixed(2)}</div>` : ''}
+        <div><strong>Discount:</strong> $${data.discount.toFixed(2)}</div>
+        <div><strong>Status:</strong> ${data.status}</div>
+      `;
+      receiptTotalEl.textContent = `$${data.amount.toFixed(2)}`;
     }
+
+    function downloadPDF() {
+      alert('PDF download feature not implemented. You can integrate jsPDF or html2pdf.js here.');
+    }
+
+    // Initialize teacher dropdown on page load
+    refreshTeacherDropdown();
+
   </script>
+
 </body>
 </html>
