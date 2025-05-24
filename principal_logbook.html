@@ -12,16 +12,16 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #0d1b2a;
-      color: #f8f8f8;
+      background-color: #fff;
+      color: #000;
     }
 
     header {
       display: flex;
       align-items: center;
       padding: 10px 20px;
-      background: #1b263b;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      background: #f1c40f;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
 
     header img {
@@ -31,7 +31,7 @@
 
     header h1 {
       font-size: 1.8rem;
-      color: #f1c40f;
+      color: #000;
     }
 
     .controls {
@@ -39,30 +39,29 @@
       flex-wrap: wrap;
       justify-content: space-around;
       padding: 15px;
-      background-color: #16263a;
-      border-bottom: 2px solid #f1c40f;
+      background-color: #f9f9f9;
+      border-bottom: 2px solid #ccc;
     }
 
     .controls input, .controls button {
       padding: 10px;
       margin: 5px;
       font-size: 1rem;
-      border: none;
+      border: 1px solid #ccc;
       border-radius: 8px;
     }
 
     .controls input {
-      background: #1e2a3c;
-      color: #fff;
+      background: #fff;
+      color: #000;
       width: 180px;
     }
 
     .controls button {
-      background: linear-gradient(to right, #f1c40f, #f39c12);
+      background: #f1c40f;
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(255, 200, 0, 0.3);
       transition: transform 0.2s ease;
     }
 
@@ -83,24 +82,31 @@
 
     th, td {
       padding: 10px;
-      border-bottom: 1px solid #3d5a80;
+      border: 1px solid #ccc;
       text-align: left;
     }
 
     th {
-      background-color: #293b5f;
-      color: #f1c40f;
+      background-color: #f1c40f;
+      color: #000;
       position: sticky;
       top: 0;
       z-index: 2;
     }
 
     tr:nth-child(even) {
-      background-color: #1e2a3c;
+      background-color: #f2f2f2;
     }
 
     tr:hover {
-      background-color: #314e6e;
+      background-color: #e6f7ff;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.5rem;
+      color: #999;
     }
 
     @media (max-width: 768px) {
@@ -108,6 +114,7 @@
         flex-direction: column;
         align-items: center;
       }
+
       .controls input {
         width: 90%;
       }
@@ -131,7 +138,9 @@
     <button onclick="window.location.href='principal-dashboard.html'">Dashboard</button>
   </div>
 
-  <div class="table-wrapper">
+  <div id="loading">Loading logbook...</div>
+
+  <div class="table-wrapper" style="display:none;">
     <table id="logbook-table">
       <thead>
         <tr id="table-headers"></tr>
@@ -144,27 +153,49 @@
     const sheetUrl = "https://script.google.com/macros/s/AKfycbxzKxyW6dDcDaBe7vK6iI8hTlLfA1DC3TFcn9u4YL9sVCuJf8OE3Y8Ba1mTO76yBgz4GA/exec";
 
     async function fetchData() {
+      document.getElementById('loading').style.display = 'block';
       const res = await fetch(sheetUrl);
       const data = await res.json();
 
       if (!data.length) return;
 
       const headers = Object.keys(data[0]);
-      const headerRow = document.getElementById('table-headers');
-      headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
-
+      document.getElementById('table-headers').innerHTML = headers.map(h => `<th>${h}</th>`).join('');
       const tableBody = document.getElementById('table-body');
       tableBody.innerHTML = '';
 
       data.forEach(row => {
         const tr = document.createElement('tr');
-        tr.innerHTML = headers.map(h => `<td>${row[h] || ''}</td>`).join('');
+        tr.innerHTML = headers.map(h => {
+          let cellValue = row[h] || '';
+          if (typeof cellValue === 'string' && cellValue.includes('T') && cellValue.includes('Z')) {
+            const localDate = new Date(cellValue);
+            cellValue = formatLocal12HourDate(localDate);
+          }
+          return `<td>${cellValue}</td>`;
+        }).join('');
         tableBody.appendChild(tr);
       });
 
       document.querySelectorAll('.controls input').forEach(input => {
         input.addEventListener('input', filterTable);
       });
+
+      document.getElementById('loading').style.display = 'none';
+      document.querySelector('.table-wrapper').style.display = 'block';
+    }
+
+    function formatLocal12HourDate(date) {
+      const offsetDate = new Date(date.toLocaleString("en-US", { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      };
+      return offsetDate.toLocaleString('en-US', options);
     }
 
     function filterTable() {
@@ -188,30 +219,29 @@
     }
 
     function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({
-    orientation: 'landscape', // ✅ Landscape mode
-    unit: 'pt',
-    format: 'a4' // Optional, but ensures standard size
-  });
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'pt',
+        format: 'a4'
+      });
 
-  doc.autoTable({
-    html: '#logbook-table',
-    startY: 20,
-    styles: {
-      fontSize: 8,
-      cellPadding: 4,
-      overflow: 'linebreak'
-    },
-    headStyles: {
-      fillColor: [241, 196, 15], // golden yellow
-      textColor: [0, 0, 0]
+      doc.autoTable({
+        html: '#logbook-table',
+        startY: 20,
+        styles: {
+          fontSize: 8,
+          cellPadding: 4,
+          overflow: 'linebreak'
+        },
+        headStyles: {
+          fillColor: [241, 196, 15],
+          textColor: [0, 0, 0]
+        }
+      });
+
+      doc.save('logbook.pdf');
     }
-  });
-
-  doc.save('logbook.pdf');
-}
-
 
     window.onload = fetchData;
   </script>
