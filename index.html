@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> Login</title>
+  <title>Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -41,8 +41,8 @@
     }
 
     .logo {
-      width: 70px;
-      margin-bottom: 10px;
+      width: 100px;
+      margin-bottom: 15px;
     }
 
     h2 {
@@ -101,6 +101,13 @@
       background-color: #e3ae17;
     }
 
+    .loading-text {
+      margin-top: 15px;
+      font-size: 14px;
+      color: var(--primary);
+      display: none;
+    }
+
     .footer {
       margin-top: 30px;
       font-size: 14px;
@@ -138,12 +145,13 @@
           <option value="mentor">Mentor</option>
         </select>
       </div>
-      <button type="submit" class="btn">Login</button>
+      <button type="submit" class="btn" id="login-btn">Login</button>
+      <div class="loading-text" id="loading-text">Please wait... Logging in</div>
     </form>
   </div>
 
   <div class="footer">
-    &copy; 2025  Alif Edu. All rights reserved.
+    &copy; 2025 Alif Edu. All rights reserved.
   </div>
 
   <script>
@@ -152,6 +160,12 @@
       const staffId = document.getElementById('staff-id').value;
       const password = document.getElementById('password').value;
       const role = document.getElementById('role').value;
+      const loadingText = document.getElementById('loading-text');
+      const loginBtn = document.getElementById('login-btn');
+
+      loadingText.style.display = 'block';
+      loginBtn.disabled = true;
+      loginBtn.innerText = 'Loading...';
 
       const data = {
         staff_id: staffId,
@@ -159,27 +173,38 @@
         role: role
       };
 
-      const url = 'https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec'; // Replace this
+      const url = 'https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec';
 
-      const response = await fetch(url, {
-        method: 'POST',
-        contentType: 'application/json',
-        body: JSON.stringify(data)
-      });
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.success) {
-        let redirectURL = '';
-        switch(result.role) {
-          case 'admin': redirectURL = 'admin-dashboard.html'; break;
-          case 'principal': redirectURL = 'principal-dashboard.html'; break;
-          case 'teacher': redirectURL = 'teacher-dashboard.html'; break;
-          case 'mentor': redirectURL = 'mentor-dashboard.html'; break;
+        if (result.success) {
+          let redirectURL = '';
+          switch(result.role) {
+            case 'admin': redirectURL = 'admin-dashboard.html'; break;
+            case 'principal': redirectURL = 'principal-dashboard.html'; break;
+            case 'teacher': redirectURL = 'teacher-dashboard.html'; break;
+            case 'mentor': redirectURL = 'mentor-dashboard.html'; break;
+          }
+          window.location.href = redirectURL;
+        } else {
+          alert(result.message || 'Login failed');
         }
-        window.location.href = redirectURL;
-      } else {
-        alert(result.message || 'Login failed');
+
+      } catch (error) {
+        alert('Error logging in. Please try again later.');
+      } finally {
+        loadingText.style.display = 'none';
+        loginBtn.disabled = false;
+        loginBtn.innerText = 'Login';
       }
     }
   </script>
