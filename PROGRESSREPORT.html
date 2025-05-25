@@ -55,7 +55,8 @@
             font-size: 0.95em;
         }
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        select { /* Added select to this rule */
             width: calc(100% - 24px); /* Account for padding and border */
             padding: 12px;
             margin-bottom: 20px;
@@ -64,9 +65,19 @@
             font-size: 1em;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
             box-sizing: border-box;
+            -webkit-appearance: none; /* Remove default dropdown arrow */
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #fff;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.9H5.4c-7.2%200-11%208.5-6.1%2014.2l140.7%20140.7c2.8%202.8%206.9%202.8%209.7%200L293.1%2084.1c4.9-5.7%201.1-14.2-6.1-14.2z%22%2F%3E%3C%2Fsvg%3E'); /* Custom dropdown arrow */
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 30px; /* Space for arrow */
         }
         input[type="text"]:focus,
-        input[type="number"]:focus {
+        input[type="number"]:focus,
+        select:focus { /* Added select to this rule */
             border-color: #007bff;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
             outline: none;
@@ -89,7 +100,7 @@
             border: 1px solid #e9ecef;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr); /* Two columns */
             gap: 15px 20px;
             position: relative;
             transition: all 0.3s ease-in-out;
@@ -246,14 +257,32 @@
     <div class="container">
         <h2>Student Progress Data Collection</h2>
         <form id="progressForm">
+            <label for="studentID">Student ID:</label>
+            <input type="text" id="studentID" name="studentID" required>
+
             <label for="studentName">Student Name:</label>
             <input type="text" id="studentName" name="studentName" required>
 
             <label for="studentClass">Class:</label>
             <input type="text" id="studentClass" name="studentClass" required>
 
-            <label for="studentID">Student ID:</label>
-            <input type="text" id="studentID" name="studentID" required>
+            <label for="examType">Exam Type:</label>
+            <select id="examType" name="examType" required>
+                <option value="">Select Exam Type</option>
+                <option value="Academic Test 1">Academic Test 1</option>
+                <option value="Academic Test 2">Academic Test 2</option>
+                <option value="Academic Test 3">Academic Test 3</option>
+                <option value="Academic Test 4">Academic Test 4</option>
+                <option value="Periodic Test 1">Periodic Test 1</option>
+                <option value="Periodic Test 2">Periodic Test 2</option>
+                <option value="Periodic Test 3">Periodic Test 3</option>
+                <option value="Periodic Test 4">Periodic Test 4</option>
+                <option value="Term 1">Term 1</option>
+                <option value="Term 2">Term 2</option>
+                <option value="Model Exam">Model Exam</option>
+                <option value="Admission Test">Admission Test</option>
+                <option value="Revision Test Series">Revision Test Series</option>
+            </select>
 
             <h3>Subjects:</h3>
             <div id="subjectsContainer">
@@ -388,9 +417,10 @@
 
             messageDiv.style.display = 'none'; // Hide previous messages
 
+            const studentID = document.getElementById('studentID').value; // Get Student ID
             const studentName = document.getElementById('studentName').value;
             const studentClass = document.getElementById('studentClass').value;
-            const studentID = document.getElementById('studentID').value;
+            const examType = document.getElementById('examType').value; 
 
             const subjectsData = [];
             document.querySelectorAll('.subject-entry').forEach(entry => {
@@ -417,16 +447,22 @@
                 showMessage('Please add at least one valid subject with marks.', 'error');
                 return;
             }
+            
+            if (!examType) { 
+                showMessage('Please select an Exam Type.', 'error');
+                return;
+            }
+
 
             const formData = {
+                studentID, // Student ID is now first in formData
                 studentName,
                 studentClass,
-                studentID,
+                examType, 
                 subjects: subjectsData
             };
 
             try {
-                // Fetch request with 'no-cors' for Google Apps Script Web Apps
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -438,11 +474,8 @@
                     }).toString(),
                 });
 
-                // With 'no-cors', we can't directly inspect the response for success/failure
-                // We assume success if the fetch operation itself doesn't throw an error.
                 showMessage('Student progress data submitted successfully!', 'success');
-                progressForm.reset(); // Clear the main form fields
-                // Reset subject entries to just one default
+                progressForm.reset(); 
                 subjectsContainer.innerHTML = `
                     <div class="subject-entry">
                         <div>
@@ -467,8 +500,8 @@
                         </div>
                     </div>
                 `;
-                subjectCount = 1; // Reset subject counter
-                attachCalculationListeners(document.querySelector('.subject-entry')); // Re-attach listeners to the new default subject
+                subjectCount = 1; 
+                attachCalculationListeners(document.querySelector('.subject-entry')); 
             } catch (error) {
                 console.error('Error submitting form:', error);
                 showMessage('An error occurred while submitting data. Please try again.', 'error');
