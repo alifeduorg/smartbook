@@ -1,276 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Premium Student Billing Panel</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Poppins -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-
-  <!-- jsPDF CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #fff8dc, #fdfdfd);
-    }
-
-    .card-3d {
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-      transform: perspective(1000px) rotateX(2deg) rotateY(-2deg);
-      transition: all 0.3s ease-in-out;
-    }
-
-    .card-3d:hover {
-      transform: perspective(1000px) rotateX(0) rotateY(0);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .popup {
-      background: #fff;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      transform: scale(1.05);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alif Edu - Billing Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"], /* Added for date input */
+        select,
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .hidden {
+            display: none;
+        }
+        .fee-calculation-section {
+            background-color: #e9f7ef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            border: 1px dashed #a8e6cf;
+        }
+        .fee-calculation-section label {
+            font-weight: normal;
+        }
+        .total-fee {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            text-align: right;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response-message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
+<body>
+    <div class="container">
+        <h2>Alif Edu - Billing Panel</h2>
+        <form id="billingForm" method="POST" action="https://script.google.com/macros/s/AKfycbyo0QABFkMjTb_hKysA80IiV2GPZjTjHL3UCmjU0NVCDBMuFAqcM83bthaasd3iYiLB/exec">
+            <div class="form-group">
+                <label for="studentName">Student Name:</label>
+                <input type="text" id="studentName" name="StudentName" required>
+            </div>
 
-<body class="min-h-screen flex items-center justify-center p-6">
-  <div class="w-full max-w-3xl p-8 bg-white rounded-3xl card-3d">
-    <h1 class="text-3xl font-bold mb-6 text-center text-yellow-600">Student Billing Panel</h1>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="Date" required>
+            </div>
 
-    <form id="billingForm" class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="date" id="date" class="border p-2 rounded" required />
-        <input type="text" id="studentName" placeholder="Student Name" class="border p-2 rounded" required />
-        <input type="text" id="studentID" placeholder="Student ID" class="border p-2 rounded" required />
-        <input type="text" id="className" placeholder="Class Name" class="border p-2 rounded" required />
-      </div>
+            <div class="form-group">
+                <label for="studentId">Student ID:</label>
+                <input type="text" id="studentId" name="StudentID" required>
+            </div>
 
-      <select id="feeType" class="border p-2 rounded w-full" required>
-        <option value="">Select Fee Type</option>
-        <option value="Tuition Fee">Tuition Fee</option>
-        <option value="Admission Fee">Admission Fee</option>
-        <option value="Exam Fee">Exam Fee</option>
-        <option value="Book Fee">Book Fee</option>
-      </select>
+            <div class="form-group">
+                <label for="class">Class:</label>
+                <input type="text" id="class" name="Class" required>
+            </div>
 
-      <div id="tuitionFields" class="space-y-2 hidden">
-        <div id="teacherContainer" class="space-y-2"></div>
-        <button type="button" onclick="addTeacher()" class="bg-yellow-500 text-white px-4 py-2 rounded shadow">+ Add Teacher</button>
-      </div>
+            <div class="form-group">
+                <label for="feeType">Type of Fee:</label>
+                <select id="feeType" name="FeeType" required>
+                    <option value="">--Select Fee Type--</option>
+                    <option value="Admission Fee">Admission Fee</option>
+                    <option value="Tuition Fee">Tuition Fee</option>
+                    <option value="Exam Fee">Exam Fee</option>
+                    <option value="Book Fee">Book Fee</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
 
-      <div id="amountField" class="hidden">
-        <input type="number" step="0.01" id="simpleAmount" placeholder="Amount" class="border p-2 rounded w-full" />
-      </div>
+            <div id="tuitionFeeSection" class="fee-calculation-section hidden">
+                <div class="form-group">
+                    <label for="tuitionHours">Tuition Hours:</label>
+                    <input type="number" id="tuitionHours" name="TuitionHours" min="0" step="any">
+                </div>
+                <div class="form-group">
+                    <label for="ratePerHour">Rate Per Hour (INR):</label>
+                    <input type="number" id="ratePerHour" name="RatePerHour" min="0" step="0.01">
+                </div>
+            </div>
 
-      <input type="number" step="0.01" id="discount" placeholder="Discount" class="border p-2 rounded w-full" />
+            <div class="form-group">
+                <label for="otherFeeAmount" id="otherFeeAmountLabel" class="hidden">Other Fee Amount (INR):</label>
+                <input type="number" id="otherFeeAmount" name="OtherFeeAmount" min="0" step="0.01" class="hidden">
+            </div>
 
-      <select id="paymentStatus" class="border p-2 rounded w-full" required>
-        <option value="">Select Payment Status</option>
-        <option value="Paid">Paid</option>
-        <option value="Pending">Pending</option>
-        <option value="Discounted">Discounted</option>
-      </select>
+            <div class="total-fee">
+                Total Fee: <span id="displayTotalFee">0.00</span> INR
+                <input type="hidden" id="totalFee" name="TotalFee">
+            </div>
 
-      <input type="number" step="0.01" id="totalAmount" placeholder="Total Amount" class="border p-2 rounded w-full bg-gray-100" readonly />
+            <div class="form-group">
+                <label for="paymentMode">Payment Mode:</label>
+                <select id="paymentMode" name="PaymentMode" required>
+                    <option value="">--Select Payment Mode--</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Card">Card</option>
+                    <option value="Cheque">Cheque</option>
+                </select>
+            </div>
 
-      <button type="submit" class="bg-blue-800 hover:bg-blue-900 text-white w-full py-2 px-4 rounded shadow">Submit</button>
-    </form>
-  </div>
+            <div class="form-group">
+                <label for="remark">Remark:</label>
+                <textarea id="remark" name="Remark" rows="3"></textarea>
+            </div>
 
-  <!-- Pop-up Slip -->
-  <div id="popupSlip" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="popup p-6 rounded-2xl max-w-lg w-full">
-      <h2 class="text-xl font-semibold mb-4 text-yellow-700">Receipt</h2>
-      <div id="slipContent" class="mb-4 text-gray-800"></div>
-      <div class="flex justify-end gap-4">
-        <button onclick="downloadSlip()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">Download</button>
-        <button onclick="closePopup()" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">Close</button>
-      </div>
+            <button type="submit">Generate Bill & Submit</button>
+        </form>
+        <div id="responseMessage" class="response-message hidden"></div>
     </div>
-  </div>
 
-  <script>
-    document.getElementById("date").valueAsDate = new Date();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('date');
+            const feeTypeSelect = document.getElementById('feeType');
+            const tuitionFeeSection = document.getElementById('tuitionFeeSection');
+            const tuitionHoursInput = document.getElementById('tuitionHours');
+            const ratePerHourInput = document.getElementById('ratePerHour');
+            const otherFeeAmountInput = document.getElementById('otherFeeAmount');
+            const otherFeeAmountLabel = document.getElementById('otherFeeAmountLabel');
+            const displayTotalFeeSpan = document.getElementById('displayTotalFee');
+            const totalFeeHiddenInput = document.getElementById('totalFee');
+            const billingForm = document.getElementById('billingForm');
+            const responseMessageDiv = document.getElementById('responseMessage');
 
-    const form = document.getElementById("billingForm");
-    const feeType = document.getElementById("feeType");
-    const tuitionFields = document.getElementById("tuitionFields");
-    const amountField = document.getElementById("amountField");
-    const totalAmount = document.getElementById("totalAmount");
-    const discount = document.getElementById("discount");
+            // Set current date as default, but allow changing
+            const today = new Date();
+            dateInput.value = today.toISOString().split('T')[0]; // YYYY-MM-DD format
 
-    feeType.addEventListener("change", () => {
-      if (feeType.value === "Tuition Fee") {
-        tuitionFields.classList.remove("hidden");
-        amountField.classList.add("hidden");
-      } else {
-        tuitionFields.classList.add("hidden");
-        amountField.classList.remove("hidden");
-      }
-      calculateTotal();
-    });
+            function calculateTotalFee() {
+                let total = 0;
+                const feeType = feeTypeSelect.value;
 
-    function addTeacher() {
-      const div = document.createElement("div");
-      div.className = "grid grid-cols-3 gap-2";
-      div.innerHTML = `
-        <input type="text" placeholder="Teacher Name" class="teacherName border p-2 rounded" required />
-        <input type="number" step="0.1" placeholder="Hours" class="hours border p-2 rounded" required />
-        <input type="number" step="0.1" placeholder="Hourly Rate" class="rate border p-2 rounded" required />
-      `;
-      document.getElementById("teacherContainer").appendChild(div);
-    }
+                if (feeType === 'Tuition Fee') {
+                    const hours = parseFloat(tuitionHoursInput.value) || 0;
+                    const rate = parseFloat(ratePerHourInput.value) || 0;
+                    total = hours * rate;
+                } else if (['Admission Fee', 'Exam Fee', 'Book Fee', 'Other'].includes(feeType)) {
+                    total = parseFloat(otherFeeAmountInput.value) || 0;
+                }
+                displayTotalFeeSpan.textContent = total.toFixed(2);
+                totalFeeHiddenInput.value = total.toFixed(2);
+            }
 
-    discount.addEventListener("input", calculateTotal);
-    form.addEventListener("input", calculateTotal);
+            feeTypeSelect.addEventListener('change', function() {
+                // Hide all conditional sections first
+                tuitionFeeSection.classList.add('hidden');
+                otherFeeAmountInput.classList.add('hidden');
+                otherFeeAmountLabel.classList.add('hidden');
 
-    function calculateTotal() {
-      let total = 0;
-      if (feeType.value === "Tuition Fee") {
-        const hours = document.querySelectorAll(".hours");
-        const rates = document.querySelectorAll(".rate");
-        for (let i = 0; i < hours.length; i++) {
-          total += parseFloat(hours[i].value || 0) * parseFloat(rates[i].value || 0);
-        }
-      } else {
-        total = parseFloat(document.getElementById("simpleAmount").value || 0);
-      }
-      total -= parseFloat(discount.value || 0);
-      totalAmount.value = total.toFixed(2);
-    }
+                // Remove 'required' attributes from all conditional inputs
+                tuitionHoursInput.removeAttribute('required');
+                ratePerHourInput.removeAttribute('required');
+                otherFeeAmountInput.removeAttribute('required');
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const teacherNames = Array.from(document.querySelectorAll(".teacherName")).map(i => i.value).join(", ");
-      const hours = Array.from(document.querySelectorAll(".hours")).map(i => i.value).join(", ");
-      const rates = Array.from(document.querySelectorAll(".rate")).map(i => i.value).join(", ");
+                // Reset values when fee type changes
+                tuitionHoursInput.value = '';
+                ratePerHourInput.value = '';
+                otherFeeAmountInput.value = '';
 
-      const data = {
-        date: document.getElementById("date").value,
-        studentName: document.getElementById("studentName").value,
-        studentID: document.getElementById("studentID").value,
-        className: document.getElementById("className").value,
-        feeType: feeType.value,
-        teacherName: teacherNames,
-        hours: hours,
-        hourlyRate: rates,
-        discount: discount.value,
-        totalAmount: totalAmount.value,
-        paymentStatus: document.getElementById("paymentStatus").value,
-      };
+                const selectedFeeType = this.value;
+                if (selectedFeeType === 'Tuition Fee') {
+                    tuitionFeeSection.classList.remove('hidden');
+                    tuitionHoursInput.setAttribute('required', 'required');
+                    ratePerHourInput.setAttribute('required', 'required');
+                } else if (['Admission Fee', 'Exam Fee', 'Book Fee', 'Other'].includes(selectedFeeType)) {
+                    otherFeeAmountInput.classList.remove('hidden');
+                    otherFeeAmountLabel.classList.remove('hidden');
+                    // Update label text based on selected fee type
+                    if (selectedFeeType === 'Other') {
+                        otherFeeAmountLabel.textContent = 'Other Fee Amount (INR):';
+                    } else {
+                        otherFeeAmountLabel.textContent = selectedFeeType + ' Amount (INR):';
+                    }
+                    otherFeeAmountInput.setAttribute('required', 'required');
+                }
+                calculateTotalFee(); // Recalculate total after fee type change
+            });
 
-      try {
-        const response = await fetch(
-          "https://script.google.com/macros/s/AKfycbz1EeKiFbWshwqgQa9t-D3-dtBjzIYy99g1p8-p8V0Blhv6e4cs9m5aIjEQrhPPYlH7ew/exec",
-          {
-            method: "POST",
-            body: JSON.stringify(data),
-          }
-        );
+            // Event listeners for calculating total fee
+            tuitionHoursInput.addEventListener('input', calculateTotalFee);
+            ratePerHourInput.addEventListener('input', calculateTotalFee);
+            otherFeeAmountInput.addEventListener('input', calculateTotalFee);
 
-        const result = await response.json();
-        if (result.success) {
-          document.getElementById("slipContent").innerHTML = `
-            <p><strong>Date:</strong> ${data.date}</p>
-            <p><strong>Student:</strong> ${data.studentName} (${data.studentID})</p>
-            <p><strong>Class:</strong> ${data.className}</p>
-            <p><strong>Fee Type:</strong> ${data.feeType}</p>
-            ${data.feeType === "Tuition Fee" ? `<p><strong>Teachers:</strong> ${data.teacherName}</p>` : ""}
-            <p><strong>Discount:</strong> ${data.discount}</p>
-            <p><strong>Status:</strong> ${data.paymentStatus}</p>
-            <p><strong>Total:</strong> ₹${data.totalAmount}</p>
-          `;
-          document.getElementById("popupSlip").classList.remove("hidden");
-          form.reset();
-          calculateTotal();
-        } else {
-          alert("Error: " + result.error);
-        }
-      } catch (error) {
-        alert("Network error or invalid response");
-      }
-    });
+            // Handle form submission to Google Apps Script
+            billingForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
 
-    function closePopup() {
-      document.getElementById("popupSlip").classList.add("hidden");
-    }
+                const formData = new FormData(billingForm);
+                const url = billingForm.action; // Your Google Apps Script Web App URL
 
-    async function downloadSlip() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+                fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Network response was not ok.');
+                })
+                .then(data => {
+                    responseMessageDiv.classList.remove('hidden', 'error');
+                    responseMessageDiv.classList.add('success');
+                    responseMessageDiv.textContent = 'Bill generated and data submitted successfully!';
+                    billingForm.reset(); // Clear the form
+                    dateInput.value = new Date().toISOString().split('T')[0]; // Reset date to today's date
+                    calculateTotalFee(); // Reset total fee display
+                    // Hide conditional sections after successful submission
+                    tuitionFeeSection.classList.add('hidden');
+                    otherFeeAmountInput.classList.add('hidden');
+                    otherFeeAmountLabel.classList.add('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    responseMessageDiv.classList.remove('hidden', 'success');
+                    responseMessageDiv.classList.add('error');
+                    responseMessageDiv.textContent = 'Error submitting data. Please try again.';
+                });
+            });
 
-      // Helper to get text by label from slipContent paragraphs
-      function getText(label) {
-        const el = Array.from(document.querySelectorAll("#slipContent p"))
-          .find((p) => p.innerText.startsWith(label));
-        return el ? el.innerText.replace(label, "").trim() : "";
-      }
-
-      const date = getText("Date:");
-      const student = getText("Student:");
-      const className = getText("Class:");
-      const feeType = getText("Fee Type:");
-      const teachers = getText("Teachers:");
-      const discount = getText("Discount:");
-      const status = getText("Status:");
-      const total = getText("Total:");
-
-      // PDF styling and content
-      doc.setFillColor(255, 235, 59); // Yellow header background
-      doc.rect(0, 0, 210, 25, "F"); // Full width header
-
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(22);
-      doc.setFont("helvetica", "bold");
-      doc.text("Student Fee Receipt", 105, 15, { align: "center" });
-
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.5);
-      doc.line(10, 30, 200, 30);
-
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "normal");
-
-      let y = 40;
-      const lineHeight = 8;
-
-      function addLine(label, value) {
-        doc.setFont(undefined, "bold");
-        doc.text(label, 15, y);
-        doc.setFont(undefined, "normal");
-        doc.text(value, 60, y);
-        y += lineHeight;
-      }
-
-      addLine("Date:", date);
-      addLine("Student:", student);
-      addLine("Class:", className);
-      addLine("Fee Type:", feeType);
-      if (feeType === "Tuition Fee" && teachers) {
-        addLine("Teachers:", teachers);
-      }
-      addLine("Discount:", discount);
-      addLine("Payment Status:", status);
-
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(33, 33, 33);
-      doc.text("Total Amount: ₹" + total, 15, y + 10);
-
-      doc.setFontSize(10);
-      doc.setTextColor(150);
-      doc.text("Thank you for your payment!", 105, 280, { align: "center" });
-
-      doc.save("fee-receipt.pdf");
-    }
-  </script>
+            // Initial calculation on page load
+            calculateTotalFee();
+        });
+    </script>
 </body>
-
 </html>
