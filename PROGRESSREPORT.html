@@ -3,539 +3,673 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Progress Form</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Student Performance Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
+        /* Custom styles for Inter font and general body */
         body {
-            font-family: 'Poppins', Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #374151; /* Dark gray text */
         }
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            max-width: 800px;
-            width: 100%;
-            box-sizing: border-box;
-            transition: transform 0.3s ease-in-out;
+        /* Style for the modal backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
         }
-        .container:hover {
-            transform: translateY(-5px); /* Subtle lift effect */
-        }
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-weight: 600;
-            position: relative;
-        }
-        h2::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background-color: #007bff;
-            margin: 10px auto 0;
-            border-radius: 2px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #34495e;
-            font-size: 0.95em;
-        }
-        input[type="text"],
-        input[type="number"],
-        select { /* Added select to this rule */
-            width: calc(100% - 24px); /* Account for padding and border */
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            box-sizing: border-box;
-            -webkit-appearance: none; /* Remove default dropdown arrow */
-            -moz-appearance: none;
-            appearance: none;
-            background-color: #fff;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.9H5.4c-7.2%200-11%208.5-6.1%2014.2l140.7%20140.7c2.8%202.8%206.9%202.8%209.7%200L293.1%2084.1c4.9-5.7%201.1-14.2-6.1-14.2z%22%2F%3E%3C%2Fsvg%3E'); /* Custom dropdown arrow */
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 12px;
-            padding-right: 30px; /* Space for arrow */
-        }
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus { /* Added select to this rule */
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-            outline: none;
-        }
-
-        h3 {
-            color: #34495e;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .subject-entry {
-            background-color: #f8f9fa;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Two columns */
-            gap: 15px 20px;
-            position: relative;
-            transition: all 0.3s ease-in-out;
-        }
-        .subject-entry:hover {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-        .subject-entry > div {
-            display: flex;
-            flex-direction: column;
-        }
-        .subject-entry label {
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #495057;
-            font-size: 0.88em;
-        }
-        .subject-entry input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 0; /* Override default margin */
-        }
-        .subject-entry span {
-            padding: 10px;
-            background-color: #e2e6ea;
-            border-radius: 8px;
-            font-weight: bold;
-            color: #34495e;
-            font-size: 1em;
-            display: block;
-            text-align: center;
-        }
-
-        .remove-subject {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%; /* Make it circular */
-            width: 36px;
-            height: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 1.1em;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            z-index: 10;
-        }
-        .remove-subject:hover {
-            background-color: #c82333;
-            transform: scale(1.1); /* Pop effect */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-        .remove-subject:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .button-group {
-            text-align: center;
-            margin-top: 30px;
-        }
-        button {
-            background-color: #28a745; /* Submit button color */
-            color: white;
-            padding: 14px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            margin: 0 10px; /* Adjusted margin for two buttons */
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden; /* For pseudo-element hover effect */
-        }
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.15);
-            transition: all 0.3s ease;
-            transform: skewX(-20deg);
-        }
-        button:hover::before {
-            left: 100%;
-        }
-
-        button:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        #addSubject {
-            background-color: #007bff; /* Add Subject button color */
-        }
-        #addSubject:hover {
-            background-color: #0056b3;
-        }
-        #dashboardButton { /* Specific style for Dashboard button */
-            background-color: #6c757d; /* Grey color for secondary action */
-        }
-        #dashboardButton:hover {
-            background-color: #5a6268;
-        }
-
-        #message {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
+        /* Hide scrollbar for elements if needed, but allow content to scroll */
+        .no-scrollbar::-webkit-scrollbar {
             display: none;
-            font-weight: 500;
-            font-size: 1em;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        /* Loading spinner animation */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo-600 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .subject-entry {
-                grid-template-columns: 1fr; /* Stack columns on smaller screens */
-                gap: 10px;
-            }
-            .subject-entry .remove-subject {
-                position: static; /* Position within the flow */
-                margin-top: 15px;
-                transform: none; /* Remove initial transform */
-            }
-            .button-group button { /* Apply to all buttons in the group */
-                width: calc(100% - 20px); /* Adjust width to account for margins */
-                margin: 0 10px 15px 10px; /* Top, Right, Bottom, Left */
-                display: block; /* Stack buttons vertically */
-            }
+        /* Added styles for modal content overflow */
+        #modalContent {
+            max-height: 90vh; /* Limit modal height to 90% of viewport height */
+            overflow-y: auto; /* Enable vertical scrolling if content overflows */
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <h2>Student Progress Data Collection</h2>
-        <form id="progressForm">
-            <label for="studentID">Student ID:</label>
-            <input type="text" id="studentID" name="studentID" required>
+<body class="p-4 sm:p-6 md:p-8">
 
-            <label for="studentName">Student Name:</label>
-            <input type="text" id="studentName" name="studentName" required>
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-xl">
+        <h1 class="text-3xl font-bold text-center mb-8 text-indigo-700">Student Performance Overview</h1>
 
-            <label for="studentClass">Class:</label>
-            <input type="text" id="studentClass" name="studentClass" required>
+        <div class="mb-6 flex items-center space-x-2">
+            <input type="text" id="studentSearch" placeholder="Search by Student Name or ID..."
+                   class="flex-grow px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                   onkeyup="filterStudentTable()"> <button onclick="filterStudentTable()"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md shadow-sm transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">
+                Search
+            </button>
+            <button onclick="resetSearch()"
+                    class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-75">
+                Reset
+            </button>
+        </div>
 
-            <label for="examType">Exam Type:</label>
-            <select id="examType" name="examType" required>
-                <option value="">Select Exam Type</option>
-                <option value="Academic Test 1">Academic Test 1</option>
-                <option value="Academic Test 2">Academic Test 2</option>
-                <option value="Academic Test 3">Academic Test 3</option>
-                <option value="Academic Test 4">Academic Test 4</option>
-                <option value="Periodic Test 1">Periodic Test 1</option>
-                <option value="Periodic Test 2">Periodic Test 2</option>
-                <option value="Periodic Test 3">Periodic Test 3</option>
-                <option value="Periodic Test 4">Periodic Test 4</option>
-                <option value="Term 1">Term 1</option>
-                <option value="Term 2">Term 2</option>
-                <option value="Model Exam">Model Exam</option>
-                <option value="Admission Test">Admission Test</option>
-                <option value="Revision Test Series">Revision Test Series</option>
-            </select>
+        <div id="loadingIndicator" class="flex items-center justify-center py-10 text-gray-600 hidden">
+            <div class="spinner mr-3"></div>
+            <span>Loading student data from Google Sheet...</span>
+        </div>
 
-            <h3>Subjects:</h3>
-            <div id="subjectsContainer">
-                <div class="subject-entry">
-                    <div>
-                        <label>Subject Name:</label>
-                        <input type="text" class="subject-name" required>
-                    </div>
-                    <div>
-                        <label>Marks Obtained:</label>
-                        <input type="number" class="mark-obtained" min="0" required>
-                    </div>
-                    <div>
-                        <label>Out Of:</label>
-                        <input type="number" class="out-of" min="1" required>
-                    </div>
-                    <div>
-                        <label>Percentage:</label>
-                        <span class="percentage">0.00%</span>
-                    </div>
-                    <div>
-                        <label>Grade:</label>
-                        <span class="grade">N/A</span>
-                    </div>
-                    </div>
+        <div id="studentTableContainer" class="overflow-x-auto rounded-lg shadow-md hidden">
+            <table class="min-w-full bg-white border-collapse">
+                <thead class="bg-indigo-600 text-white">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-lg">Student Name</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Student ID</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Class</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold uppercase tracking-wider rounded-tr-lg">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody" class="divide-y divide-gray-200">
+                </tbody>
+            </table>
+        </div>
+        <div id="errorMessage" class="text-red-600 text-center py-4 hidden">
+            Failed to load student data. Please ensure the Google Sheet URL is correct and the Apps Script is deployed.
+        </div>
+        <div id="noSearchResults" class="text-gray-500 text-center py-4 hidden">
+            No students found matching your search.
+        </div>
+    </div>
+
+    <div id="performanceModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl p-6 relative transform transition-all scale-95 opacity-0 duration-300 ease-out" id="modalContent">
+            <button onclick="closeModal()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-semibold">
+                &times;
+            </button>
+
+            <h2 id="modalStudentName" class="text-2xl font-bold text-indigo-700 mb-4"></h2>
+            <p id="modalStudentId" class="text-gray-600 mb-4"></p>
+
+            <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="examTypeFilter" class="block text-gray-700 font-medium mb-1">Filter by Exam Type:</label>
+                    <select id="examTypeFilter" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                        <option value="all">All Exam Types</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="subjectFilter" class="block text-gray-700 font-medium mb-1">Filter by Subject:</label>
+                    <select id="subjectFilter" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                        <option value="all">All Subjects</option>
+                    </select>
+                </div>
             </div>
-            <button type="button" id="addSubject">Add Subject</button>
 
-            <div class="button-group">
-                <button type="button" id="dashboardButton">Dashboard</button> <button type="submit">Submit Progress</button>
+            <div class="mb-6">
+                <label for="chartDataType" class="block text-gray-700 font-medium mb-1">Chart Data Type:</label>
+                <select id="chartDataType" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white" onchange="updatePerformanceView()">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="marks">Marks (Score)</option>
+                </select>
             </div>
-            <div id="message"></div>
-        </form>
+
+
+            <div class="relative h-64 md:h-80 lg:h-96 mb-6">
+                <canvas id="performanceChart"></canvas>
+            </div>
+
+            <h3 class="text-xl font-bold text-indigo-700 mb-3 mt-6">Detailed Exam Results</h3>
+            <div class="overflow-x-auto rounded-lg shadow-md mb-6">
+                <table class="min-w-full bg-white border-collapse">
+                    <thead class="bg-gray-200 text-gray-700">
+                        <tr>
+                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-lg">Timestamp</th>
+                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Exam Type</th>
+                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Subject</th>
+                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Mark</th>
+                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Out Of</th>
+                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Percentage</th>
+                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-lg">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examDetailsTableBody" class="divide-y divide-gray-100">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-8 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Class Teacher's Remarks:</h3>
+                <div class="h-24 border border-gray-200 bg-white rounded-md p-3 text-sm text-gray-700"
+                     style="min-height: 50px;">
+                    </div>
+                <p class="text-xs text-gray-500 mt-2">
+                    (This section is for manual entry/signature by the class teacher after printing)
+                </p>
+            </div>
+
+            <div class="flex justify-between items-end mt-8 pt-4 border-t border-gray-200">
+                <div class="text-center w-1/2 pr-2">
+                    <div class="h-16 border-b border-gray-400 mb-2"></div>
+                    <p class="text-sm text-gray-700 font-semibold">Principal's Signature</p>
+                </div>
+                <div class="text-center w-1/2 pl-2">
+                    <div class="h-16 border-b border-gray-400 mb-2"></div>
+                    <p class="text-sm text-gray-700 font-semibold">Official Seal</p>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-6">
+                <button onclick="downloadPdf()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75">
+                    Download Performance as PDF
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const subjectsContainer = document.getElementById('subjectsContainer');
-        const addSubjectButton = document.getElementById('addSubject');
-        const progressForm = document.getElementById('progressForm');
-        const messageDiv = document.getElementById('message');
-        const dashboardButton = document.getElementById('dashboardButton'); // Get the new button
+        // Your Google Apps Script Web App URL
+        // IMPORTANT: Replace this with your actual deployed Google Apps Script Web App URL
+        const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbywWPjSBqVDI4z20NFjEtBeao4uvx9WOWf-MYNOqcfvV5W8utsUqv2-Df8oSVb7-eQ3lg/exec';
 
-        // *** YOUR GOOGLE APPS SCRIPT WEB APP URL GOES HERE ***
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCZp4P8bCqAlVQbYoGktXBXPEYWtstVkWfTbyv2yCw0ktRba2msLftysAOpkhkFhs7Gw/exec'; // Replace with your actual deployed web app URL
+        let allStudentData = []; // This will be populated from the Google Sheet
+        let currentChart = null; // To store the Chart.js instance
+        let currentStudentRecords = []; // To store records of the currently viewed student
 
-        // *** YOUR DASHBOARD URL GOES HERE ***
-        // This could be:
-        // 1. The path to another HTML file: 'dashboard.html'
-        // 2. A full URL to a web page: 'https://www.yourwebsite.com/dashboard'
-        // 3. Just going back in browser history: window.history.back()
-        const DASHBOARD_URL = 'index.html'; // Example: Assuming 'index.html' is your dashboard.
-                                          // Or use window.history.back() if you just want to go back.
+        /**
+         * Fetches student data from the Google Apps Script web app.
+         */
+        async function fetchStudentDataFromGoogleSheet() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const studentTableContainer = document.getElementById('studentTableContainer');
+            const errorMessage = document.getElementById('errorMessage');
 
-        let subjectCount = 1;
+            loadingIndicator.classList.remove('hidden');
+            studentTableContainer.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            document.getElementById('noSearchResults').classList.add('hidden'); // Hide no results on initial load
 
-        function calculateResults(subjectEntry) {
-            const markInput = subjectEntry.querySelector('.mark-obtained');
-            const outOfInput = subjectEntry.querySelector('.out-of');
-            const percentageSpan = subjectEntry.querySelector('.percentage');
-            const gradeSpan = subjectEntry.querySelector('.grade');
+            try {
+                const response = await fetch(googleSheetUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
 
-            const mark = parseFloat(markInput.value);
-            const outOf = parseFloat(outOfInput.value);
+                // Ensure data types are consistent for calculations (Mark, OutOf, Percentage)
+                allStudentData = data.map(record => ({
+                    ...record,
+                    Mark: parseFloat(record.Mark),
+                    OutOf: parseFloat(record.OutOf),
+                    Percentage: parseFloat(record.Percentage)
+                }));
 
-            if (!isNaN(mark) && !isNaN(outOf) && outOf > 0) {
-                const percentage = (mark / outOf) * 100;
-                percentageSpan.textContent = percentage.toFixed(2) + '%';
-                gradeSpan.textContent = getGrade(percentage);
-            } else {
-                percentageSpan.textContent = '0.00%';
-                gradeSpan.textContent = 'N/A';
+                renderStudentTable(); // Render table after data is fetched
+                studentTableContainer.classList.remove('hidden'); // Show the table
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                errorMessage.classList.remove('hidden'); // Show error message
+            } finally {
+                loadingIndicator.classList.add('hidden'); // Hide loading indicator
             }
         }
 
-        function getGrade(percentage) {
-            if (percentage >= 90) return 'A+';
-            if (percentage >= 80) return 'A';
-            if (percentage >= 70) return 'B+';
-            if (percentage >= 60) return 'B';
-            if (percentage >= 50) return 'C';
-            if (percentage >= 40) return 'D';
-            return 'F';
-        }
+        /**
+         * Renders the main student table with unique student entries.
+         */
+        function renderStudentTable(filteredStudents = null) {
+            const tableBody = document.getElementById('studentTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+            document.getElementById('noSearchResults').classList.add('hidden');
 
-        function addSubjectEntry() {
-            subjectCount++;
-            const newSubjectEntry = document.createElement('div');
-            newSubjectEntry.classList.add('subject-entry');
-            newSubjectEntry.innerHTML = `
-                <div>
-                    <label>Subject Name:</label>
-                    <input type="text" class="subject-name" required>
-                </div>
-                <div>
-                    <label>Marks Obtained:</label>
-                    <input type="number" class="mark-obtained" min="0" required>
-                </div>
-                <div>
-                    <label>Out Of:</label>
-                    <input type="number" class="out-of" min="1" required>
-                </div>
-                <div>
-                    <label>Percentage:</label>
-                    <span class="percentage">0.00%</span>
-                </div>
-                <div>
-                    <label>Grade:</label>
-                    <span class="grade">N/A</span>
-                </div>
-                <button type="button" class="remove-subject" title="Remove Subject">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            `;
-            // Attach event listener for the new remove button
-            newSubjectEntry.querySelector('.remove-subject').addEventListener('click', function() {
-                newSubjectEntry.remove();
+            const studentsToDisplay = filteredStudents || getUniqueStudents();
+
+            if (studentsToDisplay.length === 0) {
+                const message = filteredStudents ? 'No students found matching your search.' : 'No student data available. Please ensure your Google Sheet is populated and the Apps Script is correctly configured.';
+                const row = tableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 4; // Span across all columns
+                cell.className = 'py-4 px-4 text-center text-gray-500';
+                cell.textContent = message;
+                document.getElementById('noSearchResults').classList.remove('hidden'); // Show if no search results
+                return;
+            }
+
+            studentsToDisplay.forEach(student => {
+                const row = tableBody.insertRow();
+                row.className = 'hover:bg-gray-50 transition-colors duration-200';
+
+                // Student Name Cell
+                let cell = row.insertCell();
+                cell.className = 'py-3 px-4 whitespace-nowrap text-sm font-medium text-gray-900';
+                cell.textContent = student.StudentName;
+
+                // Student ID Cell
+                cell = row.insertCell();
+                cell.className = 'py-3 px-4 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = student.StudentID;
+
+                // Class Cell
+                cell = row.insertCell();
+                cell.className = 'py-3 px-4 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = student.Class;
+
+                // Action (View) Button Cell
+                cell = row.insertCell();
+                cell.className = 'py-3 px-4 whitespace-nowrap text-center text-sm font-medium';
+                const viewButton = document.createElement('button');
+                viewButton.textContent = 'View Performance';
+                viewButton.className = 'bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75';
+                viewButton.onclick = () => showStudentPerformance(student.StudentID);
+                cell.appendChild(viewButton);
             });
-
-            subjectsContainer.appendChild(newSubjectEntry);
-            attachCalculationListeners(newSubjectEntry);
         }
 
-        function attachCalculationListeners(subjectEntry) {
-            const markInput = subjectEntry.querySelector('.mark-obtained');
-            const outOfInput = subjectEntry.querySelector('.out-of');
-
-            markInput.addEventListener('input', () => calculateResults(subjectEntry));
-            outOfInput.addEventListener('input', () => calculateResults(subjectEntry));
-        }
-
-        // Attach listeners to initial subject entry (if it exists)
-        const initialSubjectEntry = document.querySelector('.subject-entry');
-        if (initialSubjectEntry) {
-            attachCalculationListeners(initialSubjectEntry);
-        }
-
-        addSubjectButton.addEventListener('click', addSubjectEntry);
-
-   // Event listener for the new Dashboard button
-dashboardButton.addEventListener('click', () => {
-    window.location.href = 'mentor-dashboard.html'; // Redirect to mentor dashboard
-});
-
-        progressForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            messageDiv.style.display = 'none'; // Hide previous messages
-
-            // Retrieve form values in the correct order for logging
-            const studentID = document.getElementById('studentID').value;
-            const studentName = document.getElementById('studentName').value;
-            const studentClass = document.getElementById('studentClass').value;
-            const examType = document.getElementById('examType').value;
-
-            const subjectsData = [];
-            document.querySelectorAll('.subject-entry').forEach(entry => {
-                const subjectName = entry.querySelector('.subject-name').value;
-                const mark = parseFloat(entry.querySelector('.mark-obtained').value);
-                const outOf = parseFloat(entry.querySelector('.out-of').value);
-                const percentageText = entry.querySelector('.percentage').textContent;
-                const percentage = parseFloat(percentageText.replace('%', ''));
-                const grade = entry.querySelector('.grade').textContent;
-
-                // Only add valid subject entries
-                if (subjectName && !isNaN(mark) && !isNaN(outOf) && outOf > 0) {
-                    subjectsData.push({
-                        subjectName,
-                        mark,
-                        outOf,
-                        percentage,
-                        grade
+        /**
+         * Extracts unique student information from allStudentData.
+         * @returns {Array} An array of unique student objects.
+         */
+        function getUniqueStudents() {
+            const uniqueStudentsMap = new Map();
+            allStudentData.forEach(record => {
+                if (!uniqueStudentsMap.has(record.StudentID)) {
+                    uniqueStudentsMap.set(record.StudentID, {
+                        StudentID: record.StudentID,
+                        StudentName: record.StudentName,
+                        Class: record.Class
                     });
                 }
             });
-
-            if (subjectsData.length === 0) {
-                showMessage('Please add at least one valid subject with marks.', 'error');
-                return;
-            }
-
-            if (!examType) {
-                showMessage('Please select an Exam Type.', 'error');
-                return;
-            }
-
-
-            const formData = {
-                studentID,
-                studentName,
-                studentClass,
-                examType,
-                subjects: subjectsData
-            };
-
-            try {
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        data: JSON.stringify(formData)
-                    }).toString(),
-                });
-
-                showMessage('Student progress data submitted successfully!', 'success');
-                progressForm.reset();
-                // Reset subject entries to just one default
-                subjectsContainer.innerHTML = `
-                    <div class="subject-entry">
-                        <div>
-                            <label>Subject Name:</label>
-                            <input type="text" class="subject-name" required>
-                        </div>
-                        <div>
-                            <label>Marks Obtained:</label>
-                            <input type="number" class="mark-obtained" min="0" required>
-                        </div>
-                        <div>
-                            <label>Out Of:</label>
-                            <input type="number" class="out-of" min="1" required>
-                        </div>
-                        <div>
-                            <label>Percentage:</label>
-                            <span class="percentage">0.00%</span>
-                        </div>
-                        <div>
-                            <label>Grade:</label>
-                            <span class="grade">N/A</span>
-                        </div>
-                    </div>
-                `;
-                subjectCount = 1;
-                attachCalculationListeners(document.querySelector('.subject-entry'));
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                showMessage('An error occurred while submitting data. Please try again.', 'error');
-            }
-        });
-
-        function showMessage(msg, type) {
-            messageDiv.textContent = msg;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
+            return Array.from(uniqueStudentsMap.values());
         }
+
+        /**
+         * Filters the student table based on search input.
+         * This function is now explicitly called by the Search button or onkeyup.
+         */
+        function filterStudentTable() {
+            const searchValue = document.getElementById('studentSearch').value.toLowerCase();
+            const uniqueStudents = getUniqueStudents();
+            const filteredStudents = uniqueStudents.filter(student =>
+                student.StudentName.toLowerCase().includes(searchValue) ||
+                student.StudentID.toLowerCase().includes(searchValue)
+            );
+            renderStudentTable(filteredStudents);
+        }
+
+        /**
+         * Resets the search bar and displays all students again.
+         */
+        function resetSearch() {
+            document.getElementById('studentSearch').value = ''; // Clear search input
+            renderStudentTable(getUniqueStudents()); // Re-render table with all unique students
+        }
+
+        /**
+         * Displays the performance modal for a given student.
+         * @param {string} studentId - The ID of the student to display.
+         */
+        function showStudentPerformance(studentId) {
+            const modal = document.getElementById('performanceModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalStudentName = document.getElementById('modalStudentName');
+            const modalStudentId = document.getElementById('modalStudentId');
+            const examTypeFilter = document.getElementById('examTypeFilter');
+            const subjectFilter = document.getElementById('subjectFilter');
+            const chartDataTypeFilter = document.getElementById('chartDataType');
+
+
+            currentStudentRecords = allStudentData.filter(record => record.StudentID === studentId);
+
+            if (currentStudentRecords.length === 0) {
+                console.error('No records found for student ID:', studentId);
+                return;
+            }
+
+            const uniqueExamTypes = [...new Set(currentStudentRecords.map(record => record.Examtype))].sort();
+            const uniqueSubjects = [...new Set(currentStudentRecords.map(record => record.Subject))].sort();
+
+            examTypeFilter.innerHTML = '<option value="all">All Exam Types</option>';
+            uniqueExamTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                examTypeFilter.appendChild(option);
+            });
+
+            subjectFilter.innerHTML = '<option value="all">All Subjects</option>';
+            uniqueSubjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectFilter.appendChild(option);
+            });
+
+            // Reset filters to "all" and chart type to "percentage" when opening modal
+            examTypeFilter.value = 'all';
+            subjectFilter.value = 'all';
+            chartDataTypeFilter.value = 'percentage';
+
+
+            modalStudentName.textContent = `Performance for: ${currentStudentRecords[0].StudentName}`;
+            modalStudentId.textContent = `Student ID: ${currentStudentRecords[0].StudentID} | Class: ${currentStudentRecords[0].Class}`;
+
+            updatePerformanceView();
+
+            examTypeFilter.onchange = updatePerformanceView;
+            subjectFilter.onchange = updatePerformanceView;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        /**
+         * Closes the performance modal.
+         */
+        function closeModal() {
+            const modal = document.getElementById('performanceModal');
+            const modalContent = document.getElementById('modalContent');
+
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (currentChart) {
+                    currentChart.destroy();
+                    currentChart = null;
+                }
+            }, 300);
+        }
+
+        /**
+         * Renders or updates the student performance line chart AND the detailed exam table
+         * based on selected filters and chart data type.
+         */
+        function updatePerformanceView() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const examDetailsTableBody = document.getElementById('examDetailsTableBody');
+            const examTypeFilter = document.getElementById('examTypeFilter');
+            const subjectFilter = document.getElementById('subjectFilter');
+            const chartDataType = document.getElementById('chartDataType').value; // Get selected chart data type
+
+            examDetailsTableBody.innerHTML = '';
+
+            const selectedExamType = examTypeFilter.value;
+            const selectedSubject = subjectFilter.value;
+
+            let filteredRecords = currentStudentRecords;
+            if (selectedExamType !== 'all') {
+                filteredRecords = filteredRecords.filter(record => record.Examtype === selectedExamType);
+            }
+            if (selectedSubject !== 'all') {
+                filteredRecords = filteredRecords.filter(record => record.Subject === selectedSubject);
+            }
+
+            filteredRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+            // --- Prepare Chart Data ---
+            let labels = [];
+            if (selectedSubject !== 'all') {
+                labels = filteredRecords.map(record => `${record.Examtype} (${new Date(record.Timestamp).toLocaleDateString()})`);
+            } else {
+                labels = filteredRecords.map(record => `${record.Examtype} (${new Date(record.Timestamp).toLocaleDateString()}) - ${record.Subject}`);
+            }
+
+            let chartData = [];
+            let yAxisLabel = '';
+            let yAxisMax = 100;
+            let yAxisCallback = function(value) { return value + '%'; };
+            let tooltipCallback = function(context) { return `${context.dataset.label}: ${context.raw}%`; };
+
+            if (chartDataType === 'percentage') {
+                chartData = filteredRecords.map(record => record.Percentage);
+                yAxisLabel = 'Percentage (%)';
+                yAxisMax = 100;
+                yAxisCallback = function(value) { return value + '%'; };
+                tooltipCallback = function(context) { return `${context.dataset.label}: ${context.raw}%`; };
+            } else if (chartDataType === 'marks') {
+                chartData = filteredRecords.map(record => record.Mark);
+                yAxisLabel = 'Marks (Score)';
+                // Determine max mark dynamically for marks chart
+                yAxisMax = Math.max(...filteredRecords.map(record => record.OutOf), 100); // Ensure at least 100 for visual consistency
+                yAxisCallback = function(value) { return value; }; // No '%' for marks
+                tooltipCallback = function(context) {
+                    const record = filteredRecords[context.dataIndex];
+                    return `${context.dataset.label}: ${record.Mark} out of ${record.OutOf}`; // Updated tooltip for marks
+                };
+            }
+
+
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: chartDataType === 'percentage' ? 'Performance Percentage' : 'Student Marks',
+                        data: chartData,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        tension: 0.3,
+                        pointBackgroundColor: '#4f46e5',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#4f46e5',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    family: 'Inter'
+                                },
+                                color: '#374151'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: tooltipCallback
+                            },
+                            titleFont: {
+                                family: 'Inter'
+                            },
+                            bodyFont: {
+                                family: 'Inter'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Exam Instances',
+                                color: '#374151',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                    family: 'Inter'
+                                }
+                            },
+                            ticks: {
+                                color: '#4b5563',
+                                font: {
+                                    family: 'Inter'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: yAxisLabel,
+                                color: '#374151',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                    family: 'Inter'
+                                }
+                            },
+                            min: 0,
+                            max: yAxisMax, // Dynamic max for Y-axis
+                            ticks: {
+                                callback: yAxisCallback,
+                                color: '#4b5563',
+                                font: {
+                                    family: 'Inter'
+                                }
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- Render Detailed Exam Table ---
+            if (filteredRecords.length === 0) {
+                const row = examDetailsTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 7;
+                cell.className = 'py-3 px-4 text-center text-gray-500';
+                cell.textContent = 'No exam records found for the selected filters.';
+                return;
+            }
+
+            filteredRecords.forEach(record => {
+                const row = examDetailsTableBody.insertRow();
+                row.className = 'hover:bg-gray-50 transition-colors duration-200';
+
+                let cell = row.insertCell();
+                cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = new Date(record.Timestamp).toLocaleDateString();
+
+                cell = row.insertCell();
+                cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = record.Examtype;
+
+                cell = row.insertCell();
+                cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = record.Subject;
+
+                cell = row.insertCell();
+                cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = record.Mark;
+
+                cell = row.insertCell();
+                cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = record.OutOf;
+
+                cell = row.insertCell();
+                cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = `${record.Percentage}%`;
+
+                cell = row.insertCell();
+                cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
+                cell.textContent = record.Grade;
+            });
+        }
+
+        /**
+         * Downloads the content of the performance modal as a PDF.
+         */
+        async function downloadPdf() {
+            const modalContent = document.getElementById('modalContent');
+            const studentName = document.getElementById('modalStudentName').textContent.replace('Performance for: ', '');
+            const studentId = document.getElementById('modalStudentId').textContent.split('|')[0].replace('Student ID: ', '').trim();
+
+            // Store original styles
+            const originalMaxHeight = modalContent.style.maxHeight;
+            const originalOverflowY = modalContent.style.overflowY;
+            const originalPaddingBottom = modalContent.style.paddingBottom;
+
+            // Temporarily remove max-height and overflow-y to capture full content
+            modalContent.style.maxHeight = 'none';
+            modalContent.style.overflowY = 'visible';
+            modalContent.style.paddingBottom = '20mm'; // Add some padding for the footer content
+
+            // Temporarily hide the close button and download button for PDF generation
+            const closeButton = modalContent.querySelector('button.absolute');
+            const downloadButton = modalContent.querySelector('button[onclick="downloadPdf()"]');
+            if (closeButton) closeButton.style.display = 'none';
+            if (downloadButton) downloadButton.style.display = 'none';
+
+            // Get the current width and height of the modal content
+            const originalWidth = modalContent.offsetWidth;
+            const originalHeight = modalContent.offsetHeight;
+
+            // Set a fixed width for canvas rendering to ensure consistent PDF output
+            const renderWidth = 800; // A good width for PDF rendering
+            const scale = renderWidth / originalWidth;
+
+            // Use html2canvas to render the modal content
+            const canvas = await html2canvas(modalContent, {
+                scale: scale,
+                useCORS: true,
+                windowWidth: renderWidth,
+                windowHeight: originalHeight * scale,
+                scrollY: -window.scrollY,
+                scrollX: -window.scrollX
+            });
+
+            // Revert styles and show hidden elements
+            modalContent.style.maxHeight = originalMaxHeight;
+            modalContent.style.overflowY = originalOverflowY;
+            modalContent.style.paddingBottom = originalPaddingBottom;
+            if (closeButton) closeButton.style.display = 'block';
+            if (downloadButton) downloadButton.style.display = 'block';
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= -10) { // Adjusted condition to account for potential small remainders
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(`Student_Performance_${studentName.replace(/\s/g, '_')}_${studentId}.pdf`);
+        }
+
+        // Initialize the table by fetching data when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', fetchStudentDataFromGoogleSheet);
     </script>
 </body>
 </html>
