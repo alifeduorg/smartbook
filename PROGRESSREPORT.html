@@ -1,211 +1,370 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Progress Report</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7f9;
-      padding: 20px;
-    }
-    .container {
-      background: #fff;
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0px 0px 10px #ccc;
-    }
-    h2 {
-      text-align: center;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Student Progress Card</title>
+<!-- Font Awesome CDN for trash icon -->
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  rel="stylesheet"
+/>
+<style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #222;
+  }
+  form {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 0 15px rgb(0 0 0 / 0.1);
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  input[type="text"],
+  select,
+  input[type="number"] {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Subjects table */
+  .subjects-container {
+    margin-top: 20px;
+  }
+  .subjects-header,
+  .subject-row {
+    display: grid;
+    grid-template-columns: 3fr 2fr 2fr 1fr;
+    gap: 15px;
+    align-items: center;
+  }
+  .subjects-header {
+    font-weight: 700;
+    border-bottom: 2px solid #444;
+    padding-bottom: 5px;
+    color: #222;
+  }
+  .subject-row {
+    margin-top: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+  .subject-row:last-child {
+    border-bottom: none;
+  }
+  .subject-row input[type="text"],
+  .subject-row input[type="number"] {
+    padding: 6px 10px;
+    font-size: 0.95rem;
+  }
+
+  .remove-subject-btn {
+    color: #c0392b;
+    cursor: pointer;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  .remove-subject-btn:hover {
+    color: #e74c3c;
+  }
+  button#add-subject-btn {
+    margin-top: 15px;
+    background-color: #27ae60;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button#add-subject-btn:hover {
+    background-color: #2ecc71;
+  }
+  button#submit-btn {
+    margin-top: 25px;
+    width: 100%;
+    background-color: #2980b9;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  button#submit-btn:hover {
+    background-color: #3498db;
+  }
+
+  /* Percentage and grade display */
+  .percent-grade {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .subjects-header,
+    .subject-row {
+      grid-template-columns: 2fr 2fr 2fr 1fr;
     }
     label {
-      display: block;
       margin-top: 10px;
     }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-    }
-    .subject-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .subject-row input {
-      flex: 1;
-    }
-    .subject-row button {
-      background: red;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    .success, .error {
-      margin-top: 15px;
-      padding: 10px;
-      text-align: center;
-      border-radius: 5px;
-    }
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-  </style>
+  }
+
+  /* Error message */
+  #message {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 8px;
+    display: none;
+  }
+  #message.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  #message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Student Progress Report</h2>
-    <form id="progressForm">
-      <label>Student Name *</label>
-      <input type="text" name="studentName" required>
+  <h1>Student Progress Card</h1>
+  <form id="progress-form" novalidate>
+    <label for="studentName">Student Name *</label>
+    <input type="text" id="studentName" name="studentName" required />
 
-      <label>Student ID *</label>
-      <input type="text" name="studentID" required>
+    <label for="studentId">Student ID *</label>
+    <input type="text" id="studentId" name="studentId" required />
 
-      <label>Class *</label>
-      <input type="text" name="class" required>
+    <label for="studentClass">Class *</label>
+    <input type="text" id="studentClass" name="studentClass" required />
 
-      <label>Exam Type *</label>
-      <select name="examType" required>
-        <option value="">--Select--</option>
-        <option value="Academic Test 1">Academic Test 1</option>
-        <option value="Academic Test 2">Academic Test 2</option>
-        <option value="Academic Test 3">Academic Test 3</option>
-        <option value="Academic Test 4">Academic Test 4</option>
-        <option value="Periodic Test 1">Periodic Test 1</option>
-        <option value="Periodic Test 2">Periodic Test 2</option>
-        <option value="Periodic Test 3">Periodic Test 3</option>
-        <option value="Periodic Test 4">Periodic Test 4</option>
-        <option value="Term 1">Term 1</option>
-        <option value="Term 2">Term 2</option>
-        <option value="Model Exam">Model Exam</option>
-        <option value="Admission Test">Admission Test</option>
-        <option value="Revision Test Series">Revision Test Series</option>
-      </select>
+    <label for="examType">Exam Type *</label>
+    <select id="examType" name="examType" required>
+      <option value="" disabled selected>Select exam type</option>
+      <option value="Midterm">Midterm</option>
+      <option value="Final">Final</option>
+      <option value="Quiz">Quiz</option>
+      <option value="Practice">Practice</option>
+    </select>
 
-      <h3>Subjects</h3>
-      <div id="subjects"></div>
-      <button type="button" onclick="addSubject()">Add Subject</button>
+    <div class="subjects-container">
+      <div class="subjects-header">
+        <div>Subject Name *</div>
+        <div>Marks Obtained *</div>
+        <div>Marks Out Of *</div>
+        <div>Remove</div>
+      </div>
+      <div class="subject-row" data-index="0">
+        <input type="text" class="subject-name" placeholder="Subject Name" required />
+        <input type="number" class="marks-obtained" placeholder="Marks Obtained" min="0" required />
+        <input type="number" class="marks-out-of" placeholder="Marks Out Of" min="1" required />
+        <div class="remove-subject-btn" title="Remove Subject"><i class="fas fa-trash"></i></div>
+      </div>
+    </div>
+    <button type="button" id="add-subject-btn">+ Add Subject</button>
 
-      <button type="submit">Submit</button>
-      <div id="responseMessage"></div>
-    </form>
-  </div>
+    <button type="submit" id="submit-btn">Submit Progress</button>
 
-  <script>
-    const form = document.getElementById("progressForm");
-    const subjectsDiv = document.getElementById("subjects");
-    const responseDiv = document.getElementById("responseMessage");
+    <div id="message"></div>
+  </form>
 
-    function addSubject() {
-      const row = document.createElement("div");
-      row.className = "subject-row";
-      row.innerHTML = `
-        <input type="text" placeholder="Subject Name" required>
-        <input type="number" placeholder="Marks Obtained" min="0" required>
-        <input type="number" placeholder="Marks Out Of" min="1" required>
-        <button type="button" onclick="this.parentElement.remove()">X</button>
-      `;
-      subjectsDiv.appendChild(row);
-    }
+<script>
+  (() => {
+    const form = document.getElementById("progress-form");
+    const addSubjectBtn = document.getElementById("add-subject-btn");
+    const subjectsContainer = document.querySelector(".subjects-container");
+    const messageDiv = document.getElementById("message");
 
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      responseDiv.innerHTML = '';
-
-      const studentName = form.studentName.value.trim();
-      const studentID = form.studentID.value.trim();
-      const className = form.class.value.trim();
-      const examType = form.examType.value;
-
-      if (!studentName || !studentID || !className || !examType || subjectsDiv.children.length === 0) {
-        showError("Please fill all required fields and add at least one subject.");
-        return;
-      }
-
-      const subjects = [];
-      let valid = true;
-      document.querySelectorAll(".subject-row").forEach(row => {
-        const inputs = row.querySelectorAll("input");
-        const [subjectName, marksObtained, marksOutOf] = Array.from(inputs).map(i => i.value.trim());
-        if (!subjectName || !marksObtained || !marksOutOf) {
-          valid = false;
-          return;
-        }
-        const percentage = ((marksObtained / marksOutOf) * 100).toFixed(2);
-        const grade = getGrade(percentage);
-        subjects.push({
-          subjectName, marksObtained, marksOutOf, percentage, grade
-        });
-      });
-
-      if (!valid) {
-        showError("Please complete all subject fields.");
-        return;
-      }
-
-      const payload = {
-        studentName,
-        studentID,
-        class: className,
-        examType,
-        subjects
-      };
-
-      try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbyh2RV6dPgvToAzRI4_KWmKrkpXPf9ToJQqrQAfoR1JMFue_IB-Y_nd1B5hIvWOF5Cj/exec", {
-          method: "POST",
-          mode: "no-cors", // Use "cors" if Apps Script supports CORS headers
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-        showSuccess("Form submitted successfully.");
-        form.reset();
-        subjectsDiv.innerHTML = '';
-      } catch (err) {
-        showError("Submission failed. Try again.");
-      }
-    });
-
-    function getGrade(percentage) {
-      percentage = parseFloat(percentage);
+    // Grade calculation helper
+    function calculateGrade(percentage) {
       if (percentage >= 90) return "A+";
       if (percentage >= 80) return "A";
       if (percentage >= 70) return "B+";
       if (percentage >= 60) return "B";
       if (percentage >= 50) return "C";
+      if (percentage >= 40) return "D";
       return "F";
     }
 
-    function showSuccess(msg) {
-      responseDiv.innerHTML = `<div class="success">${msg}</div>`;
+    // Create a new subject input row
+    function createSubjectRow(index) {
+      const row = document.createElement("div");
+      row.className = "subject-row";
+      row.dataset.index = index;
+      row.innerHTML = `
+        <input type="text" class="subject-name" placeholder="Subject Name" required />
+        <input type="number" class="marks-obtained" placeholder="Marks Obtained" min="0" required />
+        <input type="number" class="marks-out-of" placeholder="Marks Out Of" min="1" required />
+        <div class="remove-subject-btn" title="Remove Subject"><i class="fas fa-trash"></i></div>
+      `;
+      return row;
     }
 
-    function showError(msg) {
-      responseDiv.innerHTML = `<div class="error">${msg}</div>`;
+    // Add subject row handler
+    addSubjectBtn.addEventListener("click", () => {
+      const currentRows = subjectsContainer.querySelectorAll(".subject-row").length;
+      const newRow = createSubjectRow(currentRows);
+      subjectsContainer.appendChild(newRow);
+    });
+
+    // Remove subject row handler (delegated)
+    subjectsContainer.addEventListener("click", (e) => {
+      if (
+        e.target.closest(".remove-subject-btn") &&
+        subjectsContainer.querySelectorAll(".subject-row").length > 1
+      ) {
+        e.target.closest(".subject-row").remove();
+      }
+    });
+
+    // Validation helper
+    function validateForm() {
+      messageDiv.style.display = "none";
+      let valid = true;
+
+      // Basic required fields check
+      const studentName = form.studentName.value.trim();
+      const studentId = form.studentId.value.trim();
+      const studentClass = form.studentClass.value.trim();
+      const examType = form.examType.value;
+
+      if (!studentName || !studentId || !studentClass || !examType) {
+        valid = false;
+        showMessage("Please fill in all required fields.", "error");
+        return false;
+      }
+
+      // Validate subjects
+      const subjectRows = subjectsContainer.querySelectorAll(".subject-row");
+      for (const row of subjectRows) {
+        const subjName = row.querySelector(".subject-name").value.trim();
+        const marksObt = row.querySelector(".marks-obtained").value.trim();
+        const marksOut = row.querySelector(".marks-out-of").value.trim();
+
+        if (!subjName || marksObt === "" || marksOut === "") {
+          valid = false;
+          showMessage("Please fill in all subject fields.", "error");
+          return false;
+        }
+        if (Number(marksObt) < 0 || Number(marksOut) <= 0) {
+          valid = false;
+          showMessage("Marks must be valid positive numbers.", "error");
+          return false;
+        }
+        if (Number(marksObt) > Number(marksOut)) {
+          valid = false;
+          showMessage("Marks Obtained cannot exceed Marks Out Of.", "error");
+          return false;
+        }
+      }
+      return valid;
     }
 
-    // Initial subject row
-    addSubject();
-  </script>
+    // Show message helper
+    function showMessage(msg, type = "success") {
+      messageDiv.textContent = msg;
+      messageDiv.className = type;
+      messageDiv.style.display = "block";
+    }
+
+    // Form submit handler
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!validateForm()) return;
+
+      // Prepare data
+      const data = {
+        studentName: form.studentName.value.trim(),
+        studentId: form.studentId.value.trim(),
+        studentClass: form.studentClass.value.trim(),
+        examType: form.examType.value,
+        subjects: [],
+      };
+
+      const subjectRows = subjectsContainer.querySelectorAll(".subject-row");
+      for (const row of subjectRows) {
+        const subjName = row.querySelector(".subject-name").value.trim();
+        const marksObt = Number(row.querySelector(".marks-obtained").value);
+        const marksOut = Number(row.querySelector(".marks-out-of").value);
+        const percentage = ((marksObt / marksOut) * 100).toFixed(2);
+        const grade = calculateGrade(percentage);
+
+        data.subjects.push({
+          subjectName: subjName,
+          marksObtained: marksObt,
+          marksOutOf: marksOut,
+          percentage,
+          grade,
+        });
+      }
+
+      // POST data to GAS Web App
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbyQiYZhVorYeOrJHKT4Qy4yhT8d6AYAVywu-nttd3wOJyNRyrQvWsW-VVFuecFD9nsjaQ/exec"; // <-- Replace with your deployed script URL
+
+      try {
+        showMessage("Submitting...", "success");
+        const response = await fetch(GAS_URL, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error(`Network error: ${response.status}`);
+
+        const resJson = await response.json();
+        if (resJson.status === "success") {
+          showMessage("Data submitted successfully!", "success");
+          form.reset();
+
+          // Remove extra subjects except first
+          const extraRows = subjectsContainer.querySelectorAll(".subject-row");
+          extraRows.forEach((row, idx) => {
+            if (idx > 0) row.remove();
+          });
+        } else {
+          showMessage("Error from server: " + resJson.message, "error");
+        }
+      } catch (error) {
+        showMessage("Submission failed: " + error.message, "error");
+      }
+    });
+  })();
+</script>
 </body>
 </html>
