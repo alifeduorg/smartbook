@@ -108,10 +108,10 @@
         }
 
         .download-btn {
-            background-color: #28a745; /* Green */
+            background-color: #dc3545; /* Red for PDF */
         }
         .download-btn:hover {
-            background-color: #218838;
+            background-color: #c82333;
         }
 
         /* Popup Styling */
@@ -259,7 +259,7 @@
             <h2>Payment History <span id="popupStudentName"></span></h2>
 
             <div class="popup-actions">
-                <button id="downloadAllPaymentsButton" class="download-btn">Download All Payments for this Student</button>
+                <button id="downloadAllPaymentsButton" class="download-btn">Download All Payments (PDF)</button>
             </div>
 
             <table id="paymentDetailsTable">
@@ -270,7 +270,8 @@
                         <th>Fee Type</th>
                         <th>Total Fee</th>
                         <th>Payment Mode</th>
-                        <th>Actions</th> </tr>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                     </tbody>
@@ -287,7 +288,7 @@
                 </div>
 
             <div class="popup-actions">
-                <button id="downloadIndividualPaymentButton" class="download-btn">Download This Payment</button>
+                <button id="downloadIndividualPaymentButton" class="download-btn">Download This Payment (PDF)</button>
             </div>
         </div>
     </div>
@@ -313,19 +314,20 @@
         let allPaymentData = [];
 
         let currentStudentID = null;
+        let currentStudentName = ''; // Store current student name for PDF title
         let currentStudentPayments = [];
-        let currentSinglePayment = null; // To hold the payment object for the individual popup
+        let currentSinglePayment = null;
 
         // Function to show/hide loader
         function toggleLoader(show) {
             loader.style.display = show ? 'block' : 'none';
         }
 
-        // Function to fetch data from Google Sheet Web App
+        // Function to fetch data from Google Sheet Web App (using doGet)
         async function fetchGoogleSheetData() {
             toggleLoader(true);
             try {
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL);
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL); // GET request
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -378,6 +380,7 @@
         // Function to open the main payment popup and display all payments for the student
         function openPaymentPopup(studentID, studentName) {
             currentStudentID = studentID;
+            currentStudentName = studentName; // Store the student name
             popupStudentName.textContent = `for ${studentName}`;
             paymentDetailsTableBody.innerHTML = '';
 
@@ -388,7 +391,7 @@
             if (currentStudentPayments.length === 0) {
                 const row = paymentDetailsTableBody.insertRow();
                 const cell = row.insertCell();
-                cell.colSpan = 6; // Adjust colSpan for new table columns
+                cell.colSpan = 6;
                 cell.textContent = 'No payments found for this student.';
                 cell.className = 'no-data-message';
                 downloadAllPaymentsButton.style.display = 'none';
@@ -415,9 +418,9 @@
                 actionsCell.appendChild(viewIndividualButton);
 
                 const downloadButton = document.createElement('button');
-                downloadButton.textContent = 'Download';
+                downloadButton.textContent = 'Download PDF'; // Changed text
                 downloadButton.classList.add('download-btn');
-                downloadButton.onclick = () => downloadSinglePayment(payment); // Directly download from here too
+                downloadButton.onclick = () => downloadPdf([payment], `payment_${payment.ReceiptNumber || 'individual'}.pdf`, `Individual Payment Details`);
                 actionsCell.appendChild(downloadButton);
             });
 
@@ -428,16 +431,16 @@
         function closePopup() {
             paymentPopup.style.display = 'none';
             currentStudentID = null;
+            currentStudentName = '';
             currentStudentPayments = [];
         }
 
         // Function to open individual payment popup
         function openIndividualPaymentPopup(payment) {
-            currentSinglePayment = payment; // Store the payment for download
+            currentSinglePayment = payment; // Store the payment for download button
             individualReceiptNumber.textContent = payment.ReceiptNumber;
-            individualPaymentDetailsDiv.innerHTML = ''; // Clear previous details
+            individualPaymentDetailsDiv.innerHTML = '';
 
-            // Define the fields to display in the individual view
             const fields = [
                 { label: 'Timestamp', key: 'Timestamp' },
                 { label: 'Receipt Number', key: 'ReceiptNumber' },
@@ -461,7 +464,7 @@
                 const valueElement = document.createElement('span');
                 let value = payment[field.key];
                 if (value === null || value === undefined || value === '') {
-                    value = '-'; // Display '-' for empty/null values
+                    value = '-';
                 }
                 valueElement.textContent = value;
                 individualPaymentDetailsDiv.appendChild(valueElement);
@@ -476,75 +479,68 @@
             currentSinglePayment = null;
         }
 
-        // Function to download all payments for the current student
-        function downloadAllPayments() {
-            if (currentStudentPayments.length === 0) {
-                alert('No payments to download for this student.');
-                return;
+        // New function to handle PDF download
+        async function downloadPdf(payments, fileName, reportTitle) {
+            toggleLoader(true); // Show loader for PDF generation
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        payments: payments,
+                        fileName: fileName,
+                        reportTitle: reportTitle,
+                        studentName: currentStudentName // Pass student name for the PDF title
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(`Apps Script PDF Error: ${data.error}`);
+                }
+
+                // Decode base64 PDF and create a Blob
+                const byteCharacters = atob(data.pdf);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                // Trigger download
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (error) {
+                console.error("PDF download failed:", error);
+                alert("Failed to generate PDF. Please try again or contact support.");
+            } finally {
+                toggleLoader(false); // Hide loader regardless of success or failure
             }
-
-            const student = allStudentData.find(s => s.StudentID === currentStudentID);
-            const studentNameForFile = student ? student.StudentName.replace(/[^a-zA-Z0-9]/g, '_') : 'unknown_student';
-
-            let csvContent = "Timestamp,Receipt Number,Date,Student Name,Student ID,Class,Fee Type,Tuition Hours,Rate Per Hour,Total Fee,Payment Mode,Remark\n";
-
-            currentStudentPayments.forEach(payment => {
-                csvContent += `${payment.Timestamp || ''},`;
-                csvContent += `${payment.ReceiptNumber || ''},`;
-                csvContent += `${payment.Date || ''},`;
-                csvContent += `${payment.StudentName || ''},`;
-                csvContent += `${payment.StudentID || ''},`;
-                csvContent += `${payment.Class || ''},`;
-                csvContent += `${payment.FeeType || ''},`;
-                csvContent += `${payment.TuitionHours !== null ? payment.TuitionHours : ''},`;
-                csvContent += `${payment.RatePerHour !== null ? payment.RatePerHour : ''},`;
-                csvContent += `${payment.TotalFee || ''},`;
-                csvContent += `${payment.PaymentMode || ''},`;
-                csvContent += `${payment.Remark || ''}\n`;
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `all_payments_${studentNameForFile}_${currentStudentID}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
 
-        // Function to download a single payment (used from both main popup and individual popup)
-        function downloadSinglePayment(payment) {
-            const student = allStudentData.find(s => s.StudentID === payment.StudentID);
-            const studentNameForFile = student ? student.StudentName.replace(/[^a-zA-Z0-9]/g, '_') : 'unknown_student';
-            const receiptNumForFile = (payment.ReceiptNumber || 'no_receipt').replace(/[^a-zA-Z0-9]/g, '_');
+        // Event Listeners for download buttons
+        downloadAllPaymentsButton.addEventListener('click', () => {
+            const studentNameForFile = currentStudentName.replace(/[^a-zA-Z0-9]/g, '_');
+            downloadPdf(currentStudentPayments, `all_payments_${studentNameForFile}.pdf`, `All Payments for ${currentStudentName}`);
+        });
 
-            const csvContent = "Timestamp,Receipt Number,Date,Student Name,Student ID,Class,Fee Type,Tuition Hours,Rate Per Hour,Total Fee,Payment Mode,Remark\n" +
-                               `${payment.Timestamp || ''},` +
-                               `${payment.ReceiptNumber || ''},` +
-                               `${payment.Date || ''},` +
-                               `${payment.StudentName || ''},` +
-                               `${payment.StudentID || ''},` +
-                               `${payment.Class || ''},` +
-                               `${payment.FeeType || ''},` +
-                               `${payment.TuitionHours !== null ? payment.TuitionHours : ''},` +
-                               `${payment.RatePerHour !== null ? payment.RatePerHour : ''},` +
-                               `${payment.TotalFee || ''},` +
-                               `${payment.PaymentMode || ''},` +
-                               `${payment.Remark || ''}\n`;
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `payment_${studentNameForFile}_${receiptNumForFile}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Event Listeners
-        downloadAllPaymentsButton.addEventListener('click', downloadAllPayments);
-        downloadIndividualPaymentButton.addEventListener('click', () => downloadSinglePayment(currentSinglePayment));
-
+        downloadIndividualPaymentButton.addEventListener('click', () => {
+             const studentNameForFile = currentStudentName.replace(/[^a-zA-Z0-9]/g, '_');
+             const receiptNumForFile = (currentSinglePayment.ReceiptNumber || 'no_receipt').replace(/[^a-zA-Z0-9]/g, '_');
+             downloadPdf([currentSinglePayment], `payment_${studentNameForFile}_${receiptNumForFile}.pdf`, `Individual Payment for ${currentStudentName}`);
+        });
 
         // Initialize the student table when the page loads
         document.addEventListener('DOMContentLoaded', populateStudentTable);
