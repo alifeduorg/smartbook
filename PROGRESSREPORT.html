@@ -3,214 +3,192 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Report Card</title>
+  <title>Student Progress Entry Form</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     }
-    .container {
-      background: #fff;
-      padding: 30px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      border-radius: 16px;
-      max-width: 800px;
-      width: 100%;
+    .btn-3d {
+      transform: translateY(-2px);
+      box-shadow: 0 4px #999;
     }
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-    label {
-      font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    .subjects {
-      margin-top: 20px;
-    }
-    .subject-entry {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .popup-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      width: 80%;
-      max-width: 600px;
-    }
-    .popup-content canvas {
-      max-width: 100%;
-    }
-    .close-btn {
-      float: right;
-      cursor: pointer;
-      color: red;
+    .btn-3d:active {
+      transform: translateY(2px);
+      box-shadow: none;
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h2>Student Report Card</h2>
-    <label>Student ID</label>
-    <input type="text" id="studentId" placeholder="Enter Student ID" required>
-    <label>Student Name</label>
-    <input type="text" id="studentName" placeholder="Enter Student Name" required>
-    <label>Class</label>
-    <input type="text" id="studentClass" placeholder="Enter Class" required>
-    <label>Exam Type</label>
-    <select id="examType">
-      <option>ACADEMIC TEST 1</option>
-      <option>ACADEMIC TEST 2</option>
-      <option>ACADEMIC TEST 3</option>
-      <option>ACADEMIC TEST 4</option>
-      <option>REVISION TEST</option>
-      <option>TERM 1</option>
-      <option>TERM 2</option>
-      <option>MODEL EXAM</option>
-      <option>PERIODIC TEST 1</option>
-      <option>PERIODIC TEST 2</option>
-      <option>PERIODIC TEST 3</option>
-      <option>PERIODIC TEST 4</option>
-    </select>
-    <div class="subjects" id="subjects">
-      <div class="subject-entry">
-        <input type="text" placeholder="Subject Name" class="subject-name" required />
-        <input type="number" placeholder="Mark Obtained" class="subject-mark" required />
-        <input type="number" placeholder="Out of (eg: 100)" class="subject-outof" required />
+<body class="bg-gradient-to-br from-blue-100 to-white min-h-screen flex flex-col items-center justify-center p-6">
+
+  <div class="w-full max-w-4xl glass-card p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">Mentor: Student Progress Entry</h1>
+      <button class="bg-yellow-400 text-white px-4 py-2 rounded-lg shadow-lg btn-3d">Dashboard</button>
+    </div>
+
+    <form id="progressForm" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <input required name="studentName" type="text" placeholder="Student Name" class="p-2 border rounded-lg w-full" />
+        <input required name="studentClass" type="text" placeholder="Class" class="p-2 border rounded-lg w-full" />
+        <input required name="studentId" type="text" placeholder="Student ID" class="p-2 border rounded-lg w-full" />
       </div>
-    </div>
-    <div class="buttons">
-      <button onclick="addSubject()">Add Subject</button>
-      <button onclick="submitReport()">Submit</button>
-      <button onclick="showPopup()">View</button>
-    </div>
+
+      <div id="subjectContainer" class="space-y-2">
+        <!-- Subject Row -->
+      </div>
+
+      <button type="button" onclick="addSubjectRow()" class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md btn-3d">+ Add Subject</button>
+
+      <div class="flex gap-4 mt-4">
+        <button type="button" onclick="submitForm()" class="bg-blue-500 text-white px-6 py-2 rounded-lg btn-3d">Submit</button>
+        <button type="button" onclick="openPopup()" class="bg-purple-600 text-white px-6 py-2 rounded-lg btn-3d">View Report</button>
+      </div>
+    </form>
   </div>
 
-  <div class="popup" id="resultPopup">
-    <div class="popup-content">
-      <span class="close-btn" onclick="closePopup()">&times;</span>
-      <h3>Performance Graph</h3>
-      <canvas id="reportChart"></canvas>
-      <button onclick="downloadPDF()">Download Report</button>
+  <!-- POPUP REPORT CARD -->
+  <div id="popup" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-xl w-full max-w-3xl relative">
+      <button class="absolute top-2 right-2 text-xl text-red-500" onclick="closePopup()">&times;</button>
+      <h2 class="text-2xl font-bold mb-4">Progress Report</h2>
+      <div id="reportCard">
+        <p><strong>Name:</strong> <span id="rName"></span></p>
+        <p><strong>Class:</strong> <span id="rClass"></span></p>
+        <p><strong>ID:</strong> <span id="rID"></span></p>
+        <table class="table-auto w-full mt-4 border">
+          <thead>
+            <tr>
+              <th class="border px-4 py-2">Subject</th>
+              <th class="border px-4 py-2">Mark</th>
+              <th class="border px-4 py-2">Out of</th>
+              <th class="border px-4 py-2">%</th>
+              <th class="border px-4 py-2">Grade</th>
+            </tr>
+          </thead>
+          <tbody id="rMarks"></tbody>
+        </table>
+        <canvas id="reportChart" class="mt-6"></canvas>
+      </div>
+      <button onclick="downloadPDF()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg btn-3d">Download PDF</button>
     </div>
   </div>
 
   <script>
-    const endpoint = "https://script.google.com/macros/s/AKfycbyh2RV6dPgvToAzRI4_KWmKrkpXPf9ToJQqrQAfoR1JMFue_IB-Y_nd1B5hIvWOF5Cj/exec";
-
-    function addSubject() {
-      const subjects = document.getElementById("subjects");
-      const entry = document.createElement("div");
-      entry.className = "subject-entry";
-      entry.innerHTML = `
-        <input type="text" placeholder="Subject Name" class="subject-name" required />
-        <input type="number" placeholder="Mark Obtained" class="subject-mark" required />
-        <input type="number" placeholder="Out of" class="subject-outof" required />
+    function addSubjectRow() {
+      const div = document.createElement('div');
+      div.classList.add('grid', 'grid-cols-12', 'gap-2', 'items-center');
+      div.innerHTML = `
+        <input type="text" placeholder="Subject" class="col-span-4 p-2 border rounded-lg" required>
+        <input type="number" placeholder="Mark" class="col-span-2 p-2 border rounded-lg" required>
+        <input type="number" placeholder="Out of" class="col-span-2 p-2 border rounded-lg" required>
+        <input type="text" placeholder="Grade" class="col-span-2 p-2 border rounded-lg" disabled>
+        <input type="text" placeholder="%" class="col-span-1 p-2 border rounded-lg" disabled>
+        <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 font-bold">Remove</button>
       `;
-      subjects.appendChild(entry);
+      document.getElementById('subjectContainer').appendChild(div);
     }
 
-    function submitReport() {
-      const name = document.getElementById("studentName").value;
-      const studentId = document.getElementById("studentId").value;
-      const cls = document.getElementById("studentClass").value;
-      const exam = document.getElementById("examType").value;
+    function submitForm() {
+      const form = document.getElementById('progressForm');
+      const formData = new FormData(form);
+      const studentName = formData.get("studentName");
+      const studentClass = formData.get("studentClass");
+      const studentId = formData.get("studentId");
+      const subjects = [];
 
-      const subjectNames = [...document.querySelectorAll(".subject-name")].map(input => input.value);
-      const subjectMarks = [...document.querySelectorAll(".subject-mark")].map(input => input.value);
-      const subjectOutOf = [...document.querySelectorAll(".subject-outof")].map(input => input.value);
+      document.querySelectorAll("#subjectContainer > div").forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const mark = parseFloat(inputs[1].value);
+        const outof = parseFloat(inputs[2].value);
+        const percentage = ((mark / outof) * 100).toFixed(2);
+        const grade = getGrade(percentage);
+        inputs[3].value = grade;
+        inputs[4].value = percentage;
+        subjects.push({
+          subject: inputs[0].value,
+          mark: inputs[1].value,
+          outof: inputs[2].value,
+          percentage,
+          grade
+        });
+      });
 
-      fetch(endpoint, {
+      const data = {
+        studentName, studentClass, studentId, subjects
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbyh2RV6dPgvToAzRI4_KWmKrkpXPf9ToJQqrQAfoR1JMFue_IB-Y_nd1B5hIvWOF5Cj/exec", {
         method: "POST",
-        body: JSON.stringify({
-          studentId,
-          name,
-          cls,
-          exam,
-          subjects: subjectNames,
-          marks: subjectMarks,
-          outof: subjectOutOf
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
       })
       .then(res => res.text())
-      .then(data => {
-        alert("Report Submitted Successfully!");
-        showPopup();
-      });
+      .then(alert);
     }
 
-    function showPopup() {
-      const labels = [...document.querySelectorAll(".subject-name")].map(input => input.value);
-      const marks = [...document.querySelectorAll(".subject-mark")].map(input => parseInt(input.value));
-      const outof = [...document.querySelectorAll(".subject-outof")].map(input => parseInt(input.value));
+    function openPopup() {
+      const form = document.getElementById('progressForm');
+      const formData = new FormData(form);
+      document.getElementById("rName").textContent = formData.get("studentName");
+      document.getElementById("rClass").textContent = formData.get("studentClass");
+      document.getElementById("rID").textContent = formData.get("studentId");
 
-      document.getElementById("resultPopup").style.display = "flex";
+      const tbody = document.getElementById("rMarks");
+      tbody.innerHTML = "";
+      const labels = [], marks = [];
 
-      new Chart(document.getElementById("reportChart"), {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Marks',
-            data: marks,
-            backgroundColor: '#007bff'
-          }, {
-            label: 'Out Of',
-            data: outof,
-            backgroundColor: '#ccc'
-          }]
-        }
+      document.querySelectorAll("#subjectContainer > div").forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const subject = inputs[0].value;
+        const mark = parseFloat(inputs[1].value);
+        const outof = parseFloat(inputs[2].value);
+        const percentage = ((mark / outof) * 100).toFixed(2);
+        const grade = getGrade(percentage);
+
+        tbody.innerHTML += `<tr><td class='border px-4 py-2'>${subject}</td><td class='border px-4 py-2'>${mark}</td><td class='border px-4 py-2'>${outof}</td><td class='border px-4 py-2'>${percentage}%</td><td class='border px-4 py-2'>${grade}</td></tr>`;
+        labels.push(subject);
+        marks.push(mark);
       });
+
+      const ctx = document.getElementById('reportChart');
+      if (window.chart) window.chart.destroy();
+      window.chart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Marks', data: marks, backgroundColor: 'rgba(75,192,192,0.6)' }] },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      document.getElementById("popup").classList.remove("hidden");
     }
 
     function closePopup() {
-      document.getElementById("resultPopup").style.display = "none";
+      document.getElementById("popup").classList.add("hidden");
     }
 
-    function downloadPDF() {
-      window.print();
+    async function downloadPDF() {
+      const pdf = new jspdf.jsPDF();
+      const canvas = await html2canvas(document.getElementById("reportCard"));
+      const imgData = canvas.toDataURL("image/png");
+      pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+      pdf.save("Student_Progress_Report.pdf");
+    }
+
+    function getGrade(percentage) {
+      const percent = parseFloat(percentage);
+      if (percent >= 90) return "A+";
+      if (percent >= 80) return "A";
+      if (percent >= 70) return "B+";
+      if (percent >= 60) return "B";
+      if (percent >= 50) return "C";
+      if (percent >= 40) return "D";
+      return "F";
     }
   </script>
 </body>
