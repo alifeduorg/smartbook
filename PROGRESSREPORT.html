@@ -428,15 +428,10 @@
 
         addSubjectButton.addEventListener('click', addSubjectEntry);
 
-        // Event listener for the new Dashboard button
-        dashboardButton.addEventListener('click', () => {
-            if (DASHBOARD_URL === 'window.history.back()') {
-                window.history.back(); // Go back one page in history
-            } else {
-                window.location.href = DASHBOARD_URL; // Navigate to the specified URL
-            }
-        });
-
+   // Event listener for the new Dashboard button
+dashboardButton.addEventListener('click', () => {
+    window.location.href = 'mentor-dashboard.html'; // Redirect to mentor dashboard
+});
 
         progressForm.addEventListener('submit', async (e) => {
             e.preventDefault();
