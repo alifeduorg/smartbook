@@ -6,7 +6,7 @@
     <title>Student Fee Viewer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Montserrat:wght@400;700&display=swap');
 
         body {
             font-family: 'Roboto', sans-serif;
@@ -58,12 +58,12 @@
             100% { transform: rotate(360deg); opacity: 0.8; }
         }
 
-
         h1 {
             margin: 0;
             font-weight: 700;
             letter-spacing: 1.5px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: 'Montserrat', sans-serif;
         }
 
         .container {
@@ -75,6 +75,7 @@
             padding: 30px;
             box-sizing: border-box;
             animation: fadeInUp 0.8s ease-out;
+            margin-bottom: 30px;
         }
 
         @keyframes fadeInUp {
@@ -113,6 +114,7 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease-in-out;
+            cursor: pointer; /* Indicate clickable rows */
         }
 
         .view-btn {
@@ -160,13 +162,15 @@
             padding: 30px;
             border-radius: 10px;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px; /* Increased max-width for payment table */
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
             position: relative;
             transform: scale(0.95);
             animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             overflow-y: auto; /* Allow scrolling within the modal content */
             max-height: 90vh; /* Limit modal height */
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes zoomIn {
@@ -204,88 +208,115 @@
             margin: 0;
             color: #00796b;
             font-size: 1.8em;
+            font-family: 'Montserrat', sans-serif;
         }
 
-        .payment-card {
-            background-color: #e0f7fa;
-            border: 1px solid #b2ebf2;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            transform-style: preserve-3d; /* Enable 3D transform */
-            perspective: 1000px; /* Define perspective */
-        }
-
-        .payment-card:hover {
-            transform: translateY(-5px) rotateX(2deg) rotateY(2deg); /* Subtle 3D tilt */
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .payment-card::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: linear-gradient(45deg, rgba(0,188,212,0.1) 0%, rgba(0,150,136,0.1) 100%);
-            z-index: -1;
-            border-radius: 10px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .payment-card:hover::before {
-            opacity: 1;
-        }
-
-
-        .payment-card h3 {
-            color: #00796b;
-            margin-top: 0;
-            font-size: 1.3em;
-            border-bottom: 1px dashed #b2ebf2;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .payment-card p {
-            margin: 8px 0;
-            font-size: 0.95em;
+        .modal-actions {
             display: flex;
-            justify-content: space-between;
+            gap: 10px;
         }
 
-        .payment-card p strong {
-            color: #333;
-        }
-
-        .download-btn {
+        .modal-actions button {
             background-color: #007BFF;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            display: block;
-            margin-top: 20px;
-            width: fit-content;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .download-btn:hover {
+        .modal-actions button:hover {
             background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
 
-        .no-payments {
+        .payment-table-section, .payment-slip-section {
+            flex-grow: 1;
+            padding: 10px 0;
+            display: none; /* Controlled by JS */
+        }
+
+        .payment-table-section.active, .payment-slip-section.active {
+            display: block;
+        }
+
+        #paymentTableContainer {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        #paymentTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #paymentTable th, #paymentTable td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        #paymentTable th {
+            background-color: #f2f2f2;
+            color: #555;
+            font-weight: 600;
+        }
+
+        #paymentTable tbody tr:hover {
+            background-color: #eef;
+            cursor: pointer;
+        }
+
+        .total-amount-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px dashed #ccc;
+            color: #0056b3;
+        }
+
+        /* Payment Slip/Bill Styles */
+        #paymentSlip {
+            border: 2px solid #00796b;
+            padding: 30px;
+            margin: 20px auto;
+            border-radius: 10px;
+            background-color: #e0f7fa;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        #paymentSlip h3 {
+            text-align: center;
+            color: #00796b;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-family: 'Montserrat', sans-serif;
+            border-bottom: 2px solid #b2ebf2;
+            padding-bottom: 10px;
+        }
+
+        #paymentSlip p {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 1.1em;
+        }
+
+        #paymentSlip p strong {
+            color: #333;
+            min-width: 150px;
+        }
+
+        .no-records {
             text-align: center;
             padding: 30px;
             font-style: italic;
@@ -308,6 +339,7 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             th, td {
                 padding: 10px;
@@ -327,6 +359,16 @@
             }
             .payment-card {
                 padding: 15px;
+            }
+            #paymentSlip {
+                padding: 20px;
+            }
+            #paymentSlip p {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            #paymentSlip p strong {
+                margin-bottom: 5px;
             }
         }
     </style>
@@ -357,24 +399,59 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalStudentName"></h2>
-                <span class="close-btn">&times;</span>
-            </div>
-            <div id="paymentDetails" class="payment-details-wrapper">
+                <div class="modal-actions">
+                    <button id="backToPaymentsTableBtn" style="display:none;">Back to All Payments</button>
+                    <button id="downloadAllPaymentsBtn">Download All Payments PDF</button>
+                    <span class="close-btn">&times;</span>
                 </div>
+            </div>
+
+            <div class="payment-table-section active" id="paymentTableSection">
+                <div id="paymentTableContainer">
+                    <table id="paymentTable">
+                        <thead>
+                            <tr>
+                                <th>Receipt Number</th>
+                                <th>Date</th>
+                                <th>Fee Type</th>
+                                <th>Total Fee</th>
+                                <th>Payment Mode</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+                <div class="total-amount-display" id="totalPaidAmount"></div>
+            </div>
+
+            <div class="payment-slip-section" id="paymentSlipSection">
+                <div id="paymentSlip">
+                    </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCIlCiAEMVwav3Z6Fpqw2rFRmkyjeZC3zzGz3eANOkbDPzEnN4zgoGm2ufNTjp6k87Jg/exec'; // Replace with your deployed Web App URL
+        // Replace with your actual Google Apps Script Web App URL
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCIlCiAEMVwav3Z6Fpqw2rFRmkyjeZC3zzGz3eANOkbDPzEnN4zgoGm2ufNTjp6k87Jg/exec';
 
         const studentTableBody = document.getElementById('studentTable').getElementsByTagName('tbody')[0];
         const paymentModal = document.getElementById('paymentModal');
         const closeBtn = document.querySelector('.close-btn');
         const modalStudentName = document.getElementById('modalStudentName');
-        const paymentDetailsDiv = document.getElementById('paymentDetails');
+        const paymentTableSection = document.getElementById('paymentTableSection');
+        const paymentSlipSection = document.getElementById('paymentSlipSection');
+        const paymentTableBody = document.getElementById('paymentTable').getElementsByTagName('tbody')[0];
+        const paymentSlipDiv = document.getElementById('paymentSlip');
+        const totalPaidAmountDiv = document.getElementById('totalPaidAmount');
         const loadingSpinner = document.getElementById('loadingSpinner');
+        const downloadAllPaymentsBtn = document.getElementById('downloadAllPaymentsBtn');
+        const backToPaymentsTableBtn = document.getElementById('backToPaymentsTableBtn');
 
         let allStudentData = []; // To store all fetched data
+        let currentStudentPayments = []; // To store payments for the currently viewed student
 
         async function fetchStudentData() {
             loadingSpinner.style.display = 'block'; // Show spinner
@@ -409,7 +486,11 @@
                         payments: []
                     });
                 }
-                uniqueStudents.get(studentId).payments.push(row);
+                // Only push valid payment rows (e.g., those with a 'Total Fee' that can be parsed)
+                const totalFee = parseFloat(row['Total Fee']);
+                if (!isNaN(totalFee)) { // Ensure 'Total Fee' is a valid number
+                    uniqueStudents.get(studentId).payments.push(row);
+                }
             });
 
             uniqueStudents.forEach(student => {
@@ -429,52 +510,80 @@
 
         function showPaymentDetails(student) {
             modalStudentName.textContent = `Payments for ${student['Student Name']} (ID: ${student['Student ID']})`;
-            paymentDetailsDiv.innerHTML = ''; // Clear previous details
+            currentStudentPayments = student.payments || []; // Store for PDF download
 
-            if (student.payments && student.payments.length > 0) {
-                // Sort payments by Date (assuming Date column is parsable)
-                student.payments.sort((a, b) => {
+            paymentTableBody.innerHTML = ''; // Clear previous table rows
+            paymentSlipDiv.innerHTML = ''; // Clear previous slip
+
+            let totalPaid = 0;
+
+            if (currentStudentPayments.length > 0) {
+                // Sort payments by Date
+                currentStudentPayments.sort((a, b) => {
                     const dateA = new Date(a['Date']);
                     const dateB = new Date(b['Date']);
                     return dateA - dateB;
                 });
 
-                student.payments.forEach((payment, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'payment-card';
+                currentStudentPayments.forEach((payment, index) => {
+                    const row = paymentTableBody.insertRow();
+                    row.dataset.paymentIndex = index; // Store index for later retrieval
+                    row.classList.add('payment-row'); // Add class for styling and event delegation
 
-                    card.innerHTML = `
-                        <h3>Payment #${index + 1} (Receipt: ${payment['Receipt Number'] || 'N/A'})</h3>
-                        <p><strong>Date:</strong> <span>${payment['Date'] || 'N/A'}</span></p>
-                        <p><strong>Fee Type:</strong> <span>${payment['Fee Type'] || 'N/A'}</span></p>
-                        <p><strong>Tuition Hours:</strong> <span>${payment['Tuition Hours'] || 'N/A'}</span></p>
-                        <p><strong>Rate Per Hour:</strong> <span>${payment['Rate Per Hour'] || 'N/A'}</span></p>
-                        <p><strong>Total Fee:</strong> <span>${payment['Total Fee'] || 'N/A'}</span></p>
-                        <p><strong>Payment Mode:</strong> <span>${payment['Payment Mode'] || 'N/A'}</span></p>
-                        <p><strong>Remark:</strong> <span>${payment['Remark'] || 'N/A'}</span></p>
-                        <button class="download-btn" data-payment-index="${index}" data-student-id="${student['Student ID']}">Download PDF</button>
-                    `;
-                    paymentDetailsDiv.appendChild(card);
+                    row.insertCell(0).textContent = payment['Receipt Number'] || 'N/A';
+                    row.insertCell(1).textContent = payment['Date'] || 'N/A';
+                    row.insertCell(2).textContent = payment['Fee Type'] || 'N/A';
+                    const feeValue = parseFloat(payment['Total Fee']);
+                    row.insertCell(3).textContent = !isNaN(feeValue) ? `Rs. ${feeValue.toFixed(2)}` : 'N/A';
+                    row.insertCell(4).textContent = payment['Payment Mode'] || 'N/A';
+
+                    // Add click listener to show slip
+                    row.addEventListener('click', () => showPaymentSlip(payment, student['Student Name']));
+
+                    // Calculate total paid amount
+                    if (!isNaN(feeValue)) {
+                        totalPaid += feeValue;
+                    }
                 });
-
-                // Attach event listeners for download buttons after they are added to the DOM
-                document.querySelectorAll('.download-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const paymentIndex = parseInt(event.target.dataset.paymentIndex);
-                        const studentId = event.target.dataset.studentId;
-                        const studentPayments = allStudentData.filter(p => p['Student ID'] === studentId);
-                        const paymentToDownload = studentPayments[paymentIndex];
-                        if (paymentToDownload) {
-                            downloadPaymentPdf(paymentToDownload, student['Student Name']);
-                        }
-                    });
-                });
-
+                totalPaidAmountDiv.textContent = `Total Amount Paid: Rs. ${totalPaid.toFixed(2)}`;
+                totalPaidAmountDiv.style.display = 'block'; // Show total
             } else {
-                paymentDetailsDiv.innerHTML = '<p class="no-payments">No payment records found for this student.</p>';
+                paymentTableBody.innerHTML = '<tr><td colspan="5" class="no-records">No payment records found for this student.</td></tr>';
+                totalPaidAmountDiv.style.display = 'none'; // Hide total if no payments
             }
 
+            // Show payment table section, hide slip section
+            paymentTableSection.classList.add('active');
+            paymentSlipSection.classList.remove('active');
+            downloadAllPaymentsBtn.style.display = 'block'; // Show download all button
+            backToPaymentsTableBtn.style.display = 'none'; // Hide back button
+
             paymentModal.style.display = 'flex'; // Use flex to center
+        }
+
+        function showPaymentSlip(payment, studentName) {
+            paymentSlipDiv.innerHTML = `
+                <h3>Payment Receipt</h3>
+                <p><strong>Student Name:</strong> <span>${studentName}</span></p>
+                <p><strong>Student ID:</strong> <span>${payment['Student ID'] || 'N/A'}</span></p>
+                <p><strong>Class:</strong> <span>${payment['Class'] || 'N/A'}</span></p>
+                <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
+                <p><strong>Receipt Number:</strong> <span>${payment['Receipt Number'] || 'N/A'}</span></p>
+                <p><strong>Date:</strong> <span>${payment['Date'] || 'N/A'}</span></p>
+                <p><strong>Fee Type:</strong> <span>${payment['Fee Type'] || 'N/A'}</span></p>
+                <p><strong>Tuition Hours:</strong> <span>${payment['Tuition Hours'] || 'N/A'}</span></p>
+                <p><strong>Rate Per Hour:</strong> <span>${payment['Rate Per Hour'] || 'N/A'}</span></p>
+                <p><strong>Total Fee:</strong> <span>Rs. ${parseFloat(payment['Total Fee']).toFixed(2) || 'N/A'}</span></p>
+                <p><strong>Payment Mode:</strong> <span>${payment['Payment Mode'] || 'N/A'}</span></p>
+                <p><strong>Remark:</strong> <span>${payment['Remark'] || 'N/A'}</span></p>
+                <button class="download-btn" onclick="downloadSinglePaymentPdf(${JSON.stringify(payment).replace(/"/g, '&quot;')}, '${studentName}')">Download This Slip PDF</button>
+            `;
+
+            // Hide payment table section, show slip section
+            paymentTableSection.classList.remove('active');
+            paymentSlipSection.classList.add('active');
+            downloadAllPaymentsBtn.style.display = 'none'; // Hide download all button when viewing slip
+            backToPaymentsTableBtn.style.display = 'block'; // Show back button
         }
 
         // Close the modal when the close button is clicked
@@ -489,46 +598,128 @@
             }
         }
 
-        function downloadPaymentPdf(payment, studentName) {
-            // Using jsPDF to generate a simple PDF
+        // Back to Payments Table button
+        backToPaymentsTableBtn.onclick = function() {
+            paymentSlipSection.classList.remove('active');
+            paymentTableSection.classList.add('active');
+            downloadAllPaymentsBtn.style.display = 'block';
+            backToPaymentsTableBtn.style.display = 'none';
+        }
+
+        // Function to download a single payment slip as PDF
+        function downloadSinglePaymentPdf(payment, studentName) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            const title = `Fee Payment Record - ${studentName}`;
-            const filename = `Payment_${payment['Receipt Number'] || 'Unknown'}_${studentName.replace(/\s+/g, '_')}.pdf`;
+            const title = `Payment Receipt - ${studentName}`;
+            const filename = `Receipt_${payment['Receipt Number'] || 'Unknown'}_${studentName.replace(/\s+/g, '_')}.pdf`;
 
             doc.setFontSize(22);
             doc.text(title, 105, 20, null, null, 'center');
 
+            doc.setFontSize(10);
+            doc.text("------------------------------------------------------------------------------------------------------------------------------------------", 10, 25);
+
+
             doc.setFontSize(12);
-            let y = 40;
-            const lineHeight = 10;
+            let y = 35;
+            const lineHeight = 8;
+            const col1X = 20;
+            const col2X = 70;
 
             const addField = (label, value) => {
-                doc.text(`${label}:`, 20, y);
-                doc.text(String(value), 60, y);
+                doc.setFont("helvetica", "bold");
+                doc.text(`${label}:`, col1X, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(String(value), col2X, y);
                 y += lineHeight;
             };
 
-            doc.setFontSize(14);
-            doc.text("Payment Details:", 20, y);
-            y += lineHeight * 1.5;
-
-            doc.setFontSize(12);
-            addField('Receipt Number', payment['Receipt Number']);
-            addField('Date', payment['Date']);
             addField('Student Name', studentName);
             addField('Student ID', payment['Student ID']);
             addField('Class', payment['Class']);
+            y += lineHeight; // Extra space
+
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Payment Details:", col1X, y);
+            y += lineHeight * 1.5;
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            addField('Receipt Number', payment['Receipt Number']);
+            addField('Date', payment['Date']);
             addField('Fee Type', payment['Fee Type']);
             addField('Tuition Hours', payment['Tuition Hours']);
             addField('Rate Per Hour', payment['Rate Per Hour']);
-            addField('Total Fee', payment['Total Fee']);
             addField('Payment Mode', payment['Payment Mode']);
             addField('Remark', payment['Remark']);
 
+            const feeValue = parseFloat(payment['Total Fee']);
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text(`Total Fee: Rs. ${!isNaN(feeValue) ? feeValue.toFixed(2) : 'N/A'}`, 150, y, null, null, 'right');
+            y += lineHeight * 2;
+
+
+            doc.setFontSize(10);
+            doc.text("------------------------------------------------------------------------------------------------------------------------------------------", 10, y);
+            y += lineHeight;
+            doc.text("Thank you for your payment!", 105, y, null, null, 'center');
+
             doc.save(filename);
         }
+
+        // Function to download ALL payments for a student as a single PDF
+        downloadAllPaymentsBtn.onclick = function() {
+            if (currentStudentPayments.length === 0) {
+                alert("No payments to download for this student.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const studentName = modalStudentName.textContent.split('(')[0].replace('Payments for ', '').trim();
+            const studentId = currentStudentPayments[0]['Student ID'];
+            const filename = `All_Payments_${studentName.replace(/\s+/g, '_')}_${studentId}.pdf`;
+
+            doc.setFontSize(22);
+            doc.text(`All Payments for ${studentName} (ID: ${studentId})`, 105, 20, null, null, 'center');
+
+            let y = 35;
+            const lineHeight = 8;
+            const margin = 15;
+            const pageHeight = doc.internal.pageSize.height;
+
+            currentStudentPayments.forEach((payment, index) => {
+                if (y + (10 * lineHeight) > pageHeight - margin) { // Check if new page is needed
+                    doc.addPage();
+                    y = margin;
+                    doc.setFontSize(18);
+                    doc.text(`All Payments (Continued) for ${studentName}`, 105, 20, null, null, 'center');
+                    y = 35;
+                }
+
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.text(`Payment #${index + 1} (Receipt: ${payment['Receipt Number'] || 'N/A'})`, margin, y);
+                y += lineHeight * 1.5;
+
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Date: ${payment['Date'] || 'N/A'}`, margin, y); y += lineHeight;
+                doc.text(`Fee Type: ${payment['Fee Type'] || 'N/A'}`, margin, y); y += lineHeight;
+                const feeValue = parseFloat(payment['Total Fee']);
+                doc.text(`Total Fee: Rs. ${!isNaN(feeValue) ? feeValue.toFixed(2) : 'N/A'}`, margin, y); y += lineHeight;
+                doc.text(`Payment Mode: ${payment['Payment Mode'] || 'N/A'}`, margin, y); y += lineHeight;
+                doc.text(`Remark: ${payment['Remark'] || 'N/A'}`, margin, y); y += lineHeight * 1.5;
+
+                doc.setDrawColor(200); // Light gray for separator
+                doc.line(margin, y - lineHeight / 2, doc.internal.pageSize.width - margin, y - lineHeight / 2);
+            });
+
+            doc.save(filename);
+        };
 
         // Initial fetch of student data
         fetchStudentData();
