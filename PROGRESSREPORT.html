@@ -2,100 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Progress Entry Form</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    .glass-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 1rem;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    }
-    .btn-3d {
-      transform: translateY(-2px);
-      box-shadow: 0 4px #999;
-    }
-    .btn-3d:active {
-      transform: translateY(2px);
-      box-shadow: none;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Progress Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-100 to-white min-h-screen flex flex-col items-center justify-center p-6">
-
-  <div class="w-full max-w-4xl glass-card p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-bold">Mentor: Student Progress Entry</h1>
-      <button class="bg-yellow-400 text-white px-4 py-2 rounded-lg shadow-lg btn-3d">Dashboard</button>
-    </div>
-
-    <form id="progressForm" class="space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <input required name="studentName" type="text" placeholder="Student Name" class="p-2 border rounded-lg w-full" />
-        <input required name="studentClass" type="text" placeholder="Class" class="p-2 border rounded-lg w-full" />
-        <input required name="studentId" type="text" placeholder="Student ID" class="p-2 border rounded-lg w-full" />
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white shadow-2xl rounded-2xl p-6 w-full max-w-5xl border-t-4 border-blue-600">
+    <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Student Progress Panel</h2>
+    <form id="progressForm" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Student Name</label>
+          <input type="text" name="studentName" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Class</label>
+          <input type="text" name="studentClass" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Student ID</label>
+          <input type="text" name="studentId" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"/>
+        </div>
       </div>
 
-      <div id="subjectContainer" class="space-y-2">
-        <!-- Subject Row -->
+      <div id="subjectContainer" class="space-y-4">
+        <!-- Initial Subject Row -->
+        <div class="grid grid-cols-6 gap-2 items-center">
+          <input type="text" placeholder="Subject" required class="col-span-1 border rounded px-2 py-1" />
+          <input type="number" placeholder="Mark" required class="col-span-1 border rounded px-2 py-1" />
+          <input type="number" placeholder="Out Of" required class="col-span-1 border rounded px-2 py-1" />
+          <input type="text" placeholder="Grade" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
+          <input type="text" placeholder="%" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
+          <button type="button" onclick="removeSubject(this)" class="text-red-600 hover:text-red-800 text-sm font-bold">🗑️</button>
+        </div>
       </div>
-
-      <button type="button" onclick="addSubjectRow()" class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md btn-3d">+ Add Subject</button>
 
       <div class="flex gap-4 mt-4">
-        <button type="button" onclick="submitForm()" class="bg-blue-500 text-white px-6 py-2 rounded-lg btn-3d">Submit</button>
-        <button type="button" onclick="openPopup()" class="bg-purple-600 text-white px-6 py-2 rounded-lg btn-3d">View Report</button>
+        <button type="button" onclick="addSubject()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow">+ Add Subject</button>
+        <button type="button" onclick="submitForm()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow font-semibold">Submit</button>
       </div>
+
+      <div id="notification" class="text-center text-sm font-medium mt-4 hidden"></div>
     </form>
   </div>
 
-  <!-- POPUP REPORT CARD -->
-  <div id="popup" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden">
-    <div class="bg-white p-6 rounded-xl w-full max-w-3xl relative">
-      <button class="absolute top-2 right-2 text-xl text-red-500" onclick="closePopup()">&times;</button>
-      <h2 class="text-2xl font-bold mb-4">Progress Report</h2>
-      <div id="reportCard">
-        <p><strong>Name:</strong> <span id="rName"></span></p>
-        <p><strong>Class:</strong> <span id="rClass"></span></p>
-        <p><strong>ID:</strong> <span id="rID"></span></p>
-        <table class="table-auto w-full mt-4 border">
-          <thead>
-            <tr>
-              <th class="border px-4 py-2">Subject</th>
-              <th class="border px-4 py-2">Mark</th>
-              <th class="border px-4 py-2">Out of</th>
-              <th class="border px-4 py-2">%</th>
-              <th class="border px-4 py-2">Grade</th>
-            </tr>
-          </thead>
-          <tbody id="rMarks"></tbody>
-        </table>
-       <div class="mt-6 h-64 relative">
-  <canvas id="reportChart" class="absolute inset-0 w-full h-full"></canvas>
-</div>
-
-      </div>
-      <button onclick="downloadPDF()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg btn-3d">Download PDF</button>
-    </div>
-  </div>
-
   <script>
-    function addSubjectRow() {
-      const div = document.createElement('div');
-      div.classList.add('grid', 'grid-cols-12', 'gap-2', 'items-center');
-      div.innerHTML = `
-        <input type="text" placeholder="Subject" class="col-span-4 p-2 border rounded-lg" required>
-        <input type="number" placeholder="Mark" class="col-span-2 p-2 border rounded-lg" required>
-        <input type="number" placeholder="Out of" class="col-span-2 p-2 border rounded-lg" required>
-        <input type="text" placeholder="Grade" class="col-span-2 p-2 border rounded-lg" disabled>
-        <input type="text" placeholder="%" class="col-span-1 p-2 border rounded-lg" disabled>
-        <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 font-bold">Remove</button>
+    function getGrade(percentage) {
+      if (percentage >= 90) return "A+";
+      if (percentage >= 80) return "A";
+      if (percentage >= 70) return "B+";
+      if (percentage >= 60) return "B";
+      if (percentage >= 50) return "C+";
+      if (percentage >= 40) return "C";
+      return "F";
+    }
+
+    function addSubject() {
+      const container = document.getElementById("subjectContainer");
+      const newRow = document.createElement("div");
+      newRow.className = "grid grid-cols-6 gap-2 items-center";
+
+      newRow.innerHTML = `
+        <input type="text" placeholder="Subject" required class="col-span-1 border rounded px-2 py-1" />
+        <input type="number" placeholder="Mark" required class="col-span-1 border rounded px-2 py-1" />
+        <input type="number" placeholder="Out Of" required class="col-span-1 border rounded px-2 py-1" />
+        <input type="text" placeholder="Grade" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
+        <input type="text" placeholder="%" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
+        <button type="button" onclick="removeSubject(this)" class="text-red-600 hover:text-red-800 text-sm font-bold">🗑️</button>
       `;
-      document.getElementById('subjectContainer').appendChild(div);
+      container.appendChild(newRow);
+    }
+
+    function removeSubject(button) {
+      button.parentElement.remove();
     }
 
     function submitForm() {
@@ -105,15 +84,31 @@
       const studentClass = formData.get("studentClass");
       const studentId = formData.get("studentId");
       const subjects = [];
+      const notification = document.getElementById("notification");
+      const submitBtn = form.querySelector('button[onclick="submitForm()"]');
+
+      notification.classList.remove("hidden", "text-green-600", "text-red-600");
+      notification.classList.add("text-blue-600");
+      notification.textContent = "Saving...";
+      submitBtn.disabled = true;
+
+      let allValid = true;
 
       document.querySelectorAll("#subjectContainer > div").forEach(row => {
         const inputs = row.querySelectorAll("input");
         const mark = parseFloat(inputs[1].value);
         const outof = parseFloat(inputs[2].value);
+
+        if (isNaN(mark) || isNaN(outof) || outof === 0) {
+          allValid = false;
+          return;
+        }
+
         const percentage = ((mark / outof) * 100).toFixed(2);
         const grade = getGrade(percentage);
         inputs[3].value = grade;
         inputs[4].value = percentage;
+
         subjects.push({
           subject: inputs[0].value,
           mark: inputs[1].value,
@@ -122,6 +117,14 @@
           grade
         });
       });
+
+      if (!allValid || subjects.length === 0) {
+        notification.textContent = "❌ Please enter valid data in all subject fields.";
+        notification.classList.remove("text-blue-600");
+        notification.classList.add("text-red-600");
+        submitBtn.disabled = false;
+        return;
+      }
 
       const data = {
         studentName, studentClass, studentId, subjects
@@ -132,67 +135,26 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
-      .then(res => res.text())
-      .then(alert);
-    }
-
-    function openPopup() {
-      const form = document.getElementById('progressForm');
-      const formData = new FormData(form);
-      document.getElementById("rName").textContent = formData.get("studentName");
-      document.getElementById("rClass").textContent = formData.get("studentClass");
-      document.getElementById("rID").textContent = formData.get("studentId");
-
-      const tbody = document.getElementById("rMarks");
-      tbody.innerHTML = "";
-      const labels = [], marks = [];
-
-      document.querySelectorAll("#subjectContainer > div").forEach(row => {
-        const inputs = row.querySelectorAll("input");
-        const subject = inputs[0].value;
-        const mark = parseFloat(inputs[1].value);
-        const outof = parseFloat(inputs[2].value);
-        const percentage = ((mark / outof) * 100).toFixed(2);
-        const grade = getGrade(percentage);
-
-        tbody.innerHTML += `<tr><td class='border px-4 py-2'>${subject}</td><td class='border px-4 py-2'>${mark}</td><td class='border px-4 py-2'>${outof}</td><td class='border px-4 py-2'>${percentage}%</td><td class='border px-4 py-2'>${grade}</td></tr>`;
-        labels.push(subject);
-        marks.push(mark);
-      });
-
-      const ctx = document.getElementById('reportChart');
-      if (window.chart) window.chart.destroy();
-      window.chart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels, datasets: [{ label: 'Marks', data: marks, backgroundColor: 'rgba(75,192,192,0.6)' }] },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
-
-      document.getElementById("popup").classList.remove("hidden");
-    }
-
-    function closePopup() {
-      document.getElementById("popup").classList.add("hidden");
-    }
-
-    async function downloadPDF() {
-      const pdf = new jspdf.jsPDF();
-      const canvas = await html2canvas(document.getElementById("reportCard"));
-      const imgData = canvas.toDataURL("image/png");
-      pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
-      pdf.save("Student_Progress_Report.pdf");
-    }
-
-    function getGrade(percentage) {
-      const percent = parseFloat(percentage);
-      if (percent >= 90) return "A+";
-      if (percent >= 80) return "A";
-      if (percent >= 70) return "B+";
-      if (percent >= 60) return "B";
-      if (percent >= 50) return "C";
-      if (percent >= 40) return "D";
-      return "F";
+        .then(res => {
+          if (!res.ok) throw new Error("Network response was not ok");
+          return res.text();
+        })
+        .then(() => {
+          notification.textContent = "✅ Successfully saved!";
+          notification.classList.remove("text-blue-600");
+          notification.classList.add("text-green-600");
+        })
+        .catch(error => {
+          console.error(error);
+          notification.textContent = "❌ Error saving data. Please try again.";
+          notification.classList.remove("text-blue-600");
+          notification.classList.add("text-red-600");
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+        });
     }
   </script>
 </body>
 </html>
+
