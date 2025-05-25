@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Payment Dashboard</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Container for a subtle 3D effect */
+        .container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 90%;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.08);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: separate; /* For rounded corners on cells */
+            border-spacing: 0;
+            margin-top: 25px;
+            border-radius: 8px;
+            overflow: hidden; /* Ensures internal borders are clipped */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        th, td {
+            border: 1px solid #e0e6ed;
+            padding: 12px 15px;
+            text-align: left;
+            transition: background-color 0.2s ease;
+        }
+
+        th {
+            background-color: #4CAF50; /* A pleasant green */
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            background-color: #fdfdfd;
+        }
+
+        tbody tr:nth-child(even) td {
+            background-color: #f7f9fc;
+        }
+
+        tbody tr:hover td {
+            background-color: #e6f7ff; /* Light blue on hover */
+        }
+
+        /* Buttons */
+        button {
+            background-color: #007bff; /* Blue */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 2px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .view-btn {
+            background-color: #007bff; /* Blue */
+        }
+        .view-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .download-btn {
+            background-color: #28a745; /* Green */
+        }
+        .download-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Popup Styling */
+        .popup {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            overflow-y: auto; /* Allow scrolling for large popups */
+        }
+
+        .popup-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px; /* Max width for student payments table */
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            opacity: 0;
+            animation: fadeInScale 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Pop-in animation */
+            max-height: 90vh; /* Limit height to viewport height */
+            overflow-y: auto; /* Enable scrolling if content overflows */
+        }
+
+        #individualPaymentPopup .popup-content {
+            max-width: 500px; /* Smaller max width for individual payment view */
+        }
+
+        @keyframes fadeInScale {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s ease;
+        }
+
+        .close-button:hover {
+            color: #333;
+            transform: rotate(90deg);
+        }
+
+        #popupStudentName {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .popup-actions {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        /* Loader */
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 50px auto;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Individual Payment Details Styling */
+        #individualPaymentDetails {
+            display: grid;
+            grid-template-columns: 1fr 2fr; /* Label on left, value on right */
+            gap: 10px;
+            margin-top: 20px;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f7f9fc;
+        }
+
+        #individualPaymentDetails strong {
+            color: #555;
+        }
+        #individualPaymentDetails span {
+            color: #333;
+            word-break: break-word; /* Prevents long text from breaking layout */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Student Payment Dashboard</h1>
+
+        <div class="loader" id="loader"></div>
+
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Student ID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <div id="paymentPopup" class="popup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup()">&times;</span>
+            <h2>Payment History <span id="popupStudentName"></span></h2>
+
+            <div class="popup-actions">
+                <button id="downloadAllPaymentsButton" class="download-btn">Download All Payments for this Student</button>
+            </div>
+
+            <table id="paymentDetailsTable">
+                <thead>
+                    <tr>
+                        <th>Receipt Number</th>
+                        <th>Date</th>
+                        <th>Fee Type</th>
+                        <th>Total Fee</th>
+                        <th>Payment Mode</th>
+                        <th>Actions</th> </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="individualPaymentPopup" class="popup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closeIndividualPaymentPopup()">&times;</span>
+            <h3>Payment Details: <span id="individualReceiptNumber"></span></h3>
+
+            <div id="individualPaymentDetails">
+                </div>
+
+            <div class="popup-actions">
+                <button id="downloadIndividualPaymentButton" class="download-btn">Download This Payment</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // *** IMPORTANT: Replace with your actual Google Apps Script Web App URL ***
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCIlCiAEMVwav3Z6Fpqw2rFRmkyjeZC3zzGz3eANOkbDPzEnN4zgoGm2ufNTjp6k87Jg/exec';
+
+        const studentTableBody = document.querySelector('#studentTable tbody');
+        const paymentPopup = document.getElementById('paymentPopup');
+        const popupStudentName = document.getElementById('popupStudentName');
+        const paymentDetailsTableBody = document.querySelector('#paymentDetailsTable tbody');
+        const downloadAllPaymentsButton = document.getElementById('downloadAllPaymentsButton');
+        const loader = document.getElementById('loader');
+
+        const individualPaymentPopup = document.getElementById('individualPaymentPopup');
+        const individualReceiptNumber = document.getElementById('individualReceiptNumber');
+        const individualPaymentDetailsDiv = document.getElementById('individualPaymentDetails');
+        const downloadIndividualPaymentButton = document.getElementById('downloadIndividualPaymentButton');
+
+        let allStudentData = [];
+        let allPaymentData = [];
+
+        let currentStudentID = null;
+        let currentStudentPayments = [];
+        let currentSinglePayment = null; // To hold the payment object for the individual popup
+
+        // Function to show/hide loader
+        function toggleLoader(show) {
+            loader.style.display = show ? 'block' : 'none';
+        }
+
+        // Function to fetch data from Google Sheet Web App
+        async function fetchGoogleSheetData() {
+            toggleLoader(true);
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                toggleLoader(false);
+                if (data.error) {
+                    console.error("Apps Script Error:", data.error);
+                    alert("Error fetching data: " + data.error);
+                    return { students: [], payments: [] };
+                }
+                return data;
+            } catch (error) {
+                console.error("Failed to fetch Google Sheet data:", error);
+                alert("Could not load data. Please check the network or script URL.");
+                toggleLoader(false);
+                return { students: [], payments: [] };
+            }
+        }
+
+        // Function to populate the student table
+        async function populateStudentTable() {
+            const data = await fetchGoogleSheetData();
+            allStudentData = data.students;
+            allPaymentData = data.payments;
+            studentTableBody.innerHTML = '';
+
+            if (allStudentData.length === 0) {
+                const row = studentTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 4;
+                cell.textContent = 'No student data available.';
+                cell.className = 'no-data-message';
+                return;
+            }
+
+            allStudentData.forEach(student => {
+                const row = studentTableBody.insertRow();
+                row.insertCell().textContent = student.StudentName;
+                row.insertCell().textContent = student.Class;
+                row.insertCell().textContent = student.StudentID;
+                const actionCell = row.insertCell();
+                const viewButton = document.createElement('button');
+                viewButton.textContent = 'View Payments';
+                viewButton.classList.add('view-btn');
+                viewButton.onclick = () => openPaymentPopup(student.StudentID, student.StudentName);
+                actionCell.appendChild(viewButton);
+            });
+        }
+
+        // Function to open the main payment popup and display all payments for the student
+        function openPaymentPopup(studentID, studentName) {
+            currentStudentID = studentID;
+            popupStudentName.textContent = `for ${studentName}`;
+            paymentDetailsTableBody.innerHTML = '';
+
+            currentStudentPayments = allPaymentData.filter(payment =>
+                payment.StudentID === currentStudentID
+            );
+
+            if (currentStudentPayments.length === 0) {
+                const row = paymentDetailsTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 6; // Adjust colSpan for new table columns
+                cell.textContent = 'No payments found for this student.';
+                cell.className = 'no-data-message';
+                downloadAllPaymentsButton.style.display = 'none';
+                paymentPopup.style.display = 'flex';
+                return;
+            }
+
+            downloadAllPaymentsButton.style.display = 'inline-block';
+
+            currentStudentPayments.forEach(payment => {
+                const row = paymentDetailsTableBody.insertRow();
+                row.insertCell().textContent = payment.ReceiptNumber;
+                row.insertCell().textContent = payment.Date;
+                row.insertCell().textContent = payment.FeeType;
+                row.insertCell().textContent = payment.TotalFee;
+                row.insertCell().textContent = payment.PaymentMode;
+
+                const actionsCell = row.insertCell();
+                const viewIndividualButton = document.createElement('button');
+                viewIndividualButton.textContent = 'View';
+                viewIndividualButton.classList.add('view-btn');
+                viewIndividualButton.style.marginRight = '5px';
+                viewIndividualButton.onclick = () => openIndividualPaymentPopup(payment);
+                actionsCell.appendChild(viewIndividualButton);
+
+                const downloadButton = document.createElement('button');
+                downloadButton.textContent = 'Download';
+                downloadButton.classList.add('download-btn');
+                downloadButton.onclick = () => downloadSinglePayment(payment); // Directly download from here too
+                actionsCell.appendChild(downloadButton);
+            });
+
+            paymentPopup.style.display = 'flex';
+        }
+
+        // Function to close the main payment popup
+        function closePopup() {
+            paymentPopup.style.display = 'none';
+            currentStudentID = null;
+            currentStudentPayments = [];
+        }
+
+        // Function to open individual payment popup
+        function openIndividualPaymentPopup(payment) {
+            currentSinglePayment = payment; // Store the payment for download
+            individualReceiptNumber.textContent = payment.ReceiptNumber;
+            individualPaymentDetailsDiv.innerHTML = ''; // Clear previous details
+
+            // Define the fields to display in the individual view
+            const fields = [
+                { label: 'Timestamp', key: 'Timestamp' },
+                { label: 'Receipt Number', key: 'ReceiptNumber' },
+                { label: 'Date', key: 'Date' },
+                { label: 'Student Name', key: 'StudentName' },
+                { label: 'Student ID', key: 'StudentID' },
+                { label: 'Class', key: 'Class' },
+                { label: 'Fee Type', key: 'FeeType' },
+                { label: 'Tuition Hours', key: 'TuitionHours' },
+                { label: 'Rate Per Hour', key: 'RatePerHour' },
+                { label: 'Total Fee', key: 'TotalFee' },
+                { label: 'Payment Mode', key: 'PaymentMode' },
+                { label: 'Remark', key: 'Remark' }
+            ];
+
+            fields.forEach(field => {
+                const labelElement = document.createElement('strong');
+                labelElement.textContent = field.label + ':';
+                individualPaymentDetailsDiv.appendChild(labelElement);
+
+                const valueElement = document.createElement('span');
+                let value = payment[field.key];
+                if (value === null || value === undefined || value === '') {
+                    value = '-'; // Display '-' for empty/null values
+                }
+                valueElement.textContent = value;
+                individualPaymentDetailsDiv.appendChild(valueElement);
+            });
+
+            individualPaymentPopup.style.display = 'flex';
+        }
+
+        // Function to close individual payment popup
+        function closeIndividualPaymentPopup() {
+            individualPaymentPopup.style.display = 'none';
+            currentSinglePayment = null;
+        }
+
+        // Function to download all payments for the current student
+        function downloadAllPayments() {
+            if (currentStudentPayments.length === 0) {
+                alert('No payments to download for this student.');
+                return;
+            }
+
+            const student = allStudentData.find(s => s.StudentID === currentStudentID);
+            const studentNameForFile = student ? student.StudentName.replace(/[^a-zA-Z0-9]/g, '_') : 'unknown_student';
+
+            let csvContent = "Timestamp,Receipt Number,Date,Student Name,Student ID,Class,Fee Type,Tuition Hours,Rate Per Hour,Total Fee,Payment Mode,Remark\n";
+
+            currentStudentPayments.forEach(payment => {
+                csvContent += `${payment.Timestamp || ''},`;
+                csvContent += `${payment.ReceiptNumber || ''},`;
+                csvContent += `${payment.Date || ''},`;
+                csvContent += `${payment.StudentName || ''},`;
+                csvContent += `${payment.StudentID || ''},`;
+                csvContent += `${payment.Class || ''},`;
+                csvContent += `${payment.FeeType || ''},`;
+                csvContent += `${payment.TuitionHours !== null ? payment.TuitionHours : ''},`;
+                csvContent += `${payment.RatePerHour !== null ? payment.RatePerHour : ''},`;
+                csvContent += `${payment.TotalFee || ''},`;
+                csvContent += `${payment.PaymentMode || ''},`;
+                csvContent += `${payment.Remark || ''}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `all_payments_${studentNameForFile}_${currentStudentID}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Function to download a single payment (used from both main popup and individual popup)
+        function downloadSinglePayment(payment) {
+            const student = allStudentData.find(s => s.StudentID === payment.StudentID);
+            const studentNameForFile = student ? student.StudentName.replace(/[^a-zA-Z0-9]/g, '_') : 'unknown_student';
+            const receiptNumForFile = (payment.ReceiptNumber || 'no_receipt').replace(/[^a-zA-Z0-9]/g, '_');
+
+            const csvContent = "Timestamp,Receipt Number,Date,Student Name,Student ID,Class,Fee Type,Tuition Hours,Rate Per Hour,Total Fee,Payment Mode,Remark\n" +
+                               `${payment.Timestamp || ''},` +
+                               `${payment.ReceiptNumber || ''},` +
+                               `${payment.Date || ''},` +
+                               `${payment.StudentName || ''},` +
+                               `${payment.StudentID || ''},` +
+                               `${payment.Class || ''},` +
+                               `${payment.FeeType || ''},` +
+                               `${payment.TuitionHours !== null ? payment.TuitionHours : ''},` +
+                               `${payment.RatePerHour !== null ? payment.RatePerHour : ''},` +
+                               `${payment.TotalFee || ''},` +
+                               `${payment.PaymentMode || ''},` +
+                               `${payment.Remark || ''}\n`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `payment_${studentNameForFile}_${receiptNumForFile}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Event Listeners
+        downloadAllPaymentsButton.addEventListener('click', downloadAllPayments);
+        downloadIndividualPaymentButton.addEventListener('click', () => downloadSinglePayment(currentSinglePayment));
+
+
+        // Initialize the student table when the page loads
+        document.addEventListener('DOMContentLoaded', populateStudentTable);
+
+    </script>
+
+</body>
+</html>
