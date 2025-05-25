@@ -52,6 +52,19 @@
     <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-xl">
         <h1 class="text-3xl font-bold text-center mb-8 text-indigo-700">Student Performance Overview</h1>
 
+        <div class="mb-6 flex items-center space-x-2">
+            <input type="text" id="studentSearch" placeholder="Search by Student Name or ID..."
+                   class="flex-grow px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                   onkeyup="filterStudentTable()"> <button onclick="filterStudentTable()"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md shadow-sm transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">
+                Search
+            </button>
+            <button onclick="resetSearch()"
+                    class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-75">
+                Reset
+            </button>
+        </div>
+
         <div id="loadingIndicator" class="flex items-center justify-center py-10 text-gray-600 hidden">
             <div class="spinner mr-3"></div>
             <span>Loading student data from Google Sheet...</span>
@@ -68,11 +81,14 @@
                     </tr>
                 </thead>
                 <tbody id="studentTableBody" class="divide-y divide-gray-200">
-                    </tbody>
+                </tbody>
             </table>
         </div>
         <div id="errorMessage" class="text-red-600 text-center py-4 hidden">
             Failed to load student data. Please ensure the Google Sheet URL is correct and the Apps Script is deployed.
+        </div>
+        <div id="noSearchResults" class="text-gray-500 text-center py-4 hidden">
+            No students found matching your search.
         </div>
     </div>
 
@@ -90,15 +106,24 @@
                     <label for="examTypeFilter" class="block text-gray-700 font-medium mb-1">Filter by Exam Type:</label>
                     <select id="examTypeFilter" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
                         <option value="all">All Exam Types</option>
-                        </select>
+                    </select>
                 </div>
                 <div>
                     <label for="subjectFilter" class="block text-gray-700 font-medium mb-1">Filter by Subject:</label>
                     <select id="subjectFilter" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
                         <option value="all">All Subjects</option>
-                        </select>
+                    </select>
                 </div>
             </div>
+
+            <div class="mb-6">
+                <label for="chartDataType" class="block text-gray-700 font-medium mb-1">Chart Data Type:</label>
+                <select id="chartDataType" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white" onchange="updatePerformanceView()">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="marks">Marks (Score)</option>
+                </select>
+            </div>
+
 
             <div class="relative h-64 md:h-80 lg:h-96 mb-6">
                 <canvas id="performanceChart"></canvas>
@@ -119,11 +144,32 @@
                         </tr>
                     </thead>
                     <tbody id="examDetailsTableBody" class="divide-y divide-gray-100">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
 
-            <div class="flex justify-center">
+            <div class="mb-8 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Class Teacher's Remarks:</h3>
+                <div class="h-24 border border-gray-200 bg-white rounded-md p-3 text-sm text-gray-700"
+                     style="min-height: 50px;">
+                    </div>
+                <p class="text-xs text-gray-500 mt-2">
+                    (This section is for manual entry/signature by the class teacher after printing)
+                </p>
+            </div>
+
+            <div class="flex justify-between items-end mt-8 pt-4 border-t border-gray-200">
+                <div class="text-center w-1/2 pr-2">
+                    <div class="h-16 border-b border-gray-400 mb-2"></div>
+                    <p class="text-sm text-gray-700 font-semibold">Principal's Signature</p>
+                </div>
+                <div class="text-center w-1/2 pl-2">
+                    <div class="h-16 border-b border-gray-400 mb-2"></div>
+                    <p class="text-sm text-gray-700 font-semibold">Official Seal</p>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-6">
                 <button onclick="downloadPdf()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75">
                     Download Performance as PDF
                 </button>
@@ -133,6 +179,7 @@
 
     <script>
         // Your Google Apps Script Web App URL
+        // IMPORTANT: Replace this with your actual deployed Google Apps Script Web App URL
         const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbywWPjSBqVDI4z20NFjEtBeao4uvx9WOWf-MYNOqcfvV5W8utsUqv2-Df8oSVb7-eQ3lg/exec';
 
         let allStudentData = []; // This will be populated from the Google Sheet
@@ -150,6 +197,7 @@
             loadingIndicator.classList.remove('hidden');
             studentTableContainer.classList.add('hidden');
             errorMessage.classList.add('hidden');
+            document.getElementById('noSearchResults').classList.add('hidden'); // Hide no results on initial load
 
             try {
                 const response = await fetch(googleSheetUrl);
@@ -158,9 +206,14 @@
                 }
                 const data = await response.json();
 
-                // Assuming your Google Apps Script returns an array of objects
-                // with keys matching your sheet headers (e.g., Timestamp, StudentID, etc.)
-                allStudentData = data;
+                // Ensure data types are consistent for calculations (Mark, OutOf, Percentage)
+                allStudentData = data.map(record => ({
+                    ...record,
+                    Mark: parseFloat(record.Mark),
+                    OutOf: parseFloat(record.OutOf),
+                    Percentage: parseFloat(record.Percentage)
+                }));
+
                 renderStudentTable(); // Render table after data is fetched
                 studentTableContainer.classList.remove('hidden'); // Show the table
             } catch (error) {
@@ -174,33 +227,25 @@
         /**
          * Renders the main student table with unique student entries.
          */
-        function renderStudentTable() {
+        function renderStudentTable(filteredStudents = null) {
             const tableBody = document.getElementById('studentTableBody');
             tableBody.innerHTML = ''; // Clear existing rows
+            document.getElementById('noSearchResults').classList.add('hidden');
 
-            // Use a Map to store unique students by StudentID
-            const uniqueStudents = new Map();
-            allStudentData.forEach(record => {
-                if (!uniqueStudents.has(record.StudentID)) {
-                    uniqueStudents.set(record.StudentID, {
-                        StudentID: record.StudentID,
-                        StudentName: record.StudentName,
-                        Class: record.Class
-                    });
-                }
-            });
+            const studentsToDisplay = filteredStudents || getUniqueStudents();
 
-            // If no unique students found, display a message
-            if (uniqueStudents.size === 0) {
+            if (studentsToDisplay.length === 0) {
+                const message = filteredStudents ? 'No students found matching your search.' : 'No student data available. Please ensure your Google Sheet is populated and the Apps Script is correctly configured.';
                 const row = tableBody.insertRow();
                 const cell = row.insertCell();
                 cell.colSpan = 4; // Span across all columns
                 cell.className = 'py-4 px-4 text-center text-gray-500';
-                cell.textContent = 'No student data available. Please ensure your Google Sheet is populated and the Apps Script is correctly configured.';
-                return; // Exit function if no data
+                cell.textContent = message;
+                document.getElementById('noSearchResults').classList.remove('hidden'); // Show if no search results
+                return;
             }
 
-            uniqueStudents.forEach(student => {
+            studentsToDisplay.forEach(student => {
                 const row = tableBody.insertRow();
                 row.className = 'hover:bg-gray-50 transition-colors duration-200';
 
@@ -231,6 +276,46 @@
         }
 
         /**
+         * Extracts unique student information from allStudentData.
+         * @returns {Array} An array of unique student objects.
+         */
+        function getUniqueStudents() {
+            const uniqueStudentsMap = new Map();
+            allStudentData.forEach(record => {
+                if (!uniqueStudentsMap.has(record.StudentID)) {
+                    uniqueStudentsMap.set(record.StudentID, {
+                        StudentID: record.StudentID,
+                        StudentName: record.StudentName,
+                        Class: record.Class
+                    });
+                }
+            });
+            return Array.from(uniqueStudentsMap.values());
+        }
+
+        /**
+         * Filters the student table based on search input.
+         * This function is now explicitly called by the Search button or onkeyup.
+         */
+        function filterStudentTable() {
+            const searchValue = document.getElementById('studentSearch').value.toLowerCase();
+            const uniqueStudents = getUniqueStudents();
+            const filteredStudents = uniqueStudents.filter(student =>
+                student.StudentName.toLowerCase().includes(searchValue) ||
+                student.StudentID.toLowerCase().includes(searchValue)
+            );
+            renderStudentTable(filteredStudents);
+        }
+
+        /**
+         * Resets the search bar and displays all students again.
+         */
+        function resetSearch() {
+            document.getElementById('studentSearch').value = ''; // Clear search input
+            renderStudentTable(getUniqueStudents()); // Re-render table with all unique students
+        }
+
+        /**
          * Displays the performance modal for a given student.
          * @param {string} studentId - The ID of the student to display.
          */
@@ -241,23 +326,19 @@
             const modalStudentId = document.getElementById('modalStudentId');
             const examTypeFilter = document.getElementById('examTypeFilter');
             const subjectFilter = document.getElementById('subjectFilter');
+            const chartDataTypeFilter = document.getElementById('chartDataType');
 
-            // Filter all records for the selected student
+
             currentStudentRecords = allStudentData.filter(record => record.StudentID === studentId);
 
             if (currentStudentRecords.length === 0) {
                 console.error('No records found for student ID:', studentId);
-                // In a real app, you might show a user-friendly message
                 return;
             }
 
-            // Get unique exam types for the dropdown
-            // Changed from record.ExamType to record.Examtype to match Apps Script output
             const uniqueExamTypes = [...new Set(currentStudentRecords.map(record => record.Examtype))].sort();
-            // Get unique subjects for the dropdown
             const uniqueSubjects = [...new Set(currentStudentRecords.map(record => record.Subject))].sort();
 
-            // Populate the exam type filter dropdown
             examTypeFilter.innerHTML = '<option value="all">All Exam Types</option>';
             uniqueExamTypes.forEach(type => {
                 const option = document.createElement('option');
@@ -266,7 +347,6 @@
                 examTypeFilter.appendChild(option);
             });
 
-            // Populate the subject filter dropdown
             subjectFilter.innerHTML = '<option value="all">All Subjects</option>';
             uniqueSubjects.forEach(subject => {
                 const option = document.createElement('option');
@@ -275,23 +355,25 @@
                 subjectFilter.appendChild(option);
             });
 
-            // Update modal header
+            // Reset filters to "all" and chart type to "percentage" when opening modal
+            examTypeFilter.value = 'all';
+            subjectFilter.value = 'all';
+            chartDataTypeFilter.value = 'percentage';
+
+
             modalStudentName.textContent = `Performance for: ${currentStudentRecords[0].StudentName}`;
             modalStudentId.textContent = `Student ID: ${currentStudentRecords[0].StudentID} | Class: ${currentStudentRecords[0].Class}`;
 
-            // Initial chart and table rendering with all exam types and all subjects
             updatePerformanceView();
 
-            // Add event listeners for filter changes
             examTypeFilter.onchange = updatePerformanceView;
             subjectFilter.onchange = updatePerformanceView;
 
-            // Show the modal with animation
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modalContent.classList.remove('scale-95', 'opacity-0');
                 modalContent.classList.add('scale-100', 'opacity-100');
-            }, 50); // Small delay for transition to work
+            }, 50);
         }
 
         /**
@@ -301,36 +383,34 @@
             const modal = document.getElementById('performanceModal');
             const modalContent = document.getElementById('modalContent');
 
-            // Hide the modal with animation
             modalContent.classList.remove('scale-100', 'opacity-100');
             modalContent.classList.add('scale-95', 'opacity-0');
             setTimeout(() => {
                 modal.classList.add('hidden');
                 if (currentChart) {
-                    currentChart.destroy(); // Destroy the chart instance when modal closes
+                    currentChart.destroy();
                     currentChart = null;
                 }
-            }, 300); // Match transition duration
+            }, 300);
         }
 
         /**
          * Renders or updates the student performance line chart AND the detailed exam table
-         * based on selected filters.
+         * based on selected filters and chart data type.
          */
         function updatePerformanceView() {
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const examDetailsTableBody = document.getElementById('examDetailsTableBody');
             const examTypeFilter = document.getElementById('examTypeFilter');
             const subjectFilter = document.getElementById('subjectFilter');
+            const chartDataType = document.getElementById('chartDataType').value; // Get selected chart data type
 
-            examDetailsTableBody.innerHTML = ''; // Clear existing table rows
+            examDetailsTableBody.innerHTML = '';
 
             const selectedExamType = examTypeFilter.value;
             const selectedSubject = subjectFilter.value;
 
-            // Filter records based on selected exam type and subject
             let filteredRecords = currentStudentRecords;
-            // Changed from record.ExamType to record.Examtype for filtering
             if (selectedExamType !== 'all') {
                 filteredRecords = filteredRecords.filter(record => record.Examtype === selectedExamType);
             }
@@ -338,24 +418,43 @@
                 filteredRecords = filteredRecords.filter(record => record.Subject === selectedSubject);
             }
 
-            // Sort records by Timestamp to ensure correct graph and table order
             filteredRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-            // --- Render Chart ---
+            // --- Prepare Chart Data ---
             let labels = [];
             if (selectedSubject !== 'all') {
-                // If a specific subject is selected, labels show exam type and date for that subject
-                // Changed from record.ExamType to record.Examtype for labels
                 labels = filteredRecords.map(record => `${record.Examtype} (${new Date(record.Timestamp).toLocaleDateString()})`);
             } else {
-                // If all subjects are selected, labels include subject name
-                // Changed from record.ExamType to record.Examtype for labels
                 labels = filteredRecords.map(record => `${record.Examtype} (${new Date(record.Timestamp).toLocaleDateString()}) - ${record.Subject}`);
             }
-            const data = filteredRecords.map(record => record.Percentage);
+
+            let chartData = [];
+            let yAxisLabel = '';
+            let yAxisMax = 100;
+            let yAxisCallback = function(value) { return value + '%'; };
+            let tooltipCallback = function(context) { return `${context.dataset.label}: ${context.raw}%`; };
+
+            if (chartDataType === 'percentage') {
+                chartData = filteredRecords.map(record => record.Percentage);
+                yAxisLabel = 'Percentage (%)';
+                yAxisMax = 100;
+                yAxisCallback = function(value) { return value + '%'; };
+                tooltipCallback = function(context) { return `${context.dataset.label}: ${context.raw}%`; };
+            } else if (chartDataType === 'marks') {
+                chartData = filteredRecords.map(record => record.Mark);
+                yAxisLabel = 'Marks (Score)';
+                // Determine max mark dynamically for marks chart
+                yAxisMax = Math.max(...filteredRecords.map(record => record.OutOf), 100); // Ensure at least 100 for visual consistency
+                yAxisCallback = function(value) { return value; }; // No '%' for marks
+                tooltipCallback = function(context) {
+                    const record = filteredRecords[context.dataIndex];
+                    return `${context.dataset.label}: ${record.Mark} out of ${record.OutOf}`; // Updated tooltip for marks
+                };
+            }
+
 
             if (currentChart) {
-                currentChart.destroy(); // Destroy previous chart instance if it exists
+                currentChart.destroy();
             }
 
             currentChart = new Chart(ctx, {
@@ -363,23 +462,23 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Performance Percentage',
-                        data: data,
-                        borderColor: '#4f46e5', // Indigo-600
-                        backgroundColor: 'rgba(79, 70, 229, 0.2)', // Light indigo fill
-                        tension: 0.3, // Smooth the line
+                        label: chartDataType === 'percentage' ? 'Performance Percentage' : 'Student Marks',
+                        data: chartData,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        tension: 0.3,
                         pointBackgroundColor: '#4f46e5',
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: '#4f46e5',
                         pointRadius: 5,
                         pointHoverRadius: 7,
-                        fill: true, // Fill area under the line
+                        fill: true,
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, // Allows canvas to fill parent container
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: true,
@@ -394,9 +493,7 @@
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${context.raw}%`;
-                                }
+                                label: tooltipCallback
                             },
                             titleFont: {
                                 family: 'Inter'
@@ -425,13 +522,13 @@
                                 }
                             },
                             grid: {
-                                display: false // Hide x-axis grid lines
+                                display: false
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Percentage (%)',
+                                text: yAxisLabel,
                                 color: '#374151',
                                 font: {
                                     size: 16,
@@ -440,18 +537,16 @@
                                 }
                             },
                             min: 0,
-                            max: 100,
+                            max: yAxisMax, // Dynamic max for Y-axis
                             ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                },
+                                callback: yAxisCallback,
                                 color: '#4b5563',
                                 font: {
                                     family: 'Inter'
                                 }
                             },
                             grid: {
-                                color: '#e5e7eb' // Light gray grid lines
+                                color: '#e5e7eb'
                             }
                         }
                     }
@@ -462,7 +557,7 @@
             if (filteredRecords.length === 0) {
                 const row = examDetailsTableBody.insertRow();
                 const cell = row.insertCell();
-                cell.colSpan = 7; // Span across all columns
+                cell.colSpan = 7;
                 cell.className = 'py-3 px-4 text-center text-gray-500';
                 cell.textContent = 'No exam records found for the selected filters.';
                 return;
@@ -478,7 +573,6 @@
 
                 cell = row.insertCell();
                 cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
-                // Changed from record.ExamType to record.Examtype for table display
                 cell.textContent = record.Examtype;
 
                 cell = row.insertCell();
@@ -514,20 +608,22 @@
             // Store original styles
             const originalMaxHeight = modalContent.style.maxHeight;
             const originalOverflowY = modalContent.style.overflowY;
+            const originalPaddingBottom = modalContent.style.paddingBottom;
 
             // Temporarily remove max-height and overflow-y to capture full content
             modalContent.style.maxHeight = 'none';
             modalContent.style.overflowY = 'visible';
+            modalContent.style.paddingBottom = '20mm'; // Add some padding for the footer content
 
             // Temporarily hide the close button and download button for PDF generation
-            const closeButton = modalContent.querySelector('button');
+            const closeButton = modalContent.querySelector('button.absolute');
             const downloadButton = modalContent.querySelector('button[onclick="downloadPdf()"]');
             if (closeButton) closeButton.style.display = 'none';
             if (downloadButton) downloadButton.style.display = 'none';
 
             // Get the current width and height of the modal content
             const originalWidth = modalContent.offsetWidth;
-            const originalHeight = modalContent.offsetHeight; // This will now be the full scroll height
+            const originalHeight = modalContent.offsetHeight;
 
             // Set a fixed width for canvas rendering to ensure consistent PDF output
             const renderWidth = 800; // A good width for PDF rendering
@@ -535,22 +631,23 @@
 
             // Use html2canvas to render the modal content
             const canvas = await html2canvas(modalContent, {
-                scale: scale, // Scale the content to the desired render width
-                useCORS: true, // Important if you have images from external sources
-                windowWidth: renderWidth, // Set the window width for rendering
-                windowHeight: originalHeight * scale, // Adjust window height proportionally
-                scrollY: -window.scrollY, // Correct for current scroll position
+                scale: scale,
+                useCORS: true,
+                windowWidth: renderWidth,
+                windowHeight: originalHeight * scale,
+                scrollY: -window.scrollY,
                 scrollX: -window.scrollX
             });
 
             // Revert styles and show hidden elements
             modalContent.style.maxHeight = originalMaxHeight;
             modalContent.style.overflowY = originalOverflowY;
+            modalContent.style.paddingBottom = originalPaddingBottom;
             if (closeButton) closeButton.style.display = 'block';
             if (downloadButton) downloadButton.style.display = 'block';
 
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' size
+            const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
 
             const imgWidth = 210; // A4 width in mm
             const pageHeight = 297; // A4 height in mm
@@ -561,7 +658,7 @@
             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
 
-            while (heightLeft >= 0) {
+            while (heightLeft >= -10) { // Adjusted condition to account for potential small remainders
                 position = heightLeft - imgHeight;
                 pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
