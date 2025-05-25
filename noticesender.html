@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Submission</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light subtle grey/white background */
+            position: relative; /* For absolute positioning of canvas */
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            display: flex; /* Use flexbox to center content vertically and horizontally */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+            padding: 1rem; /* Add some padding around the content */
+        }
+        #three-canvas {
+            position: fixed; /* Fixed so it covers the whole viewport regardless of scroll */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Place behind other content */
+        }
+        .frosted-glass {
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.7); /* More opaque white for light theme */
+            border: 1px solid rgba(209, 213, 219, 0.5); /* Lighter border */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); /* Lighter shadow */
+        }
+        /* Custom scrollbar for content display area */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05); /* Light track */
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15); /* Darker thumb */
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.25);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <canvas id="three-canvas"></canvas>
+
+    <div class="frosted-glass p-8 rounded-2xl shadow-lg w-full max-w-4xl mx-auto z-10 flex flex-col lg:flex-row gap-8">
+        <div class="flex-1">
+            <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Submit New Notice</h2>
+            <form id="noticeForm" class="space-y-4">
+                <div>
+                    <label for="noticeDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="noticeDate" name="noticeDate" class="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 text-gray-800 placeholder-gray-500 transition duration-300 ease-in-out" required>
+                </div>
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <input type="text" id="subject" name="subject" placeholder="Enter subject of the notice" class="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 text-gray-800 placeholder-gray-500 transition duration-300 ease-in-out" required>
+                </div>
+                <div>
+                    <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                    <textarea id="content" name="content" rows="6" placeholder="Write the full content of the notice here..." class="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 text-gray-800 placeholder-gray-500 transition duration-300 ease-in-out" required></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="senderName" class="block text-sm font-medium text-gray-700 mb-1">Sender's Name</label>
+                        <input type="text" id="senderName" name="senderName" placeholder="e.g., John Doe" class="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 text-gray-800 placeholder-gray-500 transition duration-300 ease-in-out" required>
+                    </div>
+                    <div>
+                        <label for="designation" class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                        <select id="designation" name="designation" class="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 text-gray-800 transition duration-300 ease-in-out" required>
+                            <option value="" disabled selected class="text-gray-500">Select Designation</option>
+                            <option value="CEO">CEO</option>
+                            <option value="MD">MD</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Vice Principal">Vice Principal</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75">
+                    Submit Notice
+                </button>
+            </form>
+        </div>
+
+        <div class="flex-1 bg-gray-50 p-6 rounded-2xl border border-gray-200 custom-scrollbar overflow-y-auto max-h-[500px] flex items-center justify-center">
+            <div id="submissionStatus" class="mt-4 text-center">
+                <p class="text-gray-500">Submit the form to add a new notice to your Google Sheet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- Three.js 3D Background Animation ---
+        let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+        const canvas = document.getElementById('three-canvas');
+
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(0x000000, 0); // Transparent background
+
+            const particleCount = 2000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            const color = new THREE.Color();
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() * 2 - 1) * 20;
+                positions[i * 3 + 1] = (Math.random() * 2 - 1) * 20;
+                positions[i * 3 + 2] = (Math.random() * 2 - 1) * 20;
+
+                color.setHSL(0.6 + Math.random() * 0.1, 0.3 + Math.random() * 0.2, 0.8 + Math.random() * 0.2);
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.04,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.7,
+                blending: THREE.AdditiveBlending
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+        }
+
+        function animateThreeJS() {
+            requestAnimationFrame(animateThreeJS);
+
+            if (particles) {
+                particles.rotation.x += 0.0002;
+                particles.rotation.y += 0.0003;
+                particles.position.y = Math.sin(Date.now() * 0.0001) * 0.5;
+            }
+
+            camera.position.x += (mouseX * 0.02 - camera.position.x) * 0.03;
+            camera.position.y += (-mouseY * 0.02 - camera.position.y) * 0.03;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onDocumentMouseMove(event) {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        window.addEventListener('resize', onWindowResize);
+        document.addEventListener('mousemove', onDocumentMouseMove);
+
+        window.onload = function() {
+            initThreeJS();
+            animateThreeJS();
+        };
+
+        // --- Notice Form Logic & Google Apps Script Integration ---
+        const noticeForm = document.getElementById('noticeForm');
+        const submissionStatus = document.getElementById('submissionStatus');
+
+        // This counter should ideally be managed server-side for true persistence across users/sessions.
+        // For a client-side only approach, localStorage offers persistence in the user's browser.
+        let noticeCounter = parseInt(localStorage.getItem('noticeCounter') || '0'); 
+
+        noticeForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default browser form submission
+
+            // Get form values
+            const noticeDate = document.getElementById('noticeDate').value;
+            const subject = document.getElementById('subject').value;
+            const content = document.getElementById('content').value;
+            const senderName = document.getElementById('senderName').value;
+            const designation = document.getElementById('designation').value;
+
+            // Generate Circular ID
+            noticeCounter++;
+            localStorage.setItem('noticeCounter', noticeCounter); // Store updated counter
+            const currentYear = new Date().getFullYear();
+            // Determine financial year. Assuming financial year starts April 1st.
+            const currentMonth = new Date().getMonth(); // 0-indexed (0=Jan, 11=Dec)
+            let financialYearStart = currentYear % 100;
+            let financialYearEnd = (currentYear + 1) % 100;
+            if (currentMonth < 3) { // If before April (Jan, Feb, Mar)
+                financialYearStart = (currentYear - 1) % 100;
+                financialYearEnd = currentYear % 100;
+            }
+            const circularId = `ALI/CIR/${financialYearStart}-${String(financialYearEnd).padStart(2, '0')}/${String(noticeCounter).padStart(3, '0')}`;
+
+
+            // Create the data object to send
+            const noticeData = {
+                circularId: circularId,
+                date: noticeDate,
+                subject: subject,
+                content: content,
+                senderName: senderName,
+                designation: designation
+            };
+
+            submissionStatus.innerHTML = `<p class="text-blue-600">Submitting notice with ID <span class="font-semibold">${circularId}</span>...</p>`;
+            submissionStatus.classList.remove('hidden');
+
+            // --- IMPORTANT: YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL ---
+            const GOOGLE_APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzQQxiygLgpTAZlGqPIFqIdkVJ_VUKrq8uo72JY_-i-IhWZswLtY3NdaIEVonXEc67Q/exec'; 
+
+            if (GOOGLE_APPS_SCRIPT_WEB_APP_URL === 'YOUR_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+                submissionStatus.innerHTML = `<p class="text-red-600 font-semibold">Error: Google Apps Script URL not set!</p>`;
+                return; // Stop execution if URL is not set
+            }
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // 'no-cors' allows sending data without complex CORS setup on Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(noticeData),
+                });
+
+                // With 'no-cors', you generally cannot read the server's response.
+                // We rely on the request succeeding and the Apps Script logging to confirm.
+                console.log('Notice data sent. Check your Google Sheet for confirmation. Data:', noticeData);
+                submissionStatus.innerHTML = `<p class="text-green-600 font-semibold">Notice with ID <span class="font-semibold">${circularId}</span> submitted successfully!</p>`;
+
+            } catch (error) {
+                console.error('Error submitting notice:', error);
+                submissionStatus.innerHTML = `<p class="text-red-600 font-semibold">Error submitting notice: ${error.message}. Please try again.</p>`;
+            }
+
+            // Clear the form after submission
+            noticeForm.reset();
+            document.getElementById('designation').value = ""; // Reset select dropdown
+        });
+    </script>
+</body>
+</html>
