@@ -134,7 +134,7 @@
             display: block;
             text-align: center;
         }
-        
+
         .remove-subject {
             position: absolute;
             top: 10px;
@@ -177,7 +177,7 @@
             cursor: pointer;
             font-size: 1.1em;
             font-weight: 600;
-            margin: 0 10px;
+            margin: 0 10px; /* Adjusted margin for two buttons */
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             position: relative;
@@ -213,6 +213,12 @@
         #addSubject:hover {
             background-color: #0056b3;
         }
+        #dashboardButton { /* Specific style for Dashboard button */
+            background-color: #6c757d; /* Grey color for secondary action */
+        }
+        #dashboardButton:hover {
+            background-color: #5a6268;
+        }
 
         #message {
             margin-top: 25px;
@@ -246,9 +252,10 @@
                 margin-top: 15px;
                 transform: none; /* Remove initial transform */
             }
-            button {
-                width: 100%;
-                margin-bottom: 15px;
+            .button-group button { /* Apply to all buttons in the group */
+                width: calc(100% - 20px); /* Adjust width to account for margins */
+                margin: 0 10px 15px 10px; /* Top, Right, Bottom, Left */
+                display: block; /* Stack buttons vertically */
             }
         }
     </style>
@@ -312,7 +319,7 @@
             <button type="button" id="addSubject">Add Subject</button>
 
             <div class="button-group">
-                <button type="submit">Submit Progress</button>
+                <button type="button" id="dashboardButton">Dashboard</button> <button type="submit">Submit Progress</button>
             </div>
             <div id="message"></div>
         </form>
@@ -323,9 +330,18 @@
         const addSubjectButton = document.getElementById('addSubject');
         const progressForm = document.getElementById('progressForm');
         const messageDiv = document.getElementById('message');
+        const dashboardButton = document.getElementById('dashboardButton'); // Get the new button
 
         // *** YOUR GOOGLE APPS SCRIPT WEB APP URL GOES HERE ***
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCZp4P8bCqAlVQbYoGktXBXPEYWtstVkWfTbyv2yCw0ktRba2msLftysAOpkhkFhs7Gw/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCZp4P8bCqAlVQbYoGktXBXPEYWtstVkWfTbyv2yCw0ktRba2msLftysAOpkhkFhs7Gw/exec'; // Replace with your actual deployed web app URL
+
+        // *** YOUR DASHBOARD URL GOES HERE ***
+        // This could be:
+        // 1. The path to another HTML file: 'dashboard.html'
+        // 2. A full URL to a web page: 'https://www.yourwebsite.com/dashboard'
+        // 3. Just going back in browser history: window.history.back()
+        const DASHBOARD_URL = 'index.html'; // Example: Assuming 'index.html' is your dashboard.
+                                          // Or use window.history.back() if you just want to go back.
 
         let subjectCount = 1;
 
@@ -412,15 +428,26 @@
 
         addSubjectButton.addEventListener('click', addSubjectEntry);
 
+        // Event listener for the new Dashboard button
+        dashboardButton.addEventListener('click', () => {
+            if (DASHBOARD_URL === 'window.history.back()') {
+                window.history.back(); // Go back one page in history
+            } else {
+                window.location.href = DASHBOARD_URL; // Navigate to the specified URL
+            }
+        });
+
+
         progressForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             messageDiv.style.display = 'none'; // Hide previous messages
 
-            const studentID = document.getElementById('studentID').value; // Get Student ID
+            // Retrieve form values in the correct order for logging
+            const studentID = document.getElementById('studentID').value;
             const studentName = document.getElementById('studentName').value;
             const studentClass = document.getElementById('studentClass').value;
-            const examType = document.getElementById('examType').value; 
+            const examType = document.getElementById('examType').value;
 
             const subjectsData = [];
             document.querySelectorAll('.subject-entry').forEach(entry => {
@@ -447,18 +474,18 @@
                 showMessage('Please add at least one valid subject with marks.', 'error');
                 return;
             }
-            
-            if (!examType) { 
+
+            if (!examType) {
                 showMessage('Please select an Exam Type.', 'error');
                 return;
             }
 
 
             const formData = {
-                studentID, // Student ID is now first in formData
+                studentID,
                 studentName,
                 studentClass,
-                examType, 
+                examType,
                 subjects: subjectsData
             };
 
@@ -475,7 +502,8 @@
                 });
 
                 showMessage('Student progress data submitted successfully!', 'success');
-                progressForm.reset(); 
+                progressForm.reset();
+                // Reset subject entries to just one default
                 subjectsContainer.innerHTML = `
                     <div class="subject-entry">
                         <div>
@@ -500,8 +528,8 @@
                         </div>
                     </div>
                 `;
-                subjectCount = 1; 
-                attachCalculationListeners(document.querySelector('.subject-entry')); 
+                subjectCount = 1;
+                attachCalculationListeners(document.querySelector('.subject-entry'));
             } catch (error) {
                 console.error('Error submitting form:', error);
                 showMessage('An error occurred while submitting data. Please try again.', 'error');
