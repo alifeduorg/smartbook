@@ -3,158 +3,248 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Progress Panel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Student Progress Card</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef3f7;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #007bff;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+    }
+    .subjects {
+      margin-top: 20px;
+    }
+    .subject-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .subject-row input {
+      flex: 1;
+    }
+    .remove-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .remove-btn:hover {
+      background: #c82333;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .alert {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    .alert.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .alert.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white shadow-2xl rounded-2xl p-6 w-full max-w-5xl border-t-4 border-blue-600">
-    <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Student Progress Panel</h2>
-    <form id="progressForm" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1">Student Name</label>
-          <input type="text" name="studentName" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1">Class</label>
-          <input type="text" name="studentClass" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1">Student ID</label>
-          <input type="text" name="studentId" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"/>
-        </div>
+<body>
+  <div class="container">
+    <h2>Student Progress Card</h2>
+    <form id="progressForm">
+      <div class="form-group">
+        <label>Student Name</label>
+        <input type="text" name="studentName" required />
+      </div>
+      <div class="form-group">
+        <label>Student ID</label>
+        <input type="text" name="studentId" required />
+      </div>
+      <div class="form-group">
+        <label>Class</label>
+        <input type="text" name="class" required />
+      </div>
+      <div class="form-group">
+        <label>Exam Type</label>
+        <select name="examType" required>
+          <option value="">-- Select Exam --</option>
+          <optgroup label="Academic Test">
+            <option value="Academic Test 1">Academic Test 1</option>
+            <option value="Academic Test 2">Academic Test 2</option>
+            <option value="Academic Test 3">Academic Test 3</option>
+            <option value="Academic Test 4">Academic Test 4</option>
+          </optgroup>
+          <optgroup label="Periodic Test">
+            <option value="Periodic Test 1">Periodic Test 1</option>
+            <option value="Periodic Test 2">Periodic Test 2</option>
+            <option value="Periodic Test 3">Periodic Test 3</option>
+            <option value="Periodic Test 4">Periodic Test 4</option>
+          </optgroup>
+          <optgroup label="Term">
+            <option value="Term 1">Term 1</option>
+            <option value="Term 2">Term 2</option>
+          </optgroup>
+          <optgroup label="Others">
+            <option value="Model Exam">Model Exam</option>
+            <option value="Admission Test">Admission Test</option>
+            <option value="Revision Test Series">Revision Test Series</option>
+          </optgroup>
+        </select>
       </div>
 
-      <div id="subjectContainer" class="space-y-4">
-        <!-- Initial Subject Row -->
-        <div class="grid grid-cols-6 gap-2 items-center">
-          <input type="text" placeholder="Subject" required class="col-span-1 border rounded px-2 py-1" />
-          <input type="number" placeholder="Mark" required class="col-span-1 border rounded px-2 py-1" />
-          <input type="number" placeholder="Out Of" required class="col-span-1 border rounded px-2 py-1" />
-          <input type="text" placeholder="Grade" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
-          <input type="text" placeholder="%" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
-          <button type="button" onclick="removeSubject(this)" class="text-red-600 hover:text-red-800 text-sm font-bold">🗑️</button>
-        </div>
+      <div class="subjects" id="subjectsContainer">
+        <h4>Subjects</h4>
       </div>
-
-      <div class="flex gap-4 mt-4">
-        <button type="button" onclick="addSubject()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow">+ Add Subject</button>
-        <button type="button" onclick="submitForm()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow font-semibold">Submit</button>
-      </div>
-
-      <div id="notification" class="text-center text-sm font-medium mt-4 hidden"></div>
+      <button type="button" onclick="addSubject()">Add Subject</button>
+      <br /><br />
+      <button type="submit">Submit</button>
+      <div id="alert" class="alert"></div>
     </form>
   </div>
 
   <script>
-    function getGrade(percentage) {
-      if (percentage >= 90) return "A+";
-      if (percentage >= 80) return "A";
-      if (percentage >= 70) return "B+";
-      if (percentage >= 60) return "B";
-      if (percentage >= 50) return "C+";
-      if (percentage >= 40) return "C";
-      return "F";
-    }
+    const subjectsContainer = document.getElementById("subjectsContainer");
 
     function addSubject() {
-      const container = document.getElementById("subjectContainer");
-      const newRow = document.createElement("div");
-      newRow.className = "grid grid-cols-6 gap-2 items-center";
-
-      newRow.innerHTML = `
-        <input type="text" placeholder="Subject" required class="col-span-1 border rounded px-2 py-1" />
-        <input type="number" placeholder="Mark" required class="col-span-1 border rounded px-2 py-1" />
-        <input type="number" placeholder="Out Of" required class="col-span-1 border rounded px-2 py-1" />
-        <input type="text" placeholder="Grade" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
-        <input type="text" placeholder="%" disabled class="col-span-1 bg-gray-100 border rounded px-2 py-1" />
-        <button type="button" onclick="removeSubject(this)" class="text-red-600 hover:text-red-800 text-sm font-bold">🗑️</button>
+      const div = document.createElement("div");
+      div.classList.add("subject-row");
+      div.innerHTML = `
+        <input type="text" placeholder="Subject Name" required />
+        <input type="number" placeholder="Marks Obtained" min="0" required />
+        <input type="number" placeholder="Marks Out Of" min="1" required />
+        <button type="button" class="remove-btn" onclick="removeSubject(this)">×</button>
       `;
-      container.appendChild(newRow);
+      subjectsContainer.appendChild(div);
     }
 
     function removeSubject(button) {
       button.parentElement.remove();
     }
 
-    function submitForm() {
-      const form = document.getElementById('progressForm');
-      const formData = new FormData(form);
-      const studentName = formData.get("studentName");
-      const studentClass = formData.get("studentClass");
-      const studentId = formData.get("studentId");
-      const subjects = [];
-      const notification = document.getElementById("notification");
-      const submitBtn = form.querySelector('button[onclick="submitForm()"]');
+    function calculateGrade(percentage) {
+      if (percentage >= 90) return "A+";
+      if (percentage >= 80) return "A";
+      if (percentage >= 70) return "B";
+      if (percentage >= 60) return "C";
+      if (percentage >= 50) return "D";
+      return "F";
+    }
 
-      notification.classList.remove("hidden", "text-green-600", "text-red-600");
-      notification.classList.add("text-blue-600");
-      notification.textContent = "Saving...";
-      submitBtn.disabled = true;
+    document.getElementById("progressForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-      let allValid = true;
+      const form = e.target;
+      const studentName = form.studentName.value.trim();
+      const studentId = form.studentId.value.trim();
+      const className = form.class.value.trim();
+      const examType = form.examType.value;
 
-      document.querySelectorAll("#subjectContainer > div").forEach(row => {
-        const inputs = row.querySelectorAll("input");
-        const mark = parseFloat(inputs[1].value);
-        const outof = parseFloat(inputs[2].value);
-
-        if (isNaN(mark) || isNaN(outof) || outof === 0) {
-          allValid = false;
-          return;
-        }
-
-        const percentage = ((mark / outof) * 100).toFixed(2);
-        const grade = getGrade(percentage);
-        inputs[3].value = grade;
-        inputs[4].value = percentage;
-
-        subjects.push({
-          subject: inputs[0].value,
-          mark: inputs[1].value,
-          outof: inputs[2].value,
-          percentage,
-          grade
-        });
-      });
-
-      if (!allValid || subjects.length === 0) {
-        notification.textContent = "❌ Please enter valid data in all subject fields.";
-        notification.classList.remove("text-blue-600");
-        notification.classList.add("text-red-600");
-        submitBtn.disabled = false;
+      if (!studentName || !studentId || !className || !examType) {
+        showAlert("Please fill all required fields.", "error");
         return;
       }
 
+      const subjects = [];
+      const subjectRows = document.querySelectorAll(".subject-row");
+
+      for (const row of subjectRows) {
+        const inputs = row.querySelectorAll("input");
+        const [subject, obtained, outOf] = [...inputs].map(i => i.value.trim());
+        if (!subject || !obtained || !outOf) {
+          showAlert("Fill all subject fields.", "error");
+          return;
+        }
+        const obtainedMarks = parseFloat(obtained);
+        const maxMarks = parseFloat(outOf);
+        const percentage = ((obtainedMarks / maxMarks) * 100).toFixed(2);
+        const grade = calculateGrade(percentage);
+
+        subjects.push({
+          subject, obtainedMarks, maxMarks, percentage, grade
+        });
+      }
+
       const data = {
-        studentName, studentClass, studentId, subjects
+        studentName,
+        studentId,
+        className,
+        examType,
+        subjects
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbyh2RV6dPgvToAzRI4_KWmKrkpXPf9ToJQqrQAfoR1JMFue_IB-Y_nd1B5hIvWOF5Cj/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Network response was not ok");
-          return res.text();
-        })
-        .then(() => {
-          notification.textContent = "✅ Successfully saved!";
-          notification.classList.remove("text-blue-600");
-          notification.classList.add("text-green-600");
-        })
-        .catch(error => {
-          console.error(error);
-          notification.textContent = "❌ Error saving data. Please try again.";
-          notification.classList.remove("text-blue-600");
-          notification.classList.add("text-red-600");
-        })
-        .finally(() => {
-          submitBtn.disabled = false;
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbyh2RV6dPgvToAzRI4_KWmKrkpXPf9ToJQqrQAfoR1JMFue_IB-Y_nd1B5hIvWOF5Cj/exec', {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
+
+        const result = await response.json();
+        if (result.success) {
+          showAlert("Data submitted successfully!", "success");
+          form.reset();
+          subjectsContainer.innerHTML = "";
+          addSubject(); // Add default subject back
+        } else {
+          showAlert("Failed to submit. Try again.", "error");
+        }
+      } catch (err) {
+        showAlert("Error: " + err.message, "error");
+      }
+    });
+
+    function showAlert(msg, type) {
+      const alertDiv = document.getElementById("alert");
+      alertDiv.textContent = msg;
+      alertDiv.className = "alert " + type;
+      alertDiv.style.display = "block";
+      setTimeout(() => alertDiv.style.display = "none", 4000);
     }
+
+    // Add initial subject row on page load
+    addSubject();
   </script>
 </body>
 </html>
-
