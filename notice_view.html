@@ -3,686 +3,446 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circulars Dashboard</title>
+    <title>ALIF Notice Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* Basic body and typography styling */
+        /* Custom styles for 3D effect and animations */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f7f6;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            perspective: 1000px; /* For 3D transformations */
         }
 
-        /* Main heading style - Enhanced for 3D and UI/UX */
-        h1 {
-            text-align: center;
-            color: #2c3e50; /* Dark blue-grey text */
-            margin-bottom: 30px;
-            font-size: 2.5em; /* Slightly larger for impact */
-            padding: 15px 20px; /* Increased padding around the title */
-            /* --- 3D Background Effect for H1 --- */
-            background: linear-gradient(to right, #b2dfdb, #e0f2f1, #b2dfdb); /* Subtle light blue-green gradient */
-            border-radius: 10px; /* Rounded corners for the heading background */
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1); /* Stronger 3D shadow for lifted effect */
-            display: inline-block; /* Allows background and shadow to wrap content */
-            max-width: 80%; /* Limits the width for better aesthetics */
-            transform: perspective(500px) rotateX(2deg); /* Subtle 3D tilt effect */
-            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; /* Smooth transition for hover */
-            margin-left: auto; /* Center the inline-block element */
-            margin-right: auto; /* Center the inline-block element */
-        }
-        /* H1 Hover Effect */
-        h1:hover {
-            transform: perspective(500px) rotateX(0deg) scale(1.01); /* Flatten slightly and grow on hover */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2), 0 4px 8px rgba(0,0,0,0.15); /* More pronounced shadow on hover */
-        }
-
-        /* Container for the main dashboard content */
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            /* --- Enhanced UI/UX: Stronger Box Shadow --- */
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* More prominent shadow for increased depth */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-image: linear-gradient(to bottom right, #e0f2fe, #bfdbfe); /* Subtle gradient */
         }
 
-        /* Table styling */
-        table {
+        .heading-3d {
+            font-size: 3rem; /* Adjust as needed */
+            font-weight: 700;
+            color: #1a202c; /* Dark text */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+            transform-style: preserve-3d;
+            animation: bounceIn 1s ease-out forwards; /* Animation on load */
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .heading-3d::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #a78bfa, #8b5cf6); /* Purple gradient border */
+            z-index: -1;
+            border-radius: 1rem;
+            filter: blur(8px);
+            opacity: 0.7;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5) translateY(-50px) rotateX(-90deg); opacity: 0; }
+            60% { transform: scale(1.1) translateY(10px) rotateX(10deg); opacity: 1; }
+            80% { transform: scale(0.9) translateY(-5px) rotateX(-5deg); }
+            100% { transform: scale(1) translateY(0) rotateX(0deg); opacity: 1; }
+        }
+
+        /* Table specific styles */
+        .notice-table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            /* --- Enhanced UI/UX: Rounded Table Corners --- */
-            border-radius: 8px; /* Rounded corners for the entire table */
-            overflow: hidden; /* Ensures content respects border-radius */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            background-color: #fff;
+            border-collapse: separate;
+            border-spacing: 0 0.75rem; /* Space between rows */
         }
 
-        /* Table header and data cell styling */
-        th, td {
-            border: 1px solid #e0e0e0;
-            padding: 12px 15px;
+        .notice-table th, .notice-table td {
+            padding: 1rem;
             text-align: left;
+            border-radius: 0.75rem; /* Rounded corners for cells */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background-color: white;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
-        /* Table header specific styling - Enhanced for 3D effect */
-        th {
-            /* --- 3D Background Effect for Table Header --- */
-            background: linear-gradient(to bottom, #4CAF50, #388E3C); /* Green gradient for depth */
+        .notice-table th {
+            background-color: #3b82f6; /* Blue header background */
             color: white;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle lift effect */
-            position: sticky; /* Keeps header visible when scrolling table content */
+            position: sticky;
             top: 0;
-            z-index: 1; /* Ensures header is above table rows */
+            z-index: 10;
         }
 
-        /* Alternate row background color for readability */
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        /* Hover effect for table rows */
-        tr:hover {
-            background-color: #f1f1f1;
-            transition: background-color 0.3s ease;
-        }
-
-        /* Styling for view and download buttons */
-        .view-details-btn, .download-pdf-btn {
-            background-color: #007bff; /* Blue button */
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+        .notice-table tbody tr {
             cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin-top: 10px; /* For PDF button spacing */
         }
 
-        /* Hover effects for buttons */
-        .view-details-btn:hover, .download-pdf-btn:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-            transform: translateY(-2px); /* Slight lift effect */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        .notice-table tbody tr:hover td {
+            transform: translateY(-3px); /* Lift effect on hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        /* Active (click) effects for buttons */
-        .view-details-btn:active, .download-pdf-btn:active {
-            transform: translateY(0); /* Return to original position */
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        /* Modal specific styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+            transition: opacity 0.3s ease-out;
         }
 
-        /* Loading Spinner Styles */
-        #loading-spinner {
-            display: none; /* Hidden by default */
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #4CAF50; /* Green */
+        .modal-content {
+            transform: scale(0.8) rotateX(-30deg); /* Initial 3D transform */
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.4s ease-out; /* Springy animation */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background-image: linear-gradient(to top left, #ffffff, #f0f9ff); /* Light blue gradient */
+            border: 2px solid #93c5fd; /* Light blue border */
+            max-height: 85vh; /* Set max height for modal content */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        .modal-content.show {
+            transform: scale(1) rotateX(0deg);
+            opacity: 1;
+        }
+
+        .modal-close-button {
+            background-color: #ef4444; /* Red close button */
+            color: white;
+            border-radius: 9999px; /* Fully rounded */
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close-button:hover {
+            background-color: #dc2626; /* Darker red on hover */
+        }
+
+        .rounded-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px; /* Fully rounded */
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .date-badge {
+            background-color: #dbeafe; /* Blue-100 */
+            color: #1e40af; /* Blue-800 */
+        }
+
+        .circular-id-badge {
+            background-color: #d1fae5; /* Green-100 */
+            color: #065f46; /* Green-800 */
+        }
+
+        .download-button {
+            background-image: linear-gradient(to right, #3b82f6, #2563eb); /* Blue gradient */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1001; /* Above modal */
         }
 
-        /* Spinner animation */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Modal (Popup) Styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.3); /* Slightly transparent background overlay */
-            justify-content: center;
-            align-items: center;
-            opacity: 0; /* Start hidden for transition */
-            transition: opacity 0.3s ease;
-        }
-
-        /* Active state for modal to show it */
-        .modal.active {
-            display: flex; /* Use flexbox for centering */
-            opacity: 1; /* Fade in */
-        }
-
-        /* Modal content box styling */
-        .modal-content {
-            background-color: #fff;
-            margin: auto;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 700px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            position: relative;
-            transform: perspective(1000px) rotateY(0deg) scale(0.8); /* Initial state for animation */
-            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-            opacity: 0; /* Start hidden for animation */
-            animation: fadeInScaleUp 0.4s forwards; /* For initial appearance */
-            overflow-y: auto; /* Allow scrolling for content if it exceeds max-height */
-            max-height: 90vh; /* Max height to prevent overflow on small screens */
-        }
-
-        /* Animation for modal content when active */
-        .modal.active .modal-content {
-            transform: perspective(1000px) rotateY(0deg) scale(1); /* End state for animation */
-            opacity: 1;
-        }
-
-        /* Subtle hover effect for modal content */
-        .modal-content:hover {
-            transform: perspective(1000px) rotateY(1deg) scale(1.005); /* Subtle tilt on hover */
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-        }
-
-        /* Keyframe animation for modal entry */
-        @keyframes fadeInScaleUp {
-            from {
-                transform: perspective(1000px) rotateY(0deg) scale(0.8);
-                opacity: 0;
-            }
-            to {
-                transform: perspective(1000px) rotateY(0deg) scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* Close button for modal */
-        .close-button {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        /* Hover/focus effect for close button */
-        .close-button:hover,
-        .close-button:focus {
-            color: #333;
-            text-decoration: none;
-        }
-
-        /* Modal header for logo */
-        .modal-header {
-            display: flex;
-            justify-content: center; /* Center the logo */
-            align-items: center;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        /* Logo image styling within modal header */
-        .modal-header img {
-            max-width: 100%;
-            height: auto;
-            max-height: 100px; /* Adjust as needed */
-            object-fit: contain;
-        }
-
-        /* Container for date and circular ID in modal */
-        .modal-info-line {
-            display: flex;
-            justify-content: space-between; /* Separate date and circular ID */
-            margin-bottom: 15px;
-            font-size: 0.95em;
-            gap: 20px; /* Space between the two items */
-        }
-
-        /* Styling for info items (date, circular ID) */
-        .modal-info-item {
-            background-color: #eaf7ed; /* Light green background for rounded rectangles */
-            padding: 8px 10px; /* Reduced horizontal padding */
-            border-radius: 8px; /* Rounded edges */
-            font-weight: 600;
-            color: #28a745; /* Green text */
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        /* Specific alignment for date and circular ID */
-        #modalDate {
-            text-align: left;
-        }
-
-        #modalCircularId {
-            text-align: right;
-        }
-
-        /* Modal subject styling */
-        .modal-subject {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        /* Main content area within the modal */
-        .modal-content-area {
-            background-color: #f8f8f8;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            min-height: 150px;
-            overflow-y: auto; /* Enable scrolling for content */
-            max-height: 300px; /* Limit height for scrollability */
-            font-size: 0.9em;
-            color: #333; /* Darker text for higher contrast in PDF */
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
-            word-wrap: break-word; /* Break long words */
-        }
-
-        /* Modal footer for seal and signature */
-        .modal-footer {
-            display: flex;
-            justify-content: space-between; /* Seal on left, signature on right */
-            align-items: flex-end; /* Align items to the bottom */
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            margin-top: 20px;
-        }
-
-        /* Seal image styling */
-        .modal-footer img {
-            max-width: 100px; /* Adjust seal size */
-            height: auto;
-            opacity: 0.8;
-            margin-right: 20px;
-        }
-
-        /* Signature block styling */
-        .modal-signature-block {
-            text-align: right; /* Align signature block to the right */
-            font-size: 0.9em;
-            font-weight: 500;
-            color: #444;
-        }
-
-        /* Sender name within signature block */
-        .modal-signature-block .sender-name {
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-
-        /* Designation within signature block */
-        .modal-signature-block .designation {
-            font-style: italic;
-            color: #555; /* Darker text for higher contrast in PDF */
-        }
-
-        /* Responsive adjustments for screens up to 768px wide */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
+            .heading-3d {
+                font-size: 2rem;
+                padding: 0.25rem 1rem;
             }
-            th, td {
-                padding: 10px;
+            .notice-table th, .notice-table td {
+                padding: 0.75rem;
             }
             .modal-content {
-                width: 95%;
-                padding: 20px;
+                max-width: 95%;
+                padding: 1rem;
             }
-            .modal-info-line {
-                flex-direction: column; /* Stack date and ID vertically */
-                gap: 10px;
-            }
-            /* Reset text alignment for stacked items on small screens */
-            #modalDate, #modalCircularId {
-                text-align: center;
-            }
-            .modal-subject {
-                font-size: 1.1em;
-            }
-            .modal-content-area {
-                min-height: 100px;
-                max-height: 250px;
-            }
-            .modal-footer {
-                flex-direction: column; /* Stack seal and signature vertically */
-                align-items: center; /* Center them when stacked */
-                gap: 15px;
+            .modal-header-badges {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
             }
             .modal-signature-block {
-                text-align: center; /* Center signature block when stacked */
-            }
-            /* Adjust H1 for smaller screens */
-            h1 {
-                font-size: 2em;
-                padding: 10px 15px;
-                transform: none; /* Remove 3D tilt on smaller screens for better readability */
-            }
-            h1:hover {
-                transform: none;
-                box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Keep a basic shadow */
-            }
-        }
-
-        /* Responsive adjustments for screens up to 480px wide */
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8em;
-            }
-            .view-details-btn, .download-pdf-btn {
-                padding: 6px 10px;
-                font-size: 0.8em;
-            }
-            table {
-                font-size: 0.9em;
-            }
-            th, td {
-                padding: 8px;
-            }
-            .modal-content {
-                padding: 15px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div id="loading-spinner"></div>
-
     <div class="container">
-        <h1>Circulars Dashboard</h1>
-        <table id="circularsTable">
-            <thead>
-                <tr>
-                    <th>SI Number</th>
-                    <th>Circular ID</th>
-                    <th>Subject</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
+        <h1 class="heading-3d">NOTICE BOARD</h1>
+
+        <div id="loading-indicator" class="flex flex-col items-center justify-center p-8 hidden">
+            <div class="spinner"></div>
+            <p class="mt-4 text-gray-600">Loading notices...</p>
+        </div>
+
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline" id="error-text"></span>
+        </div>
+
+        <div class="overflow-x-auto w-full max-w-4xl bg-white rounded-lg shadow-lg p-4">
+            <table class="notice-table">
+                <thead>
+                    <tr>
+                        <th>SI No.</th>
+                        <th>Circular ID</th>
+                        <th>Subject</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="notice-table-body">
+                    </tbody>
+            </table>
+        </div>
     </div>
 
-    <div id="circularModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div class="modal-header">
-                <img id="modalLogo" src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Organization Logo" onerror="this.onerror=null;this.src='https://placehold.co/600x300/e0e0e0/555555?text=Logo+Missing';">
-            </div>
-            <div class="modal-info-line">
-                <span class="modal-info-item" id="modalDate"></span>
-                <span class="modal-info-item" id="modalCircularId"></span>
-            </div>
-            <div class="modal-subject">Subject: <span id="modalSubject"></span></div>
-            <div class="modal-content-area" id="modalContent"></div>
-            <div class="modal-footer">
-                <img id="modalSeal" src="SEAL.png" alt="Official Seal" onerror="this.onerror=null;this.src='https://placehold.co/100x100/e0e0e0/555555?text=Seal+Missing';">
-                <div class="modal-signature-block">
-                    <div class="sender-name">(<span id="modalSenderName"></span>)</div>
-                    <div class="designation"><span id="modalDesignation"></span></div>
+    <div id="notice-modal-overlay" class="modal-overlay fixed inset-0 hidden items-center justify-center z-50">
+        <div id="notice-modal-content" class="modal-content bg-white rounded-lg p-6 max-w-3xl w-full relative">
+            <button id="modal-close-button" class="modal-close-button absolute top-4 right-4 focus:outline-none">X</button>
+
+            <div id="pdf-content-area" class="p-6">
+                <div class="flex justify-center mb-6">
+                    <img src="alif_logo.png" alt="ALIF Logo" class="h-12 w-auto rounded-lg shadow-md">
+                </div>
+
+                <div class="modal-header-badges flex justify-between items-center mb-6">
+                    <span id="modal-date" class="rounded-badge date-badge"></span>
+                    <span id="modal-circular-id" class="rounded-badge circular-id-badge"></span>
+                </div>
+
+                <h2 id="modal-subject" class="text-3xl font-bold text-gray-900 mb-4 text-center"></h2>
+
+                <div id="modal-content" class="text-gray-700 leading-relaxed mb-8 text-lg"></div>
+
+                <div class="modal-signature-block flex justify-between items-end mt-12">
+                    <div class="flex flex-col items-center">
+                        <img src="https://placehold.co/100x100/000000/FFFFFF?text=Your+Seal" alt="Office Seal" class="h-24 w-24 object-contain mb-2 rounded-full shadow-md">
+                        <p class="text-sm text-gray-500">Seal of Office</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="mb-4 border-b border-gray-400 pb-2 italic text-gray-600">_________________________</p>
+                        <p id="modal-sender-name" class="font-semibold text-gray-800 text-lg"></p>
+                        <p id="modal-designation" class="text-gray-600 text-md"></p>
+                    </div>
                 </div>
             </div>
-            <button class="download-pdf-btn" id="downloadPdfButton">Download as PDF</button>
+
+            <div class="flex justify-center mt-8">
+                <button id="download-pdf-button" class="download-button">
+                    Download as PDF
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Google Apps Script Web App URL to fetch circular data
-        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx1-7RROLZk2N0xjMzXGyEmBCgVFqWDgzloZphZIwQc8ycyoMttYZELS-SPxjmO9b9G8Q/exec';
-        
-        // DOM element references
-        const circularsTableBody = document.querySelector('#circularsTable tbody');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const circularModal = document.getElementById('circularModal');
-        const closeButton = document.querySelector('.close-button');
-        const modalDate = document.getElementById('modalDate');
-        const modalCircularId = document.getElementById('modalCircularId');
-        const modalSubject = document.getElementById('modalSubject');
-        const modalContent = document.getElementById('modalContent'); // Reference to the scrollable content area
-        const modalSenderName = document.getElementById('modalSenderName');
-        const modalDesignation = document.getElementById('modalDesignation');
-        const downloadPdfButton = document.getElementById('downloadPdfButton');
+        // IMPORTANT: Replace this with the actual Web App URL you got from Google Apps Script deployment.
+        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx1-7RROLZk2N0xjMzXGyEmBCgVFqWDgzloZphZIwQc8ycyoMttYZELS-SPxjmO9b9G8Q/exec'; 
+
+        // DOM Elements
+        const noticeTableBody = document.getElementById('notice-table-body');
+        const noticeModalOverlay = document.getElementById('notice-modal-overlay');
+        const noticeModalContent = document.getElementById('notice-modal-content');
+        const modalCloseButton = document.getElementById('modal-close-button');
+        const modalDate = document.getElementById('modal-date');
+        const modalCircularId = document.getElementById('modal-circular-id');
+        const modalSubject = document.getElementById('modal-subject');
+        const modalContent = document.getElementById('modal-content');
+        const modalSenderName = document.getElementById('modal-sender-name');
+        const modalDesignation = document.getElementById('modal-designation');
+        const downloadPdfButton = document.getElementById('download-pdf-button');
+        const pdfContentArea = document.getElementById('pdf-content-area');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+
+        let allNotices = []; // To store fetched data
 
         /**
-         * Fetches circular data from the Google Apps Script Web App.
-         * Displays a loading spinner during the fetch operation.
-         * Populates the circulars table upon successful data retrieval.
-         * Handles errors and displays messages to the user.
+         * Fetches notice data from the Google Sheet Web App.
          */
-        async function fetchCirculars() {
-            loadingSpinner.style.display = 'block'; // Show spinner
-            try {
-                const response = await fetch(APPS_SCRIPT_WEB_APP_URL);
-                console.log("Raw fetch response:", response);
+        async function fetchNotices() {
+            loadingIndicator.classList.remove('hidden'); // Show loading spinner
+            errorMessage.classList.add('hidden'); // Hide any previous error
 
+            try {
+                const response = await fetch(GOOGLE_SHEET_WEB_APP_URL);
                 if (!response.ok) {
-                    console.error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log("Fetched raw data from Apps Script:", data);
 
                 if (data.error) {
-                    showMessageBox('Error fetching data: ' + data.error);
-                    return;
-                }
-                if (!data.data || data.data.length === 0) {
-                    console.log("No circular data found in the response.");
-                    circularsTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No circulars found.</td></tr>';
-                    return;
+                    throw new Error(data.details || data.error);
                 }
 
-                console.log("Parsed circulars data for table:", data.data);
-                displayCirculars(data.data);
+                allNotices = data;
+
+                // Sort notices by Timestamp in descending order (newest on top)
+                // Assuming 'timestamp' is a valid date string or number.
+                allNotices.sort((a, b) => {
+                    const dateA = new Date(a.timestamp);
+                    const dateB = new Date(b.timestamp);
+                    return dateB - dateA; // Descending order
+                });
+
+                renderTable(allNotices);
+
             } catch (error) {
-                console.error('Error fetching circulars:', error);
-                showMessageBox('Failed to load circulars. Please check the console for details. Ensure your Google Apps Script is deployed correctly with "Anyone" access.');
+                console.error("Error fetching notices:", error);
+                errorText.textContent = `Could not load notices. Please check the Web App URL and sheet permissions. Details: ${error.message}`;
+                errorMessage.classList.remove('hidden'); // Show error message
             } finally {
-                loadingSpinner.style.display = 'none'; // Hide spinner
+                loadingIndicator.classList.add('hidden'); // Hide loading spinner
             }
         }
 
         /**
-         * Populates the main circulars table with fetched data.
-         * @param {Array<Object>} circulars - An array of circular objects.
+         * Renders the notices into the HTML table.
+         * @param {Array<Object>} notices - An array of notice objects.
          */
-        function displayCirculars(circulars) {
-            circularsTableBody.innerHTML = ''; // Clear existing rows
-            circulars.forEach((circular, index) => {
-                const row = circularsTableBody.insertRow();
-                row.insertCell(0).textContent = index + 1; // SI Number
-                row.insertCell(1).textContent = circular['CIRCULAR ID'] || 'N/A';
-                row.insertCell(2).textContent = circular['SUBJECT'] || 'No Subject';
+        function renderTable(notices) {
+            noticeTableBody.innerHTML = ''; // Clear existing rows
+            if (notices.length === 0) {
+                noticeTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">No notices found.</td></tr>';
+                return;
+            }
 
-                const actionCell = row.insertCell(3);
-                const viewButton = document.createElement('button');
-                viewButton.textContent = 'View Details';
-                viewButton.classList.add('view-details-btn');
-                viewButton.onclick = () => openModal(circular); // Attach click handler to open modal
-                actionCell.appendChild(viewButton);
+            notices.forEach((notice, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rounded-l-lg">${index + 1}</td>
+                    <td>${notice.circularid || 'N/A'}</td>
+                    <td>${notice.subject || 'No Subject'}</td>
+                    <td class="rounded-r-lg">
+                        <button class="view-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105" data-index="${index}">
+                            View
+                        </button>
+                    </td>
+                `;
+                noticeTableBody.appendChild(row);
             });
         }
 
         /**
-         * Opens the modal and populates it with the details of the selected circular.
-         * @param {Object} circular - The circular object containing details.
+         * Opens the modal and populates it with the selected notice's details.
+         * @param {number} index - The index of the notice in the allNotices array.
          */
-        function openModal(circular) {
-            console.group("Opening modal with circular data");
-            console.log("Full circular object:", circular);
+        function openNoticeModal(index) {
+            const notice = allNotices[index];
+            if (!notice) return;
 
-            // Format date if it's a Date object or a string that can be parsed into a Date
-            let formattedDate = circular['DATE'];
-            if (formattedDate instanceof Date) {
-                formattedDate = formattedDate.toLocaleDateString();
-            } else if (typeof formattedDate === 'string' && !isNaN(new Date(formattedDate))) {
-                formattedDate = new Date(formattedDate).toLocaleDateString();
-            }
+            // Format date nicely
+            const dateObj = new Date(notice.date);
+            const formattedDate = dateObj.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
 
-            // Set text content for modal elements
             modalDate.textContent = formattedDate || 'N/A';
-            modalCircularId.textContent = circular['CIRCULAR ID'] || 'N/A';
-            modalSubject.textContent = circular['SUBJECT'] || 'No Subject';
+            modalCircularId.textContent = notice.circularid || 'N/A';
+            modalSubject.textContent = notice.subject || 'No Subject';
+            modalContent.innerHTML = notice.content ? notice.content.replace(/\n/g, '<br>') : 'No content provided.'; // Preserve newlines
+            modalSenderName.textContent = notice.sendername || 'Unknown Sender';
+            modalDesignation.textContent = notice.designation || 'N/A';
 
-            const contentValue = circular['CONTENT'];
-            if (contentValue !== undefined && contentValue !== null && String(contentValue).trim() !== '') {
-                modalContent.textContent = ' ' + contentValue;
-            } else {
-                modalContent.textContent = 'Content: No content provided.';
-                console.warn("CONTENTS field is missing or empty for this circular:", contentValue);
-            }
-
-            modalSenderName.textContent = circular['SENDER NAME'] || 'N/A';
-            const designationValue = circular['DESGINATION'];
-            if (designationValue !== undefined && designationValue !== null && String(designationValue).trim() !== '') {
-                modalDesignation.textContent = 'Designation: ' + designationValue;
-            } else {
-                modalDesignation.textContent = 'Designation: N/A';
-                console.warn("DESIGNATION field is missing or empty for this circular:", designationValue);
-            }
-            console.groupEnd();
-
-            circularModal.classList.add('active'); // Show modal with animation
-            document.body.style.overflow = 'hidden'; // Prevent body from scrolling when modal is open
+            noticeModalOverlay.classList.remove('hidden');
+            noticeModalOverlay.classList.add('flex'); // Ensure flex for centering
+            // Trigger reflow to ensure transition plays
+            void noticeModalContent.offsetWidth;
+            noticeModalContent.classList.add('show');
         }
 
         /**
-         * Closes the circular details modal.
+         * Closes the notice detail modal.
          */
-        function closeModal() {
-            circularModal.classList.remove('active'); // Hide modal with animation
-            document.body.style.overflow = ''; // Restore body scrolling
+        function closeNoticeModal() {
+            noticeModalContent.classList.remove('show');
+            // Hide after transition
+            setTimeout(() => {
+                noticeModalOverlay.classList.add('hidden');
+                noticeModalOverlay.classList.remove('flex');
+            }, 400); // Match transition duration
         }
 
         /**
-         * Handles the PDF download functionality for the modal content.
-         * Temporarily adjusts CSS properties of the content area to ensure full content is captured.
-         * Displays a loading spinner during PDF generation.
+         * Downloads the content of the modal as a PDF.
          */
-        async function downloadPdf() {
-            loadingSpinner.style.display = 'block'; // Show spinner during PDF generation
-            const modalContentElement = document.querySelector('.modal-content');
-            const modalContentArea = document.getElementById('modalContent'); // Get the scrollable content area
-
-            // Temporarily hide elements that should not appear in the PDF
-            closeButton.style.display = 'none';
-            downloadPdfButton.style.display = 'none';
-
-            // Store original styles to restore them later
-            const originalMaxHeight = modalContentArea.style.maxHeight;
-            const originalOverflowY = modalContentArea.style.overflowY;
-
-            // Temporarily remove max-height and overflow-y to capture full content for PDF
-            // This ensures even very long content fits across multiple A4 pages.
-            modalContentArea.style.maxHeight = 'none';
-            modalContentArea.style.overflowY = 'visible';
-
-            // Set options for html2pdf library
-            const options = {
-                margin: 10, // 10mm margin on all sides for a clean look
-                filename: `circular_${modalCircularId.textContent}.pdf`, // Dynamic filename based on Circular ID
-                image: { type: 'jpeg', quality: 0.98 }, // High quality image rendering
-                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true }, // High resolution rendering for sharp text and images
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } // A4 portrait format
+        function downloadPdf() {
+            const element = pdfContentArea; // The specific div to convert to PDF
+            const opt = {
+                margin:       [1, 1, 1, 1], // Top, Left, Bottom, Right margins in inches
+                filename:     `Notice_${modalCircularId.textContent.replace(/ /g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 1.5, logging: true, dpi: 192, letterRendering: true, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
 
-            try {
-                // Generate PDF from the entire modal content element.
-                // html2pdf automatically handles content spanning multiple A4 pages,
-                // and the footer will appear correctly after all content.
-                await html2pdf().set(options).from(modalContentElement).save();
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                showMessageBox('Failed to generate PDF. Please try again.');
-            } finally {
-                // Restore elements and styles after PDF generation
-                closeButton.style.display = 'block';
-                downloadPdfButton.style.display = 'block';
-
-                // Restore original styles of modalContentArea to revert scrollability
-                modalContentArea.style.maxHeight = originalMaxHeight;
-                modalContentArea.style.overflowY = originalOverflowY;
-
-                loadingSpinner.style.display = 'none'; // Hide spinner
-            }
-        }
-
-        /**
-         * Custom message box function to display alerts to the user,
-         * replacing the native alert() for better UI control.
-         * @param {string} message - The message to display.
-         */
-        function showMessageBox(message) {
-            const messageBox = document.createElement('div');
-            messageBox.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: #fff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1002; /* Above modal and spinner */
-                text-align: center;
-                max-width: 300px;
-                font-size: 1.1em;
-                color: #333;
-            `;
-            messageBox.textContent = message;
-
-            const closeMsgBtn = document.createElement('button');
-            closeMsgBtn.textContent = 'OK';
-            closeMsgBtn.style.cssText = `
-                margin-top: 15px;
-                padding: 8px 20px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            `;
-            closeMsgBtn.onmouseover = () => closeMsgBtn.style.backgroundColor = '#0056b3';
-            closeMsgBtn.onmouseout = () => closeMsgBtn.style.backgroundColor = '#007bff';
-            closeMsgBtn.onclick = () => document.body.removeChild(messageBox);
-
-            messageBox.appendChild(closeMsgBtn);
-            document.body.appendChild(messageBox);
+            html2pdf().set(opt).from(element).save();
         }
 
         // Event Listeners
-        closeButton.onclick = closeModal; // Close modal when close button is clicked
-        downloadPdfButton.onclick = downloadPdf; // Trigger PDF download when button is clicked
+        document.addEventListener('DOMContentLoaded', fetchNotices);
 
-        // Close modal when clicking outside the modal content area
-        window.onclick = function(event) {
-            if (event.target == circularModal) {
-                closeModal();
+        // Event delegation for view buttons
+        noticeTableBody.addEventListener('click', (event) => {
+            const viewButton = event.target.closest('.view-button');
+            if (viewButton) {
+                const index = parseInt(viewButton.dataset.index);
+                openNoticeModal(index);
             }
-        };
+        });
 
-        // Fetch circular data when the page finishes loading
-        document.addEventListener('DOMContentLoaded', fetchCirculars);
+        modalCloseButton.addEventListener('click', closeNoticeModal);
+        noticeModalOverlay.addEventListener('click', (event) => {
+            // Close modal if clicking outside the content area
+            if (event.target === noticeModalOverlay) {
+                closeNoticeModal();
+            }
+        });
+        downloadPdfButton.addEventListener('click', downloadPdf);
     </script>
 </body>
 </html>
