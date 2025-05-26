@@ -16,12 +16,28 @@
             line-height: 1.6;
         }
 
-        /* Main heading style */
+        /* Main heading style - Enhanced for 3D and UI/UX */
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: #2c3e50; /* Dark blue-grey text */
             margin-bottom: 30px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-size: 2.5em; /* Slightly larger for impact */
+            padding: 15px 20px; /* Increased padding around the title */
+            /* --- 3D Background Effect for H1 --- */
+            background: linear-gradient(to right, #b2dfdb, #e0f2f1, #b2dfdb); /* Subtle light blue-green gradient */
+            border-radius: 10px; /* Rounded corners for the heading background */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1); /* Stronger 3D shadow for lifted effect */
+            display: inline-block; /* Allows background and shadow to wrap content */
+            max-width: 80%; /* Limits the width for better aesthetics */
+            transform: perspective(500px) rotateX(2deg); /* Subtle 3D tilt effect */
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; /* Smooth transition for hover */
+            margin-left: auto; /* Center the inline-block element */
+            margin-right: auto; /* Center the inline-block element */
+        }
+        /* H1 Hover Effect */
+        h1:hover {
+            transform: perspective(500px) rotateX(0deg) scale(1.01); /* Flatten slightly and grow on hover */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2), 0 4px 8px rgba(0,0,0,0.15); /* More pronounced shadow on hover */
         }
 
         /* Container for the main dashboard content */
@@ -31,7 +47,8 @@
             background-color: #fff;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            /* --- Enhanced UI/UX: Stronger Box Shadow --- */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* More prominent shadow for increased depth */
         }
 
         /* Table styling */
@@ -39,6 +56,9 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            /* --- Enhanced UI/UX: Rounded Table Corners --- */
+            border-radius: 8px; /* Rounded corners for the entire table */
+            overflow: hidden; /* Ensures content respects border-radius */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             background-color: #fff;
         }
@@ -50,13 +70,18 @@
             text-align: left;
         }
 
-        /* Table header specific styling */
+        /* Table header specific styling - Enhanced for 3D effect */
         th {
-            background-color: #4CAF50; /* Green header */
+            /* --- 3D Background Effect for Table Header --- */
+            background: linear-gradient(to bottom, #4CAF50, #388E3C); /* Green gradient for depth */
             color: white;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle lift effect */
+            position: sticky; /* Keeps header visible when scrolling table content */
+            top: 0;
+            z-index: 1; /* Ensures header is above table rows */
         }
 
         /* Alternate row background color for readability */
@@ -129,8 +154,7 @@
             width: 100%; /* Full width */
             height: 100%; /* Full height */
             overflow: auto; /* Enable scroll if needed */
-            /* Adjusted opacity for the background overlay (was 0.6) */
-            background-color: rgba(0,0,0,0.3);
+            background-color: rgba(0,0,0,0.3); /* Slightly transparent background overlay */
             justify-content: center;
             align-items: center;
             opacity: 0; /* Start hidden for transition */
@@ -268,8 +292,7 @@
             overflow-y: auto; /* Enable scrolling for content */
             max-height: 300px; /* Limit height for scrollability */
             font-size: 0.9em;
-            /* --- PDF COLOR CONTRAST IMPROVEMENT --- */
-            color: #333; /* Changed from #555 to #333 for darker, more visible text in PDF */
+            color: #333; /* Darker text for higher contrast in PDF */
             white-space: pre-wrap; /* Preserve whitespace and line breaks */
             word-wrap: break-word; /* Break long words */
         }
@@ -309,8 +332,7 @@
         /* Designation within signature block */
         .modal-signature-block .designation {
             font-style: italic;
-            /* --- PDF COLOR CONTRAST IMPROVEMENT --- */
-            color: #555; /* Changed from #777 to #555 for better visibility in PDF */
+            color: #555; /* Darker text for higher contrast in PDF */
         }
 
         /* Responsive adjustments for screens up to 768px wide */
@@ -347,6 +369,16 @@
             }
             .modal-signature-block {
                 text-align: center; /* Center signature block when stacked */
+            }
+            /* Adjust H1 for smaller screens */
+            h1 {
+                font-size: 2em;
+                padding: 10px 15px;
+                transform: none; /* Remove 3D tilt on smaller screens for better readability */
+            }
+            h1:hover {
+                transform: none;
+                box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Keep a basic shadow */
             }
         }
 
