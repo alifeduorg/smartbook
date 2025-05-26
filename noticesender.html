@@ -188,9 +188,38 @@
         const noticeForm = document.getElementById('noticeForm');
         const submissionStatus = document.getElementById('submissionStatus');
 
-        // This counter should ideally be managed server-side for true persistence across users/sessions.
-        // For a client-side only approach, localStorage offers persistence in the user's browser.
-        let noticeCounter = parseInt(localStorage.getItem('noticeCounter') || '0'); 
+        // Function to get the current academic year in 'YY-YY' format
+        function getCurrentAcademicYear() {
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth(); // 0-indexed (0=Jan, 11=Dec)
+
+            let financialYearStart = currentYear % 100;
+            let financialYearEnd = (currentYear + 1) % 100;
+
+            // Determine academic/financial year (April 1st to March 31st)
+            if (currentMonth < 3) { // If before April (Jan, Feb, Mar)
+                financialYearStart = (currentYear - 1) % 100;
+                financialYearEnd = currentYear % 100;
+            }
+            return `${financialYearStart}-${String(financialYearEnd).padStart(2, '0')}`;
+        }
+
+        // Retrieve counter data from localStorage
+        let storedCounterData = JSON.parse(localStorage.getItem('noticeCounterData')) || { counter: 0, academicYear: '' };
+        let noticeCounter = storedCounterData.counter;
+        let lastAcademicYear = storedCounterData.academicYear;
+
+        // Check if the academic year has changed
+        const currentAcademicYear = getCurrentAcademicYear();
+        if (lastAcademicYear !== currentAcademicYear) {
+            // If academic year has changed, reset the counter to 0
+            noticeCounter = 0;
+            console.log(`New academic year detected (${currentAcademicYear}). Notice counter reset to 0.`);
+        }
+        
+        // Update the stored academic year for the next check
+        lastAcademicYear = currentAcademicYear;
+
 
         noticeForm.addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent default browser form submission
@@ -202,19 +231,18 @@
             const senderName = document.getElementById('senderName').value;
             const designation = document.getElementById('designation').value;
 
-            // Generate Circular ID
-            noticeCounter++;
-            localStorage.setItem('noticeCounter', noticeCounter); // Store updated counter
-            const currentYear = new Date().getFullYear();
-            // Determine financial year. Assuming financial year starts April 1st.
-            const currentMonth = new Date().getMonth(); // 0-indexed (0=Jan, 11=Dec)
-            let financialYearStart = currentYear % 100;
-            let financialYearEnd = (currentYear + 1) % 100;
-            if (currentMonth < 3) { // If before April (Jan, Feb, Mar)
-                financialYearStart = (currentYear - 1) % 100;
-                financialYearEnd = currentYear % 100;
-            }
-            const circularId = `ALI/CIR/${financialYearStart}-${String(financialYearEnd).padStart(2, '0')}/${String(noticeCounter).padStart(3, '0')}`;
+            // Increment the counter for the new ID.
+            // If noticeCounter was 0 (e.g., after an academic year reset or first load), it becomes 1.
+            noticeCounter++; 
+            
+            // Store updated counter and current academic year for persistence
+            localStorage.setItem('noticeCounterData', JSON.stringify({ counter: noticeCounter, academicYear: lastAcademicYear }));
+
+            // Format the notice counter to be three digits, padded with leading zeros (e.g., 001, 010, 100)
+            const formattedNoticeCounter = String(noticeCounter).padStart(3, '0');
+
+            // Construct the final circular ID
+            const circularId = `ALI/CIR/${currentAcademicYear}/${formattedNoticeCounter}`;
 
 
             // Create the data object to send
@@ -265,4 +293,3 @@
     </script>
 </body>
 </html>
-
