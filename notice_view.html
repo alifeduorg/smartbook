@@ -447,7 +447,7 @@
 
     <script>
         // Google Apps Script Web App URL to fetch circular data
-        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx1-7RROLZk2N0xjMzXGyEmBCgVFqWDgzloZphZIwQc8ycyoMttYZELS-SPxjmO9b9G8Q/exec'; 
+        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx1-7RROLZk2N0xjMzXGyEmBCgVFqWDgzloZphZIwQc8ycyoMttYZELS-SPxjmO9b9G8Q/exec';
         
         // DOM element references
         const circularsTableBody = document.querySelector('#circularsTable tbody');
@@ -554,7 +554,7 @@
             modalSenderName.textContent = circular['SENDER NAME'] || 'N/A';
             const designationValue = circular['DESGINATION'];
             if (designationValue !== undefined && designationValue !== null && String(designationValue).trim() !== '') {
-                modalDesignation.textContent = 'Designation: ' + designationValue; 
+                modalDesignation.textContent = 'Designation: ' + designationValue;
             } else {
                 modalDesignation.textContent = 'Designation: N/A';
                 console.warn("DESIGNATION field is missing or empty for this circular:", designationValue);
@@ -593,8 +593,8 @@
 
             // Temporarily remove max-height and overflow-y to capture full content for PDF
             // This ensures even very long content fits across multiple A4 pages.
-            modalContentArea.style.maxHeight = 'none'; 
-            modalContentArea.style.overflowY = 'visible'; 
+            modalContentArea.style.maxHeight = 'none';
+            modalContentArea.style.overflowY = 'visible';
 
             // Set options for html2pdf library
             const options = {
