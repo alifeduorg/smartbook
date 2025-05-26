@@ -6,6 +6,7 @@
     <title>Circulars Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* Basic body and typography styling */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -15,6 +16,7 @@
             line-height: 1.6;
         }
 
+        /* Main heading style */
         h1 {
             text-align: center;
             color: #2c3e50;
@@ -22,6 +24,7 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
+        /* Container for the main dashboard content */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -31,6 +34,7 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
+        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -39,31 +43,36 @@
             background-color: #fff;
         }
 
+        /* Table header and data cell styling */
         th, td {
             border: 1px solid #e0e0e0;
             padding: 12px 15px;
             text-align: left;
         }
 
+        /* Table header specific styling */
         th {
-            background-color: #4CAF50;
+            background-color: #4CAF50; /* Green header */
             color: white;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        /* Alternate row background color for readability */
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
 
+        /* Hover effect for table rows */
         tr:hover {
             background-color: #f1f1f1;
             transition: background-color 0.3s ease;
         }
 
+        /* Styling for view and download buttons */
         .view-details-btn, .download-pdf-btn {
-            background-color: #007bff;
+            background-color: #007bff; /* Blue button */
             color: white;
             border: none;
             padding: 8px 15px;
@@ -75,18 +84,20 @@
             margin-top: 10px; /* For PDF button spacing */
         }
 
+        /* Hover effects for buttons */
         .view-details-btn:hover, .download-pdf-btn:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: translateY(-2px); /* Slight lift effect */
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
+        /* Active (click) effects for buttons */
         .view-details-btn:active, .download-pdf-btn:active {
-            transform: translateY(0);
+            transform: translateY(0); /* Return to original position */
             box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* Loading Spinner */
+        /* Loading Spinner Styles */
         #loading-spinner {
             display: none; /* Hidden by default */
             border: 8px solid #f3f3f3; /* Light grey */
@@ -102,6 +113,7 @@
             z-index: 1001; /* Above modal */
         }
 
+        /* Spinner animation */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -117,18 +129,21 @@
             width: 100%; /* Full width */
             height: 100%; /* Full height */
             overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.3); /* Adjusted opacity here (was 0.6) */
+            /* Adjusted opacity for the background overlay (was 0.6) */
+            background-color: rgba(0,0,0,0.3);
             justify-content: center;
             align-items: center;
-            opacity: 0;
+            opacity: 0; /* Start hidden for transition */
             transition: opacity 0.3s ease;
         }
 
+        /* Active state for modal to show it */
         .modal.active {
-            display: flex;
-            opacity: 1;
+            display: flex; /* Use flexbox for centering */
+            opacity: 1; /* Fade in */
         }
 
+        /* Modal content box styling */
         .modal-content {
             background-color: #fff;
             margin: auto;
@@ -138,24 +153,27 @@
             max-width: 700px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             position: relative;
-            transform: perspective(1000px) rotateY(0deg) scale(0.8);
+            transform: perspective(1000px) rotateY(0deg) scale(0.8); /* Initial state for animation */
             transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-            opacity: 0;
+            opacity: 0; /* Start hidden for animation */
             animation: fadeInScaleUp 0.4s forwards; /* For initial appearance */
-            overflow-y: auto; /* Allow scrolling for content */
+            overflow-y: auto; /* Allow scrolling for content if it exceeds max-height */
             max-height: 90vh; /* Max height to prevent overflow on small screens */
         }
 
+        /* Animation for modal content when active */
         .modal.active .modal-content {
-            transform: perspective(1000px) rotateY(0deg) scale(1);
+            transform: perspective(1000px) rotateY(0deg) scale(1); /* End state for animation */
             opacity: 1;
         }
 
+        /* Subtle hover effect for modal content */
         .modal-content:hover {
             transform: perspective(1000px) rotateY(1deg) scale(1.005); /* Subtle tilt on hover */
             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
         }
 
+        /* Keyframe animation for modal entry */
         @keyframes fadeInScaleUp {
             from {
                 transform: perspective(1000px) rotateY(0deg) scale(0.8);
@@ -167,6 +185,7 @@
             }
         }
 
+        /* Close button for modal */
         .close-button {
             color: #aaa;
             font-size: 28px;
@@ -178,12 +197,14 @@
             transition: color 0.3s ease;
         }
 
+        /* Hover/focus effect for close button */
         .close-button:hover,
         .close-button:focus {
             color: #333;
             text-decoration: none;
         }
 
+        /* Modal header for logo */
         .modal-header {
             display: flex;
             justify-content: center; /* Center the logo */
@@ -193,6 +214,7 @@
             margin-bottom: 20px;
         }
 
+        /* Logo image styling within modal header */
         .modal-header img {
             max-width: 100%;
             height: auto;
@@ -200,6 +222,7 @@
             object-fit: contain;
         }
 
+        /* Container for date and circular ID in modal */
         .modal-info-line {
             display: flex;
             justify-content: space-between; /* Separate date and circular ID */
@@ -208,13 +231,13 @@
             gap: 20px; /* Space between the two items */
         }
 
+        /* Styling for info items (date, circular ID) */
         .modal-info-item {
             background-color: #eaf7ed; /* Light green background for rounded rectangles */
             padding: 8px 10px; /* Reduced horizontal padding */
             border-radius: 8px; /* Rounded edges */
             font-weight: 600;
             color: #28a745; /* Green text */
-            /* Removed flex-grow: 1; to make width content-based */
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
 
@@ -227,6 +250,7 @@
             text-align: right;
         }
 
+        /* Modal subject styling */
         .modal-subject {
             font-size: 1.2em;
             font-weight: bold;
@@ -234,20 +258,23 @@
             color: #2c3e50;
         }
 
+        /* Main content area within the modal */
         .modal-content-area {
             background-color: #f8f8f8;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #e0e0e0;
             min-height: 150px;
-            overflow-y: auto;
+            overflow-y: auto; /* Enable scrolling for content */
             max-height: 300px; /* Limit height for scrollability */
             font-size: 0.9em;
-            color: #555;
+            /* --- PDF COLOR CONTRAST IMPROVEMENT --- */
+            color: #333; /* Changed from #555 to #333 for darker, more visible text in PDF */
             white-space: pre-wrap; /* Preserve whitespace and line breaks */
             word-wrap: break-word; /* Break long words */
         }
 
+        /* Modal footer for seal and signature */
         .modal-footer {
             display: flex;
             justify-content: space-between; /* Seal on left, signature on right */
@@ -257,13 +284,15 @@
             margin-top: 20px;
         }
 
+        /* Seal image styling */
         .modal-footer img {
             max-width: 100px; /* Adjust seal size */
             height: auto;
             opacity: 0.8;
-            margin-right: 20px; /* Space between seal and signature if they were inline */
+            margin-right: 20px;
         }
 
+        /* Signature block styling */
         .modal-signature-block {
             text-align: right; /* Align signature block to the right */
             font-size: 0.9em;
@@ -271,17 +300,20 @@
             color: #444;
         }
 
+        /* Sender name within signature block */
         .modal-signature-block .sender-name {
-            font-weight: bold; /* Make sender name slightly more prominent */
-            margin-bottom: 2px; /* Small space between name and designation */
+            font-weight: bold;
+            margin-bottom: 2px;
         }
 
+        /* Designation within signature block */
         .modal-signature-block .designation {
             font-style: italic;
-            color: #777;
+            /* --- PDF COLOR CONTRAST IMPROVEMENT --- */
+            color: #555; /* Changed from #777 to #555 for better visibility in PDF */
         }
 
-        /* Responsive adjustments */
+        /* Responsive adjustments for screens up to 768px wide */
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -294,8 +326,8 @@
                 padding: 20px;
             }
             .modal-info-line {
-                flex-direction: column;
-                gap: 10px; /* Adjust gap for vertical stacking */
+                flex-direction: column; /* Stack date and ID vertically */
+                gap: 10px;
             }
             /* Reset text alignment for stacked items on small screens */
             #modalDate, #modalCircularId {
@@ -318,6 +350,7 @@
             }
         }
 
+        /* Responsive adjustments for screens up to 480px wide */
         @media (max-width: 480px) {
             h1 {
                 font-size: 1.8em;
@@ -381,35 +414,40 @@
     </div>
 
     <script>
-        // Corrected Apps Script Web App URL
+        // Google Apps Script Web App URL to fetch circular data
         const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx1-7RROLZk2N0xjMzXGyEmBCgVFqWDgzloZphZIwQc8ycyoMttYZELS-SPxjmO9b9G8Q/exec'; 
+        
+        // DOM element references
         const circularsTableBody = document.querySelector('#circularsTable tbody');
         const loadingSpinner = document.getElementById('loading-spinner');
-
         const circularModal = document.getElementById('circularModal');
         const closeButton = document.querySelector('.close-button');
         const modalDate = document.getElementById('modalDate');
         const modalCircularId = document.getElementById('modalCircularId');
         const modalSubject = document.getElementById('modalSubject');
-        const modalContent = document.getElementById('modalContent');
+        const modalContent = document.getElementById('modalContent'); // Reference to the scrollable content area
         const modalSenderName = document.getElementById('modalSenderName');
         const modalDesignation = document.getElementById('modalDesignation');
         const downloadPdfButton = document.getElementById('downloadPdfButton');
 
+        /**
+         * Fetches circular data from the Google Apps Script Web App.
+         * Displays a loading spinner during the fetch operation.
+         * Populates the circulars table upon successful data retrieval.
+         * Handles errors and displays messages to the user.
+         */
         async function fetchCirculars() {
             loadingSpinner.style.display = 'block'; // Show spinner
             try {
                 const response = await fetch(APPS_SCRIPT_WEB_APP_URL);
-                // Log the full response for debugging
                 console.log("Raw fetch response:", response);
 
                 if (!response.ok) {
-                    // Log specific HTTP error status if fetch was successful but response is not OK
                     console.error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log("Fetched raw data from Apps Script:", data); // Debugging: Log the raw data
+                console.log("Fetched raw data from Apps Script:", data);
 
                 if (data.error) {
                     showMessageBox('Error fetching data: ' + data.error);
@@ -421,7 +459,7 @@
                     return;
                 }
 
-                console.log("Parsed circulars data for table:", data.data); // Debugging: Log the parsed data array
+                console.log("Parsed circulars data for table:", data.data);
                 displayCirculars(data.data);
             } catch (error) {
                 console.error('Error fetching circulars:', error);
@@ -431,6 +469,10 @@
             }
         }
 
+        /**
+         * Populates the main circulars table with fetched data.
+         * @param {Array<Object>} circulars - An array of circular objects.
+         */
         function displayCirculars(circulars) {
             circularsTableBody.innerHTML = ''; // Clear existing rows
             circulars.forEach((circular, index) => {
@@ -443,16 +485,20 @@
                 const viewButton = document.createElement('button');
                 viewButton.textContent = 'View Details';
                 viewButton.classList.add('view-details-btn');
-                viewButton.onclick = () => openModal(circular);
+                viewButton.onclick = () => openModal(circular); // Attach click handler to open modal
                 actionCell.appendChild(viewButton);
             });
         }
 
+        /**
+         * Opens the modal and populates it with the details of the selected circular.
+         * @param {Object} circular - The circular object containing details.
+         */
         function openModal(circular) {
             console.group("Opening modal with circular data");
-            console.log("Full circular object:", circular); // IMPORTANT: Check this log for CONTENTS and DESIGNATION keys
+            console.log("Full circular object:", circular);
 
-            // Format date if it's a Google Sheets Date object or string
+            // Format date if it's a Date object or a string that can be parsed into a Date
             let formattedDate = circular['DATE'];
             if (formattedDate instanceof Date) {
                 formattedDate = formattedDate.toLocaleDateString();
@@ -460,12 +506,11 @@
                 formattedDate = new Date(formattedDate).toLocaleDateString();
             }
 
-            // Set text content directly without prefixes
+            // Set text content for modal elements
             modalDate.textContent = formattedDate || 'N/A';
             modalCircularId.textContent = circular['CIRCULAR ID'] || 'N/A';
             modalSubject.textContent = circular['SUBJECT'] || 'No Subject';
 
-            // Set content with "Content:" prefix
             const contentValue = circular['CONTENT'];
             if (contentValue !== undefined && contentValue !== null && String(contentValue).trim() !== '') {
                 modalContent.textContent = ' ' + contentValue;
@@ -475,7 +520,6 @@
             }
 
             modalSenderName.textContent = circular['SENDER NAME'] || 'N/A';
-            // Set designation with "Designation:" prefix
             const designationValue = circular['DESGINATION'];
             if (designationValue !== undefined && designationValue !== null && String(designationValue).trim() !== '') {
                 modalDesignation.textContent = 'Designation: ' + designationValue; 
@@ -486,48 +530,76 @@
             console.groupEnd();
 
             circularModal.classList.add('active'); // Show modal with animation
-            document.body.style.overflow = 'hidden'; // Prevent body scroll
+            document.body.style.overflow = 'hidden'; // Prevent body from scrolling when modal is open
         }
 
+        /**
+         * Closes the circular details modal.
+         */
         function closeModal() {
             circularModal.classList.remove('active'); // Hide modal with animation
-            document.body.style.overflow = ''; // Restore body scroll
+            document.body.style.overflow = ''; // Restore body scrolling
         }
 
-        // Function to handle PDF download
+        /**
+         * Handles the PDF download functionality for the modal content.
+         * Temporarily adjusts CSS properties of the content area to ensure full content is captured.
+         * Displays a loading spinner during PDF generation.
+         */
         async function downloadPdf() {
             loadingSpinner.style.display = 'block'; // Show spinner during PDF generation
             const modalContentElement = document.querySelector('.modal-content');
+            const modalContentArea = document.getElementById('modalContent'); // Get the scrollable content area
 
-            // Temporarily hide elements that shouldn't be in the PDF
+            // Temporarily hide elements that should not appear in the PDF
             closeButton.style.display = 'none';
             downloadPdfButton.style.display = 'none';
 
-            // Set options for html2pdf
+            // Store original styles to restore them later
+            const originalMaxHeight = modalContentArea.style.maxHeight;
+            const originalOverflowY = modalContentArea.style.overflowY;
+
+            // Temporarily remove max-height and overflow-y to capture full content for PDF
+            // This ensures even very long content fits across multiple A4 pages.
+            modalContentArea.style.maxHeight = 'none'; 
+            modalContentArea.style.overflowY = 'visible'; 
+
+            // Set options for html2pdf library
             const options = {
-                margin: 10,
-                filename: `circular_${modalCircularId.textContent}.pdf`, // Filename without "Circular ID:" prefix
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                margin: 10, // 10mm margin on all sides for a clean look
+                filename: `circular_${modalCircularId.textContent}.pdf`, // Dynamic filename based on Circular ID
+                image: { type: 'jpeg', quality: 0.98 }, // High quality image rendering
+                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true }, // High resolution rendering for sharp text and images
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } // A4 portrait format
             };
 
             try {
+                // Generate PDF from the entire modal content element.
+                // html2pdf automatically handles content spanning multiple A4 pages,
+                // and the footer will appear correctly after all content.
                 await html2pdf().set(options).from(modalContentElement).save();
             } catch (error) {
                 console.error('Error generating PDF:', error);
                 showMessageBox('Failed to generate PDF. Please try again.');
             } finally {
-                // Restore hidden elements
+                // Restore elements and styles after PDF generation
                 closeButton.style.display = 'block';
                 downloadPdfButton.style.display = 'block';
+
+                // Restore original styles of modalContentArea to revert scrollability
+                modalContentArea.style.maxHeight = originalMaxHeight;
+                modalContentArea.style.overflowY = originalOverflowY;
+
                 loadingSpinner.style.display = 'none'; // Hide spinner
             }
         }
 
-        // Custom message box function (replaces alert)
+        /**
+         * Custom message box function to display alerts to the user,
+         * replacing the native alert() for better UI control.
+         * @param {string} message - The message to display.
+         */
         function showMessageBox(message) {
-            // Create a simple modal/div for messages
             const messageBox = document.createElement('div');
             messageBox.style.cssText = `
                 position: fixed;
@@ -538,7 +610,7 @@
                 padding: 20px;
                 border-radius: 8px;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1002;
+                z-index: 1002; /* Above modal and spinner */
                 text-align: center;
                 max-width: 300px;
                 font-size: 1.1em;
@@ -566,19 +638,18 @@
             document.body.appendChild(messageBox);
         }
 
-
         // Event Listeners
-        closeButton.onclick = closeModal;
-        downloadPdfButton.onclick = downloadPdf;
+        closeButton.onclick = closeModal; // Close modal when close button is clicked
+        downloadPdfButton.onclick = downloadPdf; // Trigger PDF download when button is clicked
 
-        // Close modal when clicking outside the modal content
+        // Close modal when clicking outside the modal content area
         window.onclick = function(event) {
             if (event.target == circularModal) {
                 closeModal();
             }
         };
 
-        // Fetch data when the page loads
+        // Fetch circular data when the page finishes loading
         document.addEventListener('DOMContentLoaded', fetchCirculars);
     </script>
 </body>
