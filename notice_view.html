@@ -238,12 +238,12 @@
     </div>
 
     <div id="notice-modal-overlay" class="modal-overlay fixed inset-0 hidden items-center justify-center z-50">
-        <div id="notice-modal-content" class="modal-content bg-white rounded-lg p-6 max-w-3xl w-full relative">
+        <div id="notice-modal-content" class="modal-content bg-white rounded-lg p-6 max-w-3xl w-full relative flex flex-col">
             <button id="modal-close-button" class="modal-close-button absolute top-4 right-4 focus:outline-none">X</button>
 
-            <div id="pdf-content-area" class="p-6">
+            <div id="pdf-content-area" class="p-6 flex-grow flex flex-col">
                 <div class="flex justify-center mb-6">
-                    <img src="alif_logo.png" alt="ALIF Logo" class="h-12 w-auto rounded-lg shadow-md">
+                    <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="ALIF Logo" class="h-12 w-auto rounded-lg shadow-md">
                 </div>
 
                 <div class="modal-header-badges flex justify-between items-center mb-6">
@@ -257,7 +257,7 @@
 
                 <div class="modal-signature-block flex justify-between items-end mt-12">
                     <div class="flex flex-col items-center">
-                        <img src="https://placehold.co/100x100/000000/FFFFFF?text=Your+Seal" alt="Office Seal" class="h-24 w-24 object-contain mb-2 rounded-full shadow-md">
+                        <img src="SEAL.png" alt="Office Seal" class="h-24 w-24 object-contain mb-2 rounded-full shadow-md">
                         <p class="text-sm text-gray-500">Seal of Office</p>
                     </div>
                     <div class="text-right">
@@ -290,7 +290,7 @@
         const modalSubject = document.getElementById('modal-subject');
         const modalContent = document.getElementById('modal-content');
         const modalSenderName = document.getElementById('modal-sender-name');
-        const modalDesignation = document.getElementById('modal-designation');
+        const modalDesignation = document.getElementById('modal-designation'); // Corrected to match the key from Google Sheet
         const downloadPdfButton = document.getElementById('download-pdf-button');
         const pdfContentArea = document.getElementById('pdf-content-area');
         const loadingIndicator = document.getElementById('loading-indicator');
@@ -386,8 +386,8 @@
             modalSubject.textContent = notice.subject || 'No Subject';
             modalContent.innerHTML = notice.content ? notice.content.replace(/\n/g, '<br>') : 'No content provided.'; // Preserve newlines
             modalSenderName.textContent = notice.sendername || 'Unknown Sender';
-            modalDesignation.textContent = notice.designation || 'N/A';
-
+            modalDesignation.textContent = notice.desgination || 'N/A'; // Corrected to 'desgination' to match Google Sheet data
+            
             noticeModalOverlay.classList.remove('hidden');
             noticeModalOverlay.classList.add('flex'); // Ensure flex for centering
             // Trigger reflow to ensure transition plays
@@ -413,10 +413,10 @@
         function downloadPdf() {
             const element = pdfContentArea; // The specific div to convert to PDF
             const opt = {
-                margin:       [1, 1, 1, 1], // Top, Left, Bottom, Right margins in inches
+                margin:       [0.75, 1, 0.75, 1], // Top, Right, Bottom, Left margins in inches
                 filename:     `Notice_${modalCircularId.textContent.replace(/ /g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 1.5, logging: true, dpi: 192, letterRendering: true, useCORS: true },
+                html2canvas:  { scale: 1.2, logging: true, dpi: 192, letterRendering: true, useCORS: true }, // Adjusted scale
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
 
