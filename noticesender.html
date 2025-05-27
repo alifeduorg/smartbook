@@ -188,39 +188,6 @@
         const noticeForm = document.getElementById('noticeForm');
         const submissionStatus = document.getElementById('submissionStatus');
 
-        // Function to get the current academic year in 'YY-YY' format
-        function getCurrentAcademicYear() {
-            const currentYear = new Date().getFullYear();
-            const currentMonth = new Date().getMonth(); // 0-indexed (0=Jan, 11=Dec)
-
-            let financialYearStart = currentYear % 100;
-            let financialYearEnd = (currentYear + 1) % 100;
-
-            // Determine academic/financial year (April 1st to March 31st)
-            if (currentMonth < 3) { // If before April (Jan, Feb, Mar)
-                financialYearStart = (currentYear - 1) % 100;
-                financialYearEnd = currentYear % 100;
-            }
-            return `${financialYearStart}-${String(financialYearEnd).padStart(2, '0')}`;
-        }
-
-        // Retrieve counter data from localStorage
-        let storedCounterData = JSON.parse(localStorage.getItem('noticeCounterData')) || { counter: 0, academicYear: '' };
-        let noticeCounter = storedCounterData.counter;
-        let lastAcademicYear = storedCounterData.academicYear;
-
-        // Check if the academic year has changed
-        const currentAcademicYear = getCurrentAcademicYear();
-        if (lastAcademicYear !== currentAcademicYear) {
-            // If academic year has changed, reset the counter to 0
-            noticeCounter = 0;
-            console.log(`New academic year detected (${currentAcademicYear}). Notice counter reset to 0.`);
-        }
-        
-        // Update the stored academic year for the next check
-        lastAcademicYear = currentAcademicYear;
-
-
         noticeForm.addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent default browser form submission
 
@@ -230,24 +197,9 @@
             const content = document.getElementById('content').value;
             const senderName = document.getElementById('senderName').value;
             const designation = document.getElementById('designation').value;
-
-            // Increment the counter for the new ID.
-            // If noticeCounter was 0 (e.g., after an academic year reset or first load), it becomes 1.
-            noticeCounter++; 
             
-            // Store updated counter and current academic year for persistence
-            localStorage.setItem('noticeCounterData', JSON.stringify({ counter: noticeCounter, academicYear: lastAcademicYear }));
-
-            // Format the notice counter to be three digits, padded with leading zeros (e.g., 001, 010, 100)
-            const formattedNoticeCounter = String(noticeCounter).padStart(3, '0');
-
-            // Construct the final circular ID
-            const circularId = `ALI/CIR/${currentAcademicYear}/${formattedNoticeCounter}`;
-
-
             // Create the data object to send
             const noticeData = {
-                circularId: circularId,
                 date: noticeDate,
                 subject: subject,
                 content: content,
@@ -255,7 +207,7 @@
                 designation: designation
             };
 
-            submissionStatus.innerHTML = `<p class="text-blue-600">Submitting notice with ID <span class="font-semibold">${circularId}</span>...</p>`;
+            submissionStatus.innerHTML = `<p class="text-blue-600">Submitting notice...</p>`;
             submissionStatus.classList.remove('hidden');
 
             // --- IMPORTANT: YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL ---
@@ -279,7 +231,7 @@
                 // With 'no-cors', you generally cannot read the server's response.
                 // We rely on the request succeeding and the Apps Script logging to confirm.
                 console.log('Notice data sent. Check your Google Sheet for confirmation. Data:', noticeData);
-                submissionStatus.innerHTML = `<p class="text-green-600 font-semibold">Notice with ID <span class="font-semibold">${circularId}</span> submitted successfully!</p>`;
+                submissionStatus.innerHTML = `<p class="text-green-600 font-semibold">Notice submitted successfully!</p>`;
 
             } catch (error) {
                 console.error('Error submitting notice:', error);
