@@ -7,12 +7,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        /* Define CSS Variables for a consistent and friendly color palette */
+        :root {
+            --primary-dark-blue: #1A3A5E; /* Deep, professional blue for main elements */
+            --secondary-accent-yellow: #FFC107; /* Bright, inviting yellow for highlights */
+            --light-bg-blue: #E3F2FD; /* Very light blue for overall background */
+            --mid-bg-blue: #BBDEFB; /* Slightly darker blue for gradient transitions */
+            --text-dark: #333; /* Standard dark text color */
+            --text-light: #fff; /* White text for dark backgrounds */
+            --border-color: #D0D0D0; /* Light border for inputs and elements */
+            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
+            --shadow-deep: 0 12px 30px rgba(0, 0, 0, 0.15); /* Deeper shadow for hover/focus */
+            --border-radius-sm: 10px; /* Small border radius */
+            --border-radius-md: 15px; /* Medium border radius */
+            --border-radius-lg: 20px; /* Large border radius for containers */
+        }
+
         /* General Body and Font Styles */
         body {
             margin: 0;
-            font-family: 'Inter', sans-serif; /* Changed font to Inter */
-            background: linear-gradient(135deg, #e0f2f7, #c1e4ed); /* Lighter, more vibrant background */
-            color: #333;
+            padding: 20px; /* Adjusted padding for better responsiveness */
+            font-family: 'Inter', sans-serif; /* Modern, clean font */
+            background: linear-gradient(135deg, var(--light-bg-blue), var(--mid-bg-blue)); /* Soft blue gradient */
+            color: var(--text-dark);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -20,7 +38,51 @@
             overflow-x: hidden; /* Hide horizontal overflow */
         }
 
-        /* Background Animation */
+        /* Layered Background Animation - Large, subtle shapes */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3); /* Translucent white for a dreamy effect */
+            border-radius: 50%; /* Circular shapes */
+            opacity: 0.6;
+            filter: blur(80px); /* Soft blur */
+            z-index: -2; /* Behind all content and other animation layer */
+        }
+
+        body::before {
+            width: 350px;
+            height: 350px;
+            top: -70px;
+            left: -70px;
+            animation: moveShapeOne 18s infinite alternate ease-in-out; /* Slower, unique animation */
+        }
+
+        body::after {
+            width: 450px;
+            height: 450px;
+            bottom: -100px;
+            right: -100px;
+            animation: moveShapeTwo 22s infinite alternate-reverse ease-in-out; /* Different timing for variety */
+        }
+
+        @keyframes moveShapeOne {
+            0% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(60px, -40px) scale(1.08); }
+            50% { transform: translate(-20px, 70px) scale(0.98); }
+            75% { transform: translate(80px, 30px) scale(1.05); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        @keyframes moveShapeTwo {
+            0% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-50px, 30px) scale(0.95); }
+            50% { transform: translate(40px, -60px) scale(1.1); }
+            75% { transform: translate(-70px, -10px) scale(1.02); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* Background Animation - Smaller, more dynamic shapes */
         .background-animation {
             position: absolute;
             top: 0;
@@ -28,103 +90,91 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            z-index: -1; /* Ensure it stays behind content */
+            z-index: -1; /* Ensure it stays behind content, but above body::before/after */
         }
 
         .shape {
             position: absolute;
-            background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+            background: rgba(255, 255, 255, 0.15); /* Semi-transparent white */
             border-radius: 50%;
             animation: float 15s infinite ease-in-out alternate;
             opacity: 0.7;
+            filter: blur(20px); /* Slightly less blur for these shapes */
         }
 
         .shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            left: 10%;
-            top: 20%;
+            width: 90px; height: 90px; left: 10%; top: 20%;
             animation-duration: 18s;
-            background: rgba(16, 37, 66, 0.1); /* Dark blue hint */
+            background: rgba(26, 58, 94, 0.1); /* Using RGB values for --primary-dark-blue */
         }
 
         .shape:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            left: 70%;
-            top: 50%;
+            width: 130px; height: 130px; left: 70%; top: 50%;
             animation-duration: 22s;
-            background: rgba(253, 187, 45, 0.15); /* Yellow hint */
+            background: rgba(255, 193, 7, 0.15); /* Yellow hint */
         }
 
         .shape:nth-child(3) {
-            width: 60px;
-            height: 60px;
-            left: 40%;
-            top: 80%;
+            width: 70px; height: 70px; left: 40%; top: 80%;
             animation-duration: 16s;
         }
 
         .shape:nth-child(4) {
-            width: 100px;
-            height: 100px;
-            left: 85%;
-            top: 10%;
+            width: 110px; height: 110px; left: 85%; top: 10%;
             animation-duration: 20s;
-            background: rgba(16, 37, 66, 0.1);
+            background: rgba(26, 58, 94, 0.1);
         }
 
         .shape:nth-child(5) {
-            width: 90px;
-            height: 90px;
-            left: 20%;
-            top: 60%;
+            width: 100px; height: 100px; left: 20%; top: 60%;
             animation-duration: 19s;
-            background: rgba(253, 187, 45, 0.15);
+            background: rgba(255, 193, 7, 0.15);
         }
 
         @keyframes float {
             0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(20px, -20px) rotate(180deg); }
+            50% { transform: translate(25px, -25px) rotate(180deg); } /* Slightly more movement */
             100% { transform: translate(0, 0) rotate(360deg); }
         }
 
         /* Header Styles */
         header {
             padding: 1rem 2rem;
-            background: #102542; /* Dark blue */
-            color: white;
+            background: var(--primary-dark-blue); /* Dark blue header */
+            color: var(--text-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+            box-shadow: var(--shadow-medium); /* Enhanced shadow */
             position: relative;
             z-index: 10; /* Ensure header is above background animation */
+            border-bottom-left-radius: var(--border-radius-md); /* Rounded bottom corners */
+            border-bottom-right-radius: var(--border-radius-md);
         }
 
         header h1 {
-            font-size: 1.8rem; /* Slightly larger heading */
+            font-size: 1.8rem;
             margin: 0;
             font-weight: 700;
         }
 
         /* Dashboard Button */
         .dashboard-button {
-            background: #fdbb2d; /* Bright yellow */
-            color: #102542;
+            background: var(--secondary-accent-yellow); /* Bright yellow */
+            color: var(--primary-dark-blue);
             border: none;
-            padding: 0.6rem 1.2rem; /* Slightly larger padding */
-            border-radius: 25px; /* More rounded */
-            font-weight: 700; /* Bolder text */
+            padding: 0.7rem 1.4rem; /* Slightly larger padding */
+            border-radius: 28px; /* More rounded, pill-like */
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease; /* Smooth transition for all properties */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-light);
         }
 
         .dashboard-button:hover {
-            background: #fcb900; /* Darker yellow on hover */
-            transform: translateY(-2px); /* Slight lift effect */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            background: #FFD54F; /* Lighter yellow on hover */
+            transform: translateY(-3px); /* Slight lift effect */
+            box-shadow: var(--shadow-medium);
         }
 
         /* Main Container */
@@ -133,35 +183,39 @@
             max-width: 900px; /* Max width for better readability on large screens */
             margin: 2rem auto; /* Center container with margin */
             background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background for content */
-            border-radius: 20px; /* More rounded corners */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+            border-radius: var(--border-radius-lg); /* More rounded corners */
+            box-shadow: var(--shadow-medium); /* Softer, larger shadow */
             flex-grow: 1; /* Allow container to grow and fill space */
             position: relative;
             z-index: 5; /* Above background, below header */
+            backdrop-filter: blur(8px); /* Subtle glassmorphism on container */
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Light border for glass effect */
         }
 
         /* Form Elements (Select, Input) */
         select, input[type="date"] {
-            padding: 0.8rem 1rem; /* Increased padding */
-            border-radius: 12px; /* More rounded */
-            border: 1px solid #d0d0d0; /* Lighter border */
+            padding: 0.9rem 1.2rem; /* Increased padding */
+            border-radius: var(--border-radius-md); /* More rounded */
+            border: 1px solid var(--border-color); /* Lighter border */
             font-size: 1rem;
             margin: 0.75rem 0 1.5rem 0; /* More margin below */
-            width: calc(100% - 2rem); /* Adjust width for padding */
+            width: calc(100% - 2.4rem); /* Adjust width for padding */
             max-width: 400px;
             display: block;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow */
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08); /* Inner shadow */
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fcfcfc; /* Slightly off-white background */
         }
 
         select:focus, input[type="date"]:focus {
             outline: none;
-            border-color: #fdbb2d; /* Yellow border on focus */
-            box-shadow: 0 0 0 3px rgba(253, 187, 45, 0.3); /* Glow effect on focus */
+            border-color: var(--secondary-accent-yellow); /* Yellow border on focus */
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.3); /* Glow effect on focus */
         }
 
         label {
-            display: block; /* Ensure labels are on their own line */
+            display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: #555;
@@ -170,18 +224,19 @@
         /* Table Styles */
         table {
             width: 100%;
-            border-collapse: separate; /* Use separate for border-radius on cells */
-            border-spacing: 0; /* Remove space between cells */
-            box-shadow: 0 12px 25px rgba(0,0,0,0.1); /* Deeper shadow */
-            border-radius: 18px; /* More rounded table */
+            border-collapse: separate;
+            border-spacing: 0;
+            box-shadow: var(--shadow-medium); /* Deeper shadow */
+            border-radius: var(--border-radius-md); /* More rounded table */
             overflow: hidden; /* Ensures rounded corners are visible */
             background: white;
             margin-top: 2rem;
+            border: 1px solid #f0f0f0; /* Light border for table */
         }
 
         thead {
-            background: #102542; /* Dark blue header */
-            color: white;
+            background: var(--primary-dark-blue); /* Dark blue header */
+            color: var(--text-light);
         }
 
         th, td {
@@ -203,57 +258,97 @@
         .download-btn {
             margin-top: 2.5rem; /* More space above button */
             padding: 1rem 2rem; /* Larger padding */
-            background-color: #102542; /* Dark blue */
-            color: #fff;
+            background-color: var(--primary-dark-blue); /* Dark blue */
+            color: var(--text-light);
             border: none;
-            border-radius: 15px; /* More rounded */
-            font-size: 1.1rem; /* Slightly larger font */
+            border-radius: var(--border-radius-md); /* More rounded */
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-medium);
+            display: flex; /* Use flexbox for spinner */
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between text and spinner */
+            margin-left: auto; /* Center the button */
+            margin-right: auto;
         }
 
         .download-btn:hover {
-            background-color: #1b3a63; /* Darker blue on hover */
+            background-color: #2A4D75; /* Darker blue on hover */
             transform: translateY(-3px); /* More pronounced lift */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-deep);
+        }
+
+        /* Spinner for Download Button */
+        .download-btn .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--text-light);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        .download-btn.loading .spinner {
+            display: block; /* Show spinner when loading */
+        }
+
+        .download-btn.loading span {
+            display: none; /* Hide text when loading */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Custom Modal for Alerts */
         .modal {
             display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 100; /* Sit on top */
+            position: fixed;
+            z-index: 100;
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5); /* Darker overlay */
             justify-content: center;
             align-items: center;
+            opacity: 0; /* For fade-in effect */
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show { /* Class to show modal */
+            display: flex;
+            opacity: 1;
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: auto;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-deep);
             width: 80%;
-            max-width: 400px;
+            max-width: 450px; /* Slightly larger modal */
             text-align: center;
             position: relative;
-            animation: fadeIn 0.3s ease-out;
+            transform: translateY(-20px); /* For slide-in effect */
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
         }
 
         .modal-content h3 {
-            color: #102542;
+            color: var(--primary-dark-blue);
             margin-top: 0;
-            font-size: 1.4rem;
+            font-size: 1.5rem; /* Slightly larger title */
         }
 
         .modal-content p {
@@ -263,89 +358,153 @@
         }
 
         .modal-close-btn {
-            background-color: #fdbb2d;
-            color: #102542;
+            background-color: var(--secondary-accent-yellow);
+            color: var(--primary-dark-blue);
             border: none;
-            padding: 10px 25px;
-            border-radius: 10px;
+            padding: 12px 30px; /* Larger button */
+            border-radius: var(--border-radius-md);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem; /* Larger font */
             font-weight: 600;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
         }
 
         .modal-close-btn:hover {
-            background-color: #fcb900;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            background-color: #FFD54F;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
         }
 
         /* Scroll Buttons */
         .scroll-button {
             position: fixed;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: #102542;
-            color: white;
+            right: 25px; /* Slightly more prominent */
+            width: 55px; /* Larger buttons */
+            height: 55px;
+            background-color: var(--primary-dark-blue);
+            color: var(--text-light);
             border: none;
             border-radius: 50%;
-            font-size: 1.5rem;
+            font-size: 1.8rem; /* Larger icon */
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-medium);
             transition: background-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
-            z-index: 99; /* Below modal, above other content */
-            opacity: 0.8;
+            z-index: 99;
+            opacity: 0.9; /* Slightly less opaque */
         }
 
         .scroll-button:hover {
-            background-color: #1b3a63;
-            transform: scale(1.05);
+            background-color: #2A4D75;
+            transform: scale(1.1); /* More pronounced scale */
             opacity: 1;
         }
 
         .scroll-up {
-            bottom: 80px; /* Position above scroll-down */
+            bottom: 90px; /* Position above scroll-down */
         }
 
         .scroll-down {
-            bottom: 20px;
+            bottom: 25px;
         }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
             header {
                 flex-direction: column;
                 padding: 1rem;
+                text-align: center;
             }
             header h1 {
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.8rem;
+                font-size: 1.6rem;
+            }
+            .dashboard-button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            .container {
+                padding: 1.5rem;
+                margin: 1.5rem auto;
+            }
+            th, td {
+                padding: 0.8rem;
+                font-size: 0.85rem;
+            }
+            select, input[type="date"], .download-btn {
+                max-width: 100%;
+                width: calc(100% - 2.4rem); /* Adjust for padding in smaller screens */
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            .download-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            .scroll-button {
+                width: 45px;
+                height: 45px;
+                font-size: 1.5rem;
+                right: 15px;
+            }
+            .scroll-up {
+                bottom: 75px;
+            }
+            .scroll-down {
+                bottom: 15px;
+            }
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+            .modal-content h3 {
+                font-size: 1.3rem;
+            }
+            .modal-content p {
+                font-size: 1rem;
+            }
+            .modal-close-btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                padding: 0.8rem;
+            }
+            header h1 {
+                font-size: 1.4rem;
             }
             .container {
                 padding: 1rem;
                 margin: 1rem auto;
             }
             th, td {
-                padding: 0.6rem;
-                font-size: 0.9rem;
+                padding: 0.5rem;
+                font-size: 0.8rem;
             }
             select, input[type="date"], .download-btn {
-                max-width: 100%;
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
             }
             .scroll-button {
                 width: 40px;
                 height: 40px;
-                font-size: 1.2rem;
+                font-size: 1.3rem;
                 right: 10px;
             }
             .scroll-up {
-                bottom: 65px;
+                bottom: 60px;
             }
             .scroll-down {
                 bottom: 10px;
@@ -393,7 +552,10 @@
                 </tbody>
         </table>
 
-        <button class="download-btn" id="downloadBtn">Download Timetable as PDF</button>
+        <button class="download-btn" id="downloadBtn">
+            <span class="spinner"></span>
+            <span>Download Timetable as PDF</span>
+        </button>
     </div>
 
     <div id="messageModal" class="modal">
@@ -404,7 +566,10 @@
         </div>
     </div>
 
-    <button class="scroll-button scroll-up" onclick="scrollToTop()">&#9650;</button> <button class="scroll-button scroll-down" onclick="scrollToBottom()">&#9660;</button> <script>
+    <button class="scroll-button scroll-up" onclick="scrollToTop()">&#9650;</button>
+    <button class="scroll-button scroll-down" onclick="scrollToBottom()">&#9660;</button>
+
+    <script>
         // Google Sheet URL for timetable data
         const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
         let timetableData = []; // Array to store fetched timetable data
@@ -457,8 +622,10 @@
             const studentMap = new Map(); // Use a Map to store unique student IDs and names
 
             data.forEach(row => {
-                const id = row["Student ID"]?.trim();
-                const name = row["Student Name"]?.trim();
+                // Explicitly convert to string and handle potential null/undefined values
+                const id = String(row["Student ID"] || '').trim();
+                const name = String(row["Student Name"] || '').trim();
+
                 if (id && !studentMap.has(id)) {
                     studentMap.set(id, name);
                     const option = document.createElement('option');
@@ -520,6 +687,10 @@
 
         // Event listener for download button click
         document.getElementById('downloadBtn').addEventListener('click', async () => {
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.classList.add('loading'); // Add loading class
+            downloadBtn.disabled = true; // Disable button during download
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
@@ -530,10 +701,14 @@
             // Validate inputs
             if (!selectedID) {
                 showModal("Missing Selection", "Please select a student.");
+                downloadBtn.classList.remove('loading');
+                downloadBtn.disabled = false;
                 return;
             }
             if (!startDateInput || !endDateInput) {
                 showModal("Missing Dates", "Please select both start and end dates.");
+                downloadBtn.classList.remove('loading');
+                downloadBtn.disabled = false;
                 return;
             }
 
@@ -542,11 +717,15 @@
 
             if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
                 showModal("Invalid Dates", "Please enter valid start and end dates.");
+                downloadBtn.classList.remove('loading');
+                downloadBtn.disabled = false;
                 return;
             }
 
             if (startDate > endDate) {
                 showModal("Invalid Date Range", "Start date cannot be after end date.");
+                downloadBtn.classList.remove('loading');
+                downloadBtn.disabled = false;
                 return;
             }
 
@@ -558,59 +737,70 @@
 
             if (filtered.length === 0) {
                 showModal("No Data", "No timetable data found for the selected student and date range.");
+                downloadBtn.classList.remove('loading');
+                downloadBtn.disabled = false;
                 return;
             }
 
-            // Generate PDF content
-            let y = 20;
-            doc.setFontSize(14);
-            doc.text(`Student Timetable for ID: ${selectedID}`, 10, y);
-            y += 10;
-            doc.setFontSize(10);
-            doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
-            y += 15;
+            try {
+                // Generate PDF content
+                let y = 20;
+                doc.setFontSize(14);
+                doc.text(`Student Timetable for ID: ${selectedID}`, 10, y);
+                y += 10;
+                doc.setFontSize(10);
+                doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
+                y += 15;
 
-            // Add table headers to PDF
-            doc.setFontSize(10);
-            doc.text("Week Start", 10, y);
-            doc.text("Day", 40, y);
-            doc.text("Time", 70, y);
-            doc.text("Subject", 100, y);
-            doc.text("Teacher", 150, y);
-            y += 5;
-            doc.line(10, y, 200, y); // Draw a line under headers
-            y += 5;
+                // Add table headers to PDF
+                doc.setFontSize(10);
+                doc.text("Week Start", 10, y);
+                doc.text("Day", 40, y);
+                doc.text("Time", 70, y);
+                doc.text("Subject", 100, y);
+                doc.text("Teacher", 150, y);
+                y += 5;
+                doc.line(10, y, 200, y); // Draw a line under headers
+                y += 5;
 
-            // Add timetable entries to PDF
-            filtered.forEach(row => {
-                if (y > 270) { // Check if new page is needed
-                    doc.addPage();
-                    y = 20;
-                    doc.setFontSize(14);
-                    doc.text(`Student Timetable for ID: ${selectedID} (Cont.)`, 10, y);
-                    y += 10;
-                    doc.setFontSize(10);
-                    doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
-                    y += 15;
-                    doc.text("Week Start", 10, y);
-                    doc.text("Day", 40, y);
-                    doc.text("Time", 70, y);
-                    doc.text("Subject", 100, y);
-                    doc.text("Teacher", 150, y);
-                    y += 5;
-                    doc.line(10, y, 200, y);
-                    y += 5;
-                }
-                doc.text(formatDate(row["Week Start"] || ''), 10, y);
-                doc.text(row["Day"] || '', 40, y);
-                doc.text(formatTime(row["Time"] || ''), 70, y);
-                doc.text(row["Subject"] || '', 100, y);
-                doc.text(row["Teacher"] || '', 150, y);
-                y += 8;
-            });
+                // Add timetable entries to PDF
+                filtered.forEach(row => {
+                    if (y > 270) { // Check if new page is needed (approx height)
+                        doc.addPage();
+                        y = 20;
+                        doc.setFontSize(14);
+                        doc.text(`Student Timetable for ID: ${selectedID} (Cont.)`, 10, y);
+                        y += 10;
+                        doc.setFontSize(10);
+                        doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
+                        y += 15;
+                        doc.text("Week Start", 10, y);
+                        doc.text("Day", 40, y);
+                        doc.text("Time", 70, y);
+                        doc.text("Subject", 100, y);
+                        doc.text("Teacher", 150, y);
+                        y += 5;
+                        doc.line(10, y, 200, y);
+                        y += 5;
+                    }
+                    doc.text(formatDate(row["Week Start"] || ''), 10, y);
+                    doc.text(row["Day"] || '', 40, y);
+                    doc.text(formatTime(row["Time"] || ''), 70, y);
+                    doc.text(row["Subject"] || '', 100, y);
+                    doc.text(row["Teacher"] || '', 150, y);
+                    y += 8;
+                });
 
-            // Save the PDF
-            doc.save(`Timetable_${selectedID}_${formatDate(startDateInput)}_to_${formatDate(endDateInput)}.pdf`);
+                // Save the PDF
+                doc.save(`Timetable_${selectedID}_${formatDate(startDateInput)}_to_${formatDate(endDateInput)}.pdf`);
+                showModal("Success!", "Timetable PDF downloaded successfully.");
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                showModal("Error", "Failed to generate PDF. Please try again.");
+            } finally {
+                downloadBtn.classList.remove('loading'); // Remove loading class
+                downloadBtn.disabled = false; // Re-enable button
+            }
         });
 
         /**
@@ -633,14 +823,14 @@
         function showModal(title, message) {
             modalTitle.textContent = title;
             modalMessage.textContent = message;
-            messageModal.style.display = 'flex'; // Use flex to center content
+            messageModal.classList.add('show'); // Add 'show' class to trigger display and animation
         }
 
         /**
          * Hides the custom message modal.
          */
         function hideModal() {
-            messageModal.style.display = 'none';
+            messageModal.classList.remove('show'); // Remove 'show' class to hide and trigger animation
         }
 
         /**
