@@ -1,231 +1,385 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Timetable Viewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #f5f7fa, #c3cfe2);
-      color: #333;
-    }
-    header {
-      padding: 1rem 2rem;
-      background: #102542;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    header h1 {
-      font-size: 1.5rem;
-      margin: 0;
-    }
-    .dashboard-button {
-      background: #fdbb2d;
-      color: #102542;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .dashboard-button:hover {
-      background: #fcb900;
-    }
-    .container {
-      padding: 1rem;
-    }
-    select, input[type="date"] {
-      padding: 0.5rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      margin: 0.5rem 0;
-      width: 100%;
-      max-width: 400px;
-      display: block;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      border-radius: 16px;
-      overflow: hidden;
-      background: white;
-    }
-    thead {
-      background: #102542;
-      color: white;
-    }
-    th, td {
-      padding: 0.8rem;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    tbody tr:hover {
-      background-color: #f0f8ff;
-    }
-    .download-btn {
-      margin-top: 1.5rem;
-      padding: 0.7rem 1.5rem;
-      background-color: #102542;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
-      width: 100%;
-      max-width: 400px;
-    }
-    .download-btn:hover {
-      background-color: #1b3a63;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Timetable Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Custom styles for background and font */
+        body {
+            font-family: 'Poppins', sans-serif;
+            @apply bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen text-gray-800;
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            @apply bg-blue-100 rounded-full;
+        }
+        ::-webkit-scrollbar-thumb {
+            @apply bg-blue-400 rounded-full;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            @apply bg-blue-500;
+        }
+
+        /* Hide the modal by default */
+        .modal {
+            display: none;
+        }
+        .modal.show {
+            display: flex;
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>Student Timetable</h1>
-  <button class="dashboard-button" onclick="goToDashboard()">Back to Dashboard</button>
-  </header>
-  <div class="container">
-    <select id="studentSelect">
-      <option value="">Select Student</option>
-    </select>
-    <label for="startDate">Start Date</label>
-    <input type="date" id="startDate" />
-    <label for="endDate">End Date</label>
-    <input type="date" id="endDate" />
+<body class="antialiased">
+    <header class="bg-gradient-to-r from-blue-800 to-indigo-900 text-white p-4 shadow-xl rounded-b-xl flex justify-between items-center transition-all duration-300 ease-in-out transform hover:scale-100">
+        <h1 class="text-3xl font-bold tracking-wide">Student Timetable</h1>
+        <button class="bg-yellow-400 text-blue-900 px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-yellow-300 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-75"
+                onclick="goToDashboard()">
+            Back to Dashboard
+        </button>
+    </header>
 
-    <table id="timetable">
-      <thead>
-        <tr>
-          <th>Week Start</th>
-          <th>Day</th>
-          <th>Time</th>
-          <th>Subject</th>
-          <th>Teacher</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="container mx-auto p-6 my-8 bg-white rounded-xl shadow-2xl transition-all duration-500 ease-in-out transform scale-95 opacity-0 animate-fade-in-up max-w-4xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="relative">
+                <label for="studentSelect" class="block text-gray-700 text-sm font-semibold mb-2">Select Student</label>
+                <select id="studentSelect" class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out shadow-sm">
+                    <option value="">Select Student</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 top-6">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
 
-    <button class="download-btn" id="downloadBtn">Download Timetable as PDF</button>
-  </div>
+            <div>
+                <label for="startDate" class="block text-gray-700 text-sm font-semibold mb-2">Start Date</label>
+                <input type="date" id="startDate" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out shadow-sm" />
+            </div>
 
-  <script>
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
-    let timetableData = [];
+            <div>
+                <label for="endDate" class="block text-gray-700 text-sm font-semibold mb-2">End Date</label>
+                <input type="date" id="endDate" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out shadow-sm" />
+            </div>
+        </div>
 
-    fetch(sheetURL)
-      .then(res => res.json())
-      .then(data => {
-        timetableData = data.sort((a, b) => new Date(b["Week Start"]) - new Date(a["Week Start"]));
-        populateStudents(timetableData);
-      });
+        <div class="overflow-x-auto rounded-lg shadow-xl mt-8 animate-fade-in">
+            <table id="timetable" class="min-w-full bg-white border border-gray-200">
+                <thead class="bg-blue-700 text-white">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider rounded-tl-lg">Week Start</th>
+                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider">Day</th>
+                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider">Time</th>
+                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider">Subject</th>
+                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider rounded-tr-lg">Teacher</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    </tbody>
+            </table>
+        </div>
 
-    function formatDate(isoString) {
-      if (!isoString) return '';
-      const date = new Date(isoString);
-      return date.toISOString().split('T')[0];
-    }
+        <button id="downloadBtn" class="mt-8 w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:from-blue-700 hover:to-blue-900 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            Download Timetable as PDF
+        </button>
+    </div>
 
-    function formatTime(isoString) {
-      if (!isoString) return '';
-      const date = new Date(isoString);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
+    <div id="loadingSpinner" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+        <p class="text-white text-lg ml-4">Loading data...</p>
+    </div>
 
-    function populateStudents(data) {
-      const dropdown = document.getElementById('studentSelect');
-      const studentMap = new Map();
+    <div id="customModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+        <div class="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full transform scale-90 opacity-0 transition-all duration-300 ease-in-out">
+            <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4"></h3>
+            <p id="modalMessage" class="text-gray-600 mb-6"></p>
+            <button id="modalCloseBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                OK
+            </button>
+        </div>
+    </div>
 
-      data.forEach(row => {
-        const id = row["Student ID"]?.trim();
-        const name = row["Student Name"]?.trim();
-        if (id && !studentMap.has(id)) {
-          studentMap.set(id, name);
-          const option = document.createElement('option');
-          option.value = id;
-          option.textContent = `${id} - ${name}`;
-          dropdown.appendChild(option);
+    <script>
+        // Define the Google Sheet URL
+        const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
+        let timetableData = []; // Stores the fetched timetable data
+
+        // Get DOM elements
+        const studentSelect = document.getElementById('studentSelect');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const timetableBody = document.querySelector('#timetable tbody');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const customModal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+        /**
+         * Displays the custom modal with a given title and message.
+         * @param {string} title - The title of the modal.
+         * @param {string} message - The message content of the modal.
+         */
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            customModal.classList.add('show');
+            // Add animation class
+            customModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+            customModal.querySelector('div').classList.remove('scale-90', 'opacity-0');
         }
-      });
-    }
 
-    document.getElementById('studentSelect').addEventListener('change', renderTimetable);
-
-    function renderTimetable() {
-      const selectedID = document.getElementById('studentSelect').value;
-      const tbody = document.querySelector('#timetable tbody');
-      tbody.innerHTML = '';
-
-      const filtered = timetableData.filter(entry => entry["Student ID"] === selectedID);
-
-      filtered.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${formatDate(row["Week Start"] || '')}</td>
-          <td>${row["Day"] || ''}</td>
-          <td>${formatTime(row["Time"] || '')}</td>
-          <td>${row["Subject"] || ''}</td>
-          <td>${row["Teacher"] || ''}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    document.getElementById('downloadBtn').addEventListener('click', async () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      const selectedID = document.getElementById('studentSelect').value;
-      const startDateInput = document.getElementById('startDate').value;
-      const endDateInput = document.getElementById('endDate').value;
-      const startDate = new Date(startDateInput);
-      const endDate = new Date(endDateInput);
-
-      if (!selectedID || !startDateInput || !endDateInput || isNaN(startDate) || isNaN(endDate)) {
-        alert("Please select student and a valid date range.");
-        return;
-      }
-
-      const filtered = timetableData.filter(entry => {
-        const weekStart = new Date(entry["Week Start"]);
-        return entry["Student ID"] === selectedID && weekStart >= startDate && weekStart <= endDate;
-      });
-
-      if (filtered.length === 0) {
-        alert("No data for selected period.");
-        return;
-      }
-
-      let y = 20;
-      doc.setFontSize(12);
-      doc.text(`Student ID: ${selectedID}`, 10, y);
-      y += 10;
-      filtered.forEach(row => {
-        const line = `${formatDate(row["Week Start"])} | ${row["Day"]} | ${formatTime(row["Time"])} | ${row["Subject"]} | ${row["Teacher"]}`;
-        doc.text(line, 10, y);
-        y += 8;
-        if (y > 270) {
-          doc.addPage();
-          y = 20;
+        /**
+         * Hides the custom modal.
+         */
+        function hideModal() {
+            // Remove animation class before hiding
+            customModal.querySelector('div').classList.remove('scale-100', 'opacity-100');
+            customModal.querySelector('div').classList.add('scale-90', 'opacity-0');
+            setTimeout(() => {
+                customModal.classList.remove('show');
+            }, 300); // Allow time for animation to complete
         }
-      });
 
-      doc.save(`Timetable_${selectedID}_${startDateInput}_to_${endDateInput}.pdf`);
-    });
-    function goToDashboard() {
-  window.history.back();
-}
-  </script>
+        // Event listener for modal close button
+        modalCloseBtn.addEventListener('click', hideModal);
+
+        // Fetch data from Google Sheet on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadingSpinner.classList.remove('hidden'); // Show loading spinner
+            // Animate the main container after data is loaded
+            const container = document.querySelector('.container');
+            container.classList.remove('opacity-0', 'scale-95');
+            container.classList.add('opacity-100', 'scale-100');
+
+            fetch(sheetURL)
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    timetableData = data.sort((a, b) => new Date(b["Week Start"]) - new Date(a["Week Start"]));
+                    populateStudents(timetableData);
+                    loadingSpinner.classList.add('hidden'); // Hide loading spinner
+                    renderTimetable(); // Call renderTimetable after data is loaded and students are populated
+                })
+                .catch(error => {
+                    console.error('Error fetching timetable data:', error);
+                    loadingSpinner.classList.add('hidden'); // Hide loading spinner
+                    showModal('Error', 'Failed to load timetable data. Please try again later.');
+                });
+        });
+
+        /**
+         * Formats an ISO date string to YYYY-MM-DD.
+         * @param {string} isoString - The ISO date string.
+         * @returns {string} Formatted date string.
+         */
+        function formatDate(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            // Ensure date is valid before formatting
+            if (isNaN(date.getTime())) {
+                return '';
+            }
+            return date.toISOString().split('T')[0];
+        }
+
+        /**
+         * Formats an ISO date string to HH:MM AM/PM.
+         * @param {string} isoString - The ISO date string.
+         * @returns {string} Formatted time string.
+         */
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            // Ensure date is valid before formatting
+            if (isNaN(date.getTime())) {
+                return '';
+            }
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        /**
+         * Populates the student dropdown with unique student IDs and names.
+         * @param {Array<Object>} data - The timetable data.
+         */
+        function populateStudents(data) {
+            const studentMap = new Map(); // Use a Map to store unique student ID and name pairs
+
+            data.forEach(row => {
+                const id = row["Student ID"]?.trim();
+                const name = row["Student Name"]?.trim();
+                if (id && name && !studentMap.has(id)) {
+                    studentMap.set(id, name);
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = `${id} - ${name}`;
+                    studentSelect.appendChild(option);
+                }
+            });
+        }
+
+        // Event listener for student selection change
+        studentSelect.addEventListener('change', renderTimetable);
+        // Event listeners for date input changes
+        startDateInput.addEventListener('change', renderTimetable);
+        endDateInput.addEventListener('change', renderTimetable);
+
+        /**
+         * Renders the timetable based on selected student and date range.
+         */
+        function renderTimetable() {
+            const selectedID = studentSelect.value;
+            const start = startDateInput.value ? new Date(startDateInput.value) : null;
+            const end = endDateInput.value ? new Date(endDateInput.value) : null;
+
+            timetableBody.innerHTML = ''; // Clear existing table rows
+
+            if (!selectedID) {
+                // If no student is selected, clear the table and return
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="5" class="py-4 text-center text-gray-500">Please select a student to view their timetable.</td>`;
+                timetableBody.appendChild(tr);
+                return;
+            }
+
+            const filtered = timetableData.filter(entry => {
+                const weekStart = new Date(entry["Week Start"]);
+                const isStudentMatch = entry["Student ID"] === selectedID;
+                const isDateInRange = (!start || weekStart >= start) && (!end || weekStart <= end);
+                return isStudentMatch && isDateInRange;
+            });
+
+            if (filtered.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="5" class="py-4 text-center text-gray-500">No timetable entries found for the selected criteria.</td>`;
+                timetableBody.appendChild(tr);
+                return;
+            }
+
+            filtered.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.classList.add('hover:bg-blue-50', 'transition-colors', 'duration-200', 'ease-in-out'); // Tailwind hover effect
+                tr.innerHTML = `
+                    <td class="py-3 px-4">${formatDate(row["Week Start"] || '')}</td>
+                    <td class="py-3 px-4">${row["Day"] || ''}</td>
+                    <td class="py-3 px-4">${formatTime(row["Time"] || '')}</td>
+                    <td class="py-3 px-4">${row["Subject"] || ''}</td>
+                    <td class="py-3 px-4">${row["Teacher"] || ''}</td>
+                `;
+                timetableBody.appendChild(tr);
+            });
+        }
+
+        // Event listener for download button
+        downloadBtn.addEventListener('click', async () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const selectedID = studentSelect.value;
+            const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+            const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+            // Validate inputs
+            if (!selectedID) {
+                showModal('Selection Required', 'Please select a student to download the timetable.');
+                return;
+            }
+            if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                showModal('Date Range Required', 'Please select a valid start and end date for the PDF export.');
+                return;
+            }
+            if (startDate > endDate) {
+                showModal('Invalid Date Range', 'Start date cannot be after end date.');
+                return;
+            }
+
+            const filtered = timetableData.filter(entry => {
+                const weekStart = new Date(entry["Week Start"]);
+                return entry["Student ID"] === selectedID && weekStart >= startDate && weekStart <= endDate;
+            });
+
+            if (filtered.length === 0) {
+                showModal('No Data', 'No timetable entries found for the selected student and date range to download.');
+                return;
+            }
+
+            let y = 20; // Y-coordinate for text
+            const lineSpacing = 8; // Spacing between lines
+            const margin = 10; // Left margin
+
+            // Set font and add title
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text(`Student Timetable for ${selectedID}`, margin, y);
+            y += 15;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text(`Period: ${formatDate(startDate.toISOString())} to ${formatDate(endDate.toISOString())}`, margin, y);
+            y += 15;
+
+            // Add table headers
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text('Week Start', margin, y);
+            doc.text('Day', margin + 40, y);
+            doc.text('Time', margin + 70, y);
+            doc.text('Subject', margin + 100, y);
+            doc.text('Teacher', margin + 140, y);
+            y += lineSpacing;
+            doc.line(margin, y - 2, 200 - margin, y - 2); // Draw a line under headers
+            y += 5;
+
+
+            // Add timetable data
+            doc.setFont('helvetica', 'normal');
+            filtered.forEach(row => {
+                // Check if new page is needed
+                if (y > 270) {
+                    doc.addPage();
+                    y = 20; // Reset y for new page
+                    // Re-add headers on new page
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(10);
+                    doc.text('Week Start', margin, y);
+                    doc.text('Day', margin + 40, y);
+                    doc.text('Time', margin + 70, y);
+                    doc.text('Subject', margin + 100, y);
+                    doc.text('Teacher', margin + 140, y);
+                    y += lineSpacing;
+                    doc.line(margin, y - 2, 200 - margin, y - 2);
+                    y += 5;
+                    doc.setFont('helvetica', 'normal');
+                }
+
+                doc.text(formatDate(row["Week Start"] || ''), margin, y);
+                doc.text(row["Day"] || '', margin + 40, y);
+                doc.text(formatTime(row["Time"] || ''), margin + 70, y);
+                doc.text(row["Subject"] || '', margin + 100, y);
+                doc.text(row["Teacher"] || '', margin + 140, y);
+                y += lineSpacing;
+            });
+
+            doc.save(`Timetable_${selectedID}_${formatDate(startDate.toISOString())}_to_${formatDate(endDate.toISOString())}.pdf`);
+        });
+
+        /**
+         * Function to go back to the previous page (simulates dashboard navigation).
+         */
+        function goToDashboard() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>
