@@ -4,116 +4,204 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Alif Edu Attendance Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Global styles and body background animation */
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
+      font-family: 'Inter', sans-serif; /* Using Inter font for a modern look */
       margin: 0;
       padding: 0;
+      background: linear-gradient(45deg, #e0f7fa, #a1d0c9, #a7d9ed, #f0fbe2); /* Soft, colorful gradient */
+      background-size: 400% 400%; /* Larger background for smooth animation */
+      animation: gradient 15s ease infinite; /* Gradient animation */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh; /* Full viewport height */
+      color: #333; /* Default text color */
     }
 
+    /* Keyframe animation for the background gradient */
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Main container for the form */
     .container {
       max-width: 800px;
       margin: 40px auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      padding: 30px;
+      background: rgba(255, 255, 255, 0.95); /* Slightly transparent white background */
+      border-radius: 20px; /* More rounded corners */
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15); /* Enhanced shadow for depth */
+      padding: 40px;
       position: relative;
+      backdrop-filter: blur(5px); /* Subtle frosted glass effect */
+      border: 1px solid rgba(255, 255, 255, 0.3); /* Light border for definition */
+      box-sizing: border-box; /* Include padding in width */
     }
 
+    /* Top bar for dashboard button */
     .top-bar {
       display: flex;
       justify-content: flex-end;
-      padding: 10px;
+      padding: 0; /* Removed padding here as container has it */
+      margin-bottom: 20px; /* Space below the button */
     }
 
+    /* Dashboard button styling */
     .dashboard-btn {
-      background: navy;
+      background: linear-gradient(to right, #007bff, #00c6ff); /* Blue gradient */
       color: white;
-      padding: 10px 16px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 8px;
-      font-weight: bold;
+      border-radius: 10px; /* Rounded buttons */
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease; /* Smooth transition for hover effects */
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2); /* Soft shadow */
+      display: inline-flex; /* Align icon and text */
+      align-items: center;
+      gap: 8px; /* Space between icon and text */
     }
 
     .dashboard-btn:hover {
-      background: goldenrod;
+      background: linear-gradient(to right, #0056b3, #0099e6); /* Darker gradient on hover */
+      transform: translateY(-2px); /* Slight lift effect */
+      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3); /* Enhanced shadow on hover */
     }
 
+    /* Heading style */
     h2 {
       text-align: center;
-      color: navy;
-      margin-bottom: 20px;
+      color: #2c3e50; /* Darker, more professional color */
+      margin-bottom: 30px;
+      font-size: 2.8em; /* Larger heading */
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); /* Subtle text shadow */
     }
 
+    /* Form grid layout */
     form {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      gap: 20px; /* Increased gap for better spacing */
     }
 
+    /* Label styling */
     label {
-      font-weight: bold;
-      margin-bottom: 5px;
+      font-weight: 600; /* Bolder label */
+      margin-bottom: 8px; /* More space below label */
       display: block;
-      color: #333;
+      color: #555;
+      font-size: 1.05em;
     }
 
+    /* Input, select, textarea styling */
     input, select, textarea {
       width: 100%;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-shadow: inset 1px 1px 4px rgba(0,0,0,0.05);
+      padding: 12px; /* Increased padding */
+      border-radius: 10px; /* More rounded corners */
+      border: 1px solid #c0d9e7; /* Softer border color */
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.05); /* Inner shadow for depth */
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      font-size: 1em; /* Consistent font size */
+      box-sizing: border-box; /* Include padding in width */
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #007bff; /* Blue border on focus */
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus ring */
+      outline: none;
     }
 
     textarea {
       resize: vertical;
-      height: 60px;
+      min-height: 80px; /* Taller textarea */
     }
 
+    /* Full width elements in the grid */
     .full-width {
       grid-column: 1 / -1;
     }
 
+    /* Submit button styling */
     button[type="submit"] {
-      background: navy;
+      background: linear-gradient(to right, #28a745, #2edb60); /* Green gradient */
       color: white;
-      padding: 12px;
+      padding: 15px; /* Larger padding */
       border: none;
-      border-radius: 8px;
+      border-radius: 10px; /* Rounded button */
       cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s;
+      font-size: 1.1em; /* Larger font size */
+      font-weight: 600;
+      transition: all 0.3s ease; /* Smooth transition */
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2); /* Soft shadow */
     }
 
     button[type="submit"]:hover {
-      background: goldenrod;
+      background: linear-gradient(to right, #218838, #26b34d); /* Darker green on hover */
+      transform: translateY(-2px); /* Slight lift effect */
+      box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3); /* Enhanced shadow on hover */
     }
 
+    /* Message display styling */
     .message {
       grid-column: 1 / -1;
       text-align: center;
-      margin-top: 10px;
+      margin-top: 20px;
       font-weight: bold;
+      padding: 10px;
+      border-radius: 8px;
     }
 
+    /* Specific message colors */
+    .message.success {
+      background-color: #e6ffe6;
+      color: #28a745;
+    }
+
+    .message.error {
+      background-color: #ffe6e6;
+      color: #dc3545;
+    }
+
+    /* Responsive adjustments */
     @media(max-width: 600px) {
       form {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Single column layout on small screens */
+      }
+
+      .container {
+        margin: 20px auto;
+        padding: 25px;
+        width: 90%;
+      }
+
+      h2 {
+        font-size: 2em;
+      }
+
+      .dashboard-btn, button[type="submit"] {
+        padding: 10px 20px;
+        font-size: 1em;
       }
     }
   </style>
 </head>
 <body>
-  <div class="top-bar">
-    <button class="dashboard-btn" onclick="location.href='dashboard.html'">Dashboard</button>
-  </div>
-
   <div class="container">
+    <div class="top-bar">
+      <button class="dashboard-btn" onclick="window.history.back()">⬅ Dashboard</button>
+    </div>
+
     <h2>📋 Alif Edu Attendance Sheet</h2>
     <form id="attendanceForm">
       <div><label>Date</label><input type="date" name="Date" required /></div>
@@ -125,7 +213,7 @@
       <div><label>Teacher ID</label><input type="text" name="TeacherID" required /></div>
       <div><label>Class In</label><input type="time" name="ClassIn" required /></div>
       <div><label>Class Out</label><input type="time" name="ClassOut" required /></div>
-      <div><label>Duration (hrs)</label><input type="number" name="Duration" min="0" step="0.1" required /></div>
+      <div><label>Duration (mins)</label><input type="number" name="Duration" min="0" step="1" required /></div>
       <div><label>Mentor Name</label><input type="text" name="MentorName" required /></div>
       <div><label>Mentor ID</label><input type="text" name="MentorID" required /></div>
       <div><label>Status</label>
@@ -148,27 +236,41 @@
   </div>
 
   <script>
+    // Google Apps Script Web App URL - REPLACE THIS WITH YOUR ACTUAL DEPLOYED URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec';
 
     const form = document.getElementById('attendanceForm');
     const msg = document.getElementById('responseMsg');
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
-      msg.textContent = 'Submitting...';
+      msg.textContent = 'Submitting...'; // Show submitting message
+      msg.className = 'message'; // Reset class
 
-      fetch(scriptURL, {
-        method: 'POST',
-        body: new FormData(form)
-      })
-      .then(response => {
-        msg.textContent = '✅ Submitted successfully!';
-        form.reset();
-      })
-      .catch(error => {
+      try {
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: new FormData(form)
+        });
+
+        if (response.ok) {
+          msg.textContent = '✅ Submitted successfully!';
+          msg.classList.add('success'); // Add success class for green background
+          form.reset(); // Clear the form fields
+        } else {
+          const errorText = await response.text(); // Get error details
+          throw new Error(`Submission failed: ${response.status} - ${errorText}`);
+        }
+      } catch (error) {
         console.error('Error!', error.message);
         msg.textContent = '❌ Submission failed. Try again.';
-      });
+        msg.classList.add('error'); // Add error class for red background
+      } finally {
+        setTimeout(() => {
+          msg.textContent = ''; // Clear message after a few seconds
+          msg.className = 'message'; // Reset class
+        }, 5000);
+      }
     });
   </script>
 </body>
