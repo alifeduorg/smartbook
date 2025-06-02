@@ -4,208 +4,447 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Timetable Viewer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* Custom styles for background and font */
+        /* General Body and Font Styles */
         body {
-            font-family: 'Poppins', sans-serif;
-            @apply bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen text-gray-800;
-        }
-
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            @apply bg-blue-100 rounded-full;
-        }
-        ::-webkit-scrollbar-thumb {
-            @apply bg-blue-400 rounded-full;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            @apply bg-blue-500;
-        }
-
-        /* Hide the modal by default */
-        .modal {
-            display: none;
-        }
-        .modal.show {
+            margin: 0;
+            font-family: 'Inter', sans-serif; /* Changed font to Inter */
+            background: linear-gradient(135deg, #e0f2f7, #c1e4ed); /* Lighter, more vibrant background */
+            color: #333;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            position: relative; /* Needed for absolute positioning of background animation */
+            overflow-x: hidden; /* Hide horizontal overflow */
+        }
+
+        /* Background Animation */
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1; /* Ensure it stays behind content */
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out alternate;
+            opacity: 0.7;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            top: 20%;
+            animation-duration: 18s;
+            background: rgba(16, 37, 66, 0.1); /* Dark blue hint */
+        }
+
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            left: 70%;
+            top: 50%;
+            animation-duration: 22s;
+            background: rgba(253, 187, 45, 0.15); /* Yellow hint */
+        }
+
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            left: 40%;
+            top: 80%;
+            animation-duration: 16s;
+        }
+
+        .shape:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            left: 85%;
+            top: 10%;
+            animation-duration: 20s;
+            background: rgba(16, 37, 66, 0.1);
+        }
+
+        .shape:nth-child(5) {
+            width: 90px;
+            height: 90px;
+            left: 20%;
+            top: 60%;
+            animation-duration: 19s;
+            background: rgba(253, 187, 45, 0.15);
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, -20px) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        /* Header Styles */
+        header {
+            padding: 1rem 2rem;
+            background: #102542; /* Dark blue */
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+            position: relative;
+            z-index: 10; /* Ensure header is above background animation */
+        }
+
+        header h1 {
+            font-size: 1.8rem; /* Slightly larger heading */
+            margin: 0;
+            font-weight: 700;
+        }
+
+        /* Dashboard Button */
+        .dashboard-button {
+            background: #fdbb2d; /* Bright yellow */
+            color: #102542;
+            border: none;
+            padding: 0.6rem 1.2rem; /* Slightly larger padding */
+            border-radius: 25px; /* More rounded */
+            font-weight: 700; /* Bolder text */
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transition for all properties */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-button:hover {
+            background: #fcb900; /* Darker yellow on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Container */
+        .container {
+            padding: 2rem;
+            max-width: 900px; /* Max width for better readability on large screens */
+            margin: 2rem auto; /* Center container with margin */
+            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background for content */
+            border-radius: 20px; /* More rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+            flex-grow: 1; /* Allow container to grow and fill space */
+            position: relative;
+            z-index: 5; /* Above background, below header */
+        }
+
+        /* Form Elements (Select, Input) */
+        select, input[type="date"] {
+            padding: 0.8rem 1rem; /* Increased padding */
+            border-radius: 12px; /* More rounded */
+            border: 1px solid #d0d0d0; /* Lighter border */
+            font-size: 1rem;
+            margin: 0.75rem 0 1.5rem 0; /* More margin below */
+            width: calc(100% - 2rem); /* Adjust width for padding */
+            max-width: 400px;
+            display: block;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        select:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: #fdbb2d; /* Yellow border on focus */
+            box-shadow: 0 0 0 3px rgba(253, 187, 45, 0.3); /* Glow effect on focus */
+        }
+
+        label {
+            display: block; /* Ensure labels are on their own line */
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: separate; /* Use separate for border-radius on cells */
+            border-spacing: 0; /* Remove space between cells */
+            box-shadow: 0 12px 25px rgba(0,0,0,0.1); /* Deeper shadow */
+            border-radius: 18px; /* More rounded table */
+            overflow: hidden; /* Ensures rounded corners are visible */
+            background: white;
+            margin-top: 2rem;
+        }
+
+        thead {
+            background: #102542; /* Dark blue header */
+            color: white;
+        }
+
+        th, td {
+            padding: 1rem 1.2rem; /* Increased padding */
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0; /* Lighter border for rows */
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8fcfd; /* Light stripe for even rows */
+        }
+
+        tbody tr:hover {
+            background-color: #e6f7ff; /* Lighter blue on hover */
+            cursor: pointer;
+        }
+
+        /* Download Button */
+        .download-btn {
+            margin-top: 2.5rem; /* More space above button */
+            padding: 1rem 2rem; /* Larger padding */
+            background-color: #102542; /* Dark blue */
+            color: #fff;
+            border: none;
+            border-radius: 15px; /* More rounded */
+            font-size: 1.1rem; /* Slightly larger font */
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-btn:hover {
+            background-color: #1b3a63; /* Darker blue on hover */
+            transform: translateY(-3px); /* More pronounced lift */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Custom Modal for Alerts */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 100; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content h3 {
+            color: #102542;
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .modal-close-btn {
+            background-color: #fdbb2d;
+            color: #102542;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            background-color: #fcb900;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scroll Buttons */
+        .scroll-button {
+            position: fixed;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #102542;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+            z-index: 99; /* Below modal, above other content */
+            opacity: 0.8;
+        }
+
+        .scroll-button:hover {
+            background-color: #1b3a63;
+            transform: scale(1.05);
+            opacity: 1;
+        }
+
+        .scroll-up {
+            bottom: 80px; /* Position above scroll-down */
+        }
+
+        .scroll-down {
+            bottom: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            header h1 {
+                margin-bottom: 0.5rem;
+            }
+            .container {
+                padding: 1rem;
+                margin: 1rem auto;
+            }
+            th, td {
+                padding: 0.6rem;
+                font-size: 0.9rem;
+            }
+            select, input[type="date"], .download-btn {
+                max-width: 100%;
+            }
+            .scroll-button {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                right: 10px;
+            }
+            .scroll-up {
+                bottom: 65px;
+            }
+            .scroll-down {
+                bottom: 10px;
+            }
         }
     </style>
 </head>
-<body class="antialiased">
-    <header class="bg-gradient-to-r from-blue-800 to-indigo-900 text-white p-4 shadow-xl rounded-b-xl flex justify-between items-center transition-all duration-300 ease-in-out transform hover:scale-100">
-        <h1 class="text-3xl font-bold tracking-wide">Student Timetable</h1>
-        <button class="bg-yellow-400 text-blue-900 px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-yellow-300 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-75"
-                onclick="goToDashboard()">
-            Back to Dashboard
-        </button>
+<body>
+    <div class="background-animation">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <header>
+        <h1>Student Timetable</h1>
+        <button class="dashboard-button" onclick="goToDashboard()">Back to Dashboard</button>
     </header>
 
-    <div class="container mx-auto p-6 my-8 bg-white rounded-xl shadow-2xl transition-all duration-500 ease-in-out transform scale-95 opacity-0 animate-fade-in-up max-w-4xl">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div class="relative">
-                <label for="studentSelect" class="block text-gray-700 text-sm font-semibold mb-2">Select Student</label>
-                <select id="studentSelect" class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out shadow-sm">
-                    <option value="">Select Student</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 top-6">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
-            </div>
+    <div class="container">
+        <label for="studentSelect">Select Student</label>
+        <select id="studentSelect">
+            <option value="">Select Student</option>
+        </select>
 
-            <div>
-                <label for="startDate" class="block text-gray-700 text-sm font-semibold mb-2">Start Date</label>
-                <input type="date" id="startDate" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out shadow-sm" />
-            </div>
+        <label for="startDate">Start Date</label>
+        <input type="date" id="startDate" />
 
-            <div>
-                <label for="endDate" class="block text-gray-700 text-sm font-semibold mb-2">End Date</label>
-                <input type="date" id="endDate" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out shadow-sm" />
-            </div>
-        </div>
+        <label for="endDate">End Date</label>
+        <input type="date" id="endDate" />
 
-        <div class="overflow-x-auto rounded-lg shadow-xl mt-8 animate-fade-in">
-            <table id="timetable" class="min-w-full bg-white border border-gray-200">
-                <thead class="bg-blue-700 text-white">
-                    <tr>
-                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider rounded-tl-lg">Week Start</th>
-                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider">Day</th>
-                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider">Time</th>
-                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider">Subject</th>
-                        <th class="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider rounded-tr-lg">Teacher</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    </tbody>
-            </table>
-        </div>
+        <table id="timetable">
+            <thead>
+                <tr>
+                    <th>Week Start</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Subject</th>
+                    <th>Teacher</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
 
-        <button id="downloadBtn" class="mt-8 w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:from-blue-700 hover:to-blue-900 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
-            Download Timetable as PDF
-        </button>
+        <button class="download-btn" id="downloadBtn">Download Timetable as PDF</button>
     </div>
 
-    <div id="loadingSpinner" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-        <p class="text-white text-lg ml-4">Loading data...</p>
-    </div>
-
-    <div id="customModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-        <div class="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full transform scale-90 opacity-0 transition-all duration-300 ease-in-out">
-            <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4"></h3>
-            <p id="modalMessage" class="text-gray-600 mb-6"></p>
-            <button id="modalCloseBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                OK
-            </button>
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <button class="modal-close-btn" onclick="hideModal()">OK</button>
         </div>
     </div>
 
-    <script>
-        // Define the Google Sheet URL
+    <button class="scroll-button scroll-up" onclick="scrollToTop()">&#9650;</button> <button class="scroll-button scroll-down" onclick="scrollToBottom()">&#9660;</button> <script>
+        // Google Sheet URL for timetable data
         const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
-        let timetableData = []; // Stores the fetched timetable data
-
-        // Get DOM elements
-        const studentSelect = document.getElementById('studentSelect');
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const timetableBody = document.querySelector('#timetable tbody');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const customModal = document.getElementById('customModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalMessage = document.getElementById('modalMessage');
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-
-        /**
-         * Displays the custom modal with a given title and message.
-         * @param {string} title - The title of the modal.
-         * @param {string} message - The message content of the modal.
-         */
-        function showModal(title, message) {
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            customModal.classList.add('show');
-            // Add animation class
-            customModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-            customModal.querySelector('div').classList.remove('scale-90', 'opacity-0');
-        }
-
-        /**
-         * Hides the custom modal.
-         */
-        function hideModal() {
-            // Remove animation class before hiding
-            customModal.querySelector('div').classList.remove('scale-100', 'opacity-100');
-            customModal.querySelector('div').classList.add('scale-90', 'opacity-0');
-            setTimeout(() => {
-                customModal.classList.remove('show');
-            }, 300); // Allow time for animation to complete
-        }
-
-        // Event listener for modal close button
-        modalCloseBtn.addEventListener('click', hideModal);
+        let timetableData = []; // Array to store fetched timetable data
 
         // Fetch data from Google Sheet on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadingSpinner.classList.remove('hidden'); // Show loading spinner
-            // Animate the main container after data is loaded
-            const container = document.querySelector('.container');
-            container.classList.remove('opacity-0', 'scale-95');
-            container.classList.add('opacity-100', 'scale-100');
-
-            fetch(sheetURL)
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    timetableData = data.sort((a, b) => new Date(b["Week Start"]) - new Date(a["Week Start"]));
-                    populateStudents(timetableData);
-                    loadingSpinner.classList.add('hidden'); // Hide loading spinner
-                    renderTimetable(); // Call renderTimetable after data is loaded and students are populated
-                })
-                .catch(error => {
-                    console.error('Error fetching timetable data:', error);
-                    loadingSpinner.classList.add('hidden'); // Hide loading spinner
-                    showModal('Error', 'Failed to load timetable data. Please try again later.');
-                });
-        });
+        fetch(sheetURL)
+            .then(res => res.json())
+            .then(data => {
+                // Sort data by "Week Start" in descending order
+                timetableData = data.sort((a, b) => new Date(b["Week Start"]) - new Date(a["Week Start"]));
+                populateStudents(timetableData); // Populate student dropdown
+            })
+            .catch(error => {
+                console.error("Error fetching timetable data:", error);
+                showModal("Error", "Failed to load timetable data. Please try again later.");
+            });
 
         /**
-         * Formats an ISO date string to YYYY-MM-DD.
+         * Formats an ISO date string to YYYY-MM-DD format.
          * @param {string} isoString - The ISO date string.
-         * @returns {string} Formatted date string.
+         * @returns {string} Formatted date string or empty string if input is invalid.
          */
         function formatDate(isoString) {
             if (!isoString) return '';
             const date = new Date(isoString);
             // Ensure date is valid before formatting
-            if (isNaN(date.getTime())) {
-                return '';
-            }
+            if (isNaN(date.getTime())) return '';
             return date.toISOString().split('T')[0];
         }
 
         /**
-         * Formats an ISO date string to HH:MM AM/PM.
+         * Formats an ISO date string to HH:MM AM/PM format.
          * @param {string} isoString - The ISO date string.
-         * @returns {string} Formatted time string.
+         * @returns {string} Formatted time string or empty string if input is invalid.
          */
         function formatTime(isoString) {
             if (!isoString) return '';
             const date = new Date(isoString);
             // Ensure date is valid before formatting
-            if (isNaN(date.getTime())) {
-                return '';
-            }
+            if (isNaN(date.getTime())) return '';
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
@@ -214,172 +453,218 @@
          * @param {Array<Object>} data - The timetable data.
          */
         function populateStudents(data) {
-            const studentMap = new Map(); // Use a Map to store unique student ID and name pairs
+            const dropdown = document.getElementById('studentSelect');
+            const studentMap = new Map(); // Use a Map to store unique student IDs and names
 
             data.forEach(row => {
                 const id = row["Student ID"]?.trim();
                 const name = row["Student Name"]?.trim();
-                if (id && name && !studentMap.has(id)) {
+                if (id && !studentMap.has(id)) {
                     studentMap.set(id, name);
                     const option = document.createElement('option');
                     option.value = id;
                     option.textContent = `${id} - ${name}`;
-                    studentSelect.appendChild(option);
+                    dropdown.appendChild(option);
                 }
             });
         }
 
         // Event listener for student selection change
-        studentSelect.addEventListener('change', renderTimetable);
-        // Event listeners for date input changes
-        startDateInput.addEventListener('change', renderTimetable);
-        endDateInput.addEventListener('change', renderTimetable);
+        document.getElementById('studentSelect').addEventListener('change', renderTimetable);
+        // Event listeners for date input changes (to trigger re-render if needed, though current logic only filters on download)
+        document.getElementById('startDate').addEventListener('change', renderTimetable);
+        document.getElementById('endDate').addEventListener('change', renderTimetable);
+
 
         /**
-         * Renders the timetable based on selected student and date range.
+         * Renders the timetable based on the selected student.
+         * Note: Date filtering is applied only during PDF download, not for table display.
          */
         function renderTimetable() {
-            const selectedID = studentSelect.value;
-            const start = startDateInput.value ? new Date(startDateInput.value) : null;
-            const end = endDateInput.value ? new Date(endDateInput.value) : null;
-
-            timetableBody.innerHTML = ''; // Clear existing table rows
+            const selectedID = document.getElementById('studentSelect').value;
+            const tbody = document.querySelector('#timetable tbody');
+            tbody.innerHTML = ''; // Clear existing table rows
 
             if (!selectedID) {
-                // If no student is selected, clear the table and return
+                // If no student is selected, clear the table and show a message
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="5" class="py-4 text-center text-gray-500">Please select a student to view their timetable.</td>`;
-                timetableBody.appendChild(tr);
+                tr.innerHTML = `<td colspan="5" style="text-align: center; padding: 20px;">Please select a student to view their timetable.</td>`;
+                tbody.appendChild(tr);
                 return;
             }
 
-            const filtered = timetableData.filter(entry => {
-                const weekStart = new Date(entry["Week Start"]);
-                const isStudentMatch = entry["Student ID"] === selectedID;
-                const isDateInRange = (!start || weekStart >= start) && (!end || weekStart <= end);
-                return isStudentMatch && isDateInRange;
-            });
+            // Filter data for the selected student
+            const filtered = timetableData.filter(entry => entry["Student ID"] === selectedID);
 
             if (filtered.length === 0) {
+                // If no timetable data found for the selected student
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="5" class="py-4 text-center text-gray-500">No timetable entries found for the selected criteria.</td>`;
-                timetableBody.appendChild(tr);
+                tr.innerHTML = `<td colspan="5" style="text-align: center; padding: 20px;">No timetable data available for this student.</td>`;
+                tbody.appendChild(tr);
                 return;
             }
 
+            // Populate the table with filtered data
             filtered.forEach(row => {
                 const tr = document.createElement('tr');
-                tr.classList.add('hover:bg-blue-50', 'transition-colors', 'duration-200', 'ease-in-out'); // Tailwind hover effect
                 tr.innerHTML = `
-                    <td class="py-3 px-4">${formatDate(row["Week Start"] || '')}</td>
-                    <td class="py-3 px-4">${row["Day"] || ''}</td>
-                    <td class="py-3 px-4">${formatTime(row["Time"] || '')}</td>
-                    <td class="py-3 px-4">${row["Subject"] || ''}</td>
-                    <td class="py-3 px-4">${row["Teacher"] || ''}</td>
+                    <td>${formatDate(row["Week Start"] || '')}</td>
+                    <td>${row["Day"] || ''}</td>
+                    <td>${formatTime(row["Time"] || '')}</td>
+                    <td>${row["Subject"] || ''}</td>
+                    <td>${row["Teacher"] || ''}</td>
                 `;
-                timetableBody.appendChild(tr);
+                tbody.appendChild(tr);
             });
         }
 
-        // Event listener for download button
-        downloadBtn.addEventListener('click', async () => {
+        // Event listener for download button click
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            const selectedID = studentSelect.value;
-            const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
-            const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+            const selectedID = document.getElementById('studentSelect').value;
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
 
             // Validate inputs
             if (!selectedID) {
-                showModal('Selection Required', 'Please select a student to download the timetable.');
+                showModal("Missing Selection", "Please select a student.");
                 return;
             }
-            if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                showModal('Date Range Required', 'Please select a valid start and end date for the PDF export.');
-                return;
-            }
-            if (startDate > endDate) {
-                showModal('Invalid Date Range', 'Start date cannot be after end date.');
+            if (!startDateInput || !endDateInput) {
+                showModal("Missing Dates", "Please select both start and end dates.");
                 return;
             }
 
+            const startDate = new Date(startDateInput);
+            const endDate = new Date(endDateInput);
+
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                showModal("Invalid Dates", "Please enter valid start and end dates.");
+                return;
+            }
+
+            if (startDate > endDate) {
+                showModal("Invalid Date Range", "Start date cannot be after end date.");
+                return;
+            }
+
+            // Filter data based on selected student and date range
             const filtered = timetableData.filter(entry => {
                 const weekStart = new Date(entry["Week Start"]);
                 return entry["Student ID"] === selectedID && weekStart >= startDate && weekStart <= endDate;
             });
 
             if (filtered.length === 0) {
-                showModal('No Data', 'No timetable entries found for the selected student and date range to download.');
+                showModal("No Data", "No timetable data found for the selected student and date range.");
                 return;
             }
 
-            let y = 20; // Y-coordinate for text
-            const lineSpacing = 8; // Spacing between lines
-            const margin = 10; // Left margin
-
-            // Set font and add title
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(16);
-            doc.text(`Student Timetable for ${selectedID}`, margin, y);
+            // Generate PDF content
+            let y = 20;
+            doc.setFontSize(14);
+            doc.text(`Student Timetable for ID: ${selectedID}`, 10, y);
+            y += 10;
+            doc.setFontSize(10);
+            doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
             y += 15;
 
-            doc.setFont('helvetica', 'normal');
+            // Add table headers to PDF
             doc.setFontSize(10);
-            doc.text(`Period: ${formatDate(startDate.toISOString())} to ${formatDate(endDate.toISOString())}`, margin, y);
-            y += 15;
-
-            // Add table headers
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(10);
-            doc.text('Week Start', margin, y);
-            doc.text('Day', margin + 40, y);
-            doc.text('Time', margin + 70, y);
-            doc.text('Subject', margin + 100, y);
-            doc.text('Teacher', margin + 140, y);
-            y += lineSpacing;
-            doc.line(margin, y - 2, 200 - margin, y - 2); // Draw a line under headers
+            doc.text("Week Start", 10, y);
+            doc.text("Day", 40, y);
+            doc.text("Time", 70, y);
+            doc.text("Subject", 100, y);
+            doc.text("Teacher", 150, y);
+            y += 5;
+            doc.line(10, y, 200, y); // Draw a line under headers
             y += 5;
 
-
-            // Add timetable data
-            doc.setFont('helvetica', 'normal');
+            // Add timetable entries to PDF
             filtered.forEach(row => {
-                // Check if new page is needed
-                if (y > 270) {
+                if (y > 270) { // Check if new page is needed
                     doc.addPage();
-                    y = 20; // Reset y for new page
-                    // Re-add headers on new page
-                    doc.setFont('helvetica', 'bold');
+                    y = 20;
+                    doc.setFontSize(14);
+                    doc.text(`Student Timetable for ID: ${selectedID} (Cont.)`, 10, y);
+                    y += 10;
                     doc.setFontSize(10);
-                    doc.text('Week Start', margin, y);
-                    doc.text('Day', margin + 40, y);
-                    doc.text('Time', margin + 70, y);
-                    doc.text('Subject', margin + 100, y);
-                    doc.text('Teacher', margin + 140, y);
-                    y += lineSpacing;
-                    doc.line(margin, y - 2, 200 - margin, y - 2);
+                    doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
+                    y += 15;
+                    doc.text("Week Start", 10, y);
+                    doc.text("Day", 40, y);
+                    doc.text("Time", 70, y);
+                    doc.text("Subject", 100, y);
+                    doc.text("Teacher", 150, y);
                     y += 5;
-                    doc.setFont('helvetica', 'normal');
+                    doc.line(10, y, 200, y);
+                    y += 5;
                 }
-
-                doc.text(formatDate(row["Week Start"] || ''), margin, y);
-                doc.text(row["Day"] || '', margin + 40, y);
-                doc.text(formatTime(row["Time"] || ''), margin + 70, y);
-                doc.text(row["Subject"] || '', margin + 100, y);
-                doc.text(row["Teacher"] || '', margin + 140, y);
-                y += lineSpacing;
+                doc.text(formatDate(row["Week Start"] || ''), 10, y);
+                doc.text(row["Day"] || '', 40, y);
+                doc.text(formatTime(row["Time"] || ''), 70, y);
+                doc.text(row["Subject"] || '', 100, y);
+                doc.text(row["Teacher"] || '', 150, y);
+                y += 8;
             });
 
-            doc.save(`Timetable_${selectedID}_${formatDate(startDate.toISOString())}_to_${formatDate(endDate.toISOString())}.pdf`);
+            // Save the PDF
+            doc.save(`Timetable_${selectedID}_${formatDate(startDateInput)}_to_${formatDate(endDateInput)}.pdf`);
         });
 
         /**
-         * Function to go back to the previous page (simulates dashboard navigation).
+         * Navigates back to the previous page (dashboard).
          */
         function goToDashboard() {
             window.history.back();
         }
+
+        /* Custom Modal Functions */
+        const messageModal = document.getElementById('messageModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+
+        /**
+         * Displays the custom message modal.
+         * @param {string} title - The title of the message.
+         * @param {string} message - The content of the message.
+         */
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            messageModal.style.display = 'flex'; // Use flex to center content
+        }
+
+        /**
+         * Hides the custom message modal.
+         */
+        function hideModal() {
+            messageModal.style.display = 'none';
+        }
+
+        /**
+         * Scrolls the window to the top of the page.
+         */
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' // Smooth scrolling
+            });
+        }
+
+        /**
+         * Scrolls the window to the bottom of the page.
+         */
+        function scrollToBottom() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth' // Smooth scrolling
+            });
+        }
+
+        // Initial render when the page loads (to show "Select a student" message)
+        document.addEventListener('DOMContentLoaded', renderTimetable);
     </script>
 </body>
 </html>
