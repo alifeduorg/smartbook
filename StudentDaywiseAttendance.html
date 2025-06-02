@@ -1,236 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Monthly Attendance Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Attendance Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Style -->
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(145deg, #e0e0e0, #ffffff);
-      margin: 0;
-      padding: 20px;
-    }
+    <style>
+        /* Global styles and body background animation */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); /* Vibrant blue gradient */
+            background-size: 300% 300%; /* Larger size for smoother animation */
+            animation: gradientBackground 20s ease infinite; /* Slower, smoother animation */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden; /* Prevent horizontal scroll from background animation */
+        }
 
-    .dashboard-btn {
-      background: #4a90e2;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      transition: transform 0.2s ease-in-out;
-    }
+        /* Keyframe animation for the background gradient */
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    .dashboard-btn:hover {
-      transform: scale(1.05);
-    }
+        /* Main container for the dashboard */
+        #printArea {
+            background-color: rgba(255, 255, 255, 0.98); /* Near opaque white for content clarity */
+            border-radius: 25px; /* More pronounced rounded corners */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25); /* Deeper, more noticeable shadow */
+            padding: 40px;
+            width: 95%;
+            max-width: 1400px;
+            text-align: center;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden; /* Contain inner shadows/animations */
+            animation: fadeIn 1s ease-out; /* Fade in animation for the container */
+        }
 
-    h2 {
-      text-align: center;
-      color: #333;
-    }
+        /* Fade in animation for the container */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    label {
-      display: block;
-      text-align: center;
-      margin-bottom: 15px;
-    }
+        /* Dashboard button styling */
+        .dashboard-btn {
+            background: linear-gradient(to right, #ff7e5f, #feb47b); /* Warm, inviting gradient */
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px; /* Rounded buttons */
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 30px; /* More space below */
+            box-shadow: 0 6px 18px rgba(255, 126, 95, 0.3); /* Soft shadow matching gradient */
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    input[type="month"] {
-      padding: 8px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
+        .dashboard-btn:hover {
+            background: linear-gradient(to right, #fe915f, #ffc87b); /* Slightly brighter on hover */
+            transform: translateY(-3px) scale(1.02); /* Lift and slight scale effect */
+            box-shadow: 0 8px 25px rgba(255, 126, 95, 0.4);
+        }
 
-    .action-btn {
-      background: #28a745;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      margin: 10px 5px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease-in-out;
-    }
+        /* Page Title */
+        h2 {
+            color: #2c3e50; /* Dark blue for strong contrast */
+            margin-bottom: 35px;
+            font-size: 3.2em; /* Larger, more impactful title */
+            font-weight: 800; /* Extra bold */
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* More prominent text shadow */
+        }
 
-    .action-btn:hover {
-      transform: translateY(-2px);
-    }
+        /* Label for month picker */
+        label {
+            display: block;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            color: #555;
+            font-weight: 600;
+        }
 
-    table {
-      margin-top: 30px;
-      width: 100%;
-      border-collapse: collapse;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
+        /* Month input styling */
+        input[type="month"] {
+            padding: 12px;
+            font-size: 17px;
+            border-radius: 10px;
+            border: 1px solid #c0d9e7;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            margin-right: 10px; /* Space from buttons */
+        }
 
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ccc;
-    }
+        input[type="month"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3); /* Stronger focus ring */
+            outline: none;
+        }
 
-    th {
-      background-color: #f7f7f7;
-    }
+        /* Action buttons (Load, Download) */
+        .action-btn {
+            background: linear-gradient(to right, #28a745, #2edb60); /* Green gradient */
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            margin: 0 8px; /* Consistent spacing */
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.25);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    td {
-      background-color: white;
-      transition: transform 0.2s ease-in-out;
-    }
+        .action-btn:hover {
+            background: linear-gradient(to right, #218838, #26b34d); /* Darker green on hover */
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.35);
+        }
 
-    tr:hover td {
-      transform: scale(1.01);
-      background: #f1f1f1;
-    }
+        /* Container for the attendance table to enable scrolling */
+        #attendanceContainer {
+            margin-top: 40px;
+            overflow-x: auto; /* Enables horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            border-radius: 15px; /* Match table border-radius */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); /* Match table shadow */
+            background-color: white; /* Ensure background shows through scrollbar */
+            animation: slideInUp 0.8s ease-out forwards; /* Animation for table appearance */
+        }
 
-    .status-present { color: green; font-size: 18px; }
-    .status-absent { color: red; font-size: 18px; }
-    .status-late { color: orange; font-size: 18px; }
-    .status-empty { color: #aaa; }
+        /* Table styling */
+        table {
+            width: 100%; /* Ensure table takes full width of its container */
+            border-collapse: separate; /* For rounded corners on cells */
+            border-spacing: 0;
+            font-size: 15px;
+            /* box-shadow and border-radius moved to #attendanceContainer */
+            background-color: white;
+            min-width: fit-content; /* Allow table to grow beyond container width if needed */
+        }
 
-    #summary {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-  </style>
+        /* Slide in animation for the table */
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  <!-- PDF library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        th, td {
+            padding: 15px 10px; /* More padding for readability */
+            text-align: center;
+            border: 1px solid #e0e0e0; /* Lighter border for cells */
+            white-space: nowrap; /* Prevent text wrapping in cells */
+        }
+
+        th {
+            background-color: #f0f8ff; /* Very light blue header background */
+            color: #333;
+            font-weight: 700;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Striped rows */
+        tr:nth-child(even) {
+            background-color: #f8fcfd; /* Very light blue for even rows */
+        }
+
+        /* Hover effect on table rows */
+        tr:hover td {
+            background: #e6f7ff; /* Light blue on hover */
+            transform: scale(1.005); /* Subtle scale on row hover */
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Status specific styling */
+        .status-present {
+            color: #28a745;
+            font-weight: bold;
+            background-color: #e6ffe6;
+            padding: 5px 10px;
+            border-radius: 8px;
+            display: inline-block;
+            animation: pulse 1s infinite alternate; /* Subtle pulse for present */
+        }
+
+        .status-absent {
+            color: #dc3545;
+            font-weight: bold;
+            background-color: #ffe6e6;
+            padding: 5px 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .status-late {
+            color: #ffc107;
+            font-weight: bold;
+            background-color: #fffbe6;
+            padding: 5px 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .status-empty {
+            color: #aaa;
+        }
+
+        /* Pulse animation for present status */
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        /* Summary section */
+        #summary {
+            margin-top: 30px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.3em;
+            color: #4a90e2; /* Blue color for summary */
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        /* Loading indicator styles */
+        #loadingIndicator {
+            display: none; /* Hidden by default */
+            margin-top: 30px;
+            font-size: 1.8em;
+            color: #007bff;
+            font-weight: 700;
+            animation: bounce 1s infinite; /* Bouncing loading text */
+        }
+
+        /* Bounce animation for loading text */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #printArea {
+                padding: 25px;
+                border-radius: 15px;
+            }
+
+            h2 {
+                font-size: 2.2em;
+            }
+
+            .dashboard-btn, .action-btn {
+                padding: 10px 20px;
+                font-size: 15px;
+                margin: 8px 5px;
+                display: block; /* Stack buttons on small screens */
+                width: calc(100% - 16px);
+            }
+
+            input[type="month"] {
+                width: calc(100% - 20px);
+                margin-bottom: 15px;
+                margin-right: 0;
+            }
+
+            th, td {
+                padding: 10px 5px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 1.8em;
+            }
+            .dashboard-btn, .action-btn {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+            input[type="month"] {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-  <div id="printArea">
+    <div id="printArea">
 
-    <!-- Dashboard Button -->
-    <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
+        <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
 
-    <!-- Page Title -->
-    <h2>Monthly Attendance Viewer</h2>
+        <h2>Monthly Attendance Viewer</h2>
 
-    <!-- Filters -->
-    <label>
-      Select Month:
-      <input type="month" id="monthPicker">
-      <button class="action-btn" onclick="loadAttendance()">Load Attendance</button>
-      <button class="action-btn" onclick="downloadPDF()">⬇️ Download Full Page as PDF</button>
-    </label>
+        <label>
+            Select Month:
+            <input type="month" id="monthPicker">
+            <button class="action-btn" onclick="loadAttendance()">Load Attendance</button>
+            <button class="action-btn" onclick="downloadPDF()">⬇️ Download Full Page as PDF</button>
+        </label>
 
-    <!-- Attendance Table -->
-    <div id="attendanceContainer"></div>
+        <div id="loadingIndicator" style="display: none;">Loading attendance data...</div>
 
-    <!-- Summary -->
-    <div id="summary"></div>
+        <div id="attendanceContainer"></div>
 
-  </div>
+        <div id="summary"></div>
 
-  <!-- Script -->
-  <script>
-    const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec'; // 🔁 Replace with your Google Apps Script Web App URL
+    </div>
 
-    function goToDashboard() {
-      window.location.href = 'dashboard.html'; // 🔁 Replace with your actual dashboard URL
-    }
+    <script>
+        // Google Apps Script Web App URL - REPLACE THIS WITH YOUR ACTUAL DEPLOYED URL
+        const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec';
 
-    function getStatusSymbol(status) {
-      if (!status) return '<span class="status-empty">-</span>';
-      switch (status.toLowerCase()) {
-        case 'present': return '<span class="status-present">✔️</span>';
-        case 'absent': return '<span class="status-absent">❌</span>';
-        case 'late': return '<span class="status-late">⏰</span>';
-        default: return `<span>${status}</span>`;
-      }
-    }
-
-    async function loadAttendance() {
-      const monthInput = document.getElementById('monthPicker').value;
-      if (!monthInput) return alert('Please select a month');
-
-      const [year, month] = monthInput.split('-').map(Number);
-
-      const res = await fetch(sheetAPI);
-      const data = await res.json();
-
-      const filtered = data.filter(row => {
-        const d = new Date(row.Date);
-        return d.getFullYear() === year && d.getMonth() === (month - 1);
-      });
-
-      const students = {};
-      filtered.forEach(row => {
-        const key = row.StudentID;
-        if (!students[key]) {
-          students[key] = {
-            name: row.StudentName,
-            days: {},
-            totalPresent: 0
-          };
+        /**
+         * Navigates to the previous page in the browser history.
+         */
+        function goToDashboard() {
+            window.history.back();
         }
-        const day = new Date(row.Date).getDate();
-        students[key].days[day] = row.Status;
-        if (row.Status && row.Status.toLowerCase() === 'present') {
-          students[key].totalPresent++;
+
+        /**
+         * Returns a visual symbol wrapped in a span with appropriate status class.
+         * @param {string} status - The attendance status (e.g., 'Present', 'Absent', 'Late').
+         * @returns {string} - HTML string for the status symbol.
+         */
+        function getStatusSymbol(status) {
+            if (!status) return '<span class="status-empty">-</span>';
+            switch (status.toLowerCase()) {
+                case 'present': return '<span class="status-present">✔️</span>';
+                case 'absent': return '<span class="status-absent">❌</span>';
+                case 'late': return '<span class="status-late">⏰</span>';
+                default: return `<span>${status}</span>`;
+            }
         }
-      });
 
-      const daysInMonth = new Date(year, month, 0).getDate();
-      let html = '<table><tr><th>Student Name</th><th>Student ID</th>';
-      for (let d = 1; d <= daysInMonth; d++) {
-        html += `<th>${d}</th>`;
-      }
-      html += `<th>Total Present</th></tr>`;
+        /**
+         * Loads and processes attendance data from the Google Sheet API.
+         * Aggregates daily attendance for each student (in minutes) and calculates total monthly hours.
+         */
+        async function loadAttendance() {
+            const monthInput = document.getElementById('monthPicker').value;
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const attendanceContainer = document.getElementById('attendanceContainer');
+            const summaryDiv = document.getElementById('summary');
 
-      let summary = '';
+            if (!monthInput) {
+                // Custom alert for better UX
+                const alertDiv = document.createElement('div');
+                alertDiv.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background-color: #ffeb3b; padding: 20px; border-radius: 8px;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;
+                    font-weight: bold; color: #333;
+                `;
+                alertDiv.textContent = 'Please select a month!';
+                document.body.appendChild(alertDiv);
+                setTimeout(() => alertDiv.remove(), 3000);
+                return;
+            }
 
-      for (const [id, info] of Object.entries(students)) {
-        html += `<tr><td>${info.name}</td><td>${id}</td>`;
-        for (let d = 1; d <= daysInMonth; d++) {
-          const rawStatus = info.days[d] || '';
-          html += `<td>${getStatusSymbol(rawStatus)}</td>`;
+            // Show loading indicator and clear previous content
+            loadingIndicator.style.display = 'block';
+            attendanceContainer.innerHTML = '';
+            summaryDiv.innerHTML = '';
+
+            const [year, month] = monthInput.split('-').map(Number);
+
+            try {
+                const res = await fetch(sheetAPI);
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                const data = await res.json();
+
+                const filtered = data.filter(row => {
+                    const d = new Date(row.Date);
+                    return d.getFullYear() === year && d.getMonth() === (month - 1);
+                });
+
+                const students = {}; // Stores aggregated data for each student
+
+                filtered.forEach(row => {
+                    const studentId = row.StudentID;
+                    const studentName = row.StudentName;
+                    const date = new Date(row.Date);
+                    const day = date.getDate();
+                    // Parse 'Duration' as minutes as mentors will update in minutes
+                    const durationMinutes = parseFloat(row.Duration) || 0;
+                    const status = row.Status;
+
+                    if (!students[studentId]) {
+                        students[studentId] = {
+                            name: studentName,
+                            days: {}, // Stores daily attendance objects { status, totalDurationInMinutes }
+                            totalMonthlyMinutes: 0 // Accumulate total minutes for the month
+                        };
+                    }
+
+                    // Aggregate duration for the same student on the same day
+                    if (!students[studentId].days[day]) {
+                        students[studentId].days[day] = {
+                            status: status,
+                            totalDurationInMinutes: durationMinutes
+                        };
+                    } else {
+                        // If multiple entries for same student and day, sum durations
+                        students[studentId].days[day].totalDurationInMinutes += durationMinutes;
+                        // Logic for status prioritization if needed:
+                        // if (status === 'Present') students[studentId].days[day].status = 'Present';
+                        // else if (status === 'Late' && students[studentId].days[day].status !== 'Present') students[studentId].days[day].status = 'Late';
+                        // else if (status === 'Absent' && students[studentId].days[day].status !== 'Present' && students[studentId].days[day].status !== 'Late') students[studentId].days[day].status = 'Absent';
+                    }
+                    students[studentId].totalMonthlyMinutes += durationMinutes;
+                });
+
+                const daysInMonth = new Date(year, month, 0).getDate();
+                let html = '<table><thead><tr><th>Student Name</th><th>Student ID</th>';
+
+                // Generate headers for each day of the month, indicating minutes
+                for (let d = 1; d <= daysInMonth; d++) {
+                    html += `<th>${d}<br>Mins</th>`;
+                }
+                html += `<th>Total Monthly Hrs</th></tr></thead><tbody>`;
+
+                // Populate table rows
+                for (const [id, info] of Object.entries(students)) {
+                    html += `<tr><td>${info.name}</td><td>${id}</td>`;
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const dayData = info.days[d];
+                        if (dayData) {
+                            // Display status symbol and aggregated daily duration in minutes
+                            html += `<td>${getStatusSymbol(dayData.status)}<br>${dayData.totalDurationInMinutes.toFixed(0)}</td>`; // Display minutes as whole numbers
+                        } else {
+                            html += `<td>-</td>`; // No attendance for this day
+                        }
+                    }
+                    // Display total monthly hours for the student (convert minutes to hours)
+                    const totalHours = (info.totalMonthlyMinutes / 60).toFixed(1);
+                    html += `<td><strong>${totalHours}</strong></td></tr>`;
+                }
+
+                html += '</tbody></table>';
+                attendanceContainer.innerHTML = html;
+                summaryDiv.innerHTML = `Attendance for ${new Date(year, month - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}`;
+
+            } catch (error) {
+                console.error('Error loading attendance data:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    color: #dc3545; font-weight: bold; margin-top: 20px;
+                    background-color: #ffe6e6; padding: 15px; border-radius: 8px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                errorDiv.textContent = 'Failed to load data. Please check the API URL or your internet connection.';
+                attendanceContainer.innerHTML = '';
+                attendanceContainer.appendChild(errorDiv);
+            } finally {
+                loadingIndicator.style.display = 'none'; // Hide loading indicator
+            }
         }
-        html += `<td><strong>${info.totalPresent}</strong></td></tr>`;
-      }
 
-      html += '</table>';
-      document.getElementById('attendanceContainer').innerHTML = html;
+        /**
+         * Downloads the attendance report as a PDF.
+         * Uses html2pdf.js library.
+         * Temporarily widens the print area to ensure all content is captured in landscape mode.
+         */
+        function downloadPDF() {
+            const element = document.getElementById('printArea');
+            // Store original width to restore after PDF generation
+            const originalWidth = element.style.width;
+            // Temporarily widen for PDF export to ensure all columns fit
+            element.style.width = '3500px'; 
 
-      document.getElementById('summary').innerHTML = `Showing attendance for ${year}-${String(month).padStart(2, '0')}`;
-    }
+            const opt = {
+                margin: 0,
+                filename: 'Monthly_Attendance_Report.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: {
+                    scale: 2, // Higher scale for better quality
+                    useCORS: true
+                },
+                jsPDF: {
+                    unit: 'px',
+                    format: [3500, 2000], // Custom format for landscape and wide content
+                    orientation: 'landscape'
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
 
- function downloadPDF() {
-    const element = document.getElementById('printArea');
-
-    // Widen content temporarily to fit full data
-    const originalWidth = element.style.width;
-    element.style.width = '3500px'; // Very wide page to fit all columns
-
-    const opt = {
-      margin: 0,
-      filename: 'Full_Attendance_Report.pdf',
-      image: { type: 'jpeg', quality: 1 },
-      html2canvas: {
-        scale: 2,       // High-res render
-        useCORS: true
-      },
-      jsPDF: {
-        unit: 'px',
-        format: [3500, 2000], // 🟢 Custom wide format
-        orientation: 'landscape'
-      },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-
-    html2pdf().set(opt).from(element).save().then(() => {
-      element.style.width = originalWidth; // Reset width
-    });
-  }
-  </script>
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Reset width after PDF generation
+                element.style.width = originalWidth; 
+            });
+        }
+    </script>
 </body>
 </html>
