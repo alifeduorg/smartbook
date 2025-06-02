@@ -4,308 +4,365 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Principal Weekly Report Submission</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Custom styles and animations */
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #ffffff;
-            color: #001f3f;
-            margin: 0;
-            padding: 20px;
-            position: relative;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            color: #1a202c; /* Dark text for contrast */
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
-        .dashboard-button {
-            background-color: #28a745;
-            color: #ffffff;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-bottom: 20px;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .dashboard-button:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-        }
-       
-        .scroll-button {
+
+        /* Custom popup animation */
+        .popup-overlay-custom {
+            display: none; /* Hidden by default */
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #001f3f;
-            color: #ffffff;
-            padding: 12px 18px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 18px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s, transform 0.3s;
-            z-index: 1000;
-            margin-bottom: 10px;
-        }
-        .scroll-button:hover {
-            background-color: #004080;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
- .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: none;
-    justify-content: center;
-    align-items: flex-start; /* Align to top for better scrolling */
-    z-index: 999;
-    overflow-y: auto;
-    backdrop-filter: blur(10px);
-    padding: 20px; /* Prevents clipping on small screens */
-}
-
-.popup {
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 245, 0.85) 100%);
-    padding: 30px 25px;
-    width: 100%;
-    max-width: 500px;
-    border-radius: 25px;
-    border: 2px solid #f5b800; /* Golden border */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 
-                0 5px 20px rgba(245, 184, 0, 0.4), 
-                inset 0 1px 15px rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(15px);
-    color: #001f3f;
-    text-align: left;
-    animation: popupFadeIn 0.4s ease-out;
-    overflow-y: auto;
-    max-height: 90vh; /* Prevents popup from exceeding screen height */
-}
-
-.popup h2 {
-    color: #f5b800; /* Golden Yellow */
-    font-size: 28px;
-    margin-bottom: 15px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-align: center; /* Keep the title centered */
-}
-
-.popup p {
-    color: #444;
-    font-size: 17px;
-    margin-bottom: 25px;
-    line-height: 1.6;
-    text-align: left; /* Left align for a professional look */
-}
-
-.popup button {
-    background-color: #4CAF50; /* Premium Green */
-    color: #fff;
-    border: none;
-    padding: 15px 40px;
-    font-size: 18px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: 0.3s;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3),
-                0 4px 20px rgba(245, 184, 0, 0.3);
-    margin-top: 20px;
-    width: 100%;
-}
-
-.popup button:hover {
-    background-color: #3e8e41;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
-                0 6px 30px rgba(245, 184, 0, 0.4);
-    transform: translateY(-2px);
-}
-
-@keyframes popupFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* Form fields styling */
-.popup label {
-    color: #001f3f;
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    display: block;
-}
-
-.popup input,
-.popup textarea {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    box-sizing: border-box;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.popup textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-     /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 10px;  /* Rounded corners for the entire table */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 3D shadow effect */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly darker overlay */
+            backdrop-filter: blur(8px); /* Subtle blur effect */
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
         }
 
-        th, td {
-            padding: 12px 15px;
+        .popup-overlay-custom.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .popup-custom {
+            background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%); /* Soft gradient */
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 550px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25), /* Deeper shadow */
+                        0 5px 15px rgba(245, 184, 0, 0.3); /* Golden accent shadow */
+            color: #1a202c;
             text-align: left;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 90vh; /* Limit height for scrollability */
+            overflow-y: auto; /* Enable scrolling for long forms */
         }
 
-        th {
-            background-color:#f0c040;  /* Golden yellow header */
-            color: white;
-            border-radius: 10px 10px 0 0; /* Rounded corners for table header */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  /* 3D shadow for the header */
+        .popup-overlay-custom.show .popup-custom {
+            transform: scale(1);
+            opacity: 1;
         }
 
-        td {
-            background-color: #ecf0f1;
-            border-radius: 0 0 10px 10px; /* Rounded corners for table cells */
+        .popup-custom h3 {
+            color: #f5b800; /* Golden Yellow */
+            font-size: 1.875rem; /* 30px */
+            margin-bottom: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-align: center;
         }
 
-        td:hover {
-            background-color: #d5d8dc; /* Hover effect on table rows */
-            cursor: pointer;
-        }
-
-        /* View Button Styles */
-        .view-btn {
-            background-color: #f0c040;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  /* 3D effect */
-        }
-
-        .view-btn:hover {
-            background-color:f0c040;
-        }
-
-        /* Modal and other button styles */
-        #reportModal {
+        /* Custom message box styles */
+        .message-box-overlay {
             display: none;
             position: fixed;
-            z-index: 1;
-            left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
         }
 
-        #modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            width: 70%;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            position: relative;
+        .message-box-overlay.show {
+            display: flex;
+            opacity: 1;
         }
 
-        .report-section {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: #f7f7f7;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        .message-box {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
         }
 
-        /* Modal Body Scroll */
-        #modal-body {
-            max-height: 400px; /* Set the maximum height of the modal body */
-            overflow-y: auto; /* Enable vertical scrolling */
-            margin-top: 20px;
+        .message-box-overlay.show .message-box {
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        .close-btn {
-            background-color: #e74c3c;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .message-box h4 {
+            font-size: 1.5rem;
+            color: #28a745; /* Success green */
+            margin-bottom: 1rem;
         }
 
-        .close-btn:hover {
-            background-color: #c0392b;
+        .message-box p {
+            color: #4a5568;
+            margin-bottom: 1.5rem;
         }
     </style>
+</head>
+<body class="p-4 sm:p-8 md:p-12">
+    <button onclick="window.history.back()"
+        class="mb-6 px-6 py-3 bg-gray-700 text-white rounded-xl shadow-lg hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+        ← Back to Previous Page
+    </button>
+
+    <button onclick="togglePopup(true)"
+        class="dashboard-button mb-8 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-2xl shadow-xl hover:from-green-600 hover:to-green-700 transition duration-300 ease-in-out transform hover:-translate-y-2 focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-opacity-75">
+        + Add New Report
+    </button>
+
+    <div id="popup-overlay" class="popup-overlay-custom">
+        <div class="popup-custom">
+            <h3>Add New Weekly Report</h3>
+            <form onsubmit="submitReport(event)" class="space-y-5">
+                <div>
+                    <label for="startDate" class="block text-gray-700 text-lg font-medium mb-2">Start Date:</label>
+                    <input type="date" id="startDate" name="startDate" required
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200">
+                </div>
+                <div>
+                    <label for="endDate" class="block text-gray-700 text-lg font-medium mb-2">End Date:</label>
+                    <input type="date" id="endDate" name="endDate" required
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200">
+                </div>
+                <div>
+                    <label for="reportTitle" class="block text-gray-700 text-lg font-medium mb-2">Report Title:</label>
+                    <input type="text" id="reportTitle" name="reportTitle" required
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200"
+                        placeholder="e.g., Weekly Academic Progress Report">
+                </div>
+                <div>
+                    <label for="summaryActivities" class="block text-gray-700 text-lg font-medium mb-2">Summary of Activities:</label>
+                    <textarea id="summaryActivities" name="summaryActivities" required
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 min-h-[100px]"
+                        placeholder="Summarize key activities and initiatives this week."></textarea>
+                </div>
+                <div>
+                    <label for="achievements" class="block text-gray-700 text-lg font-medium mb-2">Achievements:</label>
+                    <textarea id="achievements" name="achievements" required
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 min-h-[100px]"
+                        placeholder="Highlight significant accomplishments."></textarea>
+                </div>
+                <div>
+                    <label for="challenges" class="block text-gray-700 text-lg font-medium mb-2">Challenges:</label>
+                    <textarea id="challenges" name="challenges" required
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 min-h-[100px]"
+                        placeholder="Describe any challenges encountered and how they were addressed."></textarea>
+                </div>
+                <div>
+                    <label for="plansNextWeek" class="block text-gray-700 text-lg font-medium mb-2">Plans for Next Week:</label>
+                    <textarea id="plansNextWeek" name="plansNextWeek" required
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 min-h-[100px]"
+                        placeholder="Outline key objectives and plans for the upcoming week."></textarea>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
+                    <button type="button" onclick="togglePopup(false)"
+                        class="px-8 py-3 bg-gray-400 text-white font-semibold rounded-xl shadow-md hover:bg-gray-500 transition duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50">
+                        Close
+                    </button>
+                    <button type="submit"
+                        class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-md hover:from-blue-600 hover:to-blue-700 transition duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
+        <button onclick="scrollToTop()"
+            class="scroll-button bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+        </button>
+        <button onclick="scrollToBottom()"
+            class="scroll-button bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </button>
+    </div>
+
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Weekly Reports</h1>
+
+    <div class="overflow-x-auto bg-white rounded-2xl shadow-xl p-6">
+        <table id="reportTable" class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gradient-to-r from-yellow-500 to-yellow-600">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider rounded-tl-xl">
+                        Date Range
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                        Report Title
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider rounded-tr-xl">
+                        View
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-11/12 md:w-3/4 lg:w-2/3 max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 ease-out" id="modal-content">
+            <h2 id="modalTitle" class="text-3xl font-bold text-gray-800 mb-6 text-center border-b-2 border-yellow-400 pb-4"></h2>
+            <div id="modal-body" class="space-y-6">
+                </div>
+            <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
+                <button onclick="closeModal()"
+                    class="px-8 py-3 bg-red-500 text-white font-semibold rounded-xl shadow-md hover:bg-red-600 transition duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-box-overlay" class="message-box-overlay">
+        <div class="message-box">
+            <h4 id="message-box-title"></h4>
+            <p id="message-box-text"></p>
+            <button onclick="closeMessageBox()"
+                class="px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300 ease-in-out">
+                OK
+            </button>
+        </div>
+    </div>
+
     <script>
-        
-        function togglePopup(show) {
-            document.getElementById('popup-overlay').style.display = show ? 'flex' : 'none';
+        // Function to show custom message box instead of alert()
+        function showMessageBox(title, message, isSuccess = true) {
+            const overlay = document.getElementById('message-box-overlay');
+            const titleElement = document.getElementById('message-box-title');
+            const textElement = document.getElementById('message-box-text');
+            const messageBox = overlay.querySelector('.message-box');
+
+            titleElement.textContent = title;
+            textElement.textContent = message;
+            titleElement.style.color = isSuccess ? '#28a745' : '#dc3545'; // Green for success, red for error
+
+            overlay.classList.add('show');
+            messageBox.classList.add('show');
         }
+
+        // Function to close custom message box
+        function closeMessageBox() {
+            const overlay = document.getElementById('message-box-overlay');
+            const messageBox = overlay.querySelector('.message-box');
+            overlay.classList.remove('show');
+            messageBox.classList.remove('show');
+            // Reload page after successful submission
+            if (messageBox.dataset.reload === 'true') {
+                location.reload();
+            }
+        }
+
+        // Function to toggle the report submission popup
+        function togglePopup(show) {
+            const popupOverlay = document.getElementById('popup-overlay');
+            const popup = popupOverlay.querySelector('.popup-custom');
+            if (show) {
+                popupOverlay.classList.add('show');
+                // Reset form fields when opening
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('reportTitle').value = '';
+                document.getElementById('summaryActivities').value = '';
+                document.getElementById('achievements').value = '';
+                document.getElementById('challenges').value = '';
+                document.getElementById('plansNextWeek').value = '';
+            } else {
+                popupOverlay.classList.remove('show');
+            }
+        }
+
+        // Function to handle report submission
         function submitReport(e) {
             e.preventDefault();
 
             const formData = new FormData(e.target);
-            fetch('https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec', {
+            // The URL for the Google Apps Script Web App
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec';
+
+            fetch(scriptUrl, {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.text())
             .then(data => {
-                alert(data);
-                togglePopup(false);
-                location.reload();
+                showMessageBox('Success!', data, true);
+                document.getElementById('message-box-overlay').querySelector('.message-box').dataset.reload = 'true'; // Mark for reload
+                togglePopup(false); // Close the form popup
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('There was an error submitting the report. Please try again.');
+                showMessageBox('Error!', 'There was an error submitting the report. Please try again.', false);
+                document.getElementById('message-box-overlay').querySelector('.message-box').dataset.reload = 'false';
             });
         }
+
+        // Function to scroll to the top of the page
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // Function to scroll to the bottom of the page
         function scrollToBottom() {
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
+
         const SHEET_URL = "https://script.google.com/macros/s/AKfycbzWrKgb5w4G7lOHXRwbaHL_sGx3LR3jC_7XleQL1Hg57Sl0fzw2acNGiusDjHzktRW4xg/exec";
 
-        // Fetch and display the table
-        fetch(SHEET_URL)
-            .then(res => res.json())
-            .then(data => {
-                const tableBody = document.querySelector("#reportTable tbody");
-                data.forEach((row) => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${formatDate(row.startDate)} to ${formatDate(row.endDate)}</td>
-                        <td>${row.reportTitle || "Untitled"}</td>
-                        <td><button class="view-btn" onclick='viewReport(${JSON.stringify(row)})'>View</button></td>
-                    `;
-                    tableBody.appendChild(tr);
+        // Fetch and display the table data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch(SHEET_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const tableBody = document.querySelector("#reportTable tbody");
+                    tableBody.innerHTML = ''; // Clear existing content
+                    if (data && data.length > 0) {
+                        data.forEach((row) => {
+                            const tr = document.createElement("tr");
+                            tr.classList.add('hover:bg-gray-50', 'transition', 'duration-150', 'ease-in-out'); // Hover effect for rows
+                            tr.innerHTML = `
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 rounded-bl-xl">${formatDate(row.startDate)} to ${formatDate(row.endDate)}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${row.reportTitle || "Untitled"}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium rounded-br-xl">
+                                    <button class="view-btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200 ease-in-out transform hover:scale-105"
+                                        onclick='viewReport(${JSON.stringify(row)})'>View</button>
+                                </td>
+                            `;
+                            tableBody.appendChild(tr);
+                        });
+                    } else {
+                        // Display a message if no reports are found
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `<td colspan="3" class="px-6 py-4 text-center text-gray-500">No reports found.</td>`;
+                        tableBody.appendChild(tr);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching reports:', error);
+                    const tableBody = document.querySelector("#reportTable tbody");
+                    tableBody.innerHTML = `<tr><td colspan="3" class="px-6 py-4 text-center text-red-500">Failed to load reports. Please try again later.</td></tr>`;
                 });
-            });
+        });
 
         // Format date to DD MMM YYYY
         function formatDate(dateStr) {
@@ -316,104 +373,55 @@
 
         // Show report in modal
         function viewReport(report) {
+            const modal = document.getElementById("reportModal");
+            const modalContent = document.getElementById("modal-content");
             document.getElementById("modalTitle").textContent = `Weekly Report: ${formatDate(report.startDate)} to ${formatDate(report.endDate)}`;
 
             const modalBody = document.getElementById("modal-body");
 
+            // Use optional chaining and nullish coalescing for cleaner display of potentially missing data
             const html = `
-                <div class="report-section">
-                    <h3>Start Date</h3><p>${formatDate(report.startDate)}</p>
+                <div class="report-section bg-blue-50 p-4 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-1">Start Date</h3><p class="text-gray-700">${formatDate(report.startDate)}</p>
                 </div>
-                <div class="report-section">
-                    <h3>End Date</h3><p>${formatDate(report.endDate)}</p>
+                <div class="report-section bg-blue-50 p-4 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-1">End Date</h3><p class="text-gray-700">${formatDate(report.endDate)}</p>
                 </div>
-                <div class="report-section">
-                    <h3>Report Title</h3><p>${report.reportTitle || "Not provided"}</p>
+                <div class="report-section bg-blue-50 p-4 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-1">Report Title</h3><p class="text-gray-700">${report.reportTitle || "Not provided"}</p>
                 </div>
-                <div class="report-section">
-                    <h3>Activity Summary</h3><p>${report.activitySummary || "Not provided"}</p>
+                <div class="report-section bg-blue-50 p-4 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-1">Activity Summary</h3><p class="text-gray-700 whitespace-pre-wrap">${report.summaryActivities || "Not provided"}</p>
                 </div>
-                <div class="report-section">
-                    <h3>Achievements</h3><p>${report.achievements || "Not provided"}</p>
+                <div class="report-section bg-blue-50 p-4 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-1">Achievements</h3><p class="text-gray-700 whitespace-pre-wrap">${report.achievements || "Not provided"}</p>
                 </div>
-                <div class="report-section">
-                    <h3>Challenges</h3><p>${report.challenges || "Not provided"}</p>
+                <div class="report-section bg-blue-50 p-4 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-1">Challenges</h3><p class="text-gray-700 whitespace-pre-wrap">${report.challenges || "Not provided"}</p>
                 </div>
-                <div class="report-section">
-                    <h3>Plans for Next Week</h3><p>${report.plansNextWeek || "Not provided"}</p>
+                <div class="report-section bg-blue-50 p-4 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-1">Plans for Next Week</h3><p class="text-gray-700 whitespace-pre-wrap">${report.plansNextWeek || "Not provided"}</p>
                 </div>
             `;
 
             modalBody.innerHTML = html;
-            document.getElementById("reportModal").style.display = "block";
+            modal.classList.remove('hidden'); // Show modal
+            // Trigger animation
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
         }
 
         // Close modal
         function closeModal() {
-            document.getElementById("reportModal").style.display = "none";
-        }
-
-        // Go to Dashboard
-        function goToDashboard() {
-            window.location.href = "principal-dashboard.html";  // Replace with your actual dashboard link
+            const modal = document.getElementById("reportModal");
+            const modalContent = document.getElementById("modal-content");
+            // Reverse animation
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden'); // Hide modal after animation
+            }, 300);
         }
     </script>
-</head>
-<body>
-    <button class="back-button" onclick="window.history.back()">Back to Previous Page</button>
-    <button class="dashboard-button" onclick="togglePopup(true)">+ Add New Report</button>
-
-    <div id="popup-overlay" class="popup-overlay">
-        <div class="popup">
-            <h3>Add New Weekly Report</h3>
-            <form onsubmit="submitReport(event)">
-                <label>Start Date:</label>
-                <input type="date" name="startDate" required><br><br>
-                <label>End Date:</label>
-                <input type="date" name="endDate" required><br><br>
-                <label>Report Title:</label>
-                <input type="text" name="reportTitle" required><br><br>
-                <label>Summary of Activities:</label>
-                <textarea name="summaryActivities" required></textarea><br><br>
-                <label>Achievements:</label>
-                <textarea name="achievements" required></textarea><br><br>
-                <label>Challenges:</label>
-                <textarea name="challenges" required></textarea><br><br>
-                <label>Plans for Next Week:</label>
-                <textarea name="plansNextWeek" required></textarea><br><br>
-                <button type="submit">Submit</button>
-                <button type="button" onclick="togglePopup(false)">Close</button>
-            </form>
-        </div>
-    </div>
-    <button class="scroll-button" onclick="scrollToTop()">↑</button>
-    <button class="scroll-button" onclick="scrollToBottom()">↓</button>
-      <h1>Weekly Reports</h1>
-    <!-- Table to display reports -->
-    <table id="reportTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Report Title</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be populated here -->
-        </tbody>
-    </table>
-
-    <!-- Modal to display detailed report -->
-    <div id="reportModal">
-        <div id="modal-content">
-            <h2 id="modalTitle"></h2>
-            <div id="modal-body">
-                <!-- Report content will be displayed here -->
-            </div>
-            <button class="close-btn" onclick="closeModal()">Close</button>
-            <button class="back-button" onclick="window.history.back()">Back to Previous Page</button>
-        </div>
-    </div>
-
 </body>
 </html>
