@@ -246,11 +246,10 @@
     const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec';
 
     /**
-     * Navigates to the dashboard page.
-     * Assumes 'dashboard.html' exists in the same directory.
+     * Navigates to the previous page in the browser history.
      */
     function goToDashboard() {
-      window.location.href = 'dashboard.html';
+      window.history.back(); // Changed from window.location.href to go back
     }
 
     /**
@@ -384,7 +383,7 @@
         `;
         errorDiv.textContent = 'Failed to load data. Please check the API URL or your internet connection.';
         attendanceContainer.innerHTML = ''; // Clear previous content
-        attendanceContainer.appendChild(errorDiv);
+        document.getElementById('attendanceContainer').appendChild(errorDiv);
       } finally {
         // Hide loading indicator regardless of success or failure
         loadingIndicator.style.display = 'none';
@@ -421,4 +420,3 @@
   </script>
 </body>
 </html>
-
