@@ -86,7 +86,9 @@
 
     async function loadTeacherData() {
       const monthInput = document.getElementById('monthPicker').value;
-      if (!monthInput) return alert('Please select a month');
+      if (!monthInput) {
+        return alert('Please select a month');
+      }
 
       const [year, month] = monthInput.split('-').map(Number);
       const res = await fetch(sheetAPI);
@@ -105,38 +107,41 @@
           teachers[id] = {
             name: row.TeacherName,
             days: {},
-            totalHours: 0
+            totalMinutes: 0 // Initialize totalMinutes for each teacher
           };
         }
 
         const day = new Date(row.Date).getDate();
-        const hours = parseFloat(row.Duration) || 0;
+        // Assuming 'Duration' from your sheet is now in minutes
+        const minutes = parseFloat(row.Duration) || 0;
         teachers[id].days[day] = {
           status: row.Status,
-          duration: hours
+          durationMinutes: minutes // Store duration in minutes
         };
-        teachers[id].totalHours += hours;
+        teachers[id].totalMinutes += minutes; // Accumulate total minutes
       });
 
       const daysInMonth = new Date(year, month, 0).getDate();
       let html = '<table><tr><th>Teacher Name</th><th>Teacher ID</th>';
 
       for (let d = 1; d <= daysInMonth; d++) {
-        html += `<th>${d}<br>Hrs</th>`;
+        html += `<th>${d}<br>Mins</th>`; // Display 'Mins' in daily header
       }
-      html += '<th>Total Hrs</th></tr>';
+      html += '<th>Total Hrs</th></tr>'; // Display 'Total Hrs' in monthly total header
 
       for (const [id, info] of Object.entries(teachers)) {
         html += `<tr><td>${info.name}</td><td>${id}</td>`;
         for (let d = 1; d <= daysInMonth; d++) {
           const dayData = info.days[d];
           if (dayData) {
-            html += `<td>${getStatusSymbol(dayData.status)}<br>${dayData.duration}</td>`;
+            html += `<td>${getStatusSymbol(dayData.status)}<br>${dayData.durationMinutes}</td>`;
           } else {
             html += `<td>-</td>`;
           }
         }
-        html += `<td><strong>${info.totalHours.toFixed(2)}</strong></td></tr>`;
+        // Convert totalMinutes to hours for display
+        const totalHours = (info.totalMinutes / 60).toFixed(2);
+        html += `<td><strong>${totalHours}</strong></td></tr>`;
       }
 
       html += '</table>';
