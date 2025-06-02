@@ -202,6 +202,7 @@
             border-bottom: 1px solid #eee;
             padding-bottom: 15px;
             margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
         }
 
         .modal-header h2 {
@@ -209,11 +210,15 @@
             color: #00796b;
             font-size: 1.8em;
             font-family: 'Montserrat', sans-serif;
+            flex-grow: 1; /* Allow title to take available space */
+            margin-bottom: 10px; /* Space below title on wrap */
         }
 
         .modal-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap; /* Allow buttons to wrap */
+            justify-content: flex-end; /* Align buttons to the right */
         }
 
         .modal-actions button {
@@ -233,40 +238,40 @@
             transform: translateY(-1px);
         }
 
-        .payment-table-section, .payment-slip-section {
+        .payment-table-section, .payment-slip-section, .monthly-summary-section {
             flex-grow: 1;
             padding: 10px 0;
             display: none; /* Controlled by JS */
         }
 
-        .payment-table-section.active, .payment-slip-section.active {
+        .payment-table-section.active, .payment-slip-section.active, .monthly-summary-section.active {
             display: block;
         }
 
-        #paymentTableContainer {
+        #paymentTableContainer, #monthlyEarningsTableContainer, #overallMonthlyEarningsTableContainer {
             overflow-x: auto;
             margin-top: 20px;
         }
 
-        #paymentTable {
+        #paymentTable, #monthlyEarningsTable, #overallMonthlyEarningsTable {
             width: 100%;
             border-collapse: collapse;
         }
 
-        #paymentTable th, #paymentTable td {
+        #paymentTable th, #paymentTable td, #monthlyEarningsTable th, #monthlyEarningsTable td, #overallMonthlyEarningsTable th, #overallMonthlyEarningsTable td {
             padding: 12px;
             border: 1px solid #ddd;
             text-align: left;
             font-size: 0.9em;
         }
 
-        #paymentTable th {
+        #paymentTable th, #monthlyEarningsTable th, #overallMonthlyEarningsTable th {
             background-color: #f2f2f2;
             color: #555;
             font-weight: 600;
         }
 
-        #paymentTable tbody tr:hover {
+        #paymentTable tbody tr:hover, #monthlyEarningsTable tbody tr:hover, #overallMonthlyEarningsTable tbody tr:hover {
             background-color: #eef;
             cursor: pointer;
         }
@@ -280,6 +285,46 @@
             border-top: 1px dashed #ccc;
             color: #0056b3;
         }
+
+        /* Overall Total Earnings for the main page */
+        #overallTotalEarnings {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #c8e6c9; /* Light green background */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #2e7d32; /* Darker green text */
+            border: 1px solid #a5d6a7;
+            width: 100%;
+            max-width: 600px; /* Limit width for better appearance */
+            box-sizing: border-box;
+        }
+
+        /* Overall Monthly Earnings Section on main page */
+        #overallMonthlyEarningsSection {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            box-sizing: border-box;
+            margin-top: 30px;
+        }
+
+        #overallMonthlyEarningsSection h3 {
+            text-align: center;
+            color: #00796b;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-family: 'Montserrat', sans-serif;
+            border-bottom: 2px solid #b2ebf2;
+            padding-bottom: 10px;
+        }
+
 
         /* Payment Slip/Bill Styles */
         #paymentSlip {
@@ -357,6 +402,9 @@
             .modal-header h2 {
                 font-size: 1.5em;
             }
+            .modal-actions {
+                justify-content: center; /* Center buttons on small screens */
+            }
             .payment-card {
                 padding: 15px;
             }
@@ -369,6 +417,10 @@
             }
             #paymentSlip p strong {
                 margin-bottom: 5px;
+            }
+            #overallTotalEarnings, #overallMonthlyEarningsSection {
+                font-size: 1.2em;
+                padding: 10px;
             }
         }
     </style>
@@ -393,6 +445,24 @@
             <tbody>
                 </tbody>
         </table>
+        <div class="total-amount-display" id="overallTotalEarnings"></div>
+
+        <div class="overall-monthly-earnings-section" id="overallMonthlyEarningsSection">
+            <h3>Overall Monthly Earnings Across All Students</h3>
+            <div id="overallMonthlyEarningsTableContainer">
+                <table id="overallMonthlyEarningsTable">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Total Earnings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div id="paymentModal" class="modal">
@@ -400,8 +470,10 @@
             <div class="modal-header">
                 <h2 id="modalStudentName"></h2>
                 <div class="modal-actions">
-                    <button id="backToPaymentsTableBtn" style="display:none;">Back to All Payments</button>
+                    <button id="showAllPaymentsBtn" style="display:none;">Show All Payments</button>
+                    <button id="showMonthlySummaryBtn">Show Monthly Summary</button>
                     <button id="downloadAllPaymentsBtn">Download All Payments PDF</button>
+                    <button id="backToPaymentsTableBtn" style="display:none;">Back to All Payments</button>
                     <span class="close-btn">&times;</span>
                 </div>
             </div>
@@ -425,6 +497,24 @@
                 <div class="total-amount-display" id="totalPaidAmount"></div>
             </div>
 
+            <div class="monthly-summary-section" id="monthlySummarySection">
+                <h3>Monthly Earnings Summary</h3>
+                <div id="monthlyEarningsTableContainer">
+                    <table id="monthlyEarningsTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Year</th>
+                                <th>Total Earnings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total-amount-display" id="financialYearTotal"></div>
+            </div>
+
             <div class="payment-slip-section" id="paymentSlipSection">
                 <div id="paymentSlip">
                     </div>
@@ -442,17 +532,31 @@
         const closeBtn = document.querySelector('.close-btn');
         const modalStudentName = document.getElementById('modalStudentName');
         const paymentTableSection = document.getElementById('paymentTableSection');
+        const monthlySummarySection = document.getElementById('monthlySummarySection');
         const paymentSlipSection = document.getElementById('paymentSlipSection');
         const paymentTableBody = document.getElementById('paymentTable').getElementsByTagName('tbody')[0];
+        const monthlyEarningsTableBody = document.getElementById('monthlyEarningsTable').getElementsByTagName('tbody')[0];
+        const overallMonthlyEarningsTableBody = document.getElementById('overallMonthlyEarningsTable').getElementsByTagName('tbody')[0]; // New
         const paymentSlipDiv = document.getElementById('paymentSlip');
         const totalPaidAmountDiv = document.getElementById('totalPaidAmount');
+        const financialYearTotalDiv = document.getElementById('financialYearTotal');
+        const overallTotalEarningsDiv = document.getElementById('overallTotalEarnings');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const downloadAllPaymentsBtn = document.getElementById('downloadAllPaymentsBtn');
         const backToPaymentsTableBtn = document.getElementById('backToPaymentsTableBtn');
+        const showMonthlySummaryBtn = document.getElementById('showMonthlySummaryBtn');
+        const showAllPaymentsBtn = document.getElementById('showAllPaymentsBtn');
 
         let allStudentData = []; // To store all fetched data
         let currentStudentPayments = []; // To store payments for the currently viewed student
+        let currentStudentName = ''; // To store the name of the currently viewed student
 
+        /**
+         * Fetches student payment data from the Google Apps Script URL.
+         * Displays a loading spinner during the fetch operation.
+         * Populates the main student table upon successful data retrieval.
+         * Also calculates and displays the overall total earnings.
+         */
         async function fetchStudentData() {
             loadingSpinner.style.display = 'block'; // Show spinner
             try {
@@ -463,14 +567,86 @@
                 allStudentData = await response.json();
                 console.log("Fetched data:", allStudentData); // Debugging
                 populateStudentTable(allStudentData);
+                calculateAndDisplayOverallTotalEarnings(allStudentData); // Calculate and display overall total
+                calculateAndDisplayOverallMonthlyEarnings(allStudentData); // Calculate and display overall monthly earnings
             } catch (error) {
                 console.error("Error fetching student data:", error);
-                alert("Failed to load student data. Please check the Apps Script URL and deployment.");
+                // Use a custom message box instead of alert()
+                displayMessageBox("Failed to load student data. Please check the Apps Script URL and deployment.");
             } finally {
                 loadingSpinner.style.display = 'none'; // Hide spinner
             }
         }
 
+        /**
+         * Calculates and displays the total earnings from all students.
+         * @param {Array<Object>} data - The raw payment data for all students.
+         */
+        function calculateAndDisplayOverallTotalEarnings(data) {
+            let overallTotal = 0;
+            data.forEach(row => {
+                const feeValue = parseFloat(row['Total Fee']);
+                if (!isNaN(feeValue)) {
+                    overallTotal += feeValue;
+                }
+            });
+            overallTotalEarningsDiv.textContent = `Overall Total Earnings: Rs. ${overallTotal.toFixed(2)}`;
+        }
+
+        /**
+         * Calculates and displays the overall monthly earnings across all students.
+         * @param {Array<Object>} data - The raw payment data for all students.
+         */
+        function calculateAndDisplayOverallMonthlyEarnings(data) {
+            const overallMonthlyEarnings = {};
+
+            data.forEach(payment => {
+                const date = new Date(payment['Date']);
+                if (isNaN(date.getTime())) {
+                    console.warn(`Invalid date format for payment: ${payment['Date']}`);
+                    return;
+                }
+
+                const year = date.getFullYear();
+                const month = date.getMonth(); // 0-11
+                const monthName = date.toLocaleString('default', { month: 'long' });
+
+                const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`; // YYYY-MM
+                const fee = parseFloat(payment['Total Fee']);
+
+                if (!isNaN(fee)) {
+                    if (!overallMonthlyEarnings[monthKey]) {
+                        overallMonthlyEarnings[monthKey] = {
+                            monthName: monthName,
+                            year: year,
+                            total: 0
+                        };
+                    }
+                    overallMonthlyEarnings[monthKey].total += fee;
+                }
+            });
+
+            const sortedOverallMonthlyEarnings = Object.keys(overallMonthlyEarnings).sort().map(key => overallMonthlyEarnings[key]);
+
+            overallMonthlyEarningsTableBody.innerHTML = '';
+            if (sortedOverallMonthlyEarnings.length > 0) {
+                sortedOverallMonthlyEarnings.forEach(data => {
+                    const row = overallMonthlyEarningsTableBody.insertRow();
+                    row.insertCell(0).textContent = data.monthName;
+                    row.insertCell(1).textContent = data.year;
+                    row.insertCell(2).textContent = `Rs. ${data.total.toFixed(2)}`;
+                });
+            } else {
+                overallMonthlyEarningsTableBody.innerHTML = '<tr><td colspan="3" class="no-records">No overall monthly earnings data available.</td></tr>';
+            }
+        }
+
+
+        /**
+         * Populates the main student table with unique student records.
+         * Aggregates payments for each student.
+         * @param {Array<Object>} data - The raw payment data fetched from the source.
+         */
         function populateStudentTable(data) {
             studentTableBody.innerHTML = ''; // Clear existing rows
             const uniqueStudents = new Map();
@@ -508,12 +684,20 @@
             });
         }
 
+        /**
+         * Displays the payment details modal for a selected student.
+         * Populates the payment table and calculates total paid amount.
+         * Also triggers the monthly and yearly earnings calculation.
+         * @param {Object} student - The student object with their payments.
+         */
         function showPaymentDetails(student) {
-            modalStudentName.textContent = `Payments for ${student['Student Name']} (ID: ${student['Student ID']})`;
-            currentStudentPayments = student.payments || []; // Store for PDF download
+            currentStudentName = student['Student Name']; // Store student name
+            modalStudentName.textContent = `Payments for ${currentStudentName} (ID: ${student['Student ID']})`;
+            currentStudentPayments = student.payments || []; // Store for PDF download and monthly summary
 
             paymentTableBody.innerHTML = ''; // Clear previous table rows
             paymentSlipDiv.innerHTML = ''; // Clear previous slip
+            monthlyEarningsTableBody.innerHTML = ''; // Clear previous monthly earnings table
 
             let totalPaid = 0;
 
@@ -538,7 +722,7 @@
                     row.insertCell(4).textContent = payment['Payment Mode'] || 'N/A';
 
                     // Add click listener to show slip
-                    row.addEventListener('click', () => showPaymentSlip(payment, student['Student Name']));
+                    row.addEventListener('click', () => showPaymentSlip(payment, currentStudentName));
 
                     // Calculate total paid amount
                     if (!isNaN(feeValue)) {
@@ -552,15 +736,112 @@
                 totalPaidAmountDiv.style.display = 'none'; // Hide total if no payments
             }
 
-            // Show payment table section, hide slip section
+            // Initially show payment table section, hide others
             paymentTableSection.classList.add('active');
             paymentSlipSection.classList.remove('active');
+            monthlySummarySection.classList.remove('active');
+
             downloadAllPaymentsBtn.style.display = 'block'; // Show download all button
             backToPaymentsTableBtn.style.display = 'none'; // Hide back button
+            showMonthlySummaryBtn.style.display = 'block'; // Show monthly summary button
+            showAllPaymentsBtn.style.display = 'none'; // Hide show all payments button
 
             paymentModal.style.display = 'flex'; // Use flex to center
+
+            // Render monthly and yearly summary immediately when modal opens
+            renderMonthlyAndYearlySummary(currentStudentPayments);
         }
 
+        /**
+         * Calculates and renders the monthly and financial year earnings.
+         * @param {Array<Object>} payments - The array of payment records for the current student.
+         */
+        function renderMonthlyAndYearlySummary(payments) {
+            const monthlyEarnings = {}; // Stores earnings per month (YYYY-MM: total)
+            const financialYearEarnings = {}; // Stores earnings per financial year (YYYY-YYYY: total)
+
+            payments.forEach(payment => {
+                const date = new Date(payment['Date']);
+                if (isNaN(date.getTime())) {
+                    console.warn(`Invalid date format for payment: ${payment['Date']}`);
+                    return;
+                }
+
+                const year = date.getFullYear();
+                const month = date.getMonth(); // 0-11
+                const monthName = date.toLocaleString('default', { month: 'long' });
+
+                const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`; // YYYY-MM
+                const fee = parseFloat(payment['Total Fee']);
+
+                if (!isNaN(fee)) {
+                    // Accumulate monthly earnings
+                    if (!monthlyEarnings[monthKey]) {
+                        monthlyEarnings[monthKey] = {
+                            monthName: monthName,
+                            year: year,
+                            total: 0
+                        };
+                    }
+                    monthlyEarnings[monthKey].total += fee;
+
+                    // Determine financial year (April to March)
+                    let fyStartYear;
+                    if (month >= 3) { // April (3) to December (11)
+                        fyStartYear = year;
+                    } else { // January (0) to March (2)
+                        fyStartYear = year - 1;
+                    }
+                    const fyKey = `${fyStartYear}-${fyStartYear + 1}`;
+
+                    // Accumulate financial year earnings
+                    if (!financialYearEarnings[fyKey]) {
+                        financialYearEarnings[fyKey] = 0;
+                    }
+                    financialYearEarnings[fyKey] += fee;
+                }
+            });
+
+            // Sort monthly earnings by date
+            const sortedMonthlyEarnings = Object.keys(monthlyEarnings).sort().map(key => monthlyEarnings[key]);
+
+            // Populate monthly earnings table
+            monthlyEarningsTableBody.innerHTML = '';
+            if (sortedMonthlyEarnings.length > 0) {
+                sortedMonthlyEarnings.forEach(data => {
+                    const row = monthlyEarningsTableBody.insertRow();
+                    row.insertCell(0).textContent = data.monthName;
+                    row.insertCell(1).textContent = data.year;
+                    row.insertCell(2).textContent = `Rs. ${data.total.toFixed(2)}`;
+                });
+            } else {
+                monthlyEarningsTableBody.innerHTML = '<tr><td colspan="3" class="no-records">No monthly earnings data available.</td></tr>';
+            }
+
+            // Populate financial year total
+            let totalFYAmount = 0;
+            let fyHtml = '<h4>Financial Year Totals:</h4>';
+            if (Object.keys(financialYearEarnings).length > 0) {
+                // Sort financial years for display
+                const sortedFyKeys = Object.keys(financialYearEarnings).sort();
+                sortedFyKeys.forEach(fyKey => {
+                    fyHtml += `<p><strong>${fyKey}:</strong> <span>Rs. ${financialYearEarnings[fyKey].toFixed(2)}}</span></p>`;
+                    totalFYAmount += financialYearEarnings[fyKey]; // Sum all financial years for overall total
+                });
+                financialYearTotalDiv.innerHTML = fyHtml + `<p><strong>Overall Total Earnings:</strong> <span>Rs. ${totalFYAmount.toFixed(2)}</span></p>`;
+                financialYearTotalDiv.style.display = 'block';
+            } else {
+                financialYearTotalDiv.innerHTML = '<p class="no-records">No financial year earnings data available.</p>';
+                financialYearTotalDiv.style.display = 'none';
+            }
+        }
+
+
+        /**
+         * Displays a single payment slip in the modal.
+         * @param {Object} payment - The payment object to display.
+         * @param {string} studentName - The name of the student.
+         */
         function showPaymentSlip(payment, studentName) {
             paymentSlipDiv.innerHTML = `
                 <h3>Payment Receipt</h3>
@@ -579,10 +860,14 @@
                 <button class="download-btn" onclick="downloadSinglePaymentPdf(${JSON.stringify(payment).replace(/"/g, '&quot;')}, '${studentName}')">Download This Slip PDF</button>
             `;
 
-            // Hide payment table section, show slip section
+            // Hide other sections, show slip section
             paymentTableSection.classList.remove('active');
+            monthlySummarySection.classList.remove('active');
             paymentSlipSection.classList.add('active');
+
             downloadAllPaymentsBtn.style.display = 'none'; // Hide download all button when viewing slip
+            showMonthlySummaryBtn.style.display = 'none'; // Hide monthly summary button
+            showAllPaymentsBtn.style.display = 'none'; // Hide show all payments button
             backToPaymentsTableBtn.style.display = 'block'; // Show back button
         }
 
@@ -603,10 +888,38 @@
             paymentSlipSection.classList.remove('active');
             paymentTableSection.classList.add('active');
             downloadAllPaymentsBtn.style.display = 'block';
+            showMonthlySummaryBtn.style.display = 'block';
+            showAllPaymentsBtn.style.display = 'none';
             backToPaymentsTableBtn.style.display = 'none';
         }
 
-        // Function to download a single payment slip as PDF
+        // Show Monthly Summary button
+        showMonthlySummaryBtn.onclick = function() {
+            paymentTableSection.classList.remove('active');
+            paymentSlipSection.classList.remove('active');
+            monthlySummarySection.classList.add('active');
+            downloadAllPaymentsBtn.style.display = 'none'; // Download all payments is for the table view
+            backToPaymentsTableBtn.style.display = 'none'; // No "back" from summary to slip
+            showMonthlySummaryBtn.style.display = 'none'; // Hide itself
+            showAllPaymentsBtn.style.display = 'block'; // Show button to go back to all payments
+        }
+
+        // Show All Payments button
+        showAllPaymentsBtn.onclick = function() {
+            monthlySummarySection.classList.remove('active');
+            paymentSlipSection.classList.remove('active');
+            paymentTableSection.classList.add('active');
+            downloadAllPaymentsBtn.style.display = 'block';
+            backToPaymentsTableBtn.style.display = 'none';
+            showMonthlySummaryBtn.style.display = 'block';
+            showAllPaymentsBtn.style.display = 'none';
+        }
+
+        /**
+         * Function to download a single payment slip as PDF.
+         * @param {Object} payment - The payment data.
+         * @param {string} studentName - The name of the student.
+         */
         function downloadSinglePaymentPdf(payment, studentName) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -670,10 +983,13 @@
             doc.save(filename);
         }
 
-        // Function to download ALL payments for a student as a single PDF
+        /**
+         * Function to download ALL payments for a student as a single PDF.
+         * This function now also includes monthly and financial year summaries if available.
+         */
         downloadAllPaymentsBtn.onclick = function() {
             if (currentStudentPayments.length === 0) {
-                alert("No payments to download for this student.");
+                displayMessageBox("No payments to download for this student.");
                 return;
             }
 
@@ -691,6 +1007,7 @@
             const margin = 15;
             const pageHeight = doc.internal.pageSize.height;
 
+            // Add individual payments
             currentStudentPayments.forEach((payment, index) => {
                 if (y + (10 * lineHeight) > pageHeight - margin) { // Check if new page is needed
                     doc.addPage();
@@ -718,8 +1035,151 @@
                 doc.line(margin, y - lineHeight / 2, doc.internal.pageSize.width - margin, y - lineHeight / 2);
             });
 
+            // Add Monthly and Financial Year Summary to PDF
+            const monthlyEarnings = {};
+            const financialYearEarnings = {};
+
+            currentStudentPayments.forEach(payment => {
+                const date = new Date(payment['Date']);
+                if (isNaN(date.getTime())) return;
+
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const monthName = date.toLocaleString('default', { month: 'long' });
+                const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+                const fee = parseFloat(payment['Total Fee']);
+
+                if (!isNaN(fee)) {
+                    if (!monthlyEarnings[monthKey]) {
+                        monthlyEarnings[monthKey] = { monthName: monthName, year: year, total: 0 };
+                    }
+                    monthlyEarnings[monthKey].total += fee;
+
+                    let fyStartYear;
+                    if (month >= 3) {
+                        fyStartYear = year;
+                    } else {
+                        fyStartYear = year - 1;
+                    }
+                    const fyKey = `${fyStartYear}-${fyStartYear + 1}`;
+                    if (!financialYearEarnings[fyKey]) {
+                        financialYearEarnings[fyKey] = 0;
+                    }
+                    financialYearEarnings[fyKey] += fee;
+                }
+            });
+
+            const sortedMonthlyEarnings = Object.keys(monthlyEarnings).sort().map(key => monthlyEarnings[key]);
+            const sortedFyKeys = Object.keys(financialYearEarnings).sort();
+
+            // Add a new page for summary if needed
+            if (y + (5 * lineHeight) > pageHeight - margin && (sortedMonthlyEarnings.length > 0 || sortedFyKeys.length > 0)) {
+                doc.addPage();
+                y = margin;
+            }
+
+            if (sortedMonthlyEarnings.length > 0 || sortedFyKeys.length > 0) {
+                doc.setFontSize(18);
+                doc.setFont("helvetica", "bold");
+                doc.text("Earnings Summary", 105, y, null, null, 'center');
+                y += lineHeight * 2;
+            }
+
+            if (sortedMonthlyEarnings.length > 0) {
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("Monthly Earnings:", margin, y);
+                y += lineHeight;
+
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                sortedMonthlyEarnings.forEach(data => {
+                    if (y + lineHeight > pageHeight - margin) {
+                        doc.addPage();
+                        y = margin;
+                        doc.setFontSize(14);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("Monthly Earnings (Continued):", margin, y);
+                        y += lineHeight;
+                    }
+                    doc.text(`${data.monthName} ${data.year}: Rs. ${data.total.toFixed(2)}`, margin + 10, y);
+                    y += lineHeight;
+                });
+                y += lineHeight; // Extra space
+            }
+
+            if (sortedFyKeys.length > 0) {
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("Financial Year Totals:", margin, y);
+                y += lineHeight;
+
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                let overallTotal = 0;
+                sortedFyKeys.forEach(fyKey => {
+                    if (y + lineHeight > pageHeight - margin) {
+                        doc.addPage();
+                        y = margin;
+                        doc.setFontSize(14);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("Financial Year Totals (Continued):", margin, y);
+                        y += lineHeight;
+                    }
+                    doc.text(`${fyKey}: Rs. ${financialYearEarnings[fyKey].toFixed(2)}`, margin + 10, y);
+                    overallTotal += financialYearEarnings[fyKey];
+                    y += lineHeight;
+                });
+                if (sortedFyKeys.length > 1) { // Only show overall total if there's more than one FY
+                    doc.setFontSize(14);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`Overall Total Earnings: Rs. ${overallTotal.toFixed(2)}`, margin, y);
+                    y += lineHeight;
+                }
+            }
             doc.save(filename);
         };
+
+        /**
+         * Custom message box function to replace alert().
+         * @param {string} message - The message to display.
+         */
+        function displayMessageBox(message) {
+            const messageBox = document.createElement('div');
+            messageBox.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                z-index: 2000;
+                text-align: center;
+                font-family: 'Roboto', sans-serif;
+                color: #333;
+                max-width: 80%;
+            `;
+            messageBox.innerHTML = `
+                <p>${message}</p>
+                <button style="
+                    background-color: #007BFF;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-top: 15px;
+                    font-size: 1em;
+                ">OK</button>
+            `;
+            document.body.appendChild(messageBox);
+
+            messageBox.querySelector('button').onclick = () => {
+                document.body.removeChild(messageBox);
+            };
+        }
 
         // Initial fetch of student data
         fetchStudentData();
