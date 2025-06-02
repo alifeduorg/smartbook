@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login</title>
+  <title> Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* New Premium Color Palette */
-      --primary: #2c3e50; /* Deep Charcoal Blue */
-      --accent: #f39c12; /* Rich Gold/Orange */
-      --white: #ecf0f1; /* Light Grey/Off-White */
-      --shadow: rgba(0, 0, 0, 0.25); /* Slightly darker shadow */
+      --primary: #1a3a6c;
+      --accent: #f9c21b;
+      --white: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.15);
     }
 
     * {
@@ -22,17 +21,16 @@
     }
 
     body {
-      background: linear-gradient(to bottom, var(--white), #bdc3c7); /* Adjusted gradient to match new white */
+      background: linear-gradient(to bottom, var(--white), #e0e5ec);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      position: relative; /* Needed for absolute positioning of overlay */
     }
 
     .login-container {
-      background-color: #ffffff; /* Keep container white for contrast */
+      background-color: var(--white);
       border-radius: 20px;
       box-shadow: 0 20px 40px var(--shadow);
       padding: 40px;
@@ -40,8 +38,6 @@
       max-width: 420px;
       text-align: center;
       transition: all 0.3s ease;
-      position: relative; /* For z-index stacking */
-      z-index: 1; /* Ensure it's above the overlay when not active */
     }
 
     .logo {
@@ -76,7 +72,7 @@
       border: 1.5px solid var(--primary);
       border-radius: 10px;
       font-size: 15px;
-      background: var(--white); /* Use new white for input background */
+      background: var(--white);
       transition: border 0.3s ease;
       color: #333;
     }
@@ -89,7 +85,7 @@
 
     .btn {
       background: var(--accent);
-      color: var(--primary); /* Keep text primary for contrast */
+      color: var(--primary);
       font-weight: 600;
       font-size: 16px;
       padding: 14px;
@@ -102,7 +98,7 @@
     }
 
     .btn:hover {
-      background-color: #e67e22; /* Slightly darker orange for hover */
+      background-color: #e3ae17;
     }
 
     .footer {
@@ -110,120 +106,11 @@
       font-size: 14px;
       color: var(--primary);
       text-align: center;
-      z-index: 1;
-    }
-
-    /* Loading Overlay Styles */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      visibility: hidden; /* Hidden by default */
-      opacity: 0;
-      transition: visibility 0s, opacity 0.3s linear;
-    }
-
-    .loading-overlay.visible {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    .spinner {
-      border: 6px solid #f3f3f3; /* Light grey */
-      border-top: 6px solid var(--primary); /* Use new primary color for spinner */
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-    }
-
-    .loading-text {
-      margin-top: 15px;
-      font-size: 18px;
-      color: var(--primary); /* Use new primary color for loading text */
-      font-weight: 600;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Custom Message Box Styles */
-    .message-box-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1001;
-      visibility: hidden; /* Hidden by default */
-      opacity: 0;
-      transition: visibility 0s, opacity 0.3s linear;
-    }
-
-    .message-box-overlay.visible {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    .message-box {
-      background: #ffffff; /* Keep message box white for readability */
-      border-radius: 15px;
-      box-shadow: 0 10px 30px var(--shadow);
-      padding: 30px;
-      max-width: 350px;
-      width: 90%;
-      text-align: center;
-      transform: scale(0.9);
-      transition: transform 0.3s ease-out;
-    }
-
-    .message-box-overlay.visible .message-box {
-      transform: scale(1);
-    }
-
-    .message-box p {
-      font-size: 17px;
-      color: var(--primary); /* Use new primary color for message text */
-      margin-bottom: 25px;
-      line-height: 1.5;
-    }
-
-    .message-box button {
-      background: var(--primary); /* Use new primary color for message box button */
-      color: var(--white); /* Use new white for message box button text */
-      font-weight: 600;
-      font-size: 15px;
-      padding: 10px 25px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .message-box button:hover {
-      background-color: #34495e; /* Slightly darker primary for hover */
     }
 
     @media (max-width: 500px) {
       .login-container {
         padding: 25px;
-      }
-      .message-box {
-        padding: 20px;
       }
     }
   </style>
@@ -231,7 +118,7 @@
 <body>
 
   <div class="login-container">
-    <img src="https://placehold.co/70x70/2c3e50/ecf0f1?text=LOGO" alt="Logo" class="logo" />
+    <img src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Logo" class="logo" />
     <h2>Login</h2>
     <form id="login-form" onsubmit="return handleLogin(event)">
       <div class="input-group">
@@ -256,48 +143,12 @@
   </div>
 
   <div class="footer">
-    &copy; 2025 Alif Edu. All rights reserved.
-  </div>
-
-  <div id="loading-overlay" class="loading-overlay">
-    <div class="spinner"></div>
-    <div class="loading-text">Logging in...</div>
-  </div>
-
-  <div id="message-box-overlay" class="message-box-overlay">
-    <div class="message-box">
-      <p id="message-box-text"></p>
-      <button onclick="hideMessageBox()">OK</button>
-    </div>
+    &copy; 2025  Alif Edu. All rights reserved.
   </div>
 
   <script>
-    // Function to show the loading overlay
-    function showLoading() {
-      document.getElementById('loading-overlay').classList.add('visible');
-    }
-
-    // Function to hide the loading overlay
-    function hideLoading() {
-      document.getElementById('loading-overlay').classList.remove('visible');
-    }
-
-    // Function to show the custom message box
-    function showMessageBox(message) {
-      document.getElementById('message-box-text').innerText = message;
-      document.getElementById('message-box-overlay').classList.add('visible');
-    }
-
-    // Function to hide the custom message box
-    function hideMessageBox() {
-      document.getElementById('message-box-overlay').classList.remove('visible');
-    }
-
     async function handleLogin(event) {
-      event.preventDefault(); // Prevent default form submission
-
-      showLoading(); // Show loading animation
-
+      event.preventDefault();
       const staffId = document.getElementById('staff-id').value;
       const password = document.getElementById('password').value;
       const role = document.getElementById('role').value;
@@ -308,46 +159,27 @@
         role: role
       };
 
-      // Using a placeholder image for the logo as the original URL was local.
-      // You can replace this with your actual logo URL.
-      // The original image "alif edu (600 x 300 px) (820 x 312 px).png" was a local file,
-      // so it has been replaced with a placeholder. Please update with your actual image URL.
+      const url = 'https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec'; // Replace this
 
-      const url = 'https://script.google.com/macros/s/AKfycbxCuOR7A5sosj9g4DDh95mCs5JRFpnOK06CqB24lmFwt9kN7212uqc1_3QzJIpNZayofg/exec'; // Replace this with your actual API endpoint
+      const response = await fetch(url, {
+        method: 'POST',
+        contentType: 'application/json',
+        body: JSON.stringify(data)
+      });
 
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json' // Corrected header for JSON body
-          },
-          body: JSON.stringify(data)
-        });
+      const result = await response.json();
 
-        const result = await response.json();
-
-        if (result.success) {
-          let redirectURL = '';
-          switch(result.role) {
-            case 'admin': redirectURL = 'admin-dashboard.html'; break;
-            case 'principal': redirectURL = 'principal-dashboard.html'; break;
-            case 'teacher': redirectURL = 'teacher-dashboard.html'; break;
-            case 'mentor': redirectURL = 'mentor-dashboard.html'; break;
-            default: showMessageBox('Unknown role. Redirecting to default page.'); redirectURL = 'index.html'; // Fallback
-          }
-          // Simulate a slight delay for better UX before redirecting
-          setTimeout(() => {
-            window.location.href = redirectURL;
-          }, 500); // 0.5 second delay
-        } else {
-          showMessageBox(result.message || 'Login failed. Please check your credentials.');
+      if (result.success) {
+        let redirectURL = '';
+        switch(result.role) {
+          case 'admin': redirectURL = 'admin-dashboard.html'; break;
+          case 'principal': redirectURL = 'principal-dashboard.html'; break;
+          case 'teacher': redirectURL = 'teacher-dashboard.html'; break;
+          case 'mentor': redirectURL = 'mentor-dashboard.html'; break;
         }
-      } catch (error) {
-        console.error('Error during login:', error);
-        // Updated error message for network issues
-        showMessageBox('Could not connect to the server. Please check your internet connection or try again later.');
-      } finally {
-        hideLoading(); // Hide loading animation regardless of success or failure
+        window.location.href = redirectURL;
+      } else {
+        alert(result.message || 'Login failed');
       }
     }
   </script>
