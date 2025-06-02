@@ -1,250 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Logbook Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <meta charset="UTF-8" />
+    <title>Logbook Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fff;
-      color: #000;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      background: #f1c40f;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    header img {
-      height: 50px;
-      margin-right: 15px;
-    }
-
-    header h1 {
-      font-size: 1.8rem;
-      color: #000;
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      padding: 15px;
-      background-color: #f9f9f9;
-      border-bottom: 2px solid #ccc;
-    }
-
-    .controls input, .controls button {
-      padding: 10px;
-      margin: 5px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    .controls input {
-      background: #fff;
-      color: #000;
-      width: 180px;
-    }
-
-    .controls button {
-      background: #f1c40f;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .controls button:hover {
-      transform: scale(1.05);
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      padding: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1000px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f1c40f;
-      color: #000;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    tr:hover {
-      background-color: #e6f7ff;
-    }
-
-    #loading {
-      text-align: center;
-      padding: 50px;
-      font-size: 1.5rem;
-      color: #999;
-    }
-
-    @media (max-width: 768px) {
-      .controls {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .controls input {
-        width: 90%;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <img src="1.png" alt="Logo" />
-    <h1>Logbook Viewer</h1>
-  </header>
-
-  <div class="controls">
-    <input type="text" id="searchName" placeholder="Teacher Name" />
-    <input type="text" id="searchStaff" placeholder="Staff ID" />
-    <input type="text" id="searchProgram" placeholder="Program" />
-    <input type="text" id="searchClass" placeholder="Class" />
-    <input type="text" id="searchMonth" placeholder="Month" />
-    <button onclick="downloadPDF()">Download PDF</button>
-    <button onclick="window.location.href='admin-dashboard.html'">Dashboard</button>
-  </div>
-
-  <div id="loading">Loading logbook...</div>
-
-  <div class="table-wrapper" style="display:none;">
-    <table id="logbook-table">
-      <thead>
-        <tr id="table-headers"></tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
-  </div>
-
-  <script>
-    const sheetUrl = "https://script.google.com/macros/s/AKfycbxzKxyW6dDcDaBe7vK6iI8hTlLfA1DC3TFcn9u4YL9sVCuJf8OE3Y8Ba1mTO76yBgz4GA/exec";
-
-    async function fetchData() {
-      document.getElementById('loading').style.display = 'block';
-      const res = await fetch(sheetUrl);
-      const data = await res.json();
-
-      if (!data.length) return;
-
-      const headers = Object.keys(data[0]);
-      document.getElementById('table-headers').innerHTML = headers.map(h => `<th>${h}</th>`).join('');
-      const tableBody = document.getElementById('table-body');
-      tableBody.innerHTML = '';
-
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = headers.map(h => {
-          let cellValue = row[h] || '';
-          if (typeof cellValue === 'string' && cellValue.includes('T') && cellValue.includes('Z')) {
-            const localDate = new Date(cellValue);
-            cellValue = formatLocal12HourDate(localDate);
-          }
-          return `<td>${cellValue}</td>`;
-        }).join('');
-        tableBody.appendChild(tr);
-      });
-
-      document.querySelectorAll('.controls input').forEach(input => {
-        input.addEventListener('input', filterTable);
-      });
-
-      document.getElementById('loading').style.display = 'none';
-      document.querySelector('.table-wrapper').style.display = 'block';
-    }
-
-    function formatLocal12HourDate(date) {
-      const offsetDate = new Date(date.toLocaleString("en-US", { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
-      const options = {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      };
-      return offsetDate.toLocaleString('en-US', options);
-    }
-
-    function filterTable() {
-      const name = document.getElementById('searchName').value.toLowerCase();
-      const staff = document.getElementById('searchStaff').value.toLowerCase();
-      const program = document.getElementById('searchProgram').value.toLowerCase();
-      const clas = document.getElementById('searchClass').value.toLowerCase();
-      const month = document.getElementById('searchMonth').value.toLowerCase();
-
-      const rows = document.querySelectorAll('#logbook-table tbody tr');
-      rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        const visible =
-          text.includes(name) &&
-          text.includes(staff) &&
-          text.includes(program) &&
-          text.includes(clas) &&
-          text.includes(month);
-        row.style.display = visible ? '' : 'none';
-      });
-    }
-
-    function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'pt',
-        format: 'a4'
-      });
-
-      doc.autoTable({
-        html: '#logbook-table',
-        startY: 20,
-        styles: {
-          fontSize: 8,
-          cellPadding: 4,
-          overflow: 'linebreak'
-        },
-        headStyles: {
-          fillColor: [241, 196, 15],
-          textColor: [0, 0, 0]
+    <style>
+        /* Custom styles for gradients and animations not easily done with pure Tailwind */
+        body {
+            font-family: 'Inter', sans-serif; /* Apply Inter font globally */
+            /* Background gradient for the body */
+            background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
         }
-      });
 
-      doc.save('logbook.pdf');
-    }
+        /* Custom animation for loading spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-    window.onload = fetchData;
-  </script>
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #f1c40f; /* Yellow color */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Ensure sticky header works with Tailwind */
+        th {
+            position: sticky;
+            top: 0;
+            z-index: 10; /* Higher z-index for sticky header */
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800">
+
+    <header class="flex items-center p-4 bg-gradient-to-r from-yellow-400 to-orange-500 shadow-xl rounded-b-xl mb-6">
+        <img src="https://placehold.co/50x50/f1c40f/000000?text=LOGO" alt="Logo" class="h-12 w-12 mr-4 rounded-full shadow-md transform transition-transform duration-300 hover:scale-110" />
+        <h1 class="text-3xl font-bold text-white drop-shadow-md">Logbook Viewer</h1>
+    </header>
+
+    <div class="controls flex flex-wrap justify-center gap-4 p-4 bg-white rounded-xl shadow-lg mx-auto max-w-6xl mb-8">
+        <input type="text" id="searchName" placeholder="Teacher Name" class="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 shadow-sm w-full sm:w-auto flex-grow" />
+        <input type="text" id="searchStaff" placeholder="Staff ID" class="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 shadow-sm w-full sm:w-auto flex-grow" />
+        <input type="text" id="searchProgram" placeholder="Program" class="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 shadow-sm w-full sm:w-auto flex-grow" />
+        <input type="text" id="searchClass" placeholder="Class" class="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 shadow-sm w-full sm:w-auto flex-grow" />
+        <input type="text" id="searchMonth" placeholder="Month" class="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 shadow-sm w-full sm:w-auto flex-grow" />
+        
+        <button onclick="downloadPDF()" class="px-6 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-600 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 active:scale-95 w-full sm:w-auto">
+            Download PDF
+        </button>
+        <button onclick="window.location.href='admin-dashboard.html'" class="px-6 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 active:scale-95 w-full sm:w-auto">
+            Dashboard
+        </button>
+    </div>
+
+    <div id="loading" class="flex flex-col items-center justify-center h-64 text-gray-500 text-xl">
+        <div class="spinner mb-4"></div>
+        Loading logbook...
+    </div>
+
+    <div class="table-wrapper overflow-x-auto p-4 bg-white rounded-xl shadow-lg mx-auto max-w-6xl" style="display:none;">
+        <table id="logbook-table" class="w-full border-collapse min-w-[1000px] text-left">
+            <thead>
+                <tr id="table-headers" class="bg-yellow-500 text-white font-semibold text-lg"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Google Sheets API URL
+        const sheetUrl = "https://script.google.com/macros/s/AKfycbxzKxyW6dDcDaBe7vK6iI8hTlLfA1DC3TFcn9u4YL9sVCuJf8OE3Y8Ba1mTO76yBgz4GA/exec";
+
+        /**
+         * Fetches data from the Google Sheet and populates the table.
+         * Displays a loading indicator while fetching data.
+         */
+        async function fetchData() {
+            // Show loading indicator and hide table
+            document.getElementById('loading').style.display = 'flex'; // Use flex for spinner centering
+            document.querySelector('.table-wrapper').style.display = 'none';
+
+            try {
+                const res = await fetch(sheetUrl);
+                const data = await res.json();
+
+                if (!data.length) {
+                    console.warn("No data received from the sheet.");
+                    document.getElementById('loading').innerHTML = '<p>No logbook data available.</p>';
+                    return;
+                }
+
+                // Populate table headers
+                const headers = Object.keys(data[0]);
+                const tableHeadersRow = document.getElementById('table-headers');
+                tableHeadersRow.innerHTML = headers.map(h => `<th class="p-4">${h}</th>`).join('');
+
+                // Populate table body
+                const tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                data.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    // Apply alternating row colors and hover effect
+                    tr.className = `border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-yellow-50 transition-colors duration-200`;
+                    tr.innerHTML = headers.map(h => {
+                        let cellValue = row[h] || '';
+                        // Format date-time strings
+                        if (typeof cellValue === 'string' && cellValue.includes('T') && cellValue.includes('Z')) {
+                            const localDate = new Date(cellValue);
+                            cellValue = formatLocal12HourDate(localDate);
+                        }
+                        return `<td class="p-3">${cellValue}</td>`;
+                    }).join('');
+                    tableBody.appendChild(tr);
+                });
+
+                // Add event listeners to input fields for filtering
+                document.querySelectorAll('.controls input').forEach(input => {
+                    input.addEventListener('input', filterTable);
+                });
+
+                // Hide loading indicator and show table
+                document.getElementById('loading').style.display = 'none';
+                document.querySelector('.table-wrapper').style.display = 'block';
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById('loading').innerHTML = `<p class="text-red-500">Failed to load data. Please try again later.</p>`;
+            }
+        }
+
+        /**
+         * Formats a Date object into a local 12-hour format string.
+         * @param {Date} date - The Date object to format.
+         * @returns {string} The formatted date string.
+         */
+        function formatLocal12HourDate(date) {
+            // Adjust date to local timezone using Intl.DateTimeFormat().resolvedOptions().timeZone
+            const offsetDate = new Date(date.toLocaleString("en-US", { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            };
+            return offsetDate.toLocaleString('en-US', options);
+        }
+
+        /**
+         * Filters the table rows based on the input search criteria.
+         */
+        function filterTable() {
+            const name = document.getElementById('searchName').value.toLowerCase();
+            const staff = document.getElementById('searchStaff').value.toLowerCase();
+            const program = document.getElementById('searchProgram').value.toLowerCase();
+            const clas = document.getElementById('searchClass').value.toLowerCase();
+            const month = document.getElementById('searchMonth').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#logbook-table tbody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const visible =
+                    text.includes(name) &&
+                    text.includes(staff) &&
+                    text.includes(program) &&
+                    text.includes(clas) &&
+                    text.includes(month);
+                row.style.display = visible ? '' : 'none';
+            });
+        }
+
+        /**
+         * Downloads the current table data as a PDF.
+         */
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'pt',
+                format: 'a4'
+            });
+
+            doc.autoTable({
+                html: '#logbook-table',
+                startY: 20,
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 4,
+                    overflow: 'linebreak'
+                },
+                headStyles: {
+                    fillColor: [241, 196, 15], // Yellow color for header
+                    textColor: [0, 0, 0]
+                },
+                // Only export visible rows
+                // This feature is not directly supported by jspdf-autotable's html parser.
+                // A common workaround is to generate the data array manually from visible rows.
+                // For simplicity, this example will export all data from the HTML table.
+                // If only filtered data is needed, `body` option should be used with `filterTable` logic.
+            });
+
+            doc.save('logbook.pdf');
+        }
+
+        // Fetch data when the window loads
+        window.onload = fetchData;
+    </script>
 
 </body>
 </html>
