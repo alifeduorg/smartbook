@@ -1,408 +1,521 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Attendance Sheet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Custom styles for animations and specific overrides */
-        body {
-            font-family: 'Inter', sans-serif;
-            /* Gradient background for the entire page */
-            background: linear-gradient(to bottom right, #e0f2fe, #d1c4e9); /* Light blue to light purple */
-            min-height: 100vh; /* Ensure gradient covers full height */
-        }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            /* Changed to solid white background for clarity in PDF and on screen */
-            background-color: white; 
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.8s ease-out; /* Fade-in animation for the container */
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .dashboard-btn, .action-btn {
-            transition: all 0.3s ease; /* Smooth transition for all properties */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-        }
-        .dashboard-btn:hover, .action-btn:hover {
-            transform: translateY(-2px); /* Slight lift on hover */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
-        }
-        /* Table specific styles for better readability and appearance */
-        table {
-            border-collapse: separate; /* Use separate for rounded corners on cells */
-            border-spacing: 0; /* Remove space between cells */
-            overflow: hidden; /* Ensures rounded corners are applied correctly */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Table shadow */
-            animation: slideInUp 0.7s ease-out forwards; /* Slide-in animation for table */
-            opacity: 0; /* Start hidden for animation */
-            transform: translateY(20px); /* Start slightly below for animation */
-        }
-        @keyframes slideInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        th, td {
-            border: 1px solid #e2e8f0; /* Light border color */
-            padding: 12px 8px; /* More padding for better spacing */
-            text-align: center;
-            vertical-align: middle; /* Center content vertically */
-        }
-        th {
-            background-color: #edf2f7; /* Lighter header background */
-            font-weight: 600; /* Semi-bold header text */
-            color: #2d3748; /* Darker text color */
-            position: sticky; /* Sticky header */
-            top: 0;
-            z-index: 10;
-        }
-        tr:nth-child(even) {
-            background-color: #f7fafc; /* Zebra striping for rows */
-        }
-        tr:hover {
-            background-color: #e2e8f0; /* Highlight row on hover */
-            transition: background-color 0.2s ease;
-        }
-        /* Specific status colors */
-        .present { color: #10b981; font-weight: bold; } /* Green */
-        .absent { color: #ef4444; font-weight: bold; } /* Red */
-        .late { color: #f59e0b; font-weight: bold; } /* Orange */
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentor Attendance Sheet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global styles and body background animation */
+    body {
+      font-family: 'Inter', sans-serif; /* Using Inter font */
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(45deg, #a7d9ed, #e0f7fa, #a1d0c9, #f0fbe2); /* Soft, colorful gradient */
+      background-size: 400% 400%; /* Larger background for smooth animation */
+      animation: gradient 15s ease infinite; /* Gradient animation */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh; /* Full viewport height */
+      color: #333; /* Default text color */
+    }
 
-        /* Responsive adjustments for table */
-        @media (max-width: 768px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            tr {
-                border: 1px solid #ccc;
-                margin-bottom: 10px;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-            td {
-                border: none;
-                border-bottom: 1px solid #eee;
-                position: relative;
-                padding-left: 50%;
-                text-align: right;
-            }
-            td:before {
-                position: absolute;
-                top: 6px;
-                left: 6px;
-                width: 45%;
-                padding-right: 10px;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: bold;
-            }
-            /* Data labels for responsive table */
-            td:nth-of-type(1):before { content: "Mentor Name"; }
-            td:nth-of-type(2):before { content: "Mentor ID"; }
-            /* Dynamic content for daily columns will be harder to label this way */
-            /* For daily columns, the header is already in the cell */
-        }
+    /* Keyframe animation for the background gradient */
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
-        /* Custom modal styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 100; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    /* Main container for the attendance sheet */
+    #printArea {
+      background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white background */
+      border-radius: 16px; /* More rounded corners */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+      padding: 40px;
+      width: 95%; /* Responsive width */
+      max-width: 1400px; /* Max width for larger screens */
+      text-align: center;
+      box-sizing: border-box; /* Include padding in width */
+      overflow-x: auto; /* Allow horizontal scrolling for table if needed */
+    }
+
+    /* Button styling */
+    .dashboard-btn, .action-btn {
+      background: linear-gradient(to right, #007bff, #00c6ff); /* Blue gradient */
+      color: white;
+      padding: 14px 28px;
+      margin: 10px 10px;
+      border: none;
+      border-radius: 10px; /* Rounded buttons */
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 600;
+      transition: all 0.3s ease; /* Smooth transition for hover effects */
+      box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); /* Soft shadow */
+      display: inline-flex; /* Align icon and text */
+      align-items: center;
+      gap: 8px; /* Space between icon and text */
+    }
+
+    .dashboard-btn:hover, .action-btn:hover {
+      background: linear-gradient(to right, #0056b3, #0099e6); /* Darker gradient on hover */
+      transform: translateY(-2px); /* Slight lift effect */
+      box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3); /* Enhanced shadow on hover */
+    }
+
+    /* Heading style */
+    h2 {
+      color: #2c3e50; /* Darker, more professional color */
+      margin-bottom: 30px;
+      font-size: 3em; /* Larger heading */
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); /* Subtle text shadow */
+    }
+
+    /* Label for month picker */
+    label {
+      font-size: 1.2em;
+      color: #555;
+      margin-right: 15px;
+      font-weight: 600;
+    }
+
+    /* Month input styling */
+    input[type="month"] {
+      padding: 12px;
+      font-size: 16px;
+      margin: 10px 5px;
+      border: 1px solid #c0d9e7; /* Softer border color */
+      border-radius: 8px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Inner shadow */
+    }
+
+    input[type="month"]:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus ring */
+      outline: none;
+    }
+
+    /* Table styling */
+    table {
+      margin-top: 40px;
+      width: 100%;
+      border-collapse: separate; /* Use separate for rounded corners on cells */
+      border-spacing: 0; /* Remove default spacing */
+      font-size: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+      border-radius: 12px; /* Rounded table corners */
+      overflow: hidden; /* Ensures rounded corners are visible */
+      background-color: white;
+    }
+
+    th, td {
+      border: 1px solid #e0e0e0; /* Lighter border for cells */
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #eaf6ff; /* Light blue header background */
+      color: #333;
+      font-weight: 700;
+      text-transform: uppercase;
+      position: sticky; /* Make headers sticky for scrolling */
+      top: 0;
+      z-index: 10;
+    }
+
+    /* Striped rows */
+    tr:nth-child(even) {
+      background-color: #f8fcfd; /* Very light blue for even rows */
+    }
+
+    /* Hover effect on table rows */
+    tr:hover {
+      background-color: #e6f7ff; /* Light blue on hover */
+      transition: background-color 0.2s ease;
+    }
+
+    /* Status specific styling */
+    .present {
+      color: #28a745; /* Green */
+      font-weight: bold;
+      background-color: #e6ffe6; /* Very light green background */
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block; /* For better padding */
+    }
+
+    .absent {
+      color: #dc3545; /* Red */
+      font-weight: bold;
+      background-color: #ffe6e6; /* Very light red background */
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .late {
+      color: #ffc107; /* Orange */
+      font-weight: bold;
+      background-color: #fffbe6; /* Very light yellow background */
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    /* Container for the attendance table */
+    #attendanceContainer {
+      margin-top: 30px;
+      overflow-x: auto; /* Enable horizontal scrolling if table is too wide */
+    }
+
+    /* Loading indicator styles */
+    .loading-indicator {
+      display: none; /* Hidden by default */
+      margin-top: 30px;
+      font-size: 1.5em;
+      color: #007bff;
+      font-weight: 600;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      #printArea {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 2em;
+      }
+
+      .dashboard-btn, .action-btn {
+        padding: 10px 20px;
+        font-size: 15px;
+        margin: 8px 5px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      input[type="month"] {
+        width: calc(100% - 20px); /* Full width minus padding */
+        margin-bottom: 15px;
+      }
+
+      th, td {
+        padding: 8px 5px;
+        font-size: 13px;
+      }
+    }
+
+    /* Styles for PDF generation to ensure full content is captured */
+    .pdf-export-mode #printArea {
+      width: auto !important; /* Allow printArea to expand */
+      max-width: none !important; /* Remove max-width constraint */
+      overflow-x: visible !important; /* Ensure content is not clipped */
+    }
+
+    .pdf-export-mode #attendanceContainer {
+      overflow-x: visible !important; /* Ensure content is not clipped */
+      width: auto !important; /* Allow container to expand */
+    }
+
+    .pdf-export-mode table {
+      width: max-content !important; /* Make table expand to its full content width */
+      min-width: 100% !important; /* Ensure it's at least 100% wide */
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="p-4">
+<body>
 
-    <div id="printArea" class="container">
-        <div class="flex items-center justify-between mb-6">
-            <button class="dashboard-btn bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                </svg>
-                Dashboard
-            </button>
-            <h2 class="text-3xl font-bold text-gray-800 text-center flex-grow">Mentor Attendance Report</h2>
-            <div></div> </div>
+  <div id="printArea">
+    <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
+    <h2>Mentor Attendance Report</h2>
 
-        <div class="flex flex-wrap items-center justify-center md:justify-end gap-4 mb-8">
-            <label class="text-lg font-medium text-gray-700 flex items-center gap-2">
-                Select Month:
-                <input type="month" id="monthPicker" class="p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-400 focus:border-transparent transition duration-200" />
-            </label>
-            <button id="loadButton" class="action-btn bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l3-3a1 1 0 111.414 1.414L7.414 8H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 01-1.414 1.414l-3-3z" clip-rule="evenodd" />
-                </svg>
-                Load
-            </button>
-            <button id="downloadPdfButton" class="action-btn bg-purple-600 text-white px-5 py-2 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-                Download PDF
-            </button>
-        </div>
-
-        <div id="attendanceContainer" class="overflow-x-auto relative shadow-md sm:rounded-lg">
-            <p class="text-center text-gray-500 py-10">Select a month and click 'Load' to view attendance data.</p>
-        </div>
+    <div class="controls">
+      <label>Select Month:
+        <input type="month" id="monthPicker" />
+      </label>
+      <button class="action-btn" onclick="loadMentorData()">Load Data</button>
+      <button class="action-btn" onclick="downloadPDF()">📄 Download PDF</button>
     </div>
 
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <p id="modalMessage" class="text-lg text-gray-800"></p>
-            <button id="modalOkButton" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">OK</button>
-        </div>
-    </div>
+    <div id="loadingIndicator" class="loading-indicator">Loading attendance data...</div>
 
-    <script>
-        // Replace with your actual Apps Script URL
-        const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec'; 
+    <div id="attendanceContainer"></div>
+  </div>
 
-        // Get references to buttons and modal elements
-        const dashboardBtn = document.querySelector('.dashboard-btn');
-        const loadButton = document.getElementById('loadButton');
-        const downloadPdfButton = document.getElementById('downloadPdfButton');
-        const modal = document.getElementById('myModal');
-        const modalMessage = document.getElementById('modalMessage');
-        const closeButton = document.querySelector('.close-button');
-        const modalOkButton = document.getElementById('modalOkButton');
+  <script>
+    // Google Apps Script Web App URL - REPLACE THIS WITH YOUR ACTUAL DEPLOYED URL
+    const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec';
 
-        // Function to display custom modal message
-        function showModal(message) {
-            modalMessage.textContent = message;
-            modal.style.display = 'flex'; // Use flex to center content
+    /**
+     * Navigates to the previous page in the browser history.
+     */
+    function goToDashboard() {
+      window.history.back(); // Changed from window.location.href to go back
+    }
+
+    /**
+     * Returns a display symbol and class based on the attendance status.
+     * @param {string} status - The attendance status (e.g., 'present', 'absent', 'late').
+     * @returns {object} An object containing the symbol and CSS class.
+     */
+    function getStatusSymbol(status) {
+      if (!status) return { symbol: '-', class: '' };
+      switch (status.toLowerCase()) {
+        case 'present': return { symbol: '✔️', class: 'present' }; // Checkmark for present
+        case 'absent': return { symbol: '❌', class: 'absent' };  // Cross for absent
+        case 'late': return { symbol: '⏰', class: 'late' };    // Clock for late
+        default: return { symbol: status, class: '' };      // Fallback to original status if not recognized
+      }
+    }
+
+    /**
+     * Determines the combined status for a day based on an array of individual class statuses.
+     * Prioritizes Absent > Late > Present.
+     * @param {string[]} statuses - An array of attendance statuses for classes on a given day.
+     * @returns {string} The combined status ('Present', 'Absent', 'Late', or '').
+     */
+    function getCombinedStatus(statuses) {
+      if (!statuses || statuses.length === 0) return '';
+      if (statuses.some(s => s.toLowerCase() === 'absent')) return 'Absent';
+      if (statuses.some(s => s.toLowerCase() === 'late')) return 'Late';
+      return 'Present'; // If no absent or late, then it's present
+    }
+
+    /**
+     * Loads mentor attendance data from the Google Sheet API,
+     * processes it, and displays it in a dynamic HTML table.
+     * Assumes daily duration from sheet is already in minutes.
+     * Converts monthly total minutes to hours for display.
+     */
+    async function loadMentorData() {
+      const monthInput = document.getElementById('monthPicker').value;
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const attendanceContainer = document.getElementById('attendanceContainer');
+
+      // Validate if a month is selected
+      if (!monthInput) {
+        // Using a custom alert-like message instead of window.alert()
+        const alertDiv = document.createElement('div');
+        alertDiv.style.cssText = `
+          position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          background-color: #ffeb3b; padding: 20px; border-radius: 8px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;
+          font-weight: bold; color: #333;
+        `;
+        alertDiv.textContent = 'Please select a month!';
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000); // Remove after 3 seconds
+        return;
+      }
+
+      // Show loading indicator and clear previous content
+      loadingIndicator.style.display = 'block';
+      attendanceContainer.innerHTML = '';
+
+      const [year, month] = monthInput.split('-').map(Number); // Parse year and month
+
+      try {
+        // Fetch data from the Google Apps Script API
+        const res = await fetch(sheetAPI);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
         }
+        const data = await res.json();
 
-        // Event Listeners for modal
-        closeButton.addEventListener('click', () => {
-            modal.style.display = 'none';
+        // Filter data for the selected month
+        const filtered = data.filter(row => {
+          const d = new Date(row.Date);
+          // Month is 0-indexed in JavaScript Date object, so subtract 1
+          return d.getFullYear() === year && d.getMonth() === month - 1;
         });
-        modalOkButton.addEventListener('click', () => {
-            modal.style.display = 'none';
+
+        const mentors = {}; // Object to store processed mentor data
+
+        // Process each row of filtered data
+        filtered.forEach(row => {
+          const id = row.MentorID; // Changed from TeacherID to MentorID
+          // Initialize mentor data if not already present
+          if (!mentors.hasOwnProperty(id)) {
+            mentors[id] = {
+              name: row.MentorName, // Changed from TeacherName to MentorName
+              days: {}, // Will store an object where keys are days, values are arrays of periods
+              totalMonthlyMinutes: 0 // Initialize total minutes for the mentor for the month
+            };
+          }
+
+          const day = new Date(row.Date).getDate();
+          // Initialize the day's periods array if not already present
+          if (!mentors[id].days.hasOwnProperty(day)) {
+            mentors[id].days[day] = [];
+          }
+
+          // Duration is now directly in minutes from the sheet
+          const durationInMinutes = parseFloat(row.Duration) || 0;
+
+          // Add the current period's data to the day's array
+          mentors[id].days[day].push({
+            status: row.Status,
+            durationMinutes: durationInMinutes
+          });
+
+          // Accumulate total minutes for the mentor for the month
+          mentors[id].totalMonthlyMinutes += durationInMinutes;
         });
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
+
+        // Determine the number of days in the selected month
+        const daysInMonth = new Date(year, month, 0).getDate();
+        let html = '<table><thead><tr><th>Mentor Name</th><th>Mentor ID</th>'; // Changed headers
+
+        // Generate table headers for each day of the month
+        for (let d = 1; d <= daysInMonth; d++) {
+          html += `<th>${d}<br>Mins</th>`; // Display 'Mins' for daily duration
+        }
+        html += '<th>Total Hrs</th></tr></thead><tbody>'; // Header for total hours
+
+        // Populate table rows with mentor attendance data
+        for (const id in mentors) {
+          const info = mentors[id];
+          html += `<tr><td>${info.name}</td><td>${id}</td>`;
+          for (let d = 1; d <= daysInMonth; d++) {
+            const dayPeriods = info.days[d];
+            let dailyTotalMinutes = 0;
+            let dailyStatuses = []; // To collect all statuses for the day
+
+            if (dayPeriods && dayPeriods.length > 0) {
+              dayPeriods.forEach(period => {
+                dailyTotalMinutes += period.durationMinutes;
+                dailyStatuses.push(period.status.toLowerCase());
+              });
+
+              // Determine overall daily status
+              const combinedStatus = getCombinedStatus(dailyStatuses);
+              // Correctly use getStatusSymbol to get both symbol and class
+              const statusDisplay = getStatusSymbol(combinedStatus); 
+
+              // Apply status-specific class for styling
+              html += `<td><span class="${statusDisplay.class}">${statusDisplay.symbol}</span><br>${dailyTotalMinutes}</td>`;
+            } else {
+              html += `<td>-</td>`; // Display '-' if no data for the day
             }
+          }
+          // Calculate and display total hours for the month
+          const totalHours = (info.totalMonthlyMinutes / 60).toFixed(2); // Convert total minutes to hours
+          html += `<td><strong>${totalHours}</strong></td></tr>`;
+        }
+
+        html += '</tbody></table>';
+        attendanceContainer.innerHTML = html; // Render the table
+      } catch (error) {
+        console.error('Error loading mentor data:', error);
+        // Display an error message to the user
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+          color: #dc3545; font-weight: bold; margin-top: 20px;
+          background-color: #ffe6e6; padding: 15px; border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        `;
+        errorDiv.textContent = 'Failed to load data. Please check the API URL or your internet connection.';
+        attendanceContainer.innerHTML = ''; // Clear previous content
+        document.getElementById('attendanceContainer').appendChild(errorDiv);
+      } finally {
+        // Hide loading indicator regardless of success or failure
+        loadingIndicator.style.display = 'none';
+      }
+    }
+
+    /**
+     * Downloads the attendance report as a PDF.
+     * Uses html2pdf.js library.
+     */
+    function downloadPDF() {
+      const element = document.getElementById('printArea');
+      const attendanceContainer = document.getElementById('attendanceContainer');
+      const table = attendanceContainer.querySelector('table');
+      const body = document.body;
+
+      // Store original styles
+      const originalPrintAreaWidth = element.style.width;
+      const originalPrintAreaMaxWidth = element.style.maxWidth;
+      const originalPrintAreaOverflowX = element.style.overflowX;
+
+      const originalAttendanceContainerWidth = attendanceContainer.style.width;
+      const originalAttendanceContainerOverflowX = attendanceContainer.style.overflowX;
+
+      const originalTableWidth = table ? table.style.width : '';
+      const originalTableMinWidth = table ? table.style.minWidth : '';
+
+      // Apply PDF-specific styles
+      body.classList.add('pdf-export-mode'); // Apply class for general overrides
+
+      // Force elements to expand to their full content width
+      if (table) {
+        table.style.width = `${table.scrollWidth}px`; // Set table width to its full scrollWidth
+        table.style.minWidth = 'auto'; // Remove min-width constraint
+      }
+      element.style.width = 'auto'; // Allow printArea to expand
+      element.style.maxWidth = 'none'; // Remove max-width constraint
+      element.style.overflowX = 'visible'; // Ensure content is not clipped
+
+      attendanceContainer.style.width = 'auto'; // Allow container to expand
+      attendanceContainer.style.overflowX = 'visible'; // Ensure content is not clipped
+
+
+      // A small delay to ensure styles are applied before rendering
+      setTimeout(() => {
+        // Calculate the required width for the PDF based on the table's actual rendered width
+        // Use offsetWidth as it reflects the rendered width after styles are applied
+        const pdfContentWidth = table ? table.offsetWidth + 100 : 4000; // Add some padding, fallback to a large value
+        const pdfHeight = 2000; // A large enough height for typical reports
+
+        html2pdf().set({
+          margin: 0,
+          filename: 'Mentor_Attendance_Report.pdf', // Changed filename
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2, // Increased scale for better quality
+            useCORS: true,
+            // Explicitly set width to capture full content
+            width: pdfContentWidth // Use the calculated content width for html2canvas
+          },
+          jsPDF: {
+            unit: 'px',
+            format: [pdfContentWidth, pdfHeight], // Dynamic width based on table content
+            orientation: 'landscape'
+          }
+        }).from(element).save().then(() => {
+          // Restore original styles after PDF generation
+          body.classList.remove('pdf-export-mode');
+
+          element.style.width = originalPrintAreaWidth;
+          element.style.maxWidth = originalPrintAreaMaxWidth;
+          element.style.overflowX = originalPrintAreaOverflowX;
+
+          attendanceContainer.style.width = originalAttendanceContainerWidth;
+          attendanceContainer.style.overflowX = originalAttendanceContainerOverflowX;
+
+          if (table) {
+            table.style.width = originalTableWidth;
+            table.style.minWidth = originalTableMinWidth;
+          }
         });
-
-        // Event Listeners for main buttons
-        dashboardBtn.addEventListener('click', () => {
-            // In a real application, this would navigate to a dashboard page.
-            // For this single-page example, we'll just show a message.
-            showModal('Navigating to Dashboard (functionality not implemented in this snippet)');
-            // window.location.href = 'dashboard.html'; // Uncomment for actual navigation
-        });
-        loadButton.addEventListener('click', loadMentorData);
-        downloadPdfButton.addEventListener('click', downloadPDF);
-
-        /**
-         * Returns a display symbol and class for attendance status.
-         * @param {string} status - The attendance status (Present, Absent, Late).
-         * @returns {object} An object containing the symbol and CSS class.
-         */
-        function getStatusDisplay(status) {
-            if (!status) return { symbol: '-', class: '' };
-            switch (status.toLowerCase()) {
-                case 'present': return { symbol: '✔️', class: 'present' };
-                case 'absent': return { symbol: '❌', class: 'absent' };
-                case 'late': return { symbol: '⏰', class: 'late' };
-                default: return { symbol: status, class: '' };
-            }
-        }
-
-        /**
-         * Determines the combined status for a day based on an array of individual class statuses.
-         * Prioritizes Absent > Late > Present.
-         * @param {string[]} statuses - An array of attendance statuses for classes on a given day.
-         * @returns {string} The combined status ('Present', 'Absent', 'Late', or '').
-         */
-        function getCombinedStatus(statuses) {
-            if (!statuses || statuses.length === 0) return '';
-            if (statuses.some(s => s.toLowerCase() === 'absent')) return 'Absent';
-            if (statuses.some(s => s.toLowerCase() === 'late')) return 'Late';
-            return 'Present'; // If no absent or late, then it's present
-        }
-
-        /**
-         * Loads mentor attendance data from the Google Sheet API,
-         * filters by month, aggregates data for multiple classes on the same day,
-         * and displays it in a table.
-         */
-        async function loadMentorData() {
-            const monthInput = document.getElementById('monthPicker').value;
-            if (!monthInput) {
-                showModal('Please select a month');
-                return;
-            }
-
-            const [year, month] = monthInput.split('-').map(Number);
-            const attendanceContainer = document.getElementById('attendanceContainer');
-            attendanceContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Loading data...</p>'; // Loading indicator
-
-            try {
-                const res = await fetch(sheetAPI);
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                const data = await res.json();
-
-                // Filter data for the selected month
-                const filtered = data.filter(row => {
-                    const d = new Date(row.Date);
-                    return d.getFullYear() === year && d.getMonth() === month - 1;
-                });
-
-                const mentors = {};
-
-                // Process filtered data to aggregate by mentor and day
-                filtered.forEach(row => {
-                    const id = row.MentorID;
-                    // Ensure date is parsed correctly to get the day of the month
-                    const rowDate = new Date(row.Date);
-                    const day = rowDate.getDate(); 
-                    const durationInMinutes = parseFloat(row.Duration) || 0;
-                    const status = row.Status;
-
-                    if (!mentors[id]) {
-                        mentors[id] = {
-                            name: row.MentorName,
-                            days: {}, // This will store aggregated daily data
-                            totalMinutes: 0 // Initialize total minutes for the month
-                        };
-                    }
-
-                    // Initialize day data if not already present for this mentor and day
-                    if (!mentors[id].days[day]) {
-                        mentors[id].days[day] = {
-                            totalDuration: 0,
-                            statuses: [] // Store all statuses for the day to determine combined status
-                        };
-                    }
-
-                    // Aggregate for the current day
-                    mentors[id].days[day].totalDuration += durationInMinutes;
-                    mentors[id].days[day].statuses.push(status);
-                    mentors[id].totalMinutes += durationInMinutes; // Accumulate total minutes for the month
-                });
-
-                const daysInMonth = new Date(year, month, 0).getDate();
-                let html = `
-                    <table class="min-w-full divide-y divide-gray-200 rounded-lg">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Mentor Name</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mentor ID</th>
-                `;
-
-                // Generate daily headers
-                for (let d = 1; d <= daysInMonth; d++) {
-                    html += `<th scope="col" class="px-2 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">${d}<br>Mins</th>`;
-                }
-                html += `<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Total Hrs</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
-
-                // Populate table rows with mentor data
-                if (Object.keys(mentors).length === 0) {
-                    html += `<tr><td colspan="${daysInMonth + 3}" class="text-center py-4 text-gray-500">No attendance data found for the selected month.</td></tr>`;
-                } else {
-                    for (const [id, info] of Object.entries(mentors)) {
-                        html += `<tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${info.name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${id}</td>`;
-                        for (let d = 1; d <= daysInMonth; d++) {
-                            const dayData = info.days[d];
-                            if (dayData) {
-                                // Get combined status for the day and its display properties
-                                const combinedStatus = getCombinedStatus(dayData.statuses);
-                                const statusDisplay = getStatusDisplay(combinedStatus);
-                                html += `<td class="px-2 py-4 whitespace-nowrap text-sm ${statusDisplay.class}">${statusDisplay.symbol}<br>${dayData.totalDuration}</td>`;
-                            } else {
-                                html += `<td class="px-2 py-4 whitespace-nowrap text-sm text-gray-400">-</td>`;
-                            }
-                        }
-                        // Convert total minutes for the month to hours for display
-                        const totalHoursDisplay = (info.totalMinutes / 60).toFixed(2);
-                        html += `<td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${totalHoursDisplay}</td></tr>`;
-                    }
-                }
-
-                html += '</tbody></table>';
-                attendanceContainer.innerHTML = html;
-            } catch (error) {
-                console.error("Error fetching or processing data:", error);
-                attendanceContainer.innerHTML = `<p class="text-center text-red-500 py-10">Failed to load data. Please try again later. Error: ${error.message}</p>`;
-            }
-        }
-
-        /**
-         * Downloads the attendance report as a PDF.
-         */
-        function downloadPDF() {
-            const element = document.getElementById('printArea');
-            const originalWidth = element.style.width;
-            
-            // Temporarily set a large width to ensure all table columns are captured
-            element.style.width = '3500px'; 
-
-            html2pdf().set({
-                margin: 0.5, // Reduced margin for better fit
-                filename: 'Mentor_Attendance_Report.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: {
-                    unit: 'px', // Use pixels for precise control over custom format
-                    format: [3500, 2000], // Custom format: width 3500px, height 2000px
-                    orientation: 'landscape'
-                }
-            }).from(element).save().then(() => {
-                // Revert to original width after PDF generation
-                element.style.width = originalWidth; 
-            });
-        }
-    </script>
+      }, 300); // Increased delay to 300ms
+    }
+  </script>
 </body>
 </html>
