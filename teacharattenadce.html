@@ -324,22 +324,28 @@
           if (!teachers.hasOwnProperty(id)) {
             teachers[id] = {
               name: row.TeacherName,
-              days: {},
-              totalMinutes: 0 // Initialize total minutes for the teacher
+              days: {}, // Will store an object where keys are days, values are arrays of periods
+              totalMonthlyMinutes: 0 // Initialize total minutes for the teacher for the month
             };
           }
 
           const day = new Date(row.Date).getDate();
+          // Initialize the day's periods array if not already present
+          if (!teachers[id].days.hasOwnProperty(day)) {
+            teachers[id].days[day] = [];
+          }
+
           // Duration is now directly in minutes from the sheet
           const durationInMinutes = parseFloat(row.Duration) || 0;
 
-          // Store daily status and duration in minutes
-          teachers[id].days[day] = {
+          // Add the current period's data to the day's array
+          teachers[id].days[day].push({
             status: row.Status,
             durationMinutes: durationInMinutes
-          };
-          // Accumulate total minutes for the teacher
-          teachers[id].totalMinutes += durationInMinutes;
+          });
+
+          // Accumulate total minutes for the teacher for the month
+          teachers[id].totalMonthlyMinutes += durationInMinutes;
         });
 
         // Determine the number of days in the selected month
@@ -356,17 +362,34 @@
         for (const id in teachers) {
           const info = teachers[id];
           html += `<tr><td>${info.name}</td><td>${id}</td>`;
+
           for (let d = 1; d <= daysInMonth; d++) {
-            const dayData = info.days[d];
-            if (dayData) {
+            const dayPeriods = info.days[d];
+            let dailyTotalMinutes = 0;
+            let dailyStatuses = []; // To collect all statuses for the day
+
+            if (dayPeriods && dayPeriods.length > 0) {
+              dayPeriods.forEach(period => {
+                dailyTotalMinutes += period.durationMinutes;
+                dailyStatuses.push(period.status.toLowerCase());
+              });
+
+              // Determine overall daily status
+              let overallStatus = 'absent'; // Default to absent if no present/late
+              if (dailyStatuses.includes('present')) {
+                overallStatus = 'present';
+              } else if (dailyStatuses.includes('late')) {
+                overallStatus = 'late';
+              }
+
               // Apply status-specific class for styling
-              html += `<td><span class="${dayData.status.toLowerCase()}">${getStatusSymbol(dayData.status)}</span><br>${dayData.durationMinutes}</td>`;
+              html += `<td><span class="${overallStatus}">${getStatusSymbol(overallStatus)}</span><br>${dailyTotalMinutes}</td>`;
             } else {
               html += `<td>-</td>`; // Display '-' if no data for the day
             }
           }
           // Calculate and display total hours for the month
-          const totalHours = (info.totalMinutes / 60).toFixed(2); // Convert total minutes to hours
+          const totalHours = (info.totalMonthlyMinutes / 60).toFixed(2); // Convert total minutes to hours
           html += `<td><strong>${totalHours}</strong></td></tr>`;
         }
 
