@@ -1,271 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Logbook Entry</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #ffffff;
-      margin: 0;
-      padding: 0;
-      color: #0a1172;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Logbook Entry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global box-sizing for consistent layout */
+        * {
+            box-sizing: border-box;
+        }
 
-    .container {
-      max-width: 800px;
-      margin: 50px auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      border: 1px solid #eee;
-    }
+        /* Base styles for the body */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font for readability */
+            margin: 0;
+            padding: 0;
+            color: #0a1172; /* Dark blue text for good contrast */
+            background: linear-gradient(135deg, #e0f2f7, #c8e6f0, #e0f2f7); /* Subtle light blue gradient background */
+            background-size: 400% 400%; /* Larger background for smooth animation */
+            animation: gradientAnimation 15s ease infinite; /* Continuous, gentle gradient animation */
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            display: flex;
+            flex-direction: column; /* Arrange content vertically */
+            justify-content: space-between; /* Push footer to the bottom */
+            align-items: center; /* Center content horizontally */
+            padding-bottom: 20px; /* Add some padding at the bottom for spacing */
+        }
 
-    h2 {
-      text-align: center;
-      color: #0a1172;
-      margin-bottom: 30px;
-      font-size: 28px;
-    }
+        /* Keyframe animation for the background gradient */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+        /* Styles for the main container of the form */
+        .container {
+            max-width: 800px; /* Maximum width for the form on larger screens */
+            width: 90%; /* Responsive width, taking 90% of available space */
+            margin: 50px auto; /* Center the container with vertical margin */
+            background: #fff; /* White background for the form */
+            padding: 30px; /* Ample padding inside the container */
+            border-radius: 15px; /* Rounded corners for a softer look */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
+            border: 1px solid #eee; /* Subtle border */
+            transition: all 0.3s ease; /* Smooth transitions for any size changes */
+        }
 
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 8px;
-      color: #0a1172;
-    }
+        /* Heading styles */
+        h2 {
+            text-align: center;
+            color: #0a1172;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700; /* Bolder heading for emphasis */
+        }
 
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-      box-sizing: border-box;
-      transition: 0.2s ease-in-out;
-    }
+        /* Form group spacing */
+        .form-group {
+            margin-bottom: 20px; /* Space between form fields */
+        }
 
-    input:focus, select:focus, textarea:focus {
-      border-color: #ffd700;
-      outline: none;
-      box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-    }
+        /* Label styles */
+        label {
+            font-weight: 600;
+            display: block; /* Make labels block-level for proper spacing */
+            margin-bottom: 8px; /* Space between label and input */
+            color: #0a1172;
+        }
 
-    button {
-      background-color: #0a1172;
-      color: #ffd700;
-      padding: 12px;
-      width: 100%;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+        /* Styles for input, select, and textarea elements */
+        input, select, textarea {
+            width: 100%; /* Full width within their parent container */
+            padding: 12px; /* Consistent padding for all input types */
+            border-radius: 8px; /* Rounded borders */
+            border: 1px solid #ccc; /* Light grey border */
+            font-size: 15px; /* Readable font size */
+            box-sizing: border-box; /* Include padding and border in the element's total width */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions for focus effects */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Subtle inner shadow for depth */
+        }
 
-    button:hover {
-      background-color: #ffd700;
-      color: #0a1172;
-    }
+        /* Specific style for textareas to ensure a minimum height */
+        textarea {
+            min-height: 90px; /* Ensure textareas are not too small */
+            resize: vertical; /* Allow vertical resizing only */
+        }
 
-    .message {
-      display: none;
-      padding: 15px;
-      margin-top: 20px;
-      background-color: #2ecc71;
-      color: white;
-      text-align: center;
-      border-radius: 5px;
-    }
+        /* Focus styles for input, select, and textarea */
+        input:focus, select:focus, textarea:focus {
+            border-color: #ffd700; /* Gold focus border */
+            outline: none; /* Remove default outline */
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* Gold glow on focus */
+        }
 
-    .dashboard-btn {
-      background-color: #ffd700;
-      color: #0a1172;
-      margin-top: 20px;
-    }
+        /* Button styles */
+        button {
+            background-color: #0a1172; /* Dark blue button background */
+            color: #ffd700; /* Gold text color */
+            padding: 14px; /* Generous padding for easy tapping/clicking */
+            width: 100%; /* Full width button */
+            font-size: 17px; /* Slightly larger font for buttons */
+            border: none; /* No border */
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer; /* Indicate clickable element */
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Button shadow */
+        }
 
-    .dashboard-btn:hover {
-      background-color: #e0bb00;
-    }
+        /* Button hover effects */
+        button:hover {
+            background-color: #ffd700; /* Gold background on hover */
+            color: #0a1172; /* Dark blue text on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Deeper shadow on hover */
+        }
 
-    footer.footer {
-      background-color: #0a1172;
-      color: #ffd700;
-      text-align: center;
-      padding: 15px 10px;
-      margin-top: 60px;
-      font-size: 14px;
-      border-top: 2px solid #ffd700;
-    }
+        /* Message box styles (for success/error messages) */
+        .message {
+            display: none; /* Hidden by default */
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #2ecc71; /* Green for success */
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.4);
+        }
 
-    @media (max-width: 768px) {
-      .container {
-        margin: 20px;
-        padding: 20px;
-      }
+        /* Dashboard button specific styles */
+        .dashboard-btn {
+            background-color: #ffd700; /* Gold dashboard button */
+            color: #0a1172; /* Dark blue text */
+            margin-top: 20px;
+            border: 1px solid #e0bb00; /* Slightly darker gold border */
+        }
 
-      h2 {
-        font-size: 24px;
-      }
-    }
-  </style>
+        /* Dashboard button hover effects */
+        .dashboard-btn:hover {
+            background-color: #e0bb00; /* Darker gold on hover */
+            color: #0a1172;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer styles */
+        footer.footer {
+            background-color: #0a1172;
+            color: #ffd700;
+            text-align: center;
+            padding: 15px 10px;
+            margin-top: 60px; /* Adjust margin for spacing from content */
+            font-size: 14px;
+            border-top: 2px solid #ffd700;
+            width: 100%; /* Full width footer */
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto; /* Adjust margin for smaller screens */
+                padding: 20px; /* Reduce padding on smaller screens */
+            }
+
+            h2 {
+                font-size: 24px; /* Smaller heading font size */
+            }
+
+            button {
+                padding: 12px; /* Slightly less padding for buttons */
+                font-size: 16px; /* Smaller button font size */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 15px auto; /* Even less margin for very small screens */
+                padding: 15px; /* Further reduce padding */
+            }
+
+            h2 {
+                font-size: 22px; /* Smallest heading font size */
+            }
+
+            input, select, textarea {
+                padding: 10px; /* Slightly smaller padding for inputs */
+                font-size: 14px; /* Smaller font size for inputs */
+            }
+
+            label {
+                font-size: 14px; /* Smaller font size for labels */
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>Log Book</h2>
+    <div class="container">
+        <h2>Log Book</h2>
 
-    <form id="logbookForm" action="https://script.google.com/macros/s/AKfycbwHBn0I_C2X9uoLJgq85V2i6ntnUCRHmd3lfFt8A-r5_MzCZFiZqrTmKOWcBfudZ1TlvQ/exec" method="POST">
-      <div class="form-group">
-        <label for="date">Date</label>
-        <input type="date" id="date" name="date" required>
-      </div>
+        <form id="logbookForm" action="https://script.google.com/macros/s/AKfycbwHBn0I_C2X9uoLJgq85V2i6ntnUCRHmd3lfFt8A-r5_MzCZFiZqrTmKOWcBfudZ1TlvQ/exec" method="POST">
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
 
-      <div class="form-group">
-        <label for="month">Month</label>
-        <select id="month" name="month" required>
-          <option>January</option><option>February</option><option>March</option>
-          <option>April</option><option>May</option><option>June</option>
-          <option>July</option><option>August</option><option>September</option>
-          <option>October</option><option>November</option><option>December</option>
-        </select>
-      </div>
+            <div class="form-group">
+                <label for="month">Month</label>
+                <select id="month" name="month" required>
+                    <option>January</option><option>February</option><option>March</option>
+                    <option>April</option><option>May</option><option>June</option>
+                    <option>July</option><option>August</option><option>September</option>
+                    <option>October</option><option>November</option><option>December</option>
+                </select>
+            </div>
 
-      <div class="form-group">
-        <label for="teacherName">Teacher's Name</label>
-        <input type="text" id="teacherName" name="teacherName" required>
-      </div>
+            <div class="form-group">
+                <label for="teacherName">Teacher's Name</label>
+                <input type="text" id="teacherName" name="teacherName" required>
+            </div>
 
-      <div class="form-group">
-        <label for="staffID">Staff ID</label>
-        <input type="text" id="staffID" name="staffID" required>
-      </div>
+            <div class="form-group">
+                <label for="staffID">Staff ID</label>
+                <input type="text" id="staffID" name="staffID" required>
+            </div>
 
-      <div class="form-group">
-        <label for="program">Program</label>
-        <select id="program" name="program" required>
-          <option value="little_leaner">Little Learner</option>
-          <option value="kg">KG</option>
-          <option value="online_school">Online School</option>
-          <option value="horizon">Horizon</option>
-        </select>
-      </div>
+            <div class="form-group">
+                <label for="program">Program</label>
+                <select id="program" name="program" required>
+                    <option value="little_leaner">Little Learner</option>
+                    <option value="kg">KG</option>
+                    <option value="online_school">Online School</option>
+                    <option value="horizon">Horizon</option>
+                </select>
+            </div>
 
-      <div class="form-group">
-        <label for="class">Class</label>
-        <input type="text" id="class" name="class" required>
-      </div>
+            <div class="form-group">
+                <label for="class">Class</label>
+                <input type="text" id="class" name="class" required>
+            </div>
 
-      <div class="form-group">
-        <label for="studentName">Student Name</label>
-        <input type="text" id="studentName" name="studentName" required>
-      </div>
+            <div class="form-group">
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" name="studentName" required>
+            </div>
 
-      <div class="form-group">
-        <label for="subjects">Subjects</label>
-        <input type="text" id="subjects" name="subjects" required>
-      </div>
+            <div class="form-group">
+                <label for="subjects">Subjects</label>
+                <input type="text" id="subjects" name="subjects" required>
+            </div>
 
-      <div class="form-group">
-        <label for="classIn">Class In (Time)</label>
-        <input type="time" id="classIn" name="classIn" required>
-      </div>
+            <div class="form-group">
+                <label for="classIn">Class In (Time)</label>
+                <input type="time" id="classIn" name="classIn" required>
+            </div>
 
-      <div class="form-group">
-        <label for="classDuration">Class Duration</label>
-        <select id="classDuration" name="classDuration" required>
-          <option value="30">30 minutes</option>
-          <option value="60">60 minutes</option>
-          <option value="90">60 + 30 minutes</option>
-          <option value="120">60 + 30 + 30 minutes</option>
-        </select>
-      </div>
+            <div class="form-group">
+                <label for="classDuration">Class Duration</label>
+                <select id="classDuration" name="classDuration" required>
+                    <option value="30">30 minutes</option>
+                    <option value="60">60 minutes</option>
+                    <option value="90">60 + 30 minutes</option>
+                    <option value="120">60 + 30 + 30 minutes</option>
+                </select>
+            </div>
 
-      <div class="form-group">
-        <label for="teachToday">What did you teach today?</label>
-        <textarea id="teachToday" name="teachToday" rows="3" required></textarea>
-      </div>
+            <div class="form-group">
+                <label for="teachToday">What did you teach today?</label>
+                <textarea id="teachToday" name="teachToday" rows="3" required></textarea>
+            </div>
 
-      <div class="form-group">
-        <label for="studentEngagement">Student Engagement</label>
-        <textarea id="studentEngagement" name="studentEngagement" rows="3" required></textarea>
-      </div>
+            <div class="form-group">
+                <label for="studentEngagement">Student Engagement</label>
+                <textarea id="studentEngagement" name="studentEngagement" rows="3" required></textarea>
+            </div>
 
-      <div class="form-group">
-        <label for="homework">Homework or Tasks Given?</label>
-        <textarea id="homework" name="homework" rows="3" required></textarea>
-      </div>
+            <div class="form-group">
+                <label for="homework">Homework or Tasks Given?</label>
+                <textarea id="homework" name="homework" rows="3" required></textarea>
+            </div>
 
-      <div class="form-group">
-        <label for="workType">What type of Work</label>
-        <input type="text" id="workType" name="workType" required>
-      </div>
+            <div class="form-group">
+                <label for="workType">What type of Work</label>
+                <input type="text" id="workType" name="workType" required>
+            </div>
 
-      <div class="form-group">
-        <label for="classNotification">Upload Class Notification Message</label>
-        <textarea id="classNotification" name="classNotification" rows="2"></textarea>
-      </div>
+            <div class="form-group">
+                <label for="classNotification">Upload Class Notification Message</label>
+                <textarea id="classNotification" name="classNotification" rows="2"></textarea>
+            </div>
 
-      <div class="form-group">
-        <label for="additionalComments">Anything you'd like to share?</label>
-        <textarea id="additionalComments" name="additionalComments" rows="2"></textarea>
-      </div>
+            <div class="form-group">
+                <label for="additionalComments">Anything you'd like to share?</label>
+                <textarea id="additionalComments" name="additionalComments" rows="2"></textarea>
+            </div>
 
-      <button type="submit">Submit Logbook Entry</button>
+            <button type="submit">Submit Logbook Entry</button>
 
-      <div class="message" id="successMessage">
-        Your logbook entry has been submitted successfully!
-      </div>
-    </form>
+            <div class="message" id="successMessage">
+                Your logbook entry has been submitted successfully!
+            </div>
+        </form>
 
-    <button class="dashboard-btn" onclick="window.location.href='http://smartbook.alifedu.org/teacher-dashboard.html'">Go to Dashboard</button>
-  </div>
+        <button class="dashboard-btn" onclick="window.location.href='http://smartbook.alifedu.org/teacher-dashboard.html'">Go to Dashboard</button>
+    </div>
 
-  <footer class="footer">
-    <p>© Alif Edu 2025. All rights reserved.</p>
-  </footer>
+    <footer class="footer">
+        <p>© Alif Edu 2025. All rights reserved.</p>
+    </footer>
 
-  <script>
-  document.getElementById('logbookForm').onsubmit = function(e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const submitButton = form.querySelector('button[type="submit"]');
+    <script>
+        document.getElementById('logbookForm').onsubmit = function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
 
-    // Disable button and show loading text
-    submitButton.disabled = true;
-    submitButton.innerText = 'Submitting...';
+            // Disable button and show loading text
+            submitButton.disabled = true;
+            submitButton.innerText = 'Submitting...';
 
-    fetch(form.action, {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.result === "success") {
-        document.getElementById('successMessage').style.display = 'block';
-        setTimeout(() => window.location.reload(), 2000);
-      } else {
-        alert('Submission failed. Please try again.');
-        submitButton.disabled = false;
-        submitButton.innerText = 'Submit Logbook Entry';
-      }
-    })
-    .catch(error => {
-      console.error('Error!', error.message);
-      alert('Error submitting the form. Please check your connection.');
-      submitButton.disabled = false;
-      submitButton.innerText = 'Submit Logbook Entry';
-    });
-  };
-</script>
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "success") {
+                    document.getElementById('successMessage').style.display = 'block';
+                    // For success, a simple display change is fine as per current code.
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    // Custom message box for error instead of alert
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'message';
+                    errorMessage.style.display = 'block';
+                    errorMessage.style.backgroundColor = '#e74c3c'; /* Red for error */
+                    errorMessage.innerText = 'Submission failed. Please try again.';
+                    form.appendChild(errorMessage);
+                    setTimeout(() => errorMessage.style.display = 'none', 3000); // Hide after 3 seconds
 
+                    submitButton.disabled = false;
+                    submitButton.innerText = 'Submit Logbook Entry';
+                }
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                // Custom message box for error instead of alert
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'message';
+                errorMessage.style.display = 'block';
+                errorMessage.style.backgroundColor = '#e74c3c'; /* Red for error */
+                errorMessage.innerText = 'Error submitting the form. Please check your connection.';
+                form.appendChild(errorMessage);
+                setTimeout(() => errorMessage.style.display = 'none', 3000); // Hide after 3 seconds
+
+                submitButton.disabled = false;
+                submitButton.innerText = 'Submit Logbook Entry';
+            });
+        };
+    </script>
 
 </body>
 </html>
