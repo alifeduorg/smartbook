@@ -219,6 +219,23 @@
         font-size: 13px;
       }
     }
+
+    /* New styles for PDF generation to ensure full content is captured */
+    .pdf-export-mode #printArea {
+      width: auto !important; /* Allow printArea to expand */
+      max-width: none !important; /* Remove max-width constraint */
+      overflow-x: visible !important; /* Ensure content is not clipped */
+    }
+
+    .pdf-export-mode #attendanceContainer {
+      overflow-x: visible !important; /* Ensure content is not clipped */
+      width: auto !important; /* Allow container to expand */
+    }
+
+    .pdf-export-mode table {
+      width: max-content !important; /* Make table expand to its full content width */
+      min-width: 100% !important; /* Ensure it's at least 100% wide */
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -419,26 +436,76 @@
      */
     function downloadPDF() {
       const element = document.getElementById('printArea');
-      // Store original width to restore after PDF generation
-      const originalWidth = element.style.width;
-      // Temporarily set a wider width for better PDF output, especially for many columns
-      element.style.width = '3500px';
+      const attendanceContainer = document.getElementById('attendanceContainer');
+      const table = attendanceContainer.querySelector('table');
+      const body = document.body;
 
-      // Configure and generate PDF
-      html2pdf().set({
-        margin: 0,
-        filename: 'Teacher_Attendance_Report.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true }, // Scale for better quality, useCORS for images
-        jsPDF: {
-          unit: 'px',
-          format: [3500, 2000], // Custom format for landscape orientation
-          orientation: 'landscape'
-        }
-      }).from(element).save().then(() => {
-        // Restore original width after PDF generation
-        element.style.width = originalWidth;
-      });
+      // Store original styles
+      const originalPrintAreaWidth = element.style.width;
+      const originalPrintAreaMaxWidth = element.style.maxWidth;
+      const originalPrintAreaOverflowX = element.style.overflowX;
+
+      const originalAttendanceContainerWidth = attendanceContainer.style.width;
+      const originalAttendanceContainerOverflowX = attendanceContainer.style.overflowX;
+
+      const originalTableWidth = table ? table.style.width : '';
+      const originalTableMinWidth = table ? table.style.minWidth : '';
+
+      // Apply PDF-specific styles
+      body.classList.add('pdf-export-mode'); // Apply class for general overrides
+
+      // Force elements to expand to their full content width
+      if (table) {
+        table.style.width = `${table.scrollWidth}px`; // Set table width to its full scrollWidth
+        table.style.minWidth = 'auto'; // Remove min-width constraint
+      }
+      element.style.width = 'auto'; // Allow printArea to expand
+      element.style.maxWidth = 'none'; // Remove max-width constraint
+      element.style.overflowX = 'visible'; // Ensure content is not clipped
+
+      attendanceContainer.style.width = 'auto'; // Allow container to expand
+      attendanceContainer.style.overflowX = 'visible'; // Ensure content is not clipped
+
+
+      // A small delay to ensure styles are applied before rendering
+      setTimeout(() => {
+        // Calculate the required width for the PDF based on the table's actual rendered width
+        // Use offsetWidth as it reflects the rendered width after styles are applied
+        const pdfContentWidth = table ? table.offsetWidth + 100 : 4000; // Add some padding, fallback to a large value
+        const pdfHeight = 2000; // A large enough height for typical reports
+
+        html2pdf().set({
+          margin: 0,
+          filename: 'Teacher_Attendance_Report.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2, // Increased scale for better quality
+            useCORS: true,
+            // Explicitly set width to capture full content
+            width: pdfContentWidth // Use the calculated content width for html2canvas
+          },
+          jsPDF: {
+            unit: 'px',
+            format: [pdfContentWidth, pdfHeight], // Dynamic width based on table content
+            orientation: 'landscape'
+          }
+        }).from(element).save().then(() => {
+          // Restore original styles after PDF generation
+          body.classList.remove('pdf-export-mode');
+
+          element.style.width = originalPrintAreaWidth;
+          element.style.maxWidth = originalPrintAreaMaxWidth;
+          element.style.overflowX = originalPrintAreaOverflowX;
+
+          attendanceContainer.style.width = originalAttendanceContainerWidth;
+          attendanceContainer.style.overflowX = originalAttendanceContainerOverflowX;
+
+          if (table) {
+            table.style.width = originalTableWidth;
+            table.style.minWidth = originalTableMinWidth;
+          }
+        });
+      }, 300); // Increased delay to 300ms
     }
   </script>
 </body>
