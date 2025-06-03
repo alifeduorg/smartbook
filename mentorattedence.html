@@ -114,6 +114,44 @@
             /* Dynamic content for daily columns will be harder to label this way */
             /* For daily columns, the header is already in the cell */
         }
+
+        /* Custom modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 100; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -154,20 +192,51 @@
         </div>
     </div>
 
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modalMessage" class="text-lg text-gray-800"></p>
+            <button id="modalOkButton" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">OK</button>
+        </div>
+    </div>
+
     <script>
         // Replace with your actual Apps Script URL
         const sheetAPI = 'https://script.google.com/macros/s/AKfycbwUmtCb0jaE4Jq5DZ01wj0_ag5EbG8S3xPhslvjjyGf02Nujd0yNNfb9oX5rR1Po-6sEA/exec'; 
 
-        // Get references to buttons
+        // Get references to buttons and modal elements
         const dashboardBtn = document.querySelector('.dashboard-btn');
         const loadButton = document.getElementById('loadButton');
         const downloadPdfButton = document.getElementById('downloadPdfButton');
+        const modal = document.getElementById('myModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeButton = document.querySelector('.close-button');
+        const modalOkButton = document.getElementById('modalOkButton');
 
-        // Event Listeners
+        // Function to display custom modal message
+        function showModal(message) {
+            modalMessage.textContent = message;
+            modal.style.display = 'flex'; // Use flex to center content
+        }
+
+        // Event Listeners for modal
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        modalOkButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Event Listeners for main buttons
         dashboardBtn.addEventListener('click', () => {
             // In a real application, this would navigate to a dashboard page.
             // For this single-page example, we'll just show a message.
-            alert('Navigating to Dashboard (functionality not implemented in this snippet)');
+            showModal('Navigating to Dashboard (functionality not implemented in this snippet)');
             // window.location.href = 'dashboard.html'; // Uncomment for actual navigation
         });
         loadButton.addEventListener('click', loadMentorData);
@@ -189,14 +258,27 @@
         }
 
         /**
+         * Determines the combined status for a day based on an array of individual class statuses.
+         * Prioritizes Absent > Late > Present.
+         * @param {string[]} statuses - An array of attendance statuses for classes on a given day.
+         * @returns {string} The combined status ('Present', 'Absent', 'Late', or '').
+         */
+        function getCombinedStatus(statuses) {
+            if (!statuses || statuses.length === 0) return '';
+            if (statuses.some(s => s.toLowerCase() === 'absent')) return 'Absent';
+            if (statuses.some(s => s.toLowerCase() === 'late')) return 'Late';
+            return 'Present'; // If no absent or late, then it's present
+        }
+
+        /**
          * Loads mentor attendance data from the Google Sheet API,
-         * filters by month, and displays it in a table.
-         * Uses durations as minutes for daily display and converts total to hours.
+         * filters by month, aggregates data for multiple classes on the same day,
+         * and displays it in a table.
          */
         async function loadMentorData() {
             const monthInput = document.getElementById('monthPicker').value;
             if (!monthInput) {
-                alert('Please select a month');
+                showModal('Please select a month');
                 return;
             }
 
@@ -222,23 +304,32 @@
                 // Process filtered data to aggregate by mentor and day
                 filtered.forEach(row => {
                     const id = row.MentorID;
+                    // Ensure date is parsed correctly to get the day of the month
+                    const rowDate = new Date(row.Date);
+                    const day = rowDate.getDate(); 
+                    const durationInMinutes = parseFloat(row.Duration) || 0;
+                    const status = row.Status;
+
                     if (!mentors[id]) {
                         mentors[id] = {
                             name: row.MentorName,
-                            days: {},
-                            totalMinutes: 0 // Initialize total minutes
+                            days: {}, // This will store aggregated daily data
+                            totalMinutes: 0 // Initialize total minutes for the month
                         };
                     }
 
-                    const day = new Date(row.Date).getDate();
-                    // Duration is already in minutes, no conversion needed here.
-                    const durationInMinutes = parseFloat(row.Duration) || 0; 
+                    // Initialize day data if not already present for this mentor and day
+                    if (!mentors[id].days[day]) {
+                        mentors[id].days[day] = {
+                            totalDuration: 0,
+                            statuses: [] // Store all statuses for the day to determine combined status
+                        };
+                    }
 
-                    mentors[id].days[day] = {
-                        status: row.Status,
-                        duration: durationInMinutes // Store duration in minutes
-                    };
-                    mentors[id].totalMinutes += durationInMinutes; // Accumulate total minutes
+                    // Aggregate for the current day
+                    mentors[id].days[day].totalDuration += durationInMinutes;
+                    mentors[id].days[day].statuses.push(status);
+                    mentors[id].totalMinutes += durationInMinutes; // Accumulate total minutes for the month
                 });
 
                 const daysInMonth = new Date(year, month, 0).getDate();
@@ -265,13 +356,15 @@
                         for (let d = 1; d <= daysInMonth; d++) {
                             const dayData = info.days[d];
                             if (dayData) {
-                                const statusDisplay = getStatusDisplay(dayData.status);
-                                html += `<td class="px-2 py-4 whitespace-nowrap text-sm ${statusDisplay.class}">${statusDisplay.symbol}<br>${dayData.duration}</td>`;
+                                // Get combined status for the day and its display properties
+                                const combinedStatus = getCombinedStatus(dayData.statuses);
+                                const statusDisplay = getStatusDisplay(combinedStatus);
+                                html += `<td class="px-2 py-4 whitespace-nowrap text-sm ${statusDisplay.class}">${statusDisplay.symbol}<br>${dayData.totalDuration}</td>`;
                             } else {
                                 html += `<td class="px-2 py-4 whitespace-nowrap text-sm text-gray-400">-</td>`;
                             }
                         }
-                        // Convert total minutes to hours for display
+                        // Convert total minutes for the month to hours for display
                         const totalHoursDisplay = (info.totalMinutes / 60).toFixed(2);
                         html += `<td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${totalHoursDisplay}</td></tr>`;
                     }
