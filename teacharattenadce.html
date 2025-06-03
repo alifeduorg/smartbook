@@ -6,7 +6,7 @@
   <title>Teacher Attendance Sheet</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Global styles and body background animation */
+   /* Global styles and body background animation */
     body {
       font-family: 'Inter', sans-serif; /* Using Inter font */
       margin: 0;
@@ -220,7 +220,7 @@
       }
     }
 
-    /* New styles for PDF generation to ensure full content is captured */
+    /* Styles for PDF generation to ensure full content is captured */
     .pdf-export-mode #printArea {
       width: auto !important; /* Allow printArea to expand */
       max-width: none !important; /* Remove max-width constraint */
@@ -434,7 +434,7 @@
      * Downloads the attendance report as a PDF.
      * Uses html2pdf.js library.
      */
-    function downloadPDF() {
+        function downloadPDF() {
       const element = document.getElementById('printArea');
       const attendanceContainer = document.getElementById('attendanceContainer');
       const table = attendanceContainer.querySelector('table');
@@ -476,7 +476,7 @@
 
         html2pdf().set({
           margin: 0,
-          filename: 'Teacher_Attendance_Report.pdf',
+          filename: 'Teacher_Attendance_Report.pdf', // Changed filename
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
             scale: 2, // Increased scale for better quality
@@ -502,7 +502,7 @@
 
           if (table) {
             table.style.width = originalTableWidth;
-            table.style.minWidth = originalTableminWidth;
+            table.style.minWidth = originalTableMinWidth;
           }
         });
       }, 300); // Increased delay to 300ms
