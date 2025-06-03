@@ -4,300 +4,239 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monthly Attendance Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
-        /* Global styles and body background animation */
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); /* Vibrant blue gradient */
-            background-size: 300% 300%; /* Larger size for smoother animation */
-            animation: gradientBackground 20s ease infinite; /* Slower, smoother animation */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #333;
-            overflow-x: hidden; /* Prevent horizontal scroll from background animation */
-        }
+  body {
+      font-family: 'Inter', sans-serif; /* Using Inter font */
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(45deg, #a7d9ed, #e0f7fa, #a1d0c9, #f0fbe2); /* Soft, colorful gradient */
+      background-size: 400% 400%; /* Larger background for smooth animation */
+      animation: gradient 15s ease infinite; /* Gradient animation */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh; /* Full viewport height */
+      color: #333; /* Default text color */
+    }
 
-        /* Keyframe animation for the background gradient */
-        @keyframes gradientBackground {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    /* Keyframe animation for the background gradient */
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
-        /* Main container for the dashboard */
-        #printArea {
-            background-color: rgba(255, 255, 255, 0.98); /* Near opaque white for content clarity */
-            border-radius: 25px; /* More pronounced rounded corners */
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25); /* Deeper, more noticeable shadow */
-            padding: 40px;
-            width: 95%;
-            max-width: 1400px;
-            text-align: center;
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden; /* Contain inner shadows/animations */
-            animation: fadeIn 1s ease-out; /* Fade in animation for the container */
-        }
+    /* Main container for the attendance sheet */
+    #printArea {
+      background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white background */
+      border-radius: 16px; /* More rounded corners */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+      padding: 40px;
+      width: 95%; /* Responsive width */
+      max-width: 1400px; /* Max width for larger screens */
+      text-align: center;
+      box-sizing: border-box; /* Include padding in width */
+      overflow-x: auto; /* Allow horizontal scrolling for table if needed */
+    }
 
-        /* Fade in animation for the container */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Button styling */
+    .dashboard-btn, .action-btn {
+      background: linear-gradient(to right, #007bff, #00c6ff); /* Blue gradient */
+      color: white;
+      padding: 14px 28px;
+      margin: 10px 10px;
+      border: none;
+      border-radius: 10px; /* Rounded buttons */
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 600;
+      transition: all 0.3s ease; /* Smooth transition for hover effects */
+      box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); /* Soft shadow */
+      display: inline-flex; /* Align icon and text */
+      align-items: center;
+      gap: 8px; /* Space between icon and text */
+    }
 
-        /* Dashboard button styling */
-        .dashboard-btn {
-            background: linear-gradient(to right, #ff7e5f, #feb47b); /* Warm, inviting gradient */
-            color: white;
-            padding: 14px 28px;
-            border: none;
-            border-radius: 12px; /* Rounded buttons */
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 30px; /* More space below */
-            box-shadow: 0 6px 18px rgba(255, 126, 95, 0.3); /* Soft shadow matching gradient */
-            transition: all 0.3s ease; /* Smooth transition for hover effects */
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .dashboard-btn:hover, .action-btn:hover {
+      background: linear-gradient(to right, #0056b3, #0099e6); /* Darker gradient on hover */
+      transform: translateY(-2px); /* Slight lift effect */
+      box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3); /* Enhanced shadow on hover */
+    }
 
-        .dashboard-btn:hover {
-            background: linear-gradient(to right, #fe915f, #ffc87b); /* Slightly brighter on hover */
-            transform: translateY(-3px) scale(1.02); /* Lift and slight scale effect */
-            box-shadow: 0 8px 25px rgba(255, 126, 95, 0.4);
-        }
+    /* Heading style */
+    h2 {
+      color: #2c3e50; /* Darker, more professional color */
+      margin-bottom: 30px;
+      font-size: 3em; /* Larger heading */
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); /* Subtle text shadow */
+    }
 
-        /* Page Title */
-        h2 {
-            color: #2c3e50; /* Dark blue for strong contrast */
-            margin-bottom: 35px;
-            font-size: 3.2em; /* Larger, more impactful title */
-            font-weight: 800; /* Extra bold */
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* More prominent text shadow */
-        }
+    /* Label for month picker */
+    label {
+      font-size: 1.2em;
+      color: #555;
+      margin-right: 15px;
+      font-weight: 600;
+    }
 
-        /* Label for month picker */
-        label {
-            display: block;
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1.2em;
-            color: #555;
-            font-weight: 600;
-        }
+    /* Month input styling */
+    input[type="month"] {
+      padding: 12px;
+      font-size: 16px;
+      margin: 10px 5px;
+      border: 1px solid #c0d9e7; /* Softer border color */
+      border-radius: 8px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Inner shadow */
+    }
 
-        /* Month input styling */
-        input[type="month"] {
-            padding: 12px;
-            font-size: 17px;
-            border-radius: 10px;
-            border: 1px solid #c0d9e7;
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            margin-right: 10px; /* Space from buttons */
-        }
+    input[type="month"]:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus ring */
+      outline: none;
+    }
 
-        input[type="month"]:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3); /* Stronger focus ring */
-            outline: none;
-        }
+    /* Table styling */
+    table {
+      margin-top: 40px;
+      width: 100%;
+      border-collapse: separate; /* Use separate for rounded corners on cells */
+      border-spacing: 0; /* Remove default spacing */
+      font-size: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+      border-radius: 12px; /* Rounded table corners */
+      overflow: hidden; /* Ensures rounded corners are visible */
+      background-color: white;
+    }
 
-        /* Action buttons (Load, Download) */
-        .action-btn {
-            background: linear-gradient(to right, #28a745, #2edb60); /* Green gradient */
-            color: white;
-            padding: 14px 28px;
-            border-radius: 12px;
-            margin: 0 8px; /* Consistent spacing */
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.25);
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+    th, td {
+      border: 1px solid #e0e0e0; /* Lighter border for cells */
+      padding: 12px 10px;
+      text-align: center;
+    }
 
-        .action-btn:hover {
-            background: linear-gradient(to right, #218838, #26b34d); /* Darker green on hover */
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.35);
-        }
+    th {
+      background-color: #eaf6ff; /* Light blue header background */
+      color: #333;
+      font-weight: 700;
+      text-transform: uppercase;
+      position: sticky; /* Make headers sticky for scrolling */
+      top: 0;
+      z-index: 10;
+    }
 
-        /* Container for the attendance table to enable scrolling */
-        #attendanceContainer {
-            margin-top: 40px;
-            overflow-x: auto; /* Enables horizontal scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            border-radius: 15px; /* Match table border-radius */
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); /* Match table shadow */
-            background-color: white; /* Ensure background shows through scrollbar */
-            animation: slideInUp 0.8s ease-out forwards; /* Animation for table appearance */
-        }
+    /* Striped rows */
+    tr:nth-child(even) {
+      background-color: #f8fcfd; /* Very light blue for even rows */
+    }
 
-        /* Table styling */
-        table {
-            width: 100%; /* Ensure table takes full width of its container */
-            border-collapse: separate; /* For rounded corners on cells */
-            border-spacing: 0;
-            font-size: 15px;
-            /* box-shadow and border-radius moved to #attendanceContainer */
-            background-color: white;
-            min-width: fit-content; /* Allow table to grow beyond container width if needed */
-        }
+    /* Hover effect on table rows */
+    tr:hover {
+      background-color: #e6f7ff; /* Light blue on hover */
+      transition: background-color 0.2s ease;
+    }
 
-        /* Slide in animation for the table */
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Status specific styling */
+    .present {
+      color: #28a745; /* Green */
+      font-weight: bold;
+      background-color: #e6ffe6; /* Very light green background */
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block; /* For better padding */
+    }
 
-        th, td {
-            padding: 15px 10px; /* More padding for readability */
-            text-align: center;
-            border: 1px solid #e0e0e0; /* Lighter border for cells */
-            white-space: nowrap; /* Prevent text wrapping in cells */
-        }
+    .absent {
+      color: #dc3545; /* Red */
+      font-weight: bold;
+      background-color: #ffe6e6; /* Very light red background */
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
 
-        th {
-            background-color: #f0f8ff; /* Very light blue header background */
-            color: #333;
-            font-weight: 700;
-            text-transform: uppercase;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+    .late {
+      color: #ffc107; /* Orange */
+      font-weight: bold;
+      background-color: #fffbe6; /* Very light yellow background */
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
 
-        /* Striped rows */
-        tr:nth-child(even) {
-            background-color: #f8fcfd; /* Very light blue for even rows */
-        }
+    /* Container for the attendance table */
+    #attendanceContainer {
+      margin-top: 30px;
+      overflow-x: auto; /* Enable horizontal scrolling if table is too wide */
+    }
 
-        /* Hover effect on table rows */
-        tr:hover td {
-            background: #e6f7ff; /* Light blue on hover */
-            transform: scale(1.005); /* Subtle scale on row hover */
-            transition: all 0.2s ease-in-out;
-        }
+    /* Loading indicator styles */
+    .loading-indicator {
+      display: none; /* Hidden by default */
+      margin-top: 30px;
+      font-size: 1.5em;
+      color: #007bff;
+      font-weight: 600;
+    }
 
-        /* Status specific styling */
-        .status-present {
-            color: #28a745;
-            font-weight: bold;
-            background-color: #e6ffe6;
-            padding: 5px 10px;
-            border-radius: 8px;
-            display: inline-block;
-            animation: pulse 1s infinite alternate; /* Subtle pulse for present */
-        }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      #printArea {
+        padding: 20px;
+      }
 
-        .status-absent {
-            color: #dc3545;
-            font-weight: bold;
-            background-color: #ffe6e6;
-            padding: 5px 10px;
-            border-radius: 8px;
-            display: inline-block;
-        }
+      h2 {
+        font-size: 2em;
+      }
 
-        .status-late {
-            color: #ffc107;
-            font-weight: bold;
-            background-color: #fffbe6;
-            padding: 5px 10px;
-            border-radius: 8px;
-            display: inline-block;
-        }
+      .dashboard-btn, .action-btn {
+        padding: 10px 20px;
+        font-size: 15px;
+        margin: 8px 5px;
+      }
 
-        .status-empty {
-            color: #aaa;
-        }
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
 
-        /* Pulse animation for present status */
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
-        }
+      input[type="month"] {
+        width: calc(100% - 20px); /* Full width minus padding */
+        margin-bottom: 15px;
+      }
 
-        /* Summary section */
-        #summary {
-            margin-top: 30px;
-            font-weight: bold;
-            text-align: center;
-            font-size: 1.3em;
-            color: #4a90e2; /* Blue color for summary */
-            animation: fadeIn 1.5s ease-out forwards;
-        }
+      th, td {
+        padding: 8px 5px;
+        font-size: 13px;
+      }
+    }
 
-        /* Loading indicator styles */
-        #loadingIndicator {
-            display: none; /* Hidden by default */
-            margin-top: 30px;
-            font-size: 1.8em;
-            color: #007bff;
-            font-weight: 700;
-            animation: bounce 1s infinite; /* Bouncing loading text */
-        }
+    /* New styles for PDF generation to ensure full content is captured */
+    .pdf-export-mode #printArea {
+      width: auto !important; /* Allow printArea to expand */
+      max-width: none !important; /* Remove max-width constraint */
+      overflow-x: visible !important; /* Ensure content is not clipped */
+    }
 
-        /* Bounce animation for loading text */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
+    .pdf-export-mode #attendanceContainer {
+      overflow-x: visible !important; /* Ensure content is not clipped */
+      width: auto !important; /* Allow container to expand */
+    }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            #printArea {
-                padding: 25px;
-                border-radius: 15px;
-            }
-
-            h2 {
-                font-size: 2.2em;
-            }
-
-            .dashboard-btn, .action-btn {
-                padding: 10px 20px;
-                font-size: 15px;
-                margin: 8px 5px;
-                display: block; /* Stack buttons on small screens */
-                width: calc(100% - 16px);
-            }
-
-            input[type="month"] {
-                width: calc(100% - 20px);
-                margin-bottom: 15px;
-                margin-right: 0;
-            }
-
-            th, td {
-                padding: 10px 5px;
-                font-size: 13px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h2 {
-                font-size: 1.8em;
-            }
-            .dashboard-btn, .action-btn {
-                font-size: 14px;
-                padding: 8px 15px;
-            }
-            input[type="month"] {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
+    .pdf-export-mode table {
+      width: max-content !important; /* Make table expand to its full content width */
+      min-width: 100% !important; /* Ensure it's at least 100% wide */
+    }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -306,18 +245,24 @@
 
     <div id="printArea">
 
-        <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
+        <button class="dashboard-btn" onclick="goToDashboard()">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </button>
 
         <h2>Monthly Attendance Viewer</h2>
 
         <label>
             Select Month:
             <input type="month" id="monthPicker">
-            <button class="action-btn" onclick="loadAttendance()">Load Attendance</button>
-            <button class="action-btn" onclick="downloadPDF()">⬇️ Download Full Page as PDF</button>
+            <button class="action-btn" onclick="loadAttendance()">
+                <i class="fas fa-sync-alt"></i> Load Attendance
+            </button>
+            <button class="action-btn" onclick="downloadPDF()">
+                <i class="fas fa-download"></i> Download Full Page as PDF
+            </button>
         </label>
 
-        <div id="loadingIndicator" style="display: none;">Loading attendance data...</div>
+        <div id="loadingIndicator">Loading attendance data...</div>
 
         <div id="attendanceContainer"></div>
 
@@ -352,6 +297,19 @@
         }
 
         /**
+         * Displays a custom alert message.
+         * @param {string} message - The message to display.
+         * @param {number} duration - How long the alert should be visible in milliseconds.
+         */
+        function showCustomAlert(message, duration = 3000) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'custom-alert';
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), duration);
+        }
+
+        /**
          * Loads and processes attendance data from the Google Sheet API.
          * Aggregates daily attendance for each student (in minutes) and calculates total monthly hours.
          */
@@ -362,17 +320,7 @@
             const summaryDiv = document.getElementById('summary');
 
             if (!monthInput) {
-                // Custom alert for better UX
-                const alertDiv = document.createElement('div');
-                alertDiv.style.cssText = `
-                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                    background-color: #ffeb3b; padding: 20px; border-radius: 8px;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;
-                    font-weight: bold; color: #333;
-                `;
-                alertDiv.textContent = 'Please select a month!';
-                document.body.appendChild(alertDiv);
-                setTimeout(() => alertDiv.remove(), 3000);
+                showCustomAlert('Please select a month!');
                 return;
             }
 
@@ -384,16 +332,29 @@
             const [year, month] = monthInput.split('-').map(Number);
 
             try {
+                // --- Debugging Tip: Check if the API URL is correct and accessible ---
+                // You can open this URL directly in your browser to see if it returns data.
+                // Ensure your Google Apps Script is deployed as a Web App (Execute as: Me, Who has access: Anyone).
                 const res = await fetch(sheetAPI);
                 if (!res.ok) {
+                    // --- Debugging Tip: Check network tab in browser developer tools (F12) ---
+                    // Look for failed requests or status codes other than 200.
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
                 const data = await res.json();
 
+                // --- Debugging Tip: Log the raw data to console to inspect its structure ---
+                // console.log('Raw data from API:', data);
+
                 const filtered = data.filter(row => {
                     const d = new Date(row.Date);
+                    // --- Debugging Tip: Check if row.Date is a valid date string/format ---
+                    // console.log(`Processing row: Date=${row.Date}, Year=${d.getFullYear()}, Month=${d.getMonth() + 1}`);
                     return d.getFullYear() === year && d.getMonth() === (month - 1);
                 });
+
+                // --- Debugging Tip: Check if any data is being filtered out unexpectedly ---
+                // console.log('Filtered data for selected month:', filtered);
 
                 const students = {}; // Stores aggregated data for each student
 
@@ -482,34 +443,79 @@
          * Uses html2pdf.js library.
          * Temporarily widens the print area to ensure all content is captured in landscape mode.
          */
-        function downloadPDF() {
-            const element = document.getElementById('printArea');
-            // Store original width to restore after PDF generation
-            const originalWidth = element.style.width;
-            // Temporarily widen for PDF export to ensure all columns fit
-            element.style.width = '3500px'; 
+    function downloadPDF() {
+      const element = document.getElementById('printArea');
+      const attendanceContainer = document.getElementById('attendanceContainer');
+      const table = attendanceContainer.querySelector('table');
+      const body = document.body;
 
-            const opt = {
-                margin: 0,
-                filename: 'Monthly_Attendance_Report.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: {
-                    scale: 2, // Higher scale for better quality
-                    useCORS: true
-                },
-                jsPDF: {
-                    unit: 'px',
-                    format: [3500, 2000], // Custom format for landscape and wide content
-                    orientation: 'landscape'
-                },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
+      // Store original styles
+      const originalPrintAreaWidth = element.style.width;
+      const originalPrintAreaMaxWidth = element.style.maxWidth;
+      const originalPrintAreaOverflowX = element.style.overflowX;
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Reset width after PDF generation
-                element.style.width = originalWidth; 
-            });
-        }
+      const originalAttendanceContainerWidth = attendanceContainer.style.width;
+      const originalAttendanceContainerOverflowX = attendanceContainer.style.overflowX;
+
+      const originalTableWidth = table ? table.style.width : '';
+      const originalTableMinWidth = table ? table.style.minWidth : '';
+
+      // Apply PDF-specific styles
+      body.classList.add('pdf-export-mode'); // Apply class for general overrides
+
+      // Force elements to expand to their full content width
+      if (table) {
+        table.style.width = `${table.scrollWidth}px`; // Set table width to its full scrollWidth
+        table.style.minWidth = 'auto'; // Remove min-width constraint
+      }
+      element.style.width = 'auto'; // Allow printArea to expand
+      element.style.maxWidth = 'none'; // Remove max-width constraint
+      element.style.overflowX = 'visible'; // Ensure content is not clipped
+
+      attendanceContainer.style.width = 'auto'; // Allow container to expand
+      attendanceContainer.style.overflowX = 'visible'; // Ensure content is not clipped
+
+
+      // A small delay to ensure styles are applied before rendering
+      setTimeout(() => {
+        // Calculate the required width for the PDF based on the table's actual rendered width
+        // Use offsetWidth as it reflects the rendered width after styles are applied
+        const pdfContentWidth = table ? table.offsetWidth + 100 : 4000; // Add some padding, fallback to a large value
+        const pdfHeight = 2000; // A large enough height for typical reports
+
+        html2pdf().set({
+          margin: 0,
+          filename: 'Monthly_Attendance_Report.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2, // Increased scale for better quality
+            useCORS: true,
+            // Explicitly set width to capture full content
+            width: pdfContentWidth // Use the calculated content width for html2canvas
+          },
+          jsPDF: {
+            unit: 'px',
+            format: [pdfContentWidth, pdfHeight], // Dynamic width based on table content
+            orientation: 'landscape'
+          }
+        }).from(element).save().then(() => {
+          // Restore original styles after PDF generation
+          body.classList.remove('pdf-export-mode');
+
+          element.style.width = originalPrintAreaWidth;
+          element.style.maxWidth = originalPrintAreaMaxWidth;
+          element.style.overflowX = originalPrintAreaOverflowX;
+
+          attendanceContainer.style.width = originalAttendanceContainerWidth;
+          attendanceContainer.style.overflowX = originalAttendanceContainerOverflowX;
+
+          if (table) {
+            table.style.width = originalTableWidth;
+            table.style.minWidth = originalTableminWidth;
+          }
+        });
+      }, 300); // Increased delay to 300ms
+    }
     </script>
 </body>
 </html>
