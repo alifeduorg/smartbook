@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Teacher Detiles</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Details</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+     <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -213,183 +214,210 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>Alif Edu - Teacher detils</h1>
-    <img src="1.png" alt="Logo" />
-  </header>
+    <header>
+        <h1>Alif Edu - Teacher Details</h1>
+        <img src="1.png" alt="Logo" onerror="this.onerror=null;this.src='https://placehold.co/50x50/cccccc/000000?text=Logo';">
+    </header>
 
-  <div class="container">
-    <button class="dashboard-btn" onclick="goToDashboard()">🏠 Go to Dashboard</button>
+    <div class="container">
+        <button class="dashboard-btn" onclick="goToDashboard()">🏠 Go to Dashboard</button>
 
-    <table id="studentTable">
-      <thead>
-        <tr>
-          <th>Joining Date</th>
-          <th>Staff ID</th>
-          <th> Name</th>
-          <th>Assigned Classes</th>
-          <th>Phone</th>
-          <th>Email</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <footer>
-    © 2025 Alif Edu. All rights reserved.
-  </footer>
-<!-- Modal -->
-<div id="detailModal" class="modal">
-  <div class="modal-content" id="modalContent">
-      <span onclick="closeModal()" style="position: absolute; top: 10px; right: 20px; font-size: 26px; font-weight: bold; cursor: pointer; color: #dc3545;">&times;</span>
-
-    <img class="header-img" src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Header" />
-<div class="info-grid">
-      <div>
-        <label class="info-label">Staff ID:</label>
-        <div class="boxes" id="StaffIDBoxes"></div>
-      </div>
-      <div class="photo-box">Paste Photo<br>Here</div>
+        <table id="teacherTable"> <!-- Changed id to teacherTable for clarity -->
+            <thead>
+                <tr>
+                    <th>Joining Date</th>
+                    <th>Staff ID</th>
+                    <th>Name</th>
+                    <th>Assigned Classes</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-    <div class="section-title">Personal Details</div>
-    <div class="info-grid">
-      <div><span class="info-label">Name:</span> <span id="FullName"></span></div>
-      <div><span class="info-label">DOB:</span> <span id="teacherDOB"></span></div>
-    </div>
-    <div class="info-grid">
-      <div><span class="info-label">Gender:</span> <span id="teachergender"></span></div>
-      <div><span class="info-label">Email:</span> <span id="teacheremail"></span></div>
-    </div>
-    <div class="info-grid">
-      <div><span class="info-label">Phone:</span> <span id="teacherPhone"></span></div>
-       <div><span class="info-label">Religion:</span> <span id="Religion"></span></div>
-    </div>
-    <div class="info-grid">
-      <div><span class="info-label">Address:</span> <span id="Address"></span></div>
-    </div>
-      
-    <div class="section-title">Academic & Teaching Details:</div>
-    <div class="info-grid">
-      <div><span class="info-label">  Subjects Can Teach  :</span> <span id="SubjectsCanTeach"></span></div>
-      <div><span class="info-label">  Classes  Can Teach  :</span> <span id="ClassesCanTeach"></span></div>
-    </div>
-    <div class="info-grid">
-      <div><span class="info-label">  Preferred Time Slots  </span> <span id="PreferredTimeSlots"></span></div>
-      <div><span class="info-label">Experience:</span> <span id="Experience"></span></div>
-    </div>
-    <div class="info-grid">
-      <div><span class="info-label">Qualification </span> <span id="Qualification"></span></div>
-    </div>
-      <div class="section-title"> Offices Purpose </div>
-    <div class="info-grid">
-  <div><span class="info-label">  Employment Type  :</span> <span id="EmploymentType"></span></div>
-  <div><span class="info-label">  Salary Plan  :</span> <span id="SalaryPlan"></span></div>
-</div>
-<div class="info-grid">
-  <div><span class="info-label">Joining Date:</span> <span id="JoiningDate"></span></div>
-<div><span class="info-label">Remarks:</span> <span id="admissionRemarks"></span></div>
-    </div>
-    <div class="info-grid">
-      <div><strong>Seal</strong></div>
-      <div><strong>Principal</strong></div>
-    </div>
-<button class="print-btn" onclick="downloadPDF()">Download PDF</button>
-  </div>
-</div>
-<script>
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbwSMhVmX8CHdDLghYU-xv260_Eti6S_aBTk7JGAzIGyHcrXBaalAc1wbosfuJPL4Bafig/exec';
-  
-    let studentData = [];
-  
-    fetch(webAppUrl)
-      .then(res => res.json())
-      .then(data => {
-        studentData = data;
-        const tbody = document.querySelector('#studentTable tbody');
-  
-        setTimeout(() => {
-          data.forEach((student, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${student['Joining Date'] || ''}</td>
-              <td>${student['Staff id'] || ''}</td>
-              <td>${student['Full Name  '] || ''}</td>
-              <td>${student['Assigned Classes'] || ''}</td>
-              <td>${student['Phone Number'] || ''}</td>
-              <td>${student["Email ID"] || ''}</td>
-              <td><button onclick="viewDetails(${index})">View</button></td>
-            `;
-            tbody.appendChild(tr);
-          });
-        }, 100);
-      });
- function viewDetails(index) {
-  const student = studentData[index];
+    <footer>
+        © 2025 Alif Edu. All rights reserved.
+    </footer>
 
-  // Display modal
-  document.getElementById("detailModal").style.display = "flex";
+    <!-- Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content" id="modalContent">
+            <span onclick="closeModal()" class="close-btn">&times;</span>
 
- document.getElementById("FullName").innerText = student["Full Name  "] || "-";
-  document.getElementById("teacherDOB").innerText = student["Date of Birth"] || "-";
-  document.getElementById("teachergender").innerText = student["Gender"] || "-";
-  document.getElementById("teacheremail").innerText = student["Email ID"] || "-";
-  document.getElementById("teacherPhone").innerText = student["Phone Number"] || "-";
-   document.getElementById("Religion").innerText = student["Religion "] || "-";
-  document.getElementById("Address").innerText = student["Address"] || "-";
- document.getElementById("SubjectsCanTeach").innerText = student["  Subjects You Can Teach  "] || "-";
-  document.getElementById("ClassesCanTeach").innerText = student["  Classes You Can Teach  "] || "-";
-  document.getElementById("PreferredTimeSlots").innerText = student["  Preferred Time Slots  "] || "-";
-document.getElementById("Experience").innerText = student["Experience (in years)"] || "-";
-  document.getElementById("Qualification").innerText = student["Qualification "] || "-";
-   document.getElementById("EmploymentType").innerText = student["  Employment Type  "] || "-";
-document.getElementById("SalaryPlan").innerText = student["  Salary Plan  "] || "-";
-document.getElementById("JoiningDate").innerText = student["Joining Date"] || "-";
-document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
-  // Fill admission number box visually
-  const admissionNumber = student["Staff id"] || "";
-  const boxesContainer = document.getElementById("StaffIDBoxes");
-  boxesContainer.innerHTML = "";
-  for (let char of admissionNumber) {
-    const div = document.createElement("div");
-    div.innerText = char;
-    boxesContainer.appendChild(div);
-  }
-}
+            <img class="header-img" src="alif edu (600 x 300 px) (820 x 312 px).png" alt="Header" onerror="this.onerror=null;this.src='https://placehold.co/600x300/cccccc/000000?text=Header+Image';">
+            <div class="info-grid">
+                <div>
+                    <label class="info-label">Staff ID:</label>
+                    <div class="boxes" id="StaffIDBoxes"></div>
+                </div>
+                <div class="photo-box">Paste Photo<br>Here</div>
+            </div>
 
-  function closeModal() {
-    document.getElementById("detailModal").style.display = "none";
-  }
-function downloadPDF() {
-  const element = document.getElementById('modalContent');
-  const opt = {
-    margin: 10,
-    filename: 'student-details.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      scrollY: 0,
-      useCORS: true,
-      windowHeight: element.scrollHeight  // KEY: capture full height
-    },
-    jsPDF: {
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait'
-    }
-  };
-  html2pdf().set(opt).from(element).save();
-}
-    function goToDashboard() {
-  window.history.back(); // Goes back to the previous page
-}
-  </script>
+            <div class="section-title">Personal Details</div>
+            <div class="info-grid">
+                <div><span class="info-label">Name:</span> <span id="FullName"></span></div>
+                <div><span class="info-label">DOB:</span> <span id="teacherDOB"></span></div>
+            </div>
+            <div class="info-grid">
+                <div><span class="info-label">Gender:</span> <span id="teachergender"></span></div>
+                <div><span class="info-label">Email:</span> <span id="teacheremail"></span></div>
+            </div>
+            <div class="info-grid">
+                <div><span class="info-label">Phone:</span> <span id="teacherPhone"></span></div>
+                <div><span class="info-label">Religion:</span> <span id="Religion"></span></div>
+            </div>
+            <div class="info-grid">
+                <div><span class="info-label">Address:</span> <span id="Address"></span></div>
+            </div>
+            
+            <div class="section-title">Academic & Teaching Details:</div>
+            <div class="info-grid">
+                <div><span class="info-label">Subjects Can Teach:</span> <span id="SubjectsCanTeach"></span></div>
+                <div><span class="info-label">Classes Can Teach:</span> <span id="ClassesCanTeach"></span></div>
+            </div>
+            <div class="info-grid">
+                <div><span class="info-label">Preferred Time Slots:</span> <span id="PreferredTimeSlots"></span></div>
+                <div><span class="info-label">Experience:</span> <span id="Experience"></span></div>
+            </div>
+            <div class="info-grid">
+                <div><span class="info-label">Qualification:</span> <span id="Qualification"></span></div>
+            </div>
+            
+            <div class="section-title"> Offices Purpose </div>
+            <div class="info-grid">
+                <div><span class="info-label">Employment Type:</span> <span id="EmploymentType"></span></div>
+                <div><span class="info-label">Salary Plan:</span> <span id="SalaryPlan"></span></div>
+            </div>
+            <div class="info-grid">
+                <div><span class="info-label">Joining Date:</span> <span id="JoiningDate"></span></div>
+                <div><span class="info-label">Remarks:</span> <span id="teacherRemarks"></span></div> <!-- Changed ID for clarity -->
+            </div>
+            <div class="info-grid">
+                <div><strong>Seal</strong></div>
+                <div><strong>Principal</strong></div>
+            </div>
+            <button class="print-btn" onclick="downloadPDF()">Download PDF</button>
+        </div>
+    </div>
+
     <script>
-    function printPage() {
-      window.print();
-    }
-  </script>
+        // Changed webAppUrl for teacher data
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbwSMhVmX8CHdDLghYU-xv260_Eti6S_aBTk7JGAzIGyHcrXBaalAc1wbosfuJPL4Bafig/exec';
+        
+        let teacherData = []; // Changed variable name for clarity
+
+        // Helper function to format date to DD/MM/YYYY
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            // Check if the date is valid. If not, return the original string or empty string.
+            if (isNaN(date.getTime())) {
+                console.warn(`Invalid date string received: ${dateString}`);
+                return dateString; // Fallback to original string if not a valid date
+            }
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        fetch(webAppUrl)
+            .then(res => res.json())
+            .then(data => {
+                teacherData = data; // Assign data to teacherData
+                const tbody = document.querySelector('#teacherTable tbody'); // Referencing teacherTable
+
+                setTimeout(() => {
+                    data.forEach((teacher, index) => { // Looping through teacher data
+                        // Format Joining Date for the table
+                        const formattedJoiningDate = formatDate(teacher['Joining Date']);
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${formattedJoiningDate}</td>
+                            <td>${teacher['Staff id'] || ''}</td>
+                            <td>${teacher['Full Name  '] || ''}</td>
+                            <td>${teacher['Assigned Classes'] || ''}</td>
+                            <td>${teacher['Phone Number'] || ''}</td>
+                            <td>${teacher["Email ID"] || ''}</td>
+                            <td><button onclick="viewDetails(${index})">View</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }, 100);
+            })
+            .catch(error => {
+                console.error("Error fetching teacher data:", error);
+                // You might want to display a user-friendly error message here
+            });
+
+        function viewDetails(index) {
+            const teacher = teacherData[index]; // Use teacherData
+
+            // Display modal
+            document.getElementById("detailModal").style.display = "flex";
+
+            // Fill data safely
+            document.getElementById("FullName").innerText = teacher["Full Name  "] || "-";
+            document.getElementById("teacherDOB").innerText = teacher["Date of Birth"] ? formatDate(teacher["Date of Birth"]) : "-"; // Format DOB
+            document.getElementById("teachergender").innerText = teacher["Gender"] || "-";
+            document.getElementById("teacheremail").innerText = teacher["Email ID"] || "-";
+            document.getElementById("teacherPhone").innerText = teacher["Phone Number"] || "-";
+            document.getElementById("Religion").innerText = teacher["Religion "] || "-";
+            document.getElementById("Address").innerText = teacher["Address"] || "-";
+            document.getElementById("SubjectsCanTeach").innerText = teacher["  Subjects You Can Teach  "] || "-";
+            document.getElementById("ClassesCanTeach").innerText = teacher["  Classes You Can Teach  "] || "-";
+            document.getElementById("PreferredTimeSlots").innerText = teacher["  Preferred Time Slots  "] || "-";
+            document.getElementById("Experience").innerText = teacher["Experience (in years)"] || "-";
+            document.getElementById("Qualification").innerText = teacher["Qualification "]  || "-";
+            document.getElementById("EmploymentType").innerText = teacher["  Employment Type  "] || "-";
+            document.getElementById("SalaryPlan").innerText = teacher["  Salary Plan  "] || "-";
+            document.getElementById("JoiningDate").innerText = teacher["Joining Date"] ? formatDate(teacher["Joining Date"]) : "-"; // Format Joining Date
+            document.getElementById("teacherRemarks").innerText = teacher["  Remarks   "]|| "-"; // Changed ID for clarity
+
+
+            // Fill Staff ID box visually
+            const staffID = teacher["Staff id"] || "";
+            const boxesContainer = document.getElementById("StaffIDBoxes");
+            boxesContainer.innerHTML = "";
+            for (let char of staffID) {
+                const div = document.createElement("div");
+                div.innerText = char;
+                boxesContainer.appendChild(div);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById("detailModal").style.display = "none";
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('modalContent');
+            const opt = {
+                margin: 10,
+                filename: 'teacher-details.pdf', // Changed filename
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    scrollY: 0,
+                    useCORS: true,
+                    windowHeight: element.scrollHeight
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function goToDashboard() {
+            window.history.back(); // Goes back to the previous page
+        }
+    </script>
 </body>
 </html>
