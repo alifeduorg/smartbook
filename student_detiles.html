@@ -6,7 +6,7 @@
     <title>Student Admissions</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <style>
-        body {
+          body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f6f8;
@@ -337,8 +337,8 @@
 
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td>${formattedAdmissionDate}</td>
-                              <td>${student['Student ID'] || ''}</td>
+            <td>${formattedAdmissionDate}</td>
+            <td>${student['Student ID'] || ''}</td>
               <td>${student['Student Full Name '] || ''}</td>
               <td>${student['  Class Admitted To  '] || ''}</td>
               <td>${student['  Phone Number (WhatsApp)  '] || ''}</td>
@@ -361,68 +361,65 @@
             document.getElementById("detailModal").style.display = "flex";
 
          // Fill data safely
-  document.getElementById("studentName").innerText = student["Student Full Name "] || "-";
-  document.getElementById("studentDOB").innerText = student["Date of Birth"] || "-";
-  document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
-  document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
-  document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
-   document.getElementById("Religion").innerText = student["Religion"] || "-";
-  document.getElementById("fatherName").innerText = student["Father Name"] || "-";
- document.getElementById("Guardian’sContactNumber").innerText = student["  Guardian’s Contact Number  "] || "-";
-  document.getElementById("motherName").innerText = student["Mother Name"] || "-";
-  document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
-document.getElementById("Guardian’sOccupation").innerText = student["Guardian’s  Occupation "] || "-";
-  document.getElementById("studentAddress").innerText = student["Address"] || "-";
-   document.getElementById("studentSubjects").innerText = student["  Subjects Opted  "] || "-";
-document.getElementById("studentFeePlan").innerText = student["  Fee Plan  "] || "-";
-document.getElementById("admissionDate").innerText = student["Admission Date "] || "-";
-document.getElementById("admissionMode").innerText = student["  Mode of Admission  "] || "-";
-document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
+            document.getElementById("studentName").innerText = student["Student Full Name "] || "-";
+            document.getElementById("studentDOB").innerText = student["Date of Birth"] ? formatDate(student["Date of Birth"]) : "-"; // Format DOB as well
+            document.getElementById("studentClass").innerText = student["  Class Admitted To  "] || "-";
+            document.getElementById("studentPhone").innerText = student["  Phone Number (WhatsApp)  "] || "-";
+            document.getElementById("studentEmail").innerText = student["  Email ID(Student)  "] || "-";
+            document.getElementById("Religion").innerText = student["Religion"] || "-";
+            document.getElementById("fatherName").innerText = student["Father Name"] || "-";
+            document.getElementById("Guardian’sContactNumber").innerText = student["  Guardian’s Contact Number  "] || "-";
+            document.getElementById("motherName").innerText = student["Mother Name"] || "-";
+            document.getElementById("parentEmail").innerText = student["  Email ID(Parent)  "] || "-";
+            document.getElementById("Guardian’sOccupation").innerText = student["Guardian’s  Occupation "] || "-";
+            document.getElementById("studentAddress").innerText = student["Address"] || "-";
+            document.getElementById("studentSubjects").innerText = student["  Subjects Opted  "] || "-";
+            document.getElementById("studentFeePlan").innerText = student["  Fee Plan  "] || "-";
+            // Format admission date for the modal (and thus the PDF)
+            document.getElementById("admissionDate").innerText = student["Admission Date "] ? formatDate(student["Admission Date "]) : "-";
+            document.getElementById("admissionMode").innerText = student["  Mode of Admission  "] || "-";
+            document.getElementById("admissionRemarks").innerText = student["  Remarks   "] || "-";
 
 
-  // Fill admission number box visually
-  const admissionNumber = student["Student ID"] || "";
-  const boxesContainer = document.getElementById("admissionNumberBoxes");
-  boxesContainer.innerHTML = "";
-  for (let char of admissionNumber) {
-    const div = document.createElement("div");
-    div.innerText = char;
-    boxesContainer.appendChild(div);
-  }
-}
+            // Fill admission number box visually
+            const admissionNumber = student["Student ID"] || "";
+            const boxesContainer = document.getElementById("admissionNumberBoxes");
+            boxesContainer.innerHTML = "";
+            for (let char of admissionNumber) {
+                const div = document.createElement("div");
+                div.innerText = char;
+                boxesContainer.appendChild(div);
+            }
+        }
 
         function closeModal() {
-    document.getElementById("detailModal").style.display = "none";
-  }
-function downloadPDF() {
-  const element = document.getElementById('modalContent');
-  const opt = {
-    margin: 10,
-    filename: 'student-details.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      scrollY: 0,
-      useCORS: true,
-      windowHeight: element.scrollHeight  // KEY: capture full height
-    },
-    jsPDF: {
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait'
-    }
-  };
-  html2pdf().set(opt).from(element).save();
-}
-function goToDashboard() {
-  window.history.back();
-}
+            document.getElementById("detailModal").style.display = "none";
+        }
 
-  </script>
-    <script>
-    function printPage() {
-      window.print();
-    }
+        function downloadPDF() {
+            const element = document.getElementById('modalContent');
+            const opt = {
+                margin: 10,
+                filename: 'student-details.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    scrollY: 0,
+                    useCORS: true,
+                    windowHeight: element.scrollHeight  // KEY: capture full height
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function goToDashboard() {
+            window.history.back();
+        }
     </script>
 </body>
 </html>
