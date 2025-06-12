@@ -327,7 +327,7 @@
           data.forEach((student, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-              <td>${student['Admission Date '] || ''}</td>
+              <td>${formattedAdmissionDate}</td>
               <td>${student['Student ID'] || ''}</td>
               <td>${student['Student Full Name '] || ''}</td>
               <td>${student['  Class Admitted To  '] || ''}</td>
