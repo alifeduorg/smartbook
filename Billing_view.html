@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Fee Viewer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Montserrat:wght@400;700&display=swap');
 
@@ -405,9 +406,6 @@
             .modal-actions {
                 justify-content: center; /* Center buttons on small screens */
             }
-            .payment-card {
-                padding: 15px;
-            }
             #paymentSlip {
                 padding: 20px;
             }
@@ -443,7 +441,8 @@
                 </tr>
             </thead>
             <tbody>
-                </tbody>
+                <!-- Student data will be populated here by JavaScript -->
+            </tbody>
         </table>
         <div class="total-amount-display" id="overallTotalEarnings"></div>
 
@@ -459,6 +458,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Overall monthly earnings will be populated here -->
                     </tbody>
                 </table>
             </div>
@@ -491,7 +491,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            </tbody>
+                            <!-- Payment details will be populated here -->
+                        </tbody>
                     </table>
                 </div>
                 <div class="total-amount-display" id="totalPaidAmount"></div>
@@ -509,6 +510,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                           <!-- Monthly summary will be populated here -->
                         </tbody>
                     </table>
                 </div>
@@ -517,7 +519,8 @@
 
             <div class="payment-slip-section" id="paymentSlipSection">
                 <div id="paymentSlip">
-                    </div>
+                    <!-- Individual payment slip will be generated here -->
+                </div>
             </div>
 
         </div>
@@ -551,6 +554,23 @@
         let currentStudentPayments = []; // To store payments for the currently viewed student
         let currentStudentName = ''; // To store the name of the currently viewed student
 
+        /**
+         * Formats a date string into DD/MM/YYYY format.
+         * @param {string} dateString - The date string to format.
+         * @returns {string} The formatted date or 'N/A' if the date is invalid.
+         */
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return 'N/A'; // Return 'N/A' for invalid dates
+            }
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
         /**
          * Fetches student payment data from the Google Apps Script URL.
          * Displays a loading spinner during the fetch operation.
@@ -715,7 +735,7 @@
                     row.classList.add('payment-row'); // Add class for styling and event delegation
 
                     row.insertCell(0).textContent = payment['Receipt Number'] || 'N/A';
-                    row.insertCell(1).textContent = payment['Date'] || 'N/A';
+                    row.insertCell(1).textContent = formatDate(payment['Date']);
                     row.insertCell(2).textContent = payment['Fee Type'] || 'N/A';
                     const feeValue = parseFloat(payment['Total Fee']);
                     row.insertCell(3).textContent = !isNaN(feeValue) ? `Rs. ${feeValue.toFixed(2)}` : 'N/A';
@@ -825,7 +845,7 @@
                 // Sort financial years for display
                 const sortedFyKeys = Object.keys(financialYearEarnings).sort();
                 sortedFyKeys.forEach(fyKey => {
-                    fyHtml += `<p><strong>${fyKey}:</strong> <span>Rs. ${financialYearEarnings[fyKey].toFixed(2)}}</span></p>`;
+                    fyHtml += `<p><strong>${fyKey}:</strong> <span>Rs. ${financialYearEarnings[fyKey].toFixed(2)}</span></p>`;
                     totalFYAmount += financialYearEarnings[fyKey]; // Sum all financial years for overall total
                 });
                 financialYearTotalDiv.innerHTML = fyHtml + `<p><strong>Overall Total Earnings:</strong> <span>Rs. ${totalFYAmount.toFixed(2)}</span></p>`;
@@ -850,7 +870,7 @@
                 <p><strong>Class:</strong> <span>${payment['Class'] || 'N/A'}</span></p>
                 <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
                 <p><strong>Receipt Number:</strong> <span>${payment['Receipt Number'] || 'N/A'}</span></p>
-                <p><strong>Date:</strong> <span>${payment['Date'] || 'N/A'}</span></p>
+                <p><strong>Date:</strong> <span>${formatDate(payment['Date'])}</span></p>
                 <p><strong>Fee Type:</strong> <span>${payment['Fee Type'] || 'N/A'}</span></p>
                 <p><strong>Tuition Hours:</strong> <span>${payment['Tuition Hours'] || 'N/A'}</span></p>
                 <p><strong>Rate Per Hour:</strong> <span>${payment['Rate Per Hour'] || 'N/A'}</span></p>
@@ -961,7 +981,7 @@
             doc.setFontSize(12);
             doc.setFont("helvetica", "normal");
             addField('Receipt Number', payment['Receipt Number']);
-            addField('Date', payment['Date']);
+            addField('Date', formatDate(payment['Date']));
             addField('Fee Type', payment['Fee Type']);
             addField('Tuition Hours', payment['Tuition Hours']);
             addField('Rate Per Hour', payment['Rate Per Hour']);
@@ -1024,7 +1044,7 @@
 
                 doc.setFontSize(12);
                 doc.setFont("helvetica", "normal");
-                doc.text(`Date: ${payment['Date'] || 'N/A'}`, margin, y); y += lineHeight;
+                doc.text(`Date: ${formatDate(payment['Date'])}`, margin, y); y += lineHeight;
                 doc.text(`Fee Type: ${payment['Fee Type'] || 'N/A'}`, margin, y); y += lineHeight;
                 const feeValue = parseFloat(payment['Total Fee']);
                 doc.text(`Total Fee: Rs. ${!isNaN(feeValue) ? feeValue.toFixed(2) : 'N/A'}`, margin, y); y += lineHeight;
@@ -1180,9 +1200,11 @@
                 document.body.removeChild(messageBox);
             };
         }
+        
+        // Initial data fetch on page load
+        document.addEventListener('DOMContentLoaded', fetchStudentData);
 
-        // Initial fetch of student data
-        fetchStudentData();
     </script>
 </body>
 </html>
+
