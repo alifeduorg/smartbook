@@ -76,10 +76,8 @@
 
         @keyframes moveShapeTwo {
             0% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(-50px, 30px) scale(0.95); }
-            50% { transform: translate(40px, -60px) scale(1.1); }
-            75% { transform: translate(-70px, -10px) scale(1.02); }
-            100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-25px, 25px) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
         }
 
         /* Background Animation - Smaller, more dynamic shapes */
@@ -221,6 +219,85 @@
             color: #555;
         }
 
+        /* Action Buttons Styling (Run, Download) */
+        .action-button-group {
+            display: flex;
+            flex-direction: column; /* Stack buttons on smaller screens */
+            gap: 15px; /* Space between buttons */
+            margin-top: 2.5rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .action-button-group button {
+            padding: 1rem 2rem; /* Larger padding */
+            border: none;
+            border-radius: var(--border-radius-md); /* More rounded */
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-medium);
+            display: flex; /* Use flexbox for spinner */
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between text and spinner */
+            width: 100%; /* Ensure buttons take full width of group */
+        }
+
+        .action-button-group button:hover {
+            transform: translateY(-3px); /* More pronounced lift */
+            box-shadow: var(--shadow-deep);
+        }
+
+        .show-timetable-btn {
+            background-color: var(--secondary-accent-yellow);
+            color: var(--primary-dark-blue);
+        }
+
+        .show-timetable-btn:hover {
+            background-color: #FFD54F; /* Lighter yellow on hover */
+        }
+
+        .download-btn {
+            background-color: var(--primary-dark-blue);
+            color: var(--text-light);
+        }
+
+        .download-btn:hover {
+            background-color: #2A4D75; /* Darker blue on hover */
+        }
+
+        /* Spinner for Buttons */
+        .action-button-group button .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--text-light); /* Spinner color matches text */
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        .show-timetable-btn .spinner {
+             border-top: 4px solid var(--primary-dark-blue); /* Yellow button spinner uses dark blue */
+        }
+
+
+        .action-button-group button.loading .spinner {
+            display: block; /* Show spinner when loading */
+        }
+
+        .action-button-group button.loading span {
+            display: none; /* Hide text when loading */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Table Styles */
         table {
             width: 100%;
@@ -252,59 +329,6 @@
         tbody tr:hover {
             background-color: #e6f7ff; /* Lighter blue on hover */
             cursor: pointer;
-        }
-
-        /* Download Button */
-        .download-btn {
-            margin-top: 2.5rem; /* More space above button */
-            padding: 1rem 2rem; /* Larger padding */
-            background-color: var(--primary-dark-blue); /* Dark blue */
-            color: var(--text-light);
-            border: none;
-            border-radius: var(--border-radius-md); /* More rounded */
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: var(--shadow-medium);
-            display: flex; /* Use flexbox for spinner */
-            align-items: center;
-            justify-content: center;
-            gap: 10px; /* Space between text and spinner */
-            margin-left: auto; /* Center the button */
-            margin-right: auto;
-        }
-
-        .download-btn:hover {
-            background-color: #2A4D75; /* Darker blue on hover */
-            transform: translateY(-3px); /* More pronounced lift */
-            box-shadow: var(--shadow-deep);
-        }
-
-        /* Spinner for Download Button */
-        .download-btn .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid var(--text-light);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
-        }
-
-        .download-btn.loading .spinner {
-            display: block; /* Show spinner when loading */
-        }
-
-        .download-btn.loading span {
-            display: none; /* Hide text when loading */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         /* Custom Modal for Alerts */
@@ -437,13 +461,13 @@
                 padding: 0.8rem;
                 font-size: 0.85rem;
             }
-            select, input[type="date"], .download-btn {
+            select, input[type="date"] {
                 max-width: 100%;
                 width: calc(100% - 2.4rem); /* Adjust for padding in smaller screens */
                 padding: 0.7rem 1.2rem;
                 font-size: 0.9rem;
             }
-            .download-btn {
+            .action-button-group button {
                 padding: 0.8rem 1.5rem;
                 font-size: 1rem;
             }
@@ -493,7 +517,7 @@
                 padding: 0.5rem;
                 font-size: 0.8rem;
             }
-            select, input[type="date"], .download-btn {
+            select, input[type="date"] {
                 padding: 0.6rem 1rem;
                 font-size: 0.85rem;
             }
@@ -538,6 +562,17 @@
         <label for="endDate">End Date</label>
         <input type="date" id="endDate" />
 
+        <div class="action-button-group">
+            <button class="show-timetable-btn" id="showTimetableBtn">
+                <span class="spinner"></span>
+                <span>Show Timetable</span>
+            </button>
+            <button class="download-btn" id="downloadBtn">
+                <span class="spinner"></span>
+                <span>Download Timetable as PDF</span>
+            </button>
+        </div>
+
         <table id="timetable">
             <thead>
                 <tr>
@@ -549,13 +584,11 @@
                 </tr>
             </thead>
             <tbody>
-                </tbody>
+                <!-- Timetable data will be inserted here -->
+            </tbody>
         </table>
 
-        <button class="download-btn" id="downloadBtn">
-            <span class="spinner"></span>
-            <span>Download Timetable as PDF</span>
-        </button>
+
     </div>
 
     <div id="messageModal" class="modal">
@@ -581,6 +614,7 @@
                 // Sort data by "Week Start" in descending order
                 timetableData = data.sort((a, b) => new Date(b["Week Start"]) - new Date(a["Week Start"]));
                 populateStudents(timetableData); // Populate student dropdown
+                renderTimetable(); // Initial render after data is fetched
             })
             .catch(error => {
                 console.error("Error fetching timetable data:", error);
@@ -636,19 +670,13 @@
             });
         }
 
-        // Event listener for student selection change
-        document.getElementById('studentSelect').addEventListener('change', renderTimetable);
-        // Event listeners for date input changes (to trigger re-render if needed, though current logic only filters on download)
-        document.getElementById('startDate').addEventListener('change', renderTimetable);
-        document.getElementById('endDate').addEventListener('change', renderTimetable);
-
-
         /**
-         * Renders the timetable based on the selected student.
-         * Note: Date filtering is applied only during PDF download, not for table display.
+         * Renders the timetable based on the selected student and date range.
          */
         function renderTimetable() {
             const selectedID = document.getElementById('studentSelect').value;
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
             const tbody = document.querySelector('#timetable tbody');
             tbody.innerHTML = ''; // Clear existing table rows
 
@@ -660,19 +688,50 @@
                 return;
             }
 
-            // Filter data for the selected student
-            const filtered = timetableData.filter(entry => entry["Student ID"] === selectedID);
+            let currentFilteredData = timetableData.filter(entry => entry["Student ID"] === selectedID);
 
-            if (filtered.length === 0) {
-                // If no timetable data found for the selected student
+            // Apply date filtering if both start and end dates are provided
+            if (startDateInput && endDateInput) {
+                const startDate = new Date(startDateInput);
+                const endDate = new Date(endDateInput);
+
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    showModal("Invalid Dates", "Please enter valid start and end dates.");
+                    return;
+                }
+
+                if (startDate > endDate) {
+                    showModal("Invalid Date Range", "Start date cannot be after end date.");
+                    return;
+                }
+
+                currentFilteredData = currentFilteredData.filter(entry => {
+                    const weekStart = new Date(entry["Week Start"]);
+                    // Normalize dates to start of day for accurate comparison
+                    const normalizedWeekStart = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+                    const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                    const normalizedEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+                    return normalizedWeekStart >= normalizedStartDate && normalizedWeekStart <= normalizedEndDate;
+                });
+            } else if (startDateInput || endDateInput) {
+                // If only one date is provided
+                showModal("Missing Date", "Please select both start and end dates to filter by date range, or leave both empty to see all timetable data for the selected student.");
+                 // Optionally clear dates here if user wants to retry
+                 document.getElementById('startDate').value = '';
+                 document.getElementById('endDate').value = '';
+                return;
+            }
+
+            if (currentFilteredData.length === 0) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="5" style="text-align: center; padding: 20px;">No timetable data available for this student.</td>`;
+                tr.innerHTML = `<td colspan="5" style="text-align: center; padding: 20px;">No timetable data found for the selected student and date range.</td>`;
                 tbody.appendChild(tr);
                 return;
             }
 
             // Populate the table with filtered data
-            filtered.forEach(row => {
+            currentFilteredData.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${formatDate(row["Week Start"] || '')}</td>
@@ -684,6 +743,12 @@
                 tbody.appendChild(tr);
             });
         }
+
+        // Event listener for student selection change
+        document.getElementById('studentSelect').addEventListener('change', renderTimetable);
+
+        // Event listener for the new 'Show Timetable' button click
+        document.getElementById('showTimetableBtn').addEventListener('click', renderTimetable);
 
         // Event listener for download button click
         document.getElementById('downloadBtn').addEventListener('click', async () => {
@@ -706,7 +771,7 @@
                 return;
             }
             if (!startDateInput || !endDateInput) {
-                showModal("Missing Dates", "Please select both start and end dates.");
+                showModal("Missing Dates", "Please select both start and end dates to download PDF.");
                 downloadBtn.classList.remove('loading');
                 downloadBtn.disabled = false;
                 return;
@@ -729,14 +794,17 @@
                 return;
             }
 
-            // Filter data based on selected student and date range
-            const filtered = timetableData.filter(entry => {
+            // Filter data based on selected student and date range for PDF
+            const filteredForPdf = timetableData.filter(entry => {
                 const weekStart = new Date(entry["Week Start"]);
-                return entry["Student ID"] === selectedID && weekStart >= startDate && weekStart <= endDate;
+                const normalizedWeekStart = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+                const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                const normalizedEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                return entry["Student ID"] === selectedID && normalizedWeekStart >= normalizedStartDate && normalizedWeekStart <= normalizedEndDate;
             });
 
-            if (filtered.length === 0) {
-                showModal("No Data", "No timetable data found for the selected student and date range.");
+            if (filteredForPdf.length === 0) {
+                showModal("No Data", "No timetable data found for the selected student and date range to generate PDF.");
                 downloadBtn.classList.remove('loading');
                 downloadBtn.disabled = false;
                 return;
@@ -764,7 +832,7 @@
                 y += 5;
 
                 // Add timetable entries to PDF
-                filtered.forEach(row => {
+                filteredForPdf.forEach(row => {
                     if (y > 270) { // Check if new page is needed (approx height)
                         doc.addPage();
                         y = 20;
@@ -852,9 +920,6 @@
                 behavior: 'smooth' // Smooth scrolling
             });
         }
-
-        // Initial render when the page loads (to show "Select a student" message)
-        document.addEventListener('DOMContentLoaded', renderTimetable);
     </script>
 </body>
 </html>
