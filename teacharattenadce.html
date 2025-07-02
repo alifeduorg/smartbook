@@ -1,560 +1,558 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Attendance Sheet</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf.js CDN for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* Custom styles for better aesthetics and responsiveness */
+        /* Global styles and body background animation */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+            margin: 0;
+            padding: 0;
+            /* Adjusted gradient colors for a slightly softer, yet clear look */
+            background: linear-gradient(45deg, #b3e0e6, #e6f7ff, #c9e6e0, #f7fbe6); 
+            background-size: 400% 400%; /* Larger background for smooth animation */
+            animation: gradient 15s ease infinite; /* Gradient animation */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            color: #333; /* Default text color */
         }
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 1.5rem;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+        /* Keyframe animation for the background gradient */
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
-        h1 {
-            color: #1a202c;
-            font-size: 2.5rem;
+
+        /* Main container for the attendance sheet */
+        #printArea {
+            background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white background */
+            border-radius: 16px; /* More rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+            padding: 40px;
+            width: 95%; /* Responsive width */
+            max-width: 1400px; /* Max width for larger screens */
+            text-align: center;
+            box-sizing: border-box; /* Include padding in width */
+            overflow-x: auto; /* Allow horizontal scrolling for table if needed */
+        }
+
+        /* Button styling */
+        .dashboard-btn, .action-btn {
+            background: linear-gradient(to right, #1a73e8, #4285f4); /* Google Blue gradient */
+            color: white;
+            padding: 14px 28px;
+            margin: 10px 10px;
+            border: none;
+            border-radius: 10px; /* Rounded buttons */
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 600;
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.2); /* Soft shadow */
+            display: inline-flex; /* Align icon and text */
+            align-items: center;
+            gap: 8px; /* Space between icon and text */
+        }
+
+        .dashboard-btn:hover, .action-btn:hover {
+            background: linear-gradient(to right, #176ac1, #3c78d8); /* Darker gradient on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3); /* Enhanced shadow on hover */
+        }
+
+        /* Heading style */
+        h2 {
+            color: #2c3e50; /* Darker, more professional color */
+            margin-bottom: 30px;
+            font-size: 3em; /* Larger heading */
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); /* Subtle text shadow */
+        }
+
+        /* Label for month picker */
+        label {
+            font-size: 1.2em;
+            color: #555;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+
+        /* Month input styling */
+        input[type="month"] {
+            padding: 12px;
+            font-size: 16px;
+            margin: 10px 5px;
+            border: 1px solid #c0d9e7; /* Softer border color */
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Inner shadow */
+        }
+
+        input[type="month"]:focus {
+            border-color: #1a73e8; /* Match button color on focus */
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25); /* Focus ring */
+            outline: none;
+        }
+
+        /* Table styling */
+        table {
+            margin-top: 40px;
+            width: 100%;
+            border-collapse: separate; /* Use separate for rounded corners on cells */
+            border-spacing: 0; /* Remove default spacing */
+            font-size: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+            border-radius: 12px; /* Rounded table corners */
+            overflow: hidden; /* Ensures rounded corners are visible */
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0; /* Lighter border for cells */
+            padding: 12px 10px;
             text-align: center;
         }
-        .form-group label {
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        .form-group select, .form-group button {
-            padding: 0.75rem 1rem;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s ease-in-out;
-        }
-        .form-group select:focus, .form-group button:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-        button {
-            cursor: pointer;
-            background-color: #6366f1;
-            color: white;
-            font-weight: 600;
-            border: none;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-        }
-        button:hover {
-            background-color: #4f46e5;
-            transform: translateY(-1px);
-        }
-        button:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-        .table-container {
-            overflow-x: auto;
-            margin-top: 2rem;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px; /* Ensure table is wide enough for all days */
-        }
-        th, td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
+
         th {
-            background-color: #edf2f7;
+            background-color: #e6f0ff; /* Light blue header background, slightly adjusted */
+            color: #333;
             font-weight: 700;
-            color: #2d3748;
-            position: sticky;
-            top: 0; /* Make header sticky for better scrolling experience */
+            text-transform: uppercase;
+            position: sticky; /* Make headers sticky for scrolling */
+            top: 0;
             z-index: 10;
         }
-        td {
-            background-color: #fff;
-            color: #4a5568;
-        }
-        tr:hover td {
-            background-color: #f7fafc;
-        }
-        .text-green-600 {
-            color: #22c55e; /* Green for present/tick */
-        }
-        .text-red-600 {
-            color: #ef4444; /* Red for absent/cross */
-        }
-        .message {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 8px;
-            background-color: #fffbeb;
-            border: 1px solid #fcd34d;
-            color: #92400e;
-            text-align: center;
-            font-weight: 500;
+
+        /* Striped rows */
+        tr:nth-child(even) {
+            background-color: #f0f8ff; /* Very light blue for even rows */
         }
 
-        /* Styles specifically for PDF generation to make content fit */
-        .pdf-table-content th,
-        .pdf-table-content td {
-            font-size: 0.65rem; /* Smaller font size for PDF */
-            padding: 0.2rem 0.3rem; /* Reduced padding for PDF */
-            white-space: nowrap; /* Prevent wrapping in cells */
-        }
-        .pdf-table-content th:first-child,
-        .pdf-table-content td:first-child {
-            min-width: 80px; /* Ensure teacher name has enough space */
-        }
-        .pdf-table-content th:nth-child(2),
-        .pdf-table-content td:nth-child(2) {
-            min-width: 50px; /* Ensure staff ID has enough space */
-        }
-        .pdf-table-content th:last-child,
-        .pdf-table-content td:last-child {
-            min-width: 70px; /* Ensure total hours has enough space */
+        /* Hover effect on table rows */
+        tr:hover {
+            background-color: #d9edf7; /* Light blue on hover */
+            transition: background-color 0.2s ease;
         }
 
-        /* Specific styling for tick and cross marks */
-        .tick-mark {
-            font-size: 1.2em; /* Larger tick mark */
+        /* Status specific styling (kept clear and distinct) */
+        .present {
+            color: #28a745; /* Green */
             font-weight: bold;
+            background-color: #e6ffe6; /* Very light green background */
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block; /* For better padding */
         }
-        .cross-mark {
-            font-size: 1.2em; /* Larger cross mark */
+
+        .absent {
+            color: #dc3545; /* Red */
             font-weight: bold;
+            background-color: #ffe6e6; /* Very light red background */
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* The 'late' status is not directly derived from 'Class Duration' > 0.
+           Keeping it for completeness if you decide to add a specific 'Status' column in your sheet.
+           For now, 'Class Duration' > 0 will map to 'present'.
+        */
+        .late {
+            color: #ffc107; /* Orange */
+            font-weight: bold;
+            background-color: #fffbe6; /* Very light yellow background */
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* Container for the attendance table */
+        #attendanceContainer {
+            margin-top: 30px;
+            overflow-x: auto; /* Enable horizontal scrolling if table is too wide */
+        }
+
+        /* Loading indicator styles */
+        .loading-indicator {
+            display: none; /* Hidden by default */
+            margin-top: 30px;
+            font-size: 1.5em;
+            color: #1a73e8; /* Match button color */
+            font-weight: 600;
         }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
-            .container {
-                margin: 1rem auto;
-                padding: 1rem;
+            #printArea {
+                padding: 20px;
             }
-            h1 {
-                font-size: 2rem;
+
+            h2 {
+                font-size: 2em;
             }
-            .form-grid {
-                grid-template-columns: 1fr;
+
+            .dashboard-btn, .action-btn {
+                padding: 10px 20px;
+                font-size: 15px;
+                margin: 8px 5px;
             }
-            .form-group select, .form-group button {
-                width: 100%;
+
+            label {
+                display: block;
+                margin-bottom: 10px;
             }
+
+            input[type="month"] {
+                width: calc(100% - 20px); /* Full width minus padding */
+                margin-bottom: 15px;
+            }
+
+            th, td {
+                padding: 8px 5px;
+                font-size: 13px;
+            }
+        }
+
+        /* Styles for PDF generation to ensure full content is captured */
+        .pdf-export-mode #printArea {
+            width: auto !important; /* Allow printArea to expand */
+            max-width: none !important; /* Remove max-width constraint */
+            overflow-x: visible !important; /* Ensure content is not clipped */
+        }
+
+        .pdf-export-mode #attendanceContainer {
+            overflow-x: visible !important; /* Ensure content is not clipped */
+            width: auto !important; /* Allow container to expand */
+        }
+
+        .pdf-export-mode table {
+            width: max-content !important; /* Make table expand to its full content width */
+            min-width: 100% !important; /* Ensure it's at least 100% wide */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="reportTitle">Teacher Attendance Sheet</h1>
 
-        <div class="flex flex-col md:flex-row gap-4 mb-6 items-center justify-center form-grid">
-            <div class="form-group flex flex-col w-full md:w-auto">
-                <label for="monthSelect">Select Month:</label>
-                <select id="monthSelect" class="rounded-lg">
-                    <!-- Options will be populated by JavaScript -->
-                </select>
-            </div>
-            <div class="form-group flex flex-col w-full md:w-auto">
-                <label for="yearSelect">Select Year:</label>
-                <select id="yearSelect" class="rounded-lg">
-                    <!-- Options will be populated by JavaScript -->
-                </select>
-            </div>
-            <button id="generateReportBtn" class="mt-4 md:mt-0 px-6 py-3 rounded-lg shadow-md">Generate Report</button>
-            <button id="downloadPdfBtn" class="mt-4 md:mt-0 px-6 py-3 rounded-lg shadow-md bg-green-500 hover:bg-green-600">Download PDF</button>
+    <div id="printArea">
+        <button class="dashboard-btn" onclick="goToDashboard()">⬅ Dashboard</button>
+        <h2 id="reportTitle">Teacher Attendance Report</h2>
+
+        <div class="controls">
+            <label>Select Month:
+                <input type="month" id="monthPicker" />
+            </label>
+            <button class="action-btn" onclick="loadTeacherData()">Load Data</button>
+            <button class="action-btn" onclick="downloadPDF()">📄 Download PDF</button>
         </div>
 
-        <div id="messageArea" class="message hidden"></div>
+        <div id="loadingIndicator" class="loading-indicator">Loading attendance data...</div>
 
-        <div id="attendanceTableContainer" class="table-container hidden">
-            <table id="attendanceTable">
-                <thead>
-                    <tr>
-                        <th>Teacher Name</th>
-                        <th>Staff ID</th>
-                        <!-- Days 1-31 will be added dynamically -->
-                        <th class="whitespace-nowrap">Total Hrs (Month)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Table rows will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
+        <div id="attendanceContainer"></div>
     </div>
 
     <script>
-        // IMPORTANT: Replace 'YOUR_APPS_SCRIPT_WEB_APP_URL' with the URL you obtained after deploying your Google Apps Script.
+        // Google Apps Script Web App URL - REPLACE THIS WITH YOUR ACTUAL DEPLOYED URL
+        // This URL should point to the Apps Script that fetches data from your combined Google Sheet.
         const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwdKvar_uKqoAg1wX60NTThwVHBul14wroJj0QqBQZ3WtQ5zx2hAWXe8hqXqifFI3diSA/exec'; 
 
         // Sample Log Book Data (used if fetching fails or URL is not set)
+        // This sample data now reflects the columns you mentioned.
         const sampleLogBookData = [
-            { Date: '2025-06-01', Month: 'June', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 60 },
-            { Date: '2025-06-01', Month: 'June', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Class Duration': 45 },
-            { Date: '2025-06-01', Month: 'June', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 30 }, // Alice teaches twice
-            { Date: '2025-06-02', Month: 'June', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 90 },
-            { Date: '2025-06-02', Month: 'June', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Class Duration': 60 },
-            { Date: '2025-06-03', Month: 'June', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Class Duration': 75 },
-            { Date: '2025-06-05', Month: 'June', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 60 },
-            { Date: '2025-06-05', Month: 'June', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Class Duration': 45 },
-            { Date: '2025-07-01', Month: 'July', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 120 },
-            { Date: '2025-07-01', Month: 'July', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Class Duration': 60 },
-            { Date: '2025-07-02', Month: 'July', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 90 },
-            { Date: '2025-07-03', Month: 'July', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Class Duration': 70 },
-            { Date: '2025-07-03', Month: 'July', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 40 },
-            { Date: '2025-07-04', Month: 'July', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Class Duration': 80 },
-            { Date: '2025-07-05', Month: 'July', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Class Duration': 50 },
-            { Date: '2025-07-10', Month: 'July', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Class Duration': 60 },
-            { Date: '2025-07-15', Month: 'July', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Class Duration': 90 },
-            { Date: '2025-07-20', Month: 'July', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Class Duration': 100 },
+            { Date: '2025-06-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 60, 'What Taught Today': 'Equations', 'Student Engagement': 'High', 'Any Work': 'Homework 1', 'Anything you\'d like to share?': '' },
+            { Date: '2025-06-01', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Biology', 'Class In': '11:00 AM', 'Class Duration': 45, 'What Taught Today': 'Cells', 'Student Engagement': 'Medium', 'Any Work': '', 'Anything you\'d like to share?': '' },
+            { Date: '2025-06-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Geometry', 'Class In': '01:00 PM', 'Class Duration': 30, 'What Taught Today': 'Shapes', 'Student Engagement': 'High', 'Any Work': '', 'Anything you\'d like to share?': '' },
+            { Date: '2025-06-02', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Calculus', 'Class In': '09:00 AM', 'Class Duration': 90, 'What Taught Today': 'Derivatives', 'Student Engagement': 'High', 'Any Work': 'Quiz', 'Anything you\'d like to share?': '' },
+            { Date: '2025-06-02', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'World War II', 'Class In': '10:30 AM', 'Class Duration': 60, 'What Taught Today': 'Causes of WWII', 'Student Engagement': 'Medium', 'Any Work': 'Reading', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 120, 'What Taught Today': 'Advanced Equations', 'Student Engagement': 'High', 'Any Work': 'Project', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-01', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Chemistry', 'Class In': '11:00 AM', 'Class Duration': 60, 'What Taught Today': 'Periodic Table', 'Student Engagement': 'High', 'Any Work': 'Lab Report', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-02', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Geometry', 'Class In': '09:00 AM', 'Class Duration': 90, 'What Taught Today': 'Theorems', 'Student Engagement': 'Medium', 'Any Work': 'Practice Problems', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-03', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'Ancient Civilizations', 'Class In': '10:30 AM', 'Class Duration': 70, 'What Taught Today': 'Egypt', 'Student Engagement': 'High', 'Any Work': 'Research', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-03', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Calculus', 'Class In': '01:00 PM', 'Class Duration': 40, 'What Taught Today': 'Integrals', 'Student Engagement': 'Low', 'Any Work': '', 'Anything you\'d like to share?': 'Student seemed distracted today.' },
+            { Date: '2025-07-04', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Physics', 'Class In': '11:00 AM', 'Class Duration': 80, 'What Taught Today': 'Motion', 'Student Engagement': 'High', 'Any Work': 'Problem Set', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-05', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'Modern History', 'Class In': '10:30 AM', 'Class Duration': 50, 'What Taught Today': 'Cold War', 'Student Engagement': 'Medium', 'Any Work': 'Essay Outline', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-10', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 60, 'What Taught Today': 'Review', 'Student Engagement': 'High', 'Any Work': 'Test Prep', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-15', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Biology', 'Class In': '11:00 AM', 'Class Duration': 90, 'What Taught Today': 'Ecosystems', 'Student Engagement': 'High', 'Any Work': 'Field Trip Prep', 'Anything you\'d like to share?': '' },
+            { Date: '2025-07-20', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'Civics', 'Class In': '10:30 AM', 'Class Duration': 100, 'What Taught Today': 'Government Structures', 'Student Engagement': 'High', 'Any Work': 'Debate Prep', 'Anything you\'d like to share?': '' },
         ];
 
         let currentLogBookData = []; // This will hold either fetched data or sample data
 
-        const monthNames = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
-
-        const monthSelect = document.getElementById('monthSelect');
-        const yearSelect = document.getElementById('yearSelect');
-        const generateReportBtn = document.getElementById('generateReportBtn');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        const attendanceTableContainer = document.getElementById('attendanceTableContainer');
-        const attendanceTable = document.getElementById('attendanceTable');
-        const messageArea = document.getElementById('messageArea');
-        const reportTitle = document.getElementById('reportTitle');
+        /**
+         * Navigates to the previous page in the browser history.
+         */
+        function goToDashboard() {
+            window.history.back();
+        }
 
         /**
-         * Fetches data from the Google Apps Script web app URL.
-         * If the URL is not set or fetching fails, it falls back to sample data.
+         * Returns a display symbol and class based on the attendance status.
+         * For teacher attendance, 'present' is when Class Duration > 0, 'absent' otherwise.
+         * @param {number} duration - The class duration in minutes.
+         * @returns {object} An object containing the symbol and CSS class.
          */
-        async function fetchLogBookData() {
-            if (GOOGLE_SHEET_WEB_APP_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL' || !GOOGLE_SHEET_WEB_APP_URL) {
-                showMessage("Google Sheet Web App URL not configured. Using sample data.", "info");
-                currentLogBookData = sampleLogBookData;
+        function getStatusSymbol(duration) {
+            if (duration > 0) {
+                return { symbol: '✔️', class: 'present' }; // Checkmark for present
+            } else {
+                return { symbol: '❌', class: 'absent' }; // Cross for absent
+            }
+        }
+
+        /**
+         * Loads teacher attendance data from the Google Sheet API,
+         * processes it, and displays it in a dynamic HTML table.
+         */
+        async function loadTeacherData() {
+            const monthPicker = document.getElementById('monthPicker');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const attendanceContainer = document.getElementById('attendanceContainer');
+            const reportTitle = document.getElementById('reportTitle');
+
+            const monthInput = monthPicker.value;
+
+            // Validate if a month is selected
+            if (!monthInput) {
+                const alertDiv = document.createElement('div');
+                alertDiv.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background-color: #ffeb3b; padding: 20px; border-radius: 8px;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;
+                    font-weight: bold; color: #333;
+                `;
+                alertDiv.textContent = 'Please select a month!';
+                document.body.appendChild(alertDiv);
+                setTimeout(() => alertDiv.remove(), 3000); // Remove after 3 seconds
                 return;
             }
 
-            showMessage("Fetching data from Google Sheet...", "info");
-            try {
-                const response = await fetch(GOOGLE_SHEET_WEB_APP_URL);
-                // First, try to read as text to debug potential non-JSON responses
-                const responseText = await response.text();
-                console.log("Raw response text from Apps Script:", responseText); // LOG: Raw text response
+            // Show loading indicator and clear previous content
+            loadingIndicator.style.display = 'block';
+            attendanceContainer.innerHTML = '';
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}. Response: ${responseText}`);
-                }
-
-                let data;
-                try {
-                    data = JSON.parse(responseText); // Attempt to parse as JSON
-                } catch (jsonError) {
-                    throw new Error(`Failed to parse JSON response from Apps Script. Raw text: ${responseText}. Error: ${jsonError.message}`);
-                }
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                currentLogBookData = data;
-                console.log("Current Log Book Data (parsed JSON from sheet):", currentLogBookData); // LOG: Parsed JSON data
-                hideMessage(); // Clear message on successful fetch
-            } catch (error) {
-                console.error("Error fetching data from Google Sheet:", error);
-                showMessage(`Failed to fetch data from Google Sheet: ${error.message}. Using sample data.`, "error");
-                currentLogBookData = sampleLogBookData;
-            }
-        }
-
-        /**
-         * Initializes the month and year dropdowns with current date values.
-         * Populates years from 2020 to the current year + 5.
-         */
-        function initializeDropdowns() {
-            const today = new Date();
-            const currentMonth = today.getMonth(); // 0-indexed
-            const currentYear = today.getFullYear();
-
-            // Populate months
-            monthNames.forEach((month, index) => {
-                const option = document.createElement('option');
-                option.value = index; // Use 0-indexed month for Date object compatibility
-                option.textContent = month;
-                if (index === currentMonth) {
-                    option.selected = true;
-                }
-                monthSelect.appendChild(option);
-            });
-
-            // Populate years (e.g., 2020 to current year + 5)
-            for (let year = 2020; year <= currentYear + 5; year++) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                if (year === currentYear) {
-                    option.selected = true;
-                }
-                yearSelect.appendChild(option);
-            }
-        }
-
-        /**
-         * Hides the message area.
-         */
-        function hideMessage() {
-            messageArea.classList.add('hidden');
-            messageArea.textContent = '';
-        }
-
-        /**
-         * Displays a message in the message area.
-         * @param {string} msg - The message to display.
-         * @param {string} type - The type of message (e.g., 'info', 'error').
-         */
-        function showMessage(msg, type = 'info') {
-            messageArea.textContent = msg;
-            messageArea.classList.remove('hidden');
-            if (type === 'error') {
-                messageArea.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
-                messageArea.classList.remove('bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
-            } else { // default to info/warning style
-                messageArea.classList.add('bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
-                messageArea.classList.remove('bg-red-100', 'border-red-400', 'text-red-700');
-            }
-        }
-
-        /**
-         * Generates the attendance sheet based on selected month and year.
-         */
-        function generateAttendanceSheet() {
-            hideMessage();
-            const selectedMonthIndex = parseInt(monthSelect.value);
-            const selectedYear = parseInt(yearSelect.value);
-            const selectedMonthName = monthNames[selectedMonthIndex];
+            const [year, monthIndex] = monthInput.split('-').map(Number); // Parse year and month (month is 1-indexed from input)
+            const selectedMonthName = new Date(year, monthIndex - 1, 1).toLocaleString('default', { month: 'long' });
 
             // Update the main title to reflect the selected month and year
-            reportTitle.textContent = `Teacher Attendance Sheet - ${selectedMonthName} ${selectedYear}`;
+            reportTitle.textContent = `Teacher Attendance Report - ${selectedMonthName} ${year}`;
 
-            // Filter data for the selected month and year
-            const filteredData = currentLogBookData.filter(entry => {
-                // Ensure 'Date' property exists and is a string (expected YYYY-MM-DD from Apps Script)
-                if (typeof entry.Date !== 'string' || !entry.Date) {
-                    // console.warn("Entry missing or invalid 'Date' property (not string or empty) for filtering:", entry);
-                    return false;
+            try {
+                // Fetch data from the Google Apps Script API
+                const res = await fetch(GOOGLE_SHEET_WEB_APP_URL);
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
                 }
+                const data = await res.json();
+                currentLogBookData = data; // Store fetched data
 
-                // Parse the date string as UTC to avoid local timezone shifts
-                const entryDate = new Date(entry.Date + 'T00:00:00Z'); // Append 'T00:00:00Z' to force UTC interpretation
-                // Check if date parsing resulted in an invalid date
-                if (isNaN(entryDate.getTime())) {
-                    console.warn("Invalid date string encountered after parsing for filtering:", entry.Date);
-                    return false;
-                }
-
-                // Use UTC methods for comparison
-                const isMatchingMonth = entryDate.getUTCMonth() === selectedMonthIndex;
-                const isMatchingYear = entryDate.getUTCFullYear() === selectedYear;
-                // console.log(`Original Date: ${entry.Date}, Parsed Date (UTC): ${entryDate.toISOString().split('T')[0]}, Month Match: ${isMatchingMonth}, Year Match: ${isMatchingYear}`);
-                return isMatchingMonth && isMatchingYear;
-            });
-            console.log("Filtered Data for Month/Year:", filteredData); // LOG: Filtered data
-
-            // Group data by teacher, summing class durations and storing staff ID
-            const teacherAttendance = {}; // { 'Teacher Name': { staffId: 'T001', dailyData: { '2025-07-01': 120, ... } }, ... }
-            const allTeacherNamesAndIds = new Map(); // To keep track of unique teachers and their IDs
-
-            filteredData.forEach(entry => {
-                const teacherName = entry['Teacher Name'];
-                const staffId = entry['Staff ID'];
-                
-                // Use the date string directly as the key (expected YYYY-MM-DD from Apps Script)
-                const entryDateKey = entry.Date;
-
-                // Ensure 'Class Duration' is treated as a number
-                const duration = parseFloat(entry['Class Duration']) || 0; // Convert to float, default to 0 if not a valid number
-
-                // console.log(`Aggregating: Teacher: ${teacherName}, Date: ${entry.Date}, Class Duration (raw): ${entry['Class Duration']}, Parsed Duration: ${duration}, EntryDateKey: ${entryDateKey}`); // LOG: Aggregation details
-
-                // Store teacher name and staff ID
-                if (!allTeacherNamesAndIds.has(teacherName)) {
-                    allTeacherNamesAndIds.set(teacherName, staffId);
-                }
-
-                if (!teacherAttendance[teacherName]) {
-                    teacherAttendance[teacherName] = { staffId: staffId, dailyData: {} };
-                }
-                if (!teacherAttendance[teacherName].dailyData[entryDateKey]) {
-                    teacherAttendance[teacherName].dailyData[entryDateKey] = 0;
-                }
-                teacherAttendance[teacherName].dailyData[entryDateKey] += duration; // Sum durations for same teacher on same day
-            });
-            console.log("Teacher Attendance Structure (aggregated):", teacherAttendance); // LOG: Aggregated data
-
-            // Get number of days in the selected month
-            const daysInMonth = new Date(selectedYear, selectedMonthIndex + 1, 0).getDate();
-
-            // Clear previous table content
-            const thead = attendanceTable.querySelector('thead tr');
-            const tbody = attendanceTable.querySelector('tbody');
-            tbody.innerHTML = ''; // Clear existing rows
-
-            // Recreate table header (Teacher Name, Staff ID, Days 1-31/30/29/28, Total Hrs)
-            // Clear all current headers except the first two if they exist, or just clear all
-            while (thead.children.length > 0) {
-                thead.removeChild(thead.lastChild);
-            }
-
-            // Add fixed headers
-            const thTeacherName = document.createElement('th');
-            thTeacherName.textContent = 'Teacher Name';
-            thead.appendChild(thTeacherName);
-
-            const thStaffId = document.createElement('th');
-            thStaffId.textContent = 'Staff ID';
-            thead.appendChild(thStaffId);
-
-            // Add dynamic day headers
-            for (let i = 1; i <= daysInMonth; i++) {
-                const th = document.createElement('th');
-                th.textContent = i;
-                th.classList.add('text-center');
-                thead.appendChild(th);
-            }
-
-            // Add Total Hours header
-            const totalHrsTh = document.createElement('th');
-            totalHrsTh.textContent = 'Total Hrs (Month)';
-            totalHrsTh.classList.add('whitespace-nowrap');
-            thead.appendChild(totalHrsTh);
-
-
-            if (Object.keys(teacherAttendance).length === 0) {
-                showMessage(`No log book entries found for ${selectedMonthName} ${selectedYear}.`);
-                attendanceTableContainer.classList.add('hidden');
-                return;
-            }
-
-            // Populate table body
-            Array.from(allTeacherNamesAndIds.keys()).sort().forEach(teacherName => {
-                const row = tbody.insertRow();
-                let totalMonthlyMinutes = 0;
-                const teacherData = teacherAttendance[teacherName];
-
-                // Teacher Name and Staff ID columns
-                row.insertCell().textContent = teacherName;
-                row.insertCell().textContent = teacherData.staffId;
-
-                // Daily attendance and minutes
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const cell = row.insertCell();
-                    // Construct date string for comparison (YYYY-MM-DD)
-                    const dateString = `${selectedYear}-${String(selectedMonthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const dailyMinutes = teacherData.dailyData[dateString];
-                    // console.log(`Displaying Day ${day} for ${teacherName}: dailyMinutes = ${dailyMinutes}`); // LOG: Daily minutes for display
-
-                    // Check if dailyMinutes is a number greater than 0
-                    if (typeof dailyMinutes === 'number' && dailyMinutes > 0) {
-                        // Present: Tick mark with minutes
-                        cell.innerHTML = `<span class="tick-mark">&#10004;</span><br>${dailyMinutes} min`;
-                        cell.classList.add('text-green-600', 'font-semibold', 'text-center');
-                        totalMonthlyMinutes += dailyMinutes;
-                    } else {
-                        // Absent: X mark
-                        cell.innerHTML = `<span class="cross-mark">&#10006;</span>`;
-                        cell.classList.add('text-red-600', 'text-center');
+                // Filter data for the selected month and year, and for teacher entries
+                const filtered = currentLogBookData.filter(row => {
+                    // Ensure 'Date' property exists and is a string (expected YYYY-MM-DD from Apps Script)
+                    if (typeof row.Date !== 'string' || !row.Date) {
+                        return false;
                     }
+
+                    // Parse the date string as UTC to avoid local timezone shifts
+                    const d = new Date(row.Date + 'T00:00:00Z'); 
+                    if (isNaN(d.getTime())) {
+                        console.warn("Invalid date string encountered after parsing for filtering:", row.Date);
+                        return false;
+                    }
+
+                    // Use UTC methods for comparison
+                    const isMatchingMonth = d.getUTCMonth() === monthIndex - 1; // monthIndex is 1-based, getUTCMonth is 0-based
+                    const isMatchingYear = d.getUTCFullYear() === year;
+                    
+                    // Only include entries that have a Teacher Name and Staff ID
+                    return isMatchingMonth && isMatchingYear && row['Teacher Name'] && row['Staff ID'];
+                });
+                console.log("Filtered Data for Month/Year (Teachers Only):", filtered);
+
+                const teachers = {}; // Object to store processed teacher data
+
+                // Process each row of filtered data
+                filtered.forEach(row => {
+                    const id = row['Staff ID'];
+                    // Initialize teacher data if not already present
+                    if (!teachers.hasOwnProperty(id)) {
+                        teachers[id] = {
+                            name: row['Teacher Name'],
+                            dailyDurations: {}, // Will store total duration for each day
+                            totalMonthlyMinutes: 0 // Initialize total minutes for the teacher for the month
+                        };
+                    }
+
+                    const day = new Date(row.Date + 'T00:00:00Z').getUTCDate(); // Get UTC day
+                    const durationInMinutes = parseFloat(row['Class Duration']) || 0;
+
+                    if (!teachers[id].dailyDurations.hasOwnProperty(day)) {
+                        teachers[id].dailyDurations[day] = 0;
+                    }
+                    teachers[id].dailyDurations[day] += durationInMinutes;
+
+                    // Accumulate total minutes for the teacher for the month
+                    teachers[id].totalMonthlyMinutes += durationInMinutes;
+                });
+                console.log("Teacher Attendance Structure (aggregated):", teachers);
+
+                // Determine the number of days in the selected month
+                const daysInMonth = new Date(year, monthIndex, 0).getDate(); // monthIndex is 1-based here
+
+                let html = '<table><thead><tr><th>Teacher Name</th><th>Staff ID</th>';
+
+                // Generate table headers for each day of the month
+                for (let d = 1; d <= daysInMonth; d++) {
+                    html += `<th>${d}<br>Mins</th>`;
                 }
+                html += '<th>Total Hrs</th></tr></thead><tbody>';
 
-                // Total Hours (Month)
-                const totalHoursCell = row.insertCell();
-                totalHoursCell.textContent = `${(totalMonthlyMinutes / 60).toFixed(2)} hrs`;
-                totalHoursCell.classList.add('font-bold', 'text-right');
-            });
+                // Sort teachers by name for consistent display
+                const sortedTeacherIds = Object.keys(teachers).sort((a, b) => 
+                    teachers[a].name.localeCompare(teachers[b].name)
+                );
 
-            attendanceTableContainer.classList.remove('hidden');
+                // Populate table rows with teacher attendance data
+                sortedTeacherIds.forEach(id => {
+                    const info = teachers[id];
+                    html += `<tr><td>${info.name}</td><td>${id}</td>`;
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const dailyTotalMinutes = info.dailyDurations[d] || 0;
+                        const statusDisplay = getStatusSymbol(dailyTotalMinutes); // Get symbol and class based on duration
+                        html += `<td><span class="${statusDisplay.class}">${statusDisplay.symbol}</span><br>${dailyTotalMinutes}</td>`;
+                    }
+                    // Calculate and display total hours for the month
+                    const totalHours = (info.totalMonthlyMinutes / 60).toFixed(2);
+                    html += `<td><strong>${totalHours}</strong></td></tr>`;
+                });
+
+                html += '</tbody></table>';
+                attendanceContainer.innerHTML = html; // Render the table
+            } catch (error) {
+                console.error('Error loading teacher data:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    color: #dc3545; font-weight: bold; margin-top: 20px;
+                    background-color: #ffe6e6; padding: 15px; border-radius: 8px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                errorDiv.textContent = 'Failed to load data. Please check the API URL or your internet connection.';
+                attendanceContainer.innerHTML = ''; // Clear previous content
+                document.getElementById('attendanceContainer').appendChild(errorDiv);
+            } finally {
+                // Hide loading indicator regardless of success or failure
+                loadingIndicator.style.display = 'none';
+            }
         }
 
         /**
-         * Downloads the generated attendance table as a PDF file.
+         * Downloads the attendance report as a PDF.
+         * Uses html2pdf.js library.
          */
         function downloadPDF() {
-            if (attendanceTableContainer.classList.contains('hidden')) {
-                showMessage('Generate a report first before downloading.', 'error');
+            const element = document.getElementById('printArea');
+            const attendanceContainer = document.getElementById('attendanceContainer');
+            const table = attendanceContainer.querySelector('table');
+            const body = document.body;
+
+            if (!table) {
+                const alertDiv = document.createElement('div');
+                alertDiv.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background-color: #ffeb3b; padding: 20px; border-radius: 8px;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;
+                    font-weight: bold; color: #333;
+                `;
+                alertDiv.textContent = 'Please load data first before downloading PDF!';
+                document.body.appendChild(alertDiv);
+                setTimeout(() => alertDiv.remove(), 3000); 
                 return;
             }
 
-            const selectedMonthName = monthNames[parseInt(monthSelect.value)];
-            const selectedYear = parseInt(yearSelect.value);
-            const filename = `Attendance_Sheet_${selectedMonthName}_${selectedYear}.pdf`;
+            // Store original styles
+            const originalPrintAreaWidth = element.style.width;
+            const originalPrintAreaMaxWidth = element.style.maxWidth;
+            const originalPrintAreaOverflowX = element.style.overflowX;
 
-            // Create a temporary div to hold the title and the table for PDF generation
-            const pdfContentWrapper = document.createElement('div');
-            pdfContentWrapper.style.padding = '10mm'; // Add some padding around the content
-            pdfContentWrapper.style.backgroundColor = '#fff'; // Ensure white background for PDF
+            const originalAttendanceContainerWidth = attendanceContainer.style.width;
+            const originalAttendanceContainerOverflowX = attendanceContainer.style.overflowX;
 
-            // Clone the report title and append to the wrapper
-            const clonedTitle = reportTitle.cloneNode(true);
-            clonedTitle.style.marginBottom = '15px'; // Add space below title
-            clonedTitle.style.fontSize = '24px'; // Ensure title is readable in PDF
-            clonedTitle.style.textAlign = 'center';
-            pdfContentWrapper.appendChild(clonedTitle);
+            const originalTableWidth = table.style.width;
+            const originalTableMinWidth = table.style.minWidth;
 
-            // Clone the table container and append to the wrapper
-            const clonedTableContainer = attendanceTableContainer.cloneNode(true);
-            // Apply PDF-specific styles to the cloned table
-            const clonedTable = clonedTableContainer.querySelector('#attendanceTable');
-            if (clonedTable) {
-                clonedTable.classList.add('pdf-table-content');
-            }
-            pdfContentWrapper.appendChild(clonedTableContainer);
+            // Apply PDF-specific styles
+            body.classList.add('pdf-export-mode'); // Apply class for general overrides
 
-            // Append the wrapper to the body temporarily
-            document.body.appendChild(pdfContentWrapper);
+            // Force elements to expand to their full content width
+            table.style.width = `${table.scrollWidth}px`; // Set table width to its full scrollWidth
+            table.style.minWidth = 'auto'; // Remove min-width constraint
+            element.style.width = 'auto'; // Allow printArea to expand
+            element.style.maxWidth = 'none'; // Remove max-width constraint
+            element.style.overflowX = 'visible'; // Ensure content is not clipped
 
-            // html2pdf options
-            const options = {
-                margin: 10,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a2', orientation: 'landscape' } // A2 for more horizontal space
-            };
+            attendanceContainer.style.width = 'auto'; // Allow container to expand
+            attendanceContainer.style.overflowX = 'visible'; // Ensure content is not clipped
 
-            // Generate PDF from the temporary wrapper
-            html2pdf().set(options).from(pdfContentWrapper).save().then(() => {
-                // Remove the temporary wrapper after PDF generation is complete
-                document.body.removeChild(pdfContentWrapper);
-            });
+
+            // A small delay to ensure styles are applied before rendering
+            setTimeout(() => {
+                // Calculate the required width for the PDF based on the table's actual rendered width
+                // Use offsetWidth as it reflects the rendered width after styles are applied
+                const pdfContentWidth = table.offsetWidth + 100; // Add some padding
+                const pdfHeight = 2000; // A large enough height for typical reports
+
+                html2pdf().set({
+                    margin: 0,
+                    filename: 'Teacher_Attendance_Report.pdf', // Changed filename
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2, // Increased scale for better quality
+                        useCORS: true,
+                        // Explicitly set width to capture full content
+                        width: pdfContentWidth // Use the calculated content width for html2canvas
+                    },
+                    jsPDF: {
+                        unit: 'px',
+                        format: [pdfContentWidth, pdfHeight], // Dynamic width based on table content
+                        orientation: 'landscape'
+                    }
+                }).from(element).save().then(() => {
+                    // Restore original styles after PDF generation
+                    body.classList.remove('pdf-export-mode');
+
+                    element.style.width = originalPrintAreaWidth;
+                    element.style.maxWidth = originalPrintAreaMaxWidth;
+                    element.style.overflowX = originalPrintAreaOverflowX;
+
+                    attendanceContainer.style.width = originalAttendanceContainerWidth;
+                    attendanceContainer.style.overflowX = originalAttendanceContainerOverflowX;
+
+                    table.style.width = originalTableWidth;
+                    table.style.minWidth = originalTableMinWidth;
+                });
+            }, 300); // Increased delay to 300ms
         }
 
-        // Event Listeners
-        window.onload = async () => {
-            initializeDropdowns();
-            await fetchLogBookData(); // Fetch data before generating the initial report
-            generateAttendanceSheet(); // Generate report on initial load
+        // Initialize the month picker with the current month/year
+        window.onload = () => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+            document.getElementById('monthPicker').value = `${year}-${month}`;
+            loadTeacherData(); // Load data on initial page load
         };
-        generateReportBtn.addEventListener('click', generateAttendanceSheet);
-        downloadPdfBtn.addEventListener('click', downloadPDF);
     </script>
 </body>
 </html>
