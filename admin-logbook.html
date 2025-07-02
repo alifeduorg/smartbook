@@ -127,12 +127,12 @@
             <div>
                 <label for="teacherStaffIdFilter" class="block text-sm font-medium text-gray-700 mb-1">Teacher Name / Staff ID:</label>
                 <input type="text" id="teacherStaffIdFilter" placeholder="e.g., John Doe or 12345"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
             </div>
             <div>
                 <label for="studentNameFilter" class="block text-sm font-medium text-gray-700 mb-1">Student Name:</label>
                 <input type="text" id="studentNameFilter" placeholder="e.g., Alice Smith"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
             </div>
             <div class="flex flex-col">
                 <label for="monthFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Month:</label>
@@ -259,8 +259,9 @@
         function populateMonthFilter(data) {
             const months = new Set();
             data.forEach(row => {
-                if (row.Timestamp) {
-                    const date = new Date(row.Timestamp);
+                // Use the 'Date' column for month filtering
+                if (row.Date) {
+                    const date = new Date(row.Date);
                     const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`; // YYYY-MM for sorting
                     months.add(monthYear);
                 }
@@ -305,8 +306,9 @@
 
             if (selectedMonth) {
                 filtered = filtered.filter(row => {
-                    if (row.Timestamp) {
-                        const date = new Date(row.Timestamp);
+                    // Use the 'Date' column for filtering by month
+                    if (row.Date) {
+                        const date = new Date(row.Date);
                         const rowMonthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`.toLowerCase();
                         return rowMonthYear === selectedMonth;
                     }
@@ -342,10 +344,10 @@
         function renderTable(dataToRender) {
             dataTableBody.innerHTML = ''; // Clear existing rows
             
-            // Sort data by Timestamp in descending order (newest first)
+            // Sort data by the 'Date' column in descending order (newest first)
             dataToRender.sort((a, b) => {
-                const dateA = new Date(a.Timestamp);
-                const dateB = new Date(b.Timestamp);
+                const dateA = new Date(a.Date); // Use 'Date' column for sorting
+                const dateB = new Date(b.Date); // Use 'Date' column for sorting
                 return dateB - dateA; // For descending order
             });
 
@@ -369,9 +371,9 @@
                 row.setAttribute('data-index', index); 
                 row.classList.add('hover:bg-blue-50', 'transition-all', 'duration-200', 'ease-in-out', 'transform', 'hover:scale-[1.01]', 'hover:shadow-md');
 
-                // Format Timestamp to a readable Date
-                const timestamp = new Date(rowData.Timestamp);
-                const formattedDate = timestamp.toLocaleDateString('en-US', {
+                // Format 'Date' column for display in the main table
+                const dateFromData = new Date(rowData.Date);
+                const formattedDate = dateFromData.toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'
@@ -427,7 +429,8 @@
 
             // Define the order and labels for display in the modal
             const displayOrder = [
-                { key: 'Timestamp', label: 'Date & Time' },
+                { key: 'Date', label: 'Date' }, // Display 'Date' column as date only
+                { key: 'Timestamp', label: 'Timestamp' }, // Display 'Timestamp' column with full date and time
                 { key: 'Teacher Name', label: 'Teacher' },
                 { key: 'Staff ID', label: 'Staff ID' },
                 { key: 'Program', label: 'Program' },
@@ -445,8 +448,17 @@
 
             displayOrder.forEach(item => {
                 let value = rowData[item.key];
-                if (item.key === 'Timestamp' && value) {
+                if (item.key === 'Date' && value) {
                     const dateObj = new Date(value);
+                    // Format 'Date' to show only date in the modal
+                    value = dateObj.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                } else if (item.key === 'Timestamp' && value) {
+                    const dateObj = new Date(value);
+                    // Format 'Timestamp' to show full date and time in the modal
                     value = dateObj.toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'long',
@@ -495,8 +507,8 @@
             const element = document.getElementById('tableContainer'); // Element to convert to PDF
             const selectedMonthForDownload = monthFilter.value;
             const filename = selectedMonthForDownload ? 
-                             `classroom_log_${selectedMonthForDownload.replace(/ /g, '_')}.pdf` : 
-                             `classroom_log_all_filtered.pdf`;
+                                `classroom_log_${selectedMonthForDownload.replace(/ /g, '_')}.pdf` : 
+                                `classroom_log_all_filtered.pdf`;
 
             // Options for html2pdf
             const options = {
@@ -564,3 +576,4 @@
     </script>
 </body>
 </html>
+
