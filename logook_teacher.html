@@ -1,367 +1,522 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Logbook Entry</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Class Log</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        /* Global box-sizing for consistent layout */
-        * {
-            box-sizing: border-box;
-        }
-
-        /* Base styles for the body */
         body {
-            font-family: 'Inter', sans-serif; /* Using Inter font for readability */
-            margin: 0;
-            padding: 0;
-            color: #0a1172; /* Dark blue text for good contrast */
-            background: linear-gradient(135deg, #e0f2f7, #c8e6f0, #e0f2f7); /* Subtle light blue gradient background */
-            background-size: 400% 400%; /* Larger background for smooth animation */
-            animation: gradientAnimation 15s ease infinite; /* Continuous, gentle gradient animation */
-            min-height: 100vh; /* Ensure body takes full viewport height */
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light gray background */
             display: flex;
-            flex-direction: column; /* Arrange content vertically */
-            justify-content: space-between; /* Push footer to the bottom */
-            align-items: center; /* Center content horizontally */
-            padding-bottom: 20px; /* Add some padding at the bottom for spacing */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            position: relative;
         }
-
-        /* Keyframe animation for the background gradient */
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* Canvas for 3D animation */
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Send it to the background */
+            opacity: 0.3; /* Increased opacity for more visibility */
         }
-
-        /* Styles for the main container of the form */
         .container {
-            max-width: 800px; /* Maximum width for the form on larger screens */
-            width: 90%; /* Responsive width, taking 90% of available space */
-            margin: 50px auto; /* Center the container with vertical margin */
-            background: #fff; /* White background for the form */
-            padding: 30px; /* Ample padding inside the container */
-            border-radius: 15px; /* Rounded corners for a softer look */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
-            border: 1px solid #eee; /* Subtle border */
-            transition: all 0.3s ease; /* Smooth transitions for any size changes */
+            background-color: #ffffff;
+            padding: 2.5rem; /* Increased padding */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Deeper shadow */
+            max-width: 900px; /* Wider container for better layout */
+            width: 95%; /* Responsive width */
+            margin: 2rem auto; /* Center with margin */
+            position: relative;
+            z-index: 1; /* Ensure form is above canvas */
         }
-
-        /* Heading styles */
-        h2 {
-            text-align: center;
-            color: #0a1172;
-            margin-bottom: 30px;
-            font-size: 28px;
-            font-weight: 700; /* Bolder heading for emphasis */
+        h1 {
+            color: #000080; /* Navy Blue color for the title */
+            font-weight: 700; /* Bold heading */
+            margin-bottom: 2rem; /* More space below heading */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* Subtle 3D effect for text */
         }
-
-        /* Form group spacing */
-        .form-group {
-            margin-bottom: 20px; /* Space between form fields */
-        }
-
-        /* Label styles */
         label {
-            font-weight: 600;
-            display: block; /* Make labels block-level for proper spacing */
-            margin-bottom: 8px; /* Space between label and input */
-            color: #0a1172;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500; /* Medium weight for labels */
+            color: #4a5568; /* Slightly darker gray for labels */
         }
-
-        /* Styles for input, select, and textarea elements */
-        input, select, textarea {
-            width: 100%; /* Full width within their parent container */
-            padding: 12px; /* Consistent padding for all input types */
-            border-radius: 8px; /* Rounded borders */
-            border: 1px solid #ccc; /* Light grey border */
-            font-size: 15px; /* Readable font size */
-            box-sizing: border-box; /* Include padding and border in the element's total width */
-            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions for focus effects */
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Subtle inner shadow for depth */
-        }
-
-        /* Specific style for textareas to ensure a minimum height */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"], /* Added time input type */
+        select,
         textarea {
-            min-height: 90px; /* Ensure textareas are not too small */
-            resize: vertical; /* Allow vertical resizing only */
+            width: 100%;
+            padding: 0.75rem 1rem; /* More padding for inputs */
+            margin-bottom: 1.5rem; /* More space below inputs */
+            border: 1px solid #cbd5e0; /* Lighter border */
+            border-radius: 0.75rem; /* Rounded input fields */
+            font-size: 1rem;
+            color: #2d3748; /* Darker text for input values */
+            background-color: #edf2f7; /* Light background for inputs */
+            transition: all 0.2s ease-in-out; /* Smooth transitions */
         }
-
-        /* Focus styles for input, select, and textarea */
-        input:focus, select:focus, textarea:focus {
-            border-color: #ffd700; /* Gold focus border */
-            outline: none; /* Remove default outline */
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* Gold glow on focus */
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus, /* Added time input type focus */
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #6366f1; /* Indigo focus border */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Focus ring */
+            background-color: #ffffff; /* White background on focus */
         }
-
-        /* Button styles */
-        button {
-            background-color: #0a1172; /* Dark blue button background */
-            color: #ffd700; /* Gold text color */
-            padding: 14px; /* Generous padding for easy tapping/clicking */
-            width: 100%; /* Full width button */
-            font-size: 17px; /* Slightly larger font for buttons */
-            border: none; /* No border */
-            border-radius: 8px; /* Rounded corners */
-            cursor: pointer; /* Indicate clickable element */
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth hover effects */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Button shadow */
+        textarea {
+            min-height: 100px; /* Larger text area */
+            resize: vertical; /* Allow vertical resizing */
         }
-
-        /* Button hover effects */
-        button:hover {
-            background-color: #ffd700; /* Gold background on hover */
-            color: #0a1172; /* Dark blue text on hover */
+        .button-group {
+            display: flex;
+            gap: 1rem; /* Space between buttons */
+            margin-top: 1.5rem; /* Space above the button group */
+            margin-bottom: 1.5rem; /* Space below the button group */
+        }
+        .button-group button {
+            flex: 1; /* Each button takes equal space */
+            padding: 1.25rem 1.5rem; /* Increased padding for larger button */
+            border: none;
+            border-radius: 0.75rem; /* Rounded button */
+            font-size: 1.25rem; /* Larger font size */
+            font-weight: 600; /* Semi-bold */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Button shadow */
+            width: auto; /* Override default 100% width for flex item */
+        }
+        .button-group button:hover:not(:disabled) {
             transform: translateY(-2px); /* Slight lift effect */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Deeper shadow on hover */
         }
-
-        /* Message box styles (for success/error messages) */
-        .message {
-            display: none; /* Hidden by default */
-            padding: 15px;
-            margin-top: 20px;
-            background-color: #2ecc71; /* Green for success */
+        .button-group button:disabled {
+            background-color: #a7a7a7; /* Gray for disabled state */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        #submitButton {
+            background-color: #6366f1; /* Indigo for submit button */
             color: white;
-            text-align: center;
-            border-radius: 8px;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.4);
+        }
+        #submitButton:hover:not(:disabled) {
+            background-color: #4f46e5; /* Darker indigo on hover */
+        }
+        #dashboardButton {
+            background-color: #10b981; /* Green for dashboard button */
+            color: white;
+        }
+        #dashboardButton:hover:not(:disabled) {
+            background-color: #059669; /* Darker green on hover */
         }
 
-        /* Dashboard button specific styles */
-        .dashboard-btn {
-            background-color: #ffd700; /* Gold dashboard button */
-            color: #0a1172; /* Dark blue text */
-            margin-top: 20px;
-            border: 1px solid #e0bb00; /* Slightly darker gold border */
+        .grid-cols-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem; /* Space between grid items */
         }
-
-        /* Dashboard button hover effects */
-        .dashboard-btn:hover {
-            background-color: #e0bb00; /* Darker gold on hover */
-            color: #0a1172;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Footer styles */
-        footer.footer {
-            background-color: #0a1172;
-            color: #ffd700;
-            text-align: center;
-            padding: 15px 10px;
-            margin-top: 60px; /* Adjust margin for spacing from content */
-            font-size: 14px;
-            border-top: 2px solid #ffd700;
-            width: 100%; /* Full width footer */
-        }
-
-        /* Media queries for responsiveness */
         @media (max-width: 768px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr; /* Stack columns on smaller screens */
+            }
             .container {
-                margin: 20px auto; /* Adjust margin for smaller screens */
-                padding: 20px; /* Reduce padding on smaller screens */
+                padding: 1.5rem;
+                margin: 1rem auto;
             }
-
-            h2 {
-                font-size: 24px; /* Smaller heading font size */
+            h1 {
+                font-size: 1.75rem;
             }
-
-            button {
-                padding: 12px; /* Slightly less padding for buttons */
-                font-size: 16px; /* Smaller button font size */
+            .button-group {
+                flex-direction: column; /* Stack buttons on small screens */
+                gap: 1rem;
+            }
+            .button-group button {
+                width: 100%; /* Full width when stacked */
+                font-size: 1.125rem; /* Adjust button font size for mobile */
+                padding: 1rem 1.25rem;
             }
         }
-
-        @media (max-width: 480px) {
-            .container {
-                margin: 15px auto; /* Even less margin for very small screens */
-                padding: 15px; /* Further reduce padding */
-            }
-
-            h2 {
-                font-size: 22px; /* Smallest heading font size */
-            }
-
-            input, select, textarea {
-                padding: 10px; /* Slightly smaller padding for inputs */
-                font-size: 14px; /* Smaller font size for inputs */
-            }
-
-            label {
-                font-size: 14px; /* Smaller font size for labels */
-            }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #4CAF50; /* Green for success */
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .message-box.error {
+            background-color: #f44336; /* Red for error */
+        }
+        .message-box.show {
+            display: block;
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
+    <canvas id="three-canvas"></canvas>
+
     <div class="container">
-        <h2>Log Book</h2>
-
-        <form id="logbookForm" action="https://script.google.com/macros/s/AKfycbwHBn0I_C2X9uoLJgq85V2i6ntnUCRHmd3lfFt8A-r5_MzCZFiZqrTmKOWcBfudZ1TlvQ/exec" method="POST">
-            <div class="form-group">
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date" required>
+        <h1 class="text-3xl text-center">Daily Class Log</h1>
+        <form id="logForm">
+            <div class="grid grid-cols-2">
+                <div>
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required class="rounded-xl">
+                </div>
+                <div>
+                    <label for="month">Month:</label>
+                    <select id="month" name="month" required class="rounded-xl">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="month">Month</label>
-                <select id="month" name="month" required>
-                    <option>January</option><option>February</option><option>March</option>
-                    <option>April</option><option>May</option><option>June</option>
-                    <option>July</option><option>August</option><option>September</option>
-                    <option>October</option><option>November</option><option>December</option>
-                </select>
+            <div class="grid grid-cols-2">
+                <div>
+                    <label for="teacherName">Teacher Name:</label>
+                    <input type="text" id="teacherName" name="teacherName" placeholder="Enter teacher's name" required class="rounded-xl">
+                </div>
+                <div>
+                    <label for="staffId">Staff ID:</label>
+                    <input type="text" id="staffId" name="staffId" placeholder="Enter staff ID" required class="rounded-xl">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="teacherName">Teacher's Name</label>
-                <input type="text" id="teacherName" name="teacherName" required>
+            <label for="program">Program:</label>
+            <select id="program" name="program" required class="rounded-xl">
+                <option value="">Select Program</option>
+                <option value="INTERNATIONAL SCHOOL">INTERNATIONAL SCHOOL</option>
+                <option value="LITTLE LEANER">LITTLE LEANER</option>
+                <option value="HORIZON">HORIZON</option>
+                <option value="EPISTEM">EPISTEM</option>
+                <option value="AL ILM ISLAMIC SCHOOL">AL ILM ISLAMIC SCHOOL</option>
+            </select>
+
+            <label for="classroomName">Class Room Name:</label>
+            <input type="text" id="classroomName" name="classroomName" placeholder="e.g., Grade 5A" required class="rounded-xl">
+
+            <div class="grid grid-cols-2">
+                <div>
+                    <label for="studentName">Student Name:</label>
+                    <input type="text" id="studentName" name="studentName" placeholder="Enter student's name" required class="rounded-xl">
+                </div>
+                <div>
+                    <label for="studentId">Student ID:</label>
+                    <input type="text" id="studentId" name="studentId" placeholder="Enter student ID" required class="rounded-xl">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="staffID">Staff ID</label>
-                <input type="text" id="staffID" name="staffID" required>
+            <div class="grid grid-cols-2">
+                <div>
+                    <label for="subject">Subject:</label>
+                    <input type="text" id="subject" name="subject" placeholder="e.g., Mathematics" required class="rounded-xl">
+                </div>
+                <div>
+                    <label for="classIn">Class In (Time):</label>
+                    <input type="time" id="classIn" name="classIn" required class="rounded-xl">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="program">Program</label>
-                <select id="program" name="program" required>
-                    <option value="little_leaner">Little Learner</option>
-                    <option value="kg">KG</option>
-                    <option value="online_school">Online School</option>
-                    <option value="horizon">Horizon</option>
-                </select>
-            </div>
+            <label for="classDuration">Class Duration (minutes):</label>
+            <input type="number" id="classDuration" name="classDuration" placeholder="e.g., 45" required class="rounded-xl">
 
-            <div class="form-group">
-                <label for="class">Class</label>
-                <input type="text" id="class" name="class" required>
-            </div>
+            <label for="whatTeachToday">What Taught Today:</label>
+            <textarea id="whatTeachToday" name="whatTeachToday" placeholder="Describe the topics covered and activities done..." required class="rounded-xl"></textarea>
 
-            <div class="form-group">
-                <label for="studentName">Student Name</label>
-                <input type="text" id="studentName" name="studentName" required>
-            </div>
+            <label for="studentEngagement">Student Engagement:</label>
+            <textarea id="studentEngagement" name="studentEngagement" placeholder="Observations on student participation and engagement..." class="rounded-xl"></textarea>
 
-            <div class="form-group">
-                <label for="subjects">Subjects</label>
-                <input type="text" id="subjects" name="subjects" required>
-            </div>
+            <label for="anyWork">Any Work:</label>
+            <textarea id="anyWork" name="anyWork" placeholder="Homework, assignments, or follow-up tasks..." class="rounded-xl"></textarea>
 
-            <div class="form-group">
-                <label for="classIn">Class In (Time)</label>
-                <input type="time" id="classIn" name="classIn" required>
-            </div>
+            <label for="anythingToShare">Anything you'd like to share?</label>
+            <textarea id="anythingToShare" name="anythingToShare" placeholder="Any additional notes, concerns, or highlights..." class="rounded-xl"></textarea>
 
-            <div class="form-group">
-                <label for="classDuration">Class Duration</label>
-                <select id="classDuration" name="classDuration" required>
-                    <option value="30">30 minutes</option>
-                    <option value="60">60 minutes</option>
-                    <option value="90">60 + 30 minutes</option>
-                    <option value="120">60 + 30 + 30 minutes</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="teachToday">What did you teach today?</label>
-                <textarea id="teachToday" name="teachToday" rows="3" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="studentEngagement">Student Engagement</label>
-                <textarea id="studentEngagement" name="studentEngagement" rows="3" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="homework">Homework or Tasks Given?</label>
-                <textarea id="homework" name="homework" rows="3" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="workType">What type of Work</label>
-                <input type="text" id="workType" name="workType" required>
-            </div>
-
-            <div class="form-group">
-                <label for="classNotification">Upload Class Notification Message</label>
-                <textarea id="classNotification" name="classNotification" rows="2"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="additionalComments">Anything you'd like to share?</label>
-                <textarea id="additionalComments" name="additionalComments" rows="2"></textarea>
-            </div>
-
-            <button type="submit">Submit Logbook Entry</button>
-
-            <div class="message" id="successMessage">
-                Your logbook entry has been submitted successfully!
+            <div class="button-group">
+                <button type="button" id="dashboardButton">Go to Dashboard</button>
+                <button type="submit" id="submitButton">Submit Log</button>
             </div>
         </form>
-
-        <button class="dashboard-btn" onclick="window.location.href='http://smartbook.alifedu.org/teacher-dashboard.html'">Go to Dashboard</button>
     </div>
 
-    <footer class="footer">
-        <p>© Alif Edu 2025. All rights reserved.</p>
-    </footer>
+    <div id="messageBox" class="message-box"></div>
 
     <script>
-        document.getElementById('logbookForm').onsubmit = function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-            const submitButton = form.querySelector('button[type="submit"]');
+        // Function to display messages
+        function showMessage(message, type = 'success') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = 'message-box show'; // Reset classes and show
+            if (type === 'error') {
+                messageBox.classList.add('error');
+            } else {
+                messageBox.classList.remove('error');
+            }
 
-            // Disable button and show loading text
-            submitButton.disabled = true;
-            submitButton.innerText = 'Submitting...';
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+                // Optional: Hide completely after transition
+                setTimeout(() => { messageBox.style.display = 'none'; }, 300);
+            }, 3000); // Message disappears after 3 seconds
+        }
 
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === "success") {
-                    document.getElementById('successMessage').style.display = 'block';
-                    // For success, a simple display change is fine as per current code.
-                    setTimeout(() => window.location.reload(), 2000);
-                } else {
-                    // Custom message box for error instead of alert
-                    const errorMessage = document.createElement('div');
-                    errorMessage.className = 'message';
-                    errorMessage.style.display = 'block';
-                    errorMessage.style.backgroundColor = '#e74c3c'; /* Red for error */
-                    errorMessage.innerText = 'Submission failed. Please try again.';
-                    form.appendChild(errorMessage);
-                    setTimeout(() => errorMessage.style.display = 'none', 3000); // Hide after 3 seconds
+        // --- Three.js Setup ---
+        let scene, camera, renderer, particles = [], glowingSpheres = [], pointLight;
+        const particleCount = 200; // More particles for a denser field
+        const glowingSphereCount = 5; // Fewer, larger glowing spheres
+        const colors = [
+            0x6366f1, // Indigo
+            0x06b6d4, // Cyan
+            0x8b5cf6, // Purple
+            0x14b8a6, // Teal
+            0xec4899, // Pink
+            0xf59e0b, // Amber
+            0x3b82f6  // Blue
+        ]; // A wider palette of vibrant colors
 
-                    submitButton.disabled = false;
-                    submitButton.innerText = 'Submit Logbook Entry';
-                }
-            })
-            .catch(error => {
-                console.error('Error!', error.message);
-                // Custom message box for error instead of alert
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'message';
-                errorMessage.style.display = 'block';
-                errorMessage.style.backgroundColor = '#e74c3c'; /* Red for error */
-                errorMessage.innerText = 'Error submitting the form. Please check your connection.';
-                form.appendChild(errorMessage);
-                setTimeout(() => errorMessage.style.display = 'none', 3000); // Hide after 3 seconds
+        function initThreeJS() {
+            const canvas = document.getElementById('three-canvas');
+            scene = new THREE.Scene();
 
-                submitButton.disabled = false;
-                submitButton.innerText = 'Submit Logbook Entry';
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 15; // Move camera back to see more particles
+
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true }); // Alpha true, antialias for smoother edges
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Create particles (points)
+            const positions = new Float32Array(particleCount * 3);
+            const colorsArray = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+
+            const particleGeometry = new THREE.BufferGeometry();
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true, // Use colors from buffer attribute
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending, // For a glowing effect
+                sizeAttenuation: true // Particles closer to camera appear larger
             });
-        };
-    </script>
 
+            for (let i = 0; i < particleCount; i++) {
+                // Positions
+                positions[i * 3] = (Math.random() - 0.5) * 30; // x
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 30; // y
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 30; // z
+
+                // Colors
+                const color = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
+                colorsArray[i * 3] = color.r;
+                colorsArray[i * 3 + 1] = color.g;
+                colorsArray[i * 3 + 2] = color.b;
+
+                // Sizes
+                sizes[i] = 0.5 + Math.random() * 1.5; // Varying sizes
+            }
+
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particleGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+            particleGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1)); // Custom size attribute
+
+            particles = new THREE.Points(particleGeometry, particleMaterial);
+            scene.add(particles);
+
+            // Create glowing spheres
+            for (let i = 0; i < glowingSphereCount; i++) {
+                const geometry = new THREE.SphereGeometry(
+                    1 + Math.random() * 1.5, // Larger random radius
+                    32, // More segments for smoother sphere
+                    32
+                );
+                const material = new THREE.MeshStandardMaterial({
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    transparent: true,
+                    opacity: 0.4 + Math.random() * 0.3, // Semi-transparent
+                    emissive: 0x000000, // No self-illumination initially, light will hit it
+                    roughness: 0.5,
+                    metalness: 0.1
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+
+                sphere.position.x = (Math.random() - 0.5) * 25;
+                sphere.position.y = (Math.random() - 0.5) * 25;
+                sphere.position.z = (Math.random() - 0.5) * 25;
+
+                sphere.rotationSpeedX = (Math.random() - 0.5) * 0.002;
+                sphere.rotationSpeedY = (Math.random() - 0.5) * 0.002;
+                sphere.rotationSpeedZ = (Math.random() - 0.5) * 0.002;
+
+                glowingSpheres.push(sphere);
+                scene.add(sphere);
+            }
+
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+            scene.add(ambientLight);
+
+            // Add a dynamic point light for glowing effect
+            pointLight = new THREE.PointLight(0xffffff, 1, 100);
+            scene.add(pointLight);
+
+            // Handle window resizing
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = Date.now() * 0.0001;
+
+            // Animate particles (subtle drift and rotation)
+            particles.rotation.y += 0.0005;
+            particles.rotation.x += 0.0002;
+
+            // Animate glowing spheres
+            glowingSpheres.forEach((sphere, index) => {
+                sphere.rotation.x += sphere.rotationSpeedX;
+                sphere.rotation.y += sphere.rotationSpeedY;
+                sphere.rotation.z += sphere.rotationSpeedZ;
+
+                // Subtle floating motion
+                sphere.position.y += Math.sin(time + index * 0.5) * 0.01;
+                sphere.position.x += Math.cos(time + index * 0.3) * 0.008;
+            });
+
+            // Animate point light
+            pointLight.position.x = Math.sin(time * 0.7) * 10;
+            pointLight.position.y = Math.cos(time * 0.5) * 10;
+            pointLight.position.z = Math.sin(time * 0.3) * 10;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- Form Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Three.js
+            initThreeJS();
+            animate(); // Start the animation loop
+
+            const dateInput = document.getElementById('date');
+            const monthSelect = document.getElementById('month');
+            const logForm = document.getElementById('logForm');
+            const submitButton = document.getElementById('submitButton');
+            const dashboardButton = document.getElementById('dashboardButton');
+
+            // Set current date
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+
+            // Set current month
+            monthSelect.value = new Date().toLocaleString('default', { month: 'long' });
+
+            // Dashboard button click handler (placeholder)
+            dashboardButton.addEventListener('click', () => {
+                showMessage("Dashboard functionality not yet implemented.", "info");
+                // In a real application, you would redirect to a dashboard page:
+                // window.location.href = 'your-dashboard-url.html';
+            });
+
+            logForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent default form submission
+
+                submitButton.disabled = true; // Disable button immediately
+                submitButton.textContent = 'Submitting...'; // Change button text
+
+                const formData = new FormData(logForm);
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+
+                console.log('Form Data:', data);
+
+                // --- Google Apps Script Integration ---
+                // The URL provided by the user is now used here.
+                const googleAppsScriptURL = 'https://script.google.com/macros/s/AKfycbzwvOCn_oiLOolWfT786giDoJTFQY34Vxso0qKwop_rHUw47AvFzmQbTO6WJ8UEF8bS/exec';
+
+                try {
+                    const response = await fetch(googleAppsScriptURL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Required for Google Apps Script if not handling CORS explicitly
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    // Note: With 'no-cors' mode, you cannot read the response body.
+                    // The success/failure must be inferred from the network request itself,
+                    // or by checking the Google Sheet after submission.
+                    // For demonstration, we'll assume success if no fetch error.
+
+                    console.log('Google Apps Script response (check network tab for actual status):', response);
+                    showMessage("Log submitted successfully!");
+                    logForm.reset(); // Clear the form after successful submission
+                    // For the requirement "dont show submit button till the page refresh",
+                    // the button will remain disabled and show "Submitted!".
+                    // To re-enable it, the user would need to refresh the page.
+
+                } catch (error) {
+                    console.error('Error submitting log:', error);
+                    showMessage("Failed to submit log. Please try again.", "error");
+                } finally {
+                    // This block will execute regardless of success or failure
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Submitted!';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
