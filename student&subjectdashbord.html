@@ -291,17 +291,28 @@
                 return;
             }
 
+            // Define the headers to display in the main table and their labels in the desired order
+            const mainTableHeaders = [
+                { key: 'Name', label: 'Name' },
+                { key: 'STATUS', label: 'Status' },
+                { key: 'Actions', label: 'Call' }, // Renamed label for clarity
+                { key: 'Room No', label: 'Room No' },
+                { key: 'Student ID', label: 'Student ID' },
+                { key: 'Phone', label: 'Phone' }
+            ];
+
             // Create table structure
             let tableHTML = `
                 <table class="min-w-full divide-y divide-gray-700 rounded-lg overflow-hidden">
                     <thead class="bg-gray-700">
                         <tr>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Room No</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Student ID</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Phone</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider call-button-cell">Call</th>
+            `;
+            // Add headers dynamically based on the defined order
+            mainTableHeaders.forEach(headerInfo => {
+                const additionalClass = headerInfo.key === 'Actions' ? ' call-button-cell' : ''; // Apply class for mobile-only display
+                tableHTML += `<th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider${additionalClass}">${headerInfo.label}</th>`;
+            });
+            tableHTML += `
                         </tr>
                     </thead>
                     <tbody class="bg-gray-800 divide-y divide-gray-700">
@@ -313,19 +324,32 @@
 
                 tableHTML += `
                     <tr class="cursor-pointer hover:bg-gray-700" onclick="openModal(${index})">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${student["Room No"] || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${student["Student ID"] || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${student.Name || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${student.Phone || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="status-badge ${getStatusClass(student.STATUS)}">${student.STATUS || 'N/A'}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 call-button-cell">
+                `;
+                
+                // Add table data dynamically based on the defined order
+                mainTableHeaders.forEach(headerInfo => {
+                    const additionalClass = headerInfo.key === 'Actions' ? ' call-button-cell' : '';
+                    let tdContent = '';
+
+                    if (headerInfo.key === 'Actions') {
+                        tdContent = `
                             <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
                                     onclick="event.stopPropagation(); window.location.href='tel:${phoneNumber}';">
                                 Call
                             </button>
-                        </td>
+                        `;
+                    } else if (headerInfo.key === 'STATUS') {
+                        tdContent = `
+                            <span class="status-badge ${getStatusClass(student.STATUS)}">${student.STATUS || 'N/A'}</span>
+                        `;
+                    } else {
+                        tdContent = student[headerInfo.key] || 'N/A';
+                    }
+
+                    tableHTML += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200${additionalClass}">${tdContent}</td>`;
+                });
+
+                tableHTML += `
                     </tr>
                 `;
             });
