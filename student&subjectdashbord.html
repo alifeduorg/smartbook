@@ -104,6 +104,14 @@
             font-size: 0.75rem;
         }
 
+        /* Highlight row for LEFT status */
+        .row-status-left {
+            background-color: rgba(239, 68, 68, 0.5) !important; /* Red with transparency */
+        }
+        .row-status-left:hover {
+            background-color: rgba(239, 68, 68, 0.7) !important; /* Darker red on hover */
+        }
+
         /* Modal specific styles */
         .modal-overlay {
             position: fixed;
@@ -200,6 +208,30 @@
             Displaying key student details. Click a row for full information.
         </p>
 
+        <!-- Filter Options -->
+        <div class="mb-6 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <div class="w-full sm:w-1/3">
+                <label for="nameFilter" class="block text-gray-300 text-sm font-bold mb-2">Filter by Name:</label>
+                <input type="text" id="nameFilter" placeholder="Enter student name..."
+                       class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-200 border-gray-300">
+            </div>
+            <div class="w-full sm:w-1/3">
+                <label for="studentIdFilter" class="block text-gray-300 text-sm font-bold mb-2">Filter by Student ID:</label>
+                <input type="text" id="studentIdFilter" placeholder="Enter student ID..."
+                       class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-200 border-gray-300">
+            </div>
+            <div class="w-full sm:w-1/3">
+                <label for="statusFilter" class="block text-gray-300 text-sm font-bold mb-2">Filter by Status:</label>
+                <select id="statusFilter"
+                        class="shadow border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-200 border-gray-300">
+                    <option value="">All Statuses</option>
+                    <option value="ONGOING">ONGOING</option>
+                    <option value="LEFT">LEFT</option>
+                    <option value="PENDING">PENDING</option>
+                </select>
+            </div>
+        </div>
+
         <div id="data-container" class="table-container rounded-lg shadow-inner bg-gray-900/70">
             <p class="text-center text-gray-400 p-8" id="loading-message">Loading student data...</p>
         </div>
@@ -225,7 +257,12 @@
         const loadingMessage = document.getElementById('loading-message');
         const modal = document.getElementById('student-details-modal');
         const modalBody = document.getElementById('modal-body');
-        let currentStudentsData = []; // To store data fetched for modal use
+        const nameFilterInput = document.getElementById('nameFilter');
+        const studentIdFilterInput = document.getElementById('studentIdFilter'); // New filter input
+        const statusFilterSelect = document.getElementById('statusFilter');
+
+        let allStudentsData = []; // To store all fetched data
+        let filteredStudentsData = []; // To store currently filtered data
 
         /**
          * Parses a string by newline characters into an array of items.
@@ -278,8 +315,31 @@
         }
 
         /**
+         * Applies filters to the allStudentsData and updates the displayed table.
+         */
+        function applyFilters() {
+            const nameFilter = nameFilterInput.value.toLowerCase();
+            const studentIdFilter = studentIdFilterInput.value.toLowerCase(); // Get student ID filter value
+            const statusFilter = statusFilterSelect.value.toLowerCase();
+
+            filteredStudentsData = allStudentsData.filter(student => {
+                const studentName = (student.Name || '').toLowerCase();
+                const studentId = (student["Student ID"] || '').toLowerCase(); // Get student ID from data
+                const studentStatus = (student.STATUS || '').replace(/\s/g, '').toLowerCase();
+
+                const nameMatch = nameFilter === '' || studentName.includes(nameFilter);
+                const studentIdMatch = studentIdFilter === '' || studentId.includes(studentIdFilter); // Check student ID match
+                const statusMatch = statusFilter === '' || studentStatus === statusFilter;
+
+                return nameMatch && studentIdMatch && statusMatch; // Combine all filter conditions
+            });
+
+            renderStudentData(filteredStudentsData);
+        }
+
+        /**
          * Renders the student data into a table.
-         * @param {Array<Object>} data - An array of student data objects.
+         * @param {Array<Object>} data - An array of student data objects to render.
          */
         function renderStudentData(data) {
             if (loadingMessage) {
@@ -287,7 +347,7 @@
             }
 
             if (data.length === 0) {
-                dataContainer.innerHTML = '<p class="text-center text-gray-400 p-8">No student data available.</p>';
+                dataContainer.innerHTML = '<p class="text-center text-gray-400 p-8">No matching student data available.</p>';
                 return;
             }
 
@@ -321,9 +381,13 @@
             data.forEach((student, index) => {
                 // Sanitize phone number for tel: link
                 const phoneNumber = String(student.Phone || '').replace(/\D/g, ''); // Remove non-digits
+                const cleanStatus = (student.STATUS || '').replace(/\s/g, '').toLowerCase();
+
+                // Add class for rows with 'LEFT' status
+                const rowClass = cleanStatus === 'left' ? 'row-status-left' : '';
 
                 tableHTML += `
-                    <tr class="cursor-pointer hover:bg-gray-700" onclick="openModal(${index})">
+                    <tr class="cursor-pointer hover:bg-gray-700 ${rowClass}" onclick="openModal(${index})">
                 `;
                 
                 // Add table data dynamically based on the defined order
@@ -366,7 +430,8 @@
          * @param {number} index - The index of the student in the currentStudentsData array.
          */
         function openModal(index) {
-            const student = currentStudentsData[index];
+            // Use filteredStudentsData for modal lookup
+            const student = filteredStudentsData[index]; 
             if (!student) return;
 
             modalBody.innerHTML = `
@@ -460,8 +525,8 @@
                 }
 
                 const data = await response.json();
-                currentStudentsData = data; // Store the fetched data
-                renderStudentData(data);
+                allStudentsData = data; // Store all fetched data
+                applyFilters(); // Apply filters and render initially
 
             } catch (error) {
                 console.error("Could not fetch data:", error);
@@ -486,6 +551,11 @@
                 loadingMessage.classList.add('hidden'); // Hide loading message regardless of success or failure
             }
         }
+
+        // Add event listeners for filters
+        nameFilterInput.addEventListener('input', applyFilters);
+        studentIdFilterInput.addEventListener('input', applyFilters); // New event listener for Student ID filter
+        statusFilterSelect.addEventListener('change', applyFilters);
 
         // Call the fetch function when the page loads
         document.addEventListener('DOMContentLoaded', fetchGoogleSheetData);
