@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Data Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a, #0c4a6e, #1f2937); /* Deep blue to dark gray gradient */
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: #e0e7ff; /* Light blue text */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card {
+            background-color: rgba(31, 41, 55, 0.9); /* Dark gray with transparency */
+            backdrop-filter: blur(8px); /* Frosted glass effect */
+            border: 1px solid rgba(71, 85, 105, 0.5); /* Subtle border */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow for 3D */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02); /* Lift and slightly enlarge on hover */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .table-container {
+            max-height: 60vh; /* Limit height for scrollability */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.7);
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #60a5fa; /* Light blue */
+            border-radius: 10px;
+            border: 2px solid rgba(31, 41, 55, 0.7);
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6; /* Darker blue on hover */
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            white-space: nowrap; /* Prevent wrapping for better table readability */
+        }
+
+        th {
+            background-color: #1e3a8a; /* Dark blue header */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(55, 65, 81, 0.7); /* Slightly lighter row for zebra striping */
+        }
+
+        tr:hover {
+            background-color: rgba(71, 85, 105, 0.8); /* Highlight row on hover */
+        }
+
+        /* Updated Status Colors */
+        .status-ongoing { background-color: #10b981; } /* Green */
+        .status-left { background-color: #ef4444; } /* Red */
+        .status-pending { background-color: #3b82f6; } /* Blue (Tailwind blue-500) */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px; /* Pill shape */
+            font-weight: 600;
+            color: #fff;
+            display: inline-block;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: rgba(31, 41, 55, 0.95); /* Darker gray with more transparency */
+            border: 1px solid rgba(71, 85, 105, 0.6);
+            border-radius: 1.5rem; /* More rounded */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.4);
+            padding: 2.5rem;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .modal-close-button:hover {
+            color: #e0e7ff;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed rgba(71, 85, 105, 0.4);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #a7c0f1; /* Lighter blue for labels */
+        }
+
+        .detail-value {
+            color: #e0e7ff;
+            text-align: right;
+            flex-grow: 1;
+            margin-left: 1rem;
+        }
+
+        /* Hide call button on non-mobile (md and up) */
+        @media (min-width: 768px) {
+            .call-button-cell {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-6xl w-full mx-auto p-6 bg-gray-800 rounded-2xl shadow-xl card mb-8">
+        <h1 class="text-4xl font-bold text-center mb-4 text-blue-300">Student Enrollment Dashboard</h1>
+        <p class="text-center text-lg text-gray-300 mb-6">
+            Displaying key student details. Click a row for full information.
+        </p>
+
+        <div id="data-container" class="table-container rounded-lg shadow-inner bg-gray-900/70">
+            <p class="text-center text-gray-400 p-8" id="loading-message">Loading student data...</p>
+        </div>
+    </div>
+
+    <!-- Student Details Modal -->
+    <div id="student-details-modal" class="modal-overlay">
+        <div class="modal-content w-full md:w-2/3 lg:w-1/2">
+            <button class="modal-close-button" onclick="closeModal()">&times;</button>
+            <h2 class="text-3xl font-bold text-blue-300 mb-6 text-center">Student Details</h2>
+            <div id="modal-body" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: This URL is from your deployed Google Apps Script
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbc9BMvzUt9boln_FJOIUILNpSomrdRosD8KkRa2k7D4OclV9YT9iCiHDxa_Sc08Fh2A/exec'; 
+
+        // Get references to DOM elements
+        const dataContainer = document.getElementById('data-container');
+        const loadingMessage = document.getElementById('loading-message');
+        const modal = document.getElementById('student-details-modal');
+        const modalBody = document.getElementById('modal-body');
+        let currentStudentsData = []; // To store data fetched for modal use
+
+        /**
+         * Parses a string by newline characters into an array of items.
+         * Handles cases where the string might be empty or not newline-separated.
+         * @param {string} text - The input string.
+         * @returns {string[]} An array of parsed items.
+         */
+        function parseLineSeparated(text) {
+            if (typeof text !== 'string' || text.trim() === '') {
+                return [];
+            }
+            // Split by newline characters and filter out empty strings after trimming
+            return text.split('\n').map(item => item.trim()).filter(item => item !== '');
+        }
+
+        /**
+         * Extracts teacher name and ID from a string like "Teacher Name (ID)".
+         * @param {string} teacherString - The input string for a teacher.
+         * @returns {{name: string, id: string}} An object with name and ID.
+         */
+        function extractTeacherInfo(teacherString) {
+            const match = teacherString.match(/(.*?)\s*\(([^)]+)\)$/);
+            if (match) {
+                return {
+                    name: match[1].trim(),
+                    id: match[2].trim()
+                };
+            }
+            return { name: teacherString.trim(), id: 'N/A' }; // Return original string as name if no ID found
+        }
+
+        /**
+         * Returns the appropriate Tailwind CSS class for a given status.
+         * @param {string} status - The status string (e.g., "ONGOING", "LEFT", "PENDING").
+         * @returns {string} The CSS class for the status badge.
+         */
+        function getStatusClass(status) {
+            // Remove all whitespace characters (including newlines, tabs, etc.) and convert to lowercase
+            const cleanStatus = (status || '').replace(/\s/g, '').toLowerCase(); 
+            switch (cleanStatus) {
+                case 'ongoing':
+                    return 'status-ongoing';
+                case 'left':
+                    return 'status-left';
+                case 'pending':
+                    return 'status-pending';
+                default:
+                    return 'bg-gray-500'; // Default color for unknown/undefined status
+            }
+        }
+
+        /**
+         * Renders the student data into a table.
+         * @param {Array<Object>} data - An array of student data objects.
+         */
+        function renderStudentData(data) {
+            if (loadingMessage) {
+                loadingMessage.remove(); // Remove loading message once data is ready
+            }
+
+            if (data.length === 0) {
+                dataContainer.innerHTML = '<p class="text-center text-gray-400 p-8">No student data available.</p>';
+                return;
+            }
+
+            // Create table structure
+            let tableHTML = `
+                <table class="min-w-full divide-y divide-gray-700 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Room No</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Student ID</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Phone</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider call-button-cell">Call</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+            `;
+
+            data.forEach((student, index) => {
+                // Sanitize phone number for tel: link
+                const phoneNumber = String(student.Phone || '').replace(/\D/g, ''); // Remove non-digits
+
+                tableHTML += `
+                    <tr class="cursor-pointer hover:bg-gray-700" onclick="openModal(${index})">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${student["Room No"] || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${student["Student ID"] || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${student.Name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${student.Phone || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="status-badge ${getStatusClass(student.STATUS)}">${student.STATUS || 'N/A'}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 call-button-cell">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                                    onclick="event.stopPropagation(); window.location.href='tel:${phoneNumber}';">
+                                Call
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            dataContainer.innerHTML = tableHTML;
+        }
+
+        /**
+         * Opens the modal and populates it with student details.
+         * @param {number} index - The index of the student in the currentStudentsData array.
+         */
+        function openModal(index) {
+            const student = currentStudentsData[index];
+            if (!student) return;
+
+            modalBody.innerHTML = `
+                <div class="col-span-1 md:col-span-2">
+                    <div class="detail-item">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">${student.Name || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Student ID:</span>
+                        <span class="detail-value">${student["Student ID"] || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Room No:</span>
+                        <span class="detail-value">${student["Room No"] || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Class:</span>
+                        <span class="detail-value">${student.Class || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone:</span>
+                        <span class="detail-value">${student.Phone || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Mentor:</span>
+                        <span class="detail-value">${student["Mentor / Co-odinator"] || 'N/A'} (${student["Mentor ID"] || 'N/A'})</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">
+                            <span class="status-badge ${getStatusClass(student.STATUS)}">${student.STATUS || 'N/A'}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-xl font-semibold text-blue-200 mt-4 mb-2">Subjects & Teachers:</h3>
+                    <div class="space-y-2">
+            `;
+
+            // Handle Subjects and Teachers for paired display
+            const subjects = parseLineSeparated(student.Subjects);
+            const teachers = parseLineSeparated(student.Teacher);
+            
+            const maxLength = Math.max(subjects.length, teachers.length);
+
+            if (maxLength > 0) {
+                for (let i = 0; i < maxLength; i++) {
+                    const subject = subjects[i] || 'N/A';
+                    const teacherInfo = extractTeacherInfo(teachers[i] || ''); // Extract name and ID
+                    
+                    modalBody.querySelector('.space-y-2').innerHTML += `
+                        <div class="detail-item">
+                            <span class="detail-label">${subject}:</span>
+                            <span class="detail-value">${teacherInfo.name} ${teacherInfo.id !== 'N/A' ? `(${teacherInfo.id})` : ''}</span>
+                        </div>
+                    `;
+                }
+            } else {
+                modalBody.querySelector('.space-y-2').innerHTML += '<p class="text-gray-400 text-center">No subjects assigned.</p>';
+            }
+
+            modalBody.innerHTML += `</div></div>`; // Close the subject/teacher div and modal-body
+
+            modal.classList.add('open');
+        }
+
+        /**
+         * Closes the student details modal.
+         */
+        function closeModal() {
+            modal.classList.remove('open');
+        }
+
+        /**
+         * Fetches data from the Google Apps Script Web App.
+         * Displays loading, error, and data states accordingly.
+         */
+        async function fetchGoogleSheetData() {
+            // Display loading message
+            loadingMessage.classList.remove('hidden');
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL);
+
+                if (!response.ok) {
+                    console.error(`HTTP error! Status: ${response.status}, Status Text: ${response.statusText}`);
+                    const errorDetails = await response.text();
+                    console.error("Response body:", errorDetails);
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText || 'Unknown Error'}`);
+                }
+
+                const data = await response.json();
+                currentStudentsData = data; // Store the fetched data
+                renderStudentData(data);
+
+            } catch (error) {
+                console.error("Could not fetch data:", error);
+                // Provide a more specific error message to the user
+                dataContainer.innerHTML = `
+                    <div class="text-center text-red-400 p-8">
+                        <p class="font-bold mb-2">Failed to load data.</p>
+                        <p>This is often due to Google Apps Script deployment settings or data issues.</p>
+                        <p>Please ensure:</p>
+                        <ul class="list-disc list-inside text-left mx-auto max-w-xs">
+                            <li>Your Google Apps Script is deployed from the correct Google Sheet.</li>
+                            <li>"Execute as" is "Me" and "Who has access" is "Anyone" or "Anyone, even anonymous".</li>
+                            <li>The script's \`sheetName\` variable exactly matches your Google Sheet tab name (e.g., "Sheet1").</li>
+                            <li>All rows in your Google Sheet have a value in the "STATUS" column.</li>
+                            <li>The "Subjects" and "Teacher" columns in your sheet are correctly formatted (e.g., one item per line for multi-item cells, and Teacher ID in parentheses).</li>
+                        </ul>
+                        <p class="mt-4">Error details: ${error.message || 'Network error or CORS issue.'}</p>
+                        <p>Check the browser console for more technical details.</p>
+                    </div>
+                `;
+            } finally {
+                loadingMessage.classList.add('hidden'); // Hide loading message regardless of success or failure
+            }
+        }
+
+        // Call the fetch function when the page loads
+        document.addEventListener('DOMContentLoaded', fetchGoogleSheetData);
+    </script>
+</body>
+</html>
