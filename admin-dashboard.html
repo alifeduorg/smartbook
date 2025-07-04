@@ -244,6 +244,7 @@
     .card:nth-child(14) { animation-delay: 1.4s; }
     .card:nth-child(15) { animation-delay: 1.5s; }
 .card:nth-child(16) { animation-delay: 1.6s; }
+    .card:nth-child(17) { animation-delay: 1.7s; }
 
     /* Modal styling for custom alert */
     .modal-overlay {
@@ -398,10 +399,14 @@
       <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
       <h2>Welcome Admin</h2>
     </div>
-    <div class="card-grid">
+     <div class="card-grid">
+       <div class="card" onclick="goTo('academic-caldener.html ')">
+        <h4>Academic Calendar </h4>
+      </div>
       <div class="card" onclick="goTo('StudentDaywiseAttendance.html')">
         <h4>Student Attendance</h4>
       </div>
+      
        <div class="card" onclick="goTo('student&subjectdashbord.html')">
         <h4> Student & Subject  Dashbord </h4>
       </div>
