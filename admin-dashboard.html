@@ -30,6 +30,7 @@
       font-family: 'Inter', sans-serif; /* Using Inter font */
       background-color: var(--light-background); /* Light background */
       overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow-y: auto; /* Enable vertical scrolling for the entire page */
     }
 
     /* Dashboard wrapper for overall layout */
@@ -234,6 +235,7 @@
     .card:nth-child(4) { animation-delay: 0.4s; }
     .card:nth-child(5) { animation-delay: 0.5s; }
     .card:nth-child(6) { animation-delay: 0.6s; }
+    /* Add more delays if you have more cards, up to 15 as in admin dashboard example */
     .card:nth-child(7) { animation-delay: 0.7s; }
     .card:nth-child(8) { animation-delay: 0.8s; }
     .card:nth-child(9) { animation-delay: 0.9s; }
@@ -243,7 +245,7 @@
     .card:nth-child(13) { animation-delay: 1.3s; }
     .card:nth-child(14) { animation-delay: 1.4s; }
     .card:nth-child(15) { animation-delay: 1.5s; }
-.card:nth-child(16) { animation-delay: 1.6s; }
+    .card:nth-child(16) { animation-delay: 1.6s; }
     .card:nth-child(17) { animation-delay: 1.7s; }
 
     /* Modal styling for custom alert */
@@ -332,6 +334,97 @@
       transform: translateY(-2px);
     }
 
+    /* Event Pop-up Styles (Fixed at bottom-right) */
+    #event-popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px; /* Positioned at bottom-right */
+        transform: translateY(10px); /* Initial slight offset for animation */
+        background-color: var(--card-background); /* White background */
+        border: 1px solid var(--accent-gold); /* Golden yellow border */
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: var(--shadow-hover); /* Stronger shadow */
+        z-index: 100;
+        display: none;
+        max-width: 400px;
+        width: 90%; /* Responsive width */
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: var(--text-dark);
+        opacity: 0;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+    #event-popup.show {
+        display: block;
+        opacity: 1;
+        transform: translateY(0); /* Move to final position */
+    }
+    #event-popup .popup-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 1px solid var(--accent-gold); /* Golden yellow border */
+        padding-bottom: 10px;
+    }
+    #event-popup .popup-header h5 {
+        font-weight: 700;
+        color: var(--primary-navy); /* Dark navy */
+        font-size: 1rem;
+        margin: 0;
+    }
+    #event-popup .close-button {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--primary-navy); /* Dark navy */
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        transition: color 0.2s ease;
+    }
+    #event-popup .close-button:hover {
+        color: #EF4444; /* Red on hover */
+    }
+    #event-popup .popup-section {
+        margin-bottom: 15px;
+    }
+    #event-popup .popup-section:last-child {
+        margin-bottom: 0;
+    }
+    #event-popup .popup-section h5 {
+        font-weight: 700;
+        color: var(--primary-navy); /* Dark navy for section titles */
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }
+    #event-popup .popup-event-item {
+        margin-bottom: 3px;
+        padding-left: 15px;
+        position: relative;
+    }
+    #event-popup .popup-event-item::before {
+        content: '•';
+        color: var(--accent-gold); /* Golden yellow bullet */
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+        position: absolute;
+        left: 0;
+    }
+    #event-popup .popup-event-item.is-holiday-event::before {
+        color: #DC2626; /* Red bullet */
+    }
+    #event-popup .popup-event-item .date-prefix {
+        font-weight: 600;
+        color: var(--primary-navy); /* Dark navy for date prefix */
+        margin-right: 5px;
+    }
+
+
     /* Responsive handling */
     @media (max-width: 768px) {
       .sidebar {
@@ -368,6 +461,16 @@
       .card-grid {
         grid-template-columns: 1fr; /* Single column for cards on small screens */
       }
+
+      /* Adjust popup position for smaller screens */
+      #event-popup {
+          left: 50%;
+          right: auto;
+          transform: translateX(-50%) translateY(10px);
+      }
+      #event-popup.show {
+          transform: translateX(-50%) translateY(0);
+      }
     }
   </style>
 </head>
@@ -399,63 +502,64 @@
       <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
       <h2>Welcome Admin</h2>
     </div>
-     <div class="card-grid">
+       <div class="card-grid">
        <div class="card" onclick="goTo('academic-caldener.html ')">
-        <h4>Academic Calendar </h4>
-      </div>
-      <div class="card" onclick="goTo('StudentDaywiseAttendance.html')">
-        <h4>Student Attendance</h4>
-      </div>
-      
+         <h4>Academic Calendar </h4>
+       </div>
+       <div class="card" onclick="goTo('StudentDaywiseAttendance.html')">
+         <h4>Student Attendance</h4>
+       </div>
+       
        <div class="card" onclick="goTo('student&subjectdashbord.html')">
-        <h4> Student & Subject  Dashbord </h4>
-      </div>
-      <div class="card" onclick="goTo('progress_card_view.html')">
-        <h4>Progress card viewer </h4>
-      </div>
-      <div class="card" onclick="goTo('teacharattenadce.html')">
-        <h4>Teacher Attendance</h4>
-      </div>
+         <h4> Student & Subject  Dashbord </h4>
+       </div>
+       <div class="card" onclick="goTo('progress_card_view.html')">
+         <h4>Progress card viewer </h4>
+       </div>
+       <div class="card" onclick="goTo('teacharattenadce.html')">
+         <h4>Teacher Attendance</h4>
+       </div>
        <div class="card" onclick="goTo('mentorattedence.html')">
-        <h4>Mentor Attendance</h4>
-      </div>
-      <div class="card" onclick="goTo('admin-logbook.html')">
-        <h4>Logbook Details</h4>
-      </div>
-      <div class="card" onclick="goTo('timetableview.html')">
-        <h4>Time Table</h4>
-      </div>
-      <div class="card" onclick="goTo('teacher_details.html')">
-        <h4>Teacher Details</h4>
-      </div>
-      <div class="card" onclick="goTo('student_detiles.html')">
-        <h4>Student Details</h4>
-      </div>
-      <div class="card" onclick="goTo('noticesender.html')">
-        <h4>Notice senders</h4>
-      </div>
-      <div class="card" onclick="goTo(' notice_view.html')">
-        <h4>Notice View</h4>
-      </div>
-      <div class="card" onclick="goTo('admin_weekly.html')">
-        <h4>Principal Weekly Reports</h4>
-      </div>
-      <div class="card" onclick="goTo('Fee_Reports.html')">
-        <h4>Fee Reports</h4>
-      </div>
-      <div class="card" onclick="goTo('Billing_Panel.html')">
-        <h4>Billing Panel</h4>
-      </div>
-      <div class="card" onclick="goTo('Billing_view.html')">
-        <h4>Billing View</h4>
-      </div>
-      <div class="card" onclick="goTo('Salary_Reports.html')">
-        <h4>Salary Reports</h4>
-      </div>
+         <h4>Mentor Attendance</h4>
+       </div>
+       <div class="card" onclick="goTo('admin-logbook.html')">
+         <h4>Logbook Details</h4>
+       </div>
+       <div class="card" onclick="goTo('timetableview.html')">
+         <h4>Time Table</h4>
+       </div>
+       <div class="card" onclick="goTo('teacher_details.html')">
+         <h4>Teacher Details</h4>
+       </div>
+       <div class="card" onclick="goTo('student_detiles.html')">
+         <h4>Student Details</h4>
+       </div>
+       <div class="card" onclick="goTo('noticesender.html')">
+         <h4>Notice senders</h4>
+       </div>
+       <div class="card" onclick="goTo(' notice_view.html')">
+         <h4>Notice View</h4>
+       </div>
+       <div class="card" onclick="goTo('admin_weekly.html')">
+         <h4>Principal Weekly Reports</h4>
+       </div>
+       <div class="card" onclick="goTo('Fee_Reports.html')">
+         <h4>Fee Reports</h4>
+       </div>
+       <div class="card" onclick="goTo('Billing_Panel.html')">
+         <h4>Billing Panel</h4>
+       </div>
+       <div class="card" onclick="goTo('Billing_view.html')">
+         <h4>Billing View</h4>
+       </div>
+       <div class="card" onclick="goTo('Salary_Reports.html')">
+         <h4>Salary Reports</h4>
+       </div>
     </div>
   </div>
 </div>
 
+<!-- Custom Modals (Logout and Message Box) -->
 <div class="modal-overlay" id="logoutModal">
   <div class="modal-content">
     <h3>Confirm Logout</h3>
@@ -465,6 +569,17 @@
       <button class="modal-button confirm" onclick="confirmLogout()">Logout</button>
     </div>
   </div>
+</div>
+
+<!-- Event Pop-up Element -->
+<div id="event-popup" class="rounded-lg">
+    <div class="popup-header">
+        <h5 id="popup-title"></h5>
+        <button class="close-button" id="popup-close-button">X</button>
+    </div>
+    <div id="popup-content">
+        <!-- Content will be dynamically added here by JavaScript -->
+    </div>
 </div>
 
 <script>
@@ -518,6 +633,232 @@
       sidebar.classList.remove('open');
     }
   });
+
+
+    // --- Event Pop-up Logic (Adapted from Academic Calendar) ---
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxuVZQPjLzypyR8G1G7fR3e3SjM2oT2ao6w09N46seXdVPEt39cXVOejqEyS6eWEEIe6w/exec'; 
+    let academicCalendarData = {};
+    let autoPopupIntervalId = null;
+    let autoPopupHideTimeoutId = null;
+
+    const monthsOrder = [
+        'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+        'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
+    ];
+
+    const monthNameToIndexMap = {
+        'JANUARY': 0, 'FEBRUARY': 1, 'MARCH': 2, 'APRIL': 3, 'MAY': 4, 'JUNE': 5,
+        'JULY': 6, 'AUGUST': 7, 'SEPTEMBER': 8, 'OCTOBER': 9, 'NOVEMBER': 10, 'DECEMBER': 11
+    };
+
+    /**
+     * Fetches academic calendar data from the Google Apps Script web app.
+     * @returns {Promise<Object>} A promise that resolves to the calendar data object.
+     */
+    async function fetchCalendarDataForPopup() {
+        try {
+            const response = await fetch(WEB_APP_URL);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            academicCalendarData = data; // Store fetched data
+            return data;
+        } catch (error) {
+            console.error("Error fetching calendar data for popup:", error);
+            // Optionally display a message on the dashboard if popup data fails to load
+            return null;
+        }
+    }
+
+    // Function to get events for a specific date (using uppercase month name from sheet)
+    function getEventsForDate(day, monthNameUpperCase) {
+        if (!academicCalendarData[monthNameUpperCase]) return [];
+        return academicCalendarData[monthNameUpperCase].filter(event => event.day === day && event.event.trim() !== '');
+    }
+
+    /**
+     * Shows the event pop-up with details for the given day and upcoming events.
+     * @param {number} targetDay - The day number for which to show events.
+     * @param {string} targetMonthName - The month name (e.g., 'APRIL') for which to show events.
+     * @param {boolean} [isAutoShow=false] - True if this is an automatic show on page load.
+     */
+    function showEventPopup(targetDay, targetMonthName, isAutoShow = false) {
+        const popup = document.getElementById('event-popup');
+        const popupContent = document.getElementById('popup-content');
+        const popupTitle = document.getElementById('popup-title');
+
+        // Clear previous content
+        popupContent.innerHTML = '';
+
+        // Set title for the popup
+        popupTitle.textContent = isAutoShow ? "Today's Events:" : `Events for ${targetDay} ${targetMonthName}:`;
+
+        // Section for Today's/Clicked Day's Events
+        const todayEventsSection = document.createElement('div');
+        todayEventsSection.className = 'popup-section';
+        const todayEventsList = document.createElement('ul');
+        todayEventsSection.appendChild(todayEventsList);
+
+        const eventsForTargetDay = getEventsForDate(targetDay, targetMonthName);
+        if (eventsForTargetDay.length > 0) {
+            eventsForTargetDay.forEach(event => {
+                const listItem = document.createElement('li');
+                listItem.className = 'popup-event-item';
+                listItem.textContent = event.event;
+                if (event.isHoliday) {
+                    listItem.classList.add('is-holiday-event');
+                    const holidayTag = document.createElement('span');
+                    holidayTag.className = 'holiday-tag ml-2'; // Tailwind for margin-left
+                    holidayTag.textContent = 'HOLIDAY';
+                    listItem.appendChild(holidayTag);
+                }
+                todayEventsList.appendChild(listItem);
+            });
+        } else {
+            const listItem = document.createElement('li');
+            listItem.textContent = 'No events for this day.';
+            todayEventsList.appendChild(listItem);
+        }
+        popupContent.appendChild(todayEventsSection);
+
+        // Section for Upcoming Events (next 2 weeks)
+        const upcomingEventsSection = document.createElement('div');
+        upcomingEventsSection.className = 'popup-section';
+        const upcomingEventsTitle = document.createElement('h5');
+        upcomingEventsTitle.textContent = 'Upcoming Events (Next 2 Weeks):';
+        upcomingEventsSection.appendChild(upcomingEventsTitle);
+        const upcomingEventsList = document.createElement('ul');
+        upcomingEventsSection.appendChild(upcomingEventsList);
+
+        let startDateForUpcoming = new Date();
+        const academicStartYear = 2025; 
+        let currentYearForUpcoming = academicStartYear;
+
+        if (!isAutoShow) {
+            const jsMonthIndex = monthNameToIndexMap[targetMonthName];
+            if (jsMonthIndex <= 2) { 
+                currentYearForUpcoming = academicStartYear + 1;
+            }
+            startDateForUpcoming = new Date(currentYearForUpcoming, jsMonthIndex, targetDay);
+            startDateForUpcoming.setDate(startDateForUpcoming.getDate() + 1); 
+        } else {
+            const todayMonthIndex = startDateForUpcoming.getMonth();
+            if (todayMonthIndex <= 2) { 
+                currentYearForUpcoming = startDateForUpcoming.getFullYear(); 
+            } else { 
+                currentYearForUpcoming = startDateForUpcoming.getFullYear(); 
+            }
+            startDateForUpcoming.setFullYear(currentYearForUpcoming);
+        }
+
+        let foundUpcomingEvents = false;
+        for (let i = 0; i < 14; i++) { 
+            const dateToCheck = new Date(startDateForUpcoming);
+            dateToCheck.setDate(startDateForUpcoming.getDate() + i);
+
+            let academicYearForDate = academicStartYear;
+            if (dateToCheck.getMonth() <= 2) { 
+                academicYearForDate = academicStartYear + 1;
+            }
+            dateToCheck.setFullYear(academicYearForDate);
+
+            const monthNameForLookup = monthsOrder[dateToCheck.getMonth()]; 
+            const dayNumber = dateToCheck.getDate();
+
+            const events = getEventsForDate(dayNumber, monthNameForLookup.toUpperCase()); 
+            events.forEach(event => {
+                foundUpcomingEvents = true;
+                const listItem = document.createElement('li');
+                listItem.className = 'popup-event-item';
+                const datePrefix = document.createElement('span');
+                datePrefix.className = 'date-prefix';
+                datePrefix.textContent = `${dayNumber} ${monthNameForLookup.substring(0,3).toUpperCase()}: `;
+                listItem.appendChild(datePrefix);
+                listItem.appendChild(document.createTextNode(event.event));
+                if (event.isHoliday) {
+                    listItem.classList.add('is-holiday-event');
+                    const holidayTag = document.createElement('span');
+                    holidayTag.className = 'holiday-tag ml-2';
+                    holidayTag.textContent = 'HOLIDAY';
+                    listItem.appendChild(holidayTag);
+                }
+                upcomingEventsList.appendChild(listItem);
+            });
+        }
+
+        if (!foundUpcomingEvents) {
+            const listItem = document.createElement('li');
+            listItem.textContent = 'No upcoming events in the next 2 weeks.';
+            upcomingEventsList.appendChild(listItem);
+        }
+        popupContent.appendChild(upcomingEventsSection);
+
+        popup.classList.add('show');
+
+        // Set timeout to hide the popup after 8 seconds if it's an auto-show
+        if (isAutoShow) {
+            autoPopupHideTimeoutId = setTimeout(() => {
+                hideEventPopup();
+            }, 8000); // Hide after 8 seconds
+        }
+    }
+
+    /**
+     * Hides the event pop-up.
+     */
+    function hideEventPopup() {
+        const popup = document.getElementById('event-popup');
+        popup.classList.remove('show');
+    }
+
+    /**
+     * Starts the automatic pop-up cycle.
+     */
+    function startAutoPopupCycle() {
+        // Clear any existing interval to prevent duplicates
+        clearInterval(autoPopupIntervalId);
+        clearTimeout(autoPopupHideTimeoutId);
+
+        // Set an interval to show the popup every 30 seconds
+        autoPopupIntervalId = setInterval(() => {
+            const today = new Date();
+            const currentMonthName = monthsOrder[today.getMonth()].toUpperCase();
+            const currentDay = today.getDate();
+            showEventPopup(currentDay, currentMonthName, true); // Show today's events, auto-hide
+        }, 30000); // Show every 30 seconds
+    }
+
+    // Event listener for the popup close button
+    document.addEventListener('DOMContentLoaded', () => {
+        const popupCloseButton = document.getElementById('popup-close-button');
+        if (popupCloseButton) {
+            popupCloseButton.addEventListener('click', () => {
+                hideEventPopup();
+                // When manually closed, stop the auto-popup cycle
+                clearInterval(autoPopupIntervalId);
+                clearTimeout(autoPopupHideTimeoutId);
+                autoPopupIntervalId = null; // Indicate that auto-popup is stopped
+            });
+        }
+    });
+
+
+    // Initial fetch and start auto-popup when the Admin Dashboard loads.
+    document.addEventListener('DOMContentLoaded', async () => {
+        const data = await fetchCalendarDataForPopup(); // Use the dedicated fetch function
+        if (data) {
+            // Start the automatic pop-up cycle immediately on load
+            const today = new Date();
+            const currentMonthName = monthsOrder[today.getMonth()].toUpperCase();
+            const currentDay = today.getDate();
+            showEventPopup(currentDay, currentMonthName, true); // Initial show, auto-hide
+            startAutoPopupCycle(); // Then start the recurring cycle
+        }
+    });
 
 </script>
 
