@@ -245,12 +245,22 @@
             <div id="modal-body" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Details will be populated here -->
             </div>
+            <div class="flex justify-center mt-6 space-x-4">
+                <button id="modal-call-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684L10.5 9l2.5-2.5L15 9l-1.5 1.5L16 12l2-2 2 2-1.5 1.5L21 15l-2.5 2.5 1.5 1.5L19 21a2 2 0 01-2 2h-3.28a1 1 0 01-.948-.684L13.5 15l-2.5 2.5L9 15l1.5-1.5L8 12l-2 2-2-2 1.5-1.5L3 9l2.5-2.5L3 5z"></path></svg>
+                    Call Student
+                </button>
+                <button id="modal-whatsapp-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.5 3.42 1.45 4.88l-1.53 5.58 5.73-1.51c1.36.79 2.91 1.25 4.16 1.25 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm4.72 13.24c-.2-.1-.8-.4-1.1-.55-.3-.15-.5-.1-.7.1s-.8.9-.9 1.1c-.2.2-.35.2-.65.1-.3-.15-1.2-.45-2.3-1.4s-1.8-2.2-2.1-2.7c-.3-.5-.05-.7.1-.85.1-.1.2-.25.3-.4.1-.15.15-.25.2-.4s0-.3-.1-.5c-.1-.2-.9-2.2-.9-3c0-.8-.6-1.1-.8-1.1-.2 0-.4 0-.6.1-.2.1-.7.25-1.1.65-.4.4-.9 1.1-.9 2.6s.9 3.1 1 3.3c.1.2 1.8 2.8 4.4 3.9 2.6 1.1 2.6 1 3.1.9.5-.1.8-.6 1-.9s.4-.6.6-.8c.2-.2.4-.3.6-.4.2-.1.8-.2.9-.4.2-.2.2-.4.1-.5z"/></svg>
+                    WhatsApp Chat
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         // IMPORTANT: This URL is from your deployed Google Apps Script
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbc9BMvzUt9boln_FJOIUILNpSomrdRosD8KkRa2k7D4OclV9YT9iCiHDxa_Sc08Fh2A/exec'; 
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbc9BMvzUt9boln_FJOIUILNpSomrdRosD8KkRa2k7D4OclV9YT9iCiHDxa_Sc08Fh2A/exec';
 
         // Get references to DOM elements
         const dataContainer = document.getElementById('data-container');
@@ -258,8 +268,10 @@
         const modal = document.getElementById('student-details-modal');
         const modalBody = document.getElementById('modal-body');
         const nameFilterInput = document.getElementById('nameFilter');
-        const studentIdFilterInput = document.getElementById('studentIdFilter'); // New filter input
+        const studentIdFilterInput = document.getElementById('studentIdFilter');
         const statusFilterSelect = document.getElementById('statusFilter');
+        const modalCallButton = document.getElementById('modal-call-button'); // New button reference
+        const modalWhatsAppButton = document.getElementById('modal-whatsapp-button'); // New button reference
 
         let allStudentsData = []; // To store all fetched data
         let filteredStudentsData = []; // To store currently filtered data
@@ -279,29 +291,13 @@
         }
 
         /**
-         * Extracts teacher name and ID from a string like "Teacher Name (ID)".
-         * @param {string} teacherString - The input string for a teacher.
-         * @returns {{name: string, id: string}} An object with name and ID.
-         */
-        function extractTeacherInfo(teacherString) {
-            const match = teacherString.match(/(.*?)\s*\(([^)]+)\)$/);
-            if (match) {
-                return {
-                    name: match[1].trim(),
-                    id: match[2].trim()
-                };
-            }
-            return { name: teacherString.trim(), id: 'N/A' }; // Return original string as name if no ID found
-        }
-
-        /**
          * Returns the appropriate Tailwind CSS class for a given status.
          * @param {string} status - The status string (e.g., "ONGOING", "LEFT", "PENDING").
          * @returns {string} The CSS class for the status badge.
          */
         function getStatusClass(status) {
             // Remove all whitespace characters (including newlines, tabs, etc.) and convert to lowercase
-            const cleanStatus = (status || '').replace(/\s/g, '').toLowerCase(); 
+            const cleanStatus = (status || '').replace(/\s/g, '').toLowerCase();
             switch (cleanStatus) {
                 case 'ongoing':
                     return 'status-ongoing';
@@ -319,19 +315,19 @@
          */
         function applyFilters() {
             const nameFilter = nameFilterInput.value.toLowerCase();
-            const studentIdFilter = studentIdFilterInput.value.toLowerCase(); // Get student ID filter value
+            const studentIdFilter = studentIdFilterInput.value.toLowerCase();
             const statusFilter = statusFilterSelect.value.toLowerCase();
 
             filteredStudentsData = allStudentsData.filter(student => {
                 const studentName = (student.Name || '').toLowerCase();
-                const studentId = (student["Student ID"] || '').toLowerCase(); // Get student ID from data
+                const studentId = (student["Student ID"] || '').toLowerCase();
                 const studentStatus = (student.STATUS || '').replace(/\s/g, '').toLowerCase();
 
                 const nameMatch = nameFilter === '' || studentName.includes(nameFilter);
-                const studentIdMatch = studentIdFilter === '' || studentId.includes(studentIdFilter); // Check student ID match
+                const studentIdMatch = studentIdFilter === '' || studentId.includes(studentIdFilter);
                 const statusMatch = statusFilter === '' || studentStatus === statusFilter;
 
-                return nameMatch && studentIdMatch && statusMatch; // Combine all filter conditions
+                return nameMatch && studentIdMatch && statusMatch;
             });
 
             renderStudentData(filteredStudentsData);
@@ -379,8 +375,9 @@
             `;
 
             data.forEach((student, index) => {
-                // Sanitize phone number for tel: link
+                // Sanitize phone number for tel: link and WhatsApp
                 const phoneNumber = String(student.Phone || '').replace(/\D/g, ''); // Remove non-digits
+
                 const cleanStatus = (student.STATUS || '').replace(/\s/g, '').toLowerCase();
 
                 // Add class for rows with 'LEFT' status
@@ -389,7 +386,7 @@
                 tableHTML += `
                     <tr class="cursor-pointer hover:bg-gray-700 ${rowClass}" onclick="openModal(${index})">
                 `;
-                
+
                 // Add table data dynamically based on the defined order
                 mainTableHeaders.forEach(headerInfo => {
                     const additionalClass = headerInfo.key === 'Actions' ? ' call-button-cell' : '';
@@ -430,9 +427,11 @@
          * @param {number} index - The index of the student in the currentStudentsData array.
          */
         function openModal(index) {
-            // Use filteredStudentsData for modal lookup
-            const student = filteredStudentsData[index]; 
+            const student = filteredStudentsData[index];
             if (!student) return;
+
+            // Sanitize phone number for tel: link and WhatsApp
+            const phoneNumber = String(student.Phone || '').replace(/\D/g, ''); // Remove non-digits
 
             modalBody.innerHTML = `
                 <div class="col-span-1 md:col-span-2">
@@ -474,19 +473,22 @@
 
             // Handle Subjects and Teachers for paired display
             const subjects = parseLineSeparated(student.Subjects);
-            const teachers = parseLineSeparated(student.Teacher);
-            
-            const maxLength = Math.max(subjects.length, teachers.length);
+            // Updated to use 'student.Teacher' for name and 'student["Teacher ID"]' for ID
+            const teacherNames = parseLineSeparated(student.Teacher); // Now using 'Teacher' header
+            const teacherIds = parseLineSeparated(student["Teacher ID"]); // This will be your Staff ID
+
+            const maxLength = Math.max(subjects.length, teacherNames.length, teacherIds.length);
 
             if (maxLength > 0) {
                 for (let i = 0; i < maxLength; i++) {
                     const subject = subjects[i] || 'N/A';
-                    const teacherInfo = extractTeacherInfo(teachers[i] || ''); // Extract name and ID
-                    
+                    const teacherName = teacherNames[i] || 'N/A';
+                    const teacherId = teacherIds[i] || 'N/A'; // Use this for Staff ID
+
                     modalBody.querySelector('.space-y-2').innerHTML += `
                         <div class="detail-item">
                             <span class="detail-label">${subject}:</span>
-                            <span class="detail-value">${teacherInfo.name} ${teacherInfo.id !== 'N/A' ? `(${teacherInfo.id})` : ''}</span>
+                            <span class="detail-value">${teacherName} ${teacherId !== 'N/A' ? `(${teacherId})` : ''}</span>
                         </div>
                     `;
                 }
@@ -495,6 +497,23 @@
             }
 
             modalBody.innerHTML += `</div></div>`; // Close the subject/teacher div and modal-body
+
+            // Set up call and WhatsApp buttons in the modal
+            if (phoneNumber) {
+                modalCallButton.onclick = (event) => {
+                    event.stopPropagation();
+                    window.location.href = `tel:${phoneNumber}`;
+                };
+                modalWhatsAppButton.onclick = (event) => {
+                    event.stopPropagation();
+                    window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                };
+                modalCallButton.style.display = 'flex'; // Show buttons
+                modalWhatsAppButton.style.display = 'flex';
+            } else {
+                modalCallButton.style.display = 'none'; // Hide buttons if no phone number
+                modalWhatsAppButton.style.display = 'none';
+            }
 
             modal.classList.add('open');
         }
@@ -541,7 +560,7 @@
                             <li>"Execute as" is "Me" and "Who has access" is "Anyone" or "Anyone, even anonymous".</li>
                             <li>The script's \`sheetName\` variable exactly matches your Google Sheet tab name (e.g., "Sheet1").</li>
                             <li>All rows in your Google Sheet have a value in the "STATUS" column.</li>
-                            <li>The "Subjects" and "Teacher" columns in your sheet are correctly formatted (e.g., one item per line for multi-item cells, and Teacher ID in parentheses).</li>
+                            <li>The "Subjects", "Teacher", and "Teacher ID" columns in your sheet are correctly formatted (e.g., one item per line for multi-item cells).</li>
                         </ul>
                         <p class="mt-4">Error details: ${error.message || 'Network error or CORS issue.'}</p>
                         <p>Check the browser console for more technical details.</p>
@@ -554,7 +573,7 @@
 
         // Add event listeners for filters
         nameFilterInput.addEventListener('input', applyFilters);
-        studentIdFilterInput.addEventListener('input', applyFilters); // New event listener for Student ID filter
+        studentIdFilterInput.addEventListener('input', applyFilters);
         statusFilterSelect.addEventListener('change', applyFilters);
 
         // Call the fetch function when the page loads
