@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheet Data Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- html2pdf.js CDN for PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Subtle gradient background */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        /* Custom scrollbar for table */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            animation: fadeInScale 0.3s ease-out forwards;
+            max-height: 90vh; /* Limit modal height */
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-content-body {
+            overflow-y: auto; /* Enable scrolling for modal content */
+            flex-grow: 1;
+            padding-right: 10px; /* Space for scrollbar */
+        }
+        /* Custom scrollbar for modal content */
+        .modal-content-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-content-body::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .modal-content-body::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .modal-content-body::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        /* Make table rows clickable and visually indicate it */
+        #dataTableBody tr {
+            cursor: pointer;
+        }
+        #dataTableBody tr:hover {
+            background-color: #e0f2fe; /* Lighter blue on hover */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container bg-white shadow-2xl rounded-xl p-8 mb-8 relative overflow-hidden">
+        <!-- Decorative 3D elements (subtle) -->
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-200 rounded-full opacity-20 transform rotate-45"></div>
+            <div class="absolute -bottom-10 -right-10 w-60 h-60 bg-teal-200 rounded-full opacity-15 transform -rotate-30"></div>
+        </div>
+
+        <h1 class="text-4xl font-bold text-center text-blue-800 mb-8 pb-4 relative z-10">
+            <span class="relative inline-block">
+                Classroom Activity Log
+                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-blue-500 rounded-full"></span>
+            </span>
+        </h1>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="flex justify-center items-center py-10 text-xl text-blue-600 font-medium hidden">
+            <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading data...
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline" id="errorText"></span>
+        </div>
+
+        <!-- Filter Controls -->
+        <div id="filterControls" class="hidden bg-blue-50 p-6 rounded-lg shadow-inner mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+            <div>
+                <label for="teacherStaffIdFilter" class="block text-sm font-medium text-gray-700 mb-1">Teacher Name / Staff ID:</label>
+                <input type="text" id="teacherStaffIdFilter" placeholder="e.g., John Doe or 12345"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+            </div>
+            <div>
+                <label for="studentNameFilter" class="block text-sm font-medium text-gray-700 mb-1">Student Name:</label>
+                <input type="text" id="studentNameFilter" placeholder="e.g., Alice Smith"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+            </div>
+            <div class="flex flex-col">
+                <label for="monthFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Month:</label>
+                <select id="monthFilter"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white">
+                    <option value="">All Months</option>
+                    <!-- Months will be populated by JS -->
+                </select>
+                <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                    <!-- Removed Download CSV Button -->
+                    <button id="downloadPdfBtn"
+                            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
+                        Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div id="tableContainer" class="hidden overflow-x-auto rounded-lg shadow-lg relative z-10 table-container">
+            <table class="min-w-full bg-white border-collapse">
+                <thead class="bg-blue-600 text-white sticky top-0 shadow-md">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-lg">Date</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Teacher Name</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Staff ID</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Class Room</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Student Name</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider rounded-tr-lg">Engagement</th>
+                        <!-- Removed Actions column header -->
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody" class="divide-y divide-gray-200">
+                    <!-- Data rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Teacher Login/Search -->
+    <div id="teacherLoginModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 modal-overlay">
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-8 w-11/12 md:w-1/2 lg:w-1/3 relative border-t-8 border-blue-500 text-center">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 border-b pb-3">Teacher Login</h2>
+            <p class="text-gray-700 mb-6">Please enter your Staff ID or Name to view your activity logs.</p>
+            <input
+                type="text"
+                id="initialTeacherSearchInput"
+                placeholder="Staff ID or Name (e.g., T001 or Alice Smith)"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-700 shadow-sm mb-4"
+            />
+            <button
+                id="initialTeacherSearchButton"
+                class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105 w-full"
+            >
+                View My Logs
+            </button>
+            <div id="initialSearchMessage" class="text-red-600 mt-4 hidden"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Full Details -->
+    <div id="detailsModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden modal-overlay">
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-8 w-11/12 md:w-2/3 lg:w-1/2 relative border-t-8 border-blue-500">
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl font-bold transition-transform duration-200 hover:rotate-90">
+                &times;
+            </button>
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 border-b pb-3">Full Details</h2>
+            <div id="modalContentBody" class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 text-lg modal-content-body">
+                <!-- Details will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: Replace with the Web App URL you got from Google Apps Script deployment
+        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz7k3pUaJRVZR3GIRwxXavATTHYC17efvX3-EtkX9tv-80wYo4_FJoEfl_pW-6T-cG7Sw/exec';
+
+        let allData = []; // Store all fetched data globally
+        let currentFilteredAndSortedData = []; // Store data currently displayed in the table
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const tableContainer = document.getElementById('tableContainer');
+        const dataTableBody = document.getElementById('dataTableBody');
+        const detailsModal = document.getElementById('detailsModal');
+        const closeModalButton = document.getElementById('closeModal');
+        const modalContentBody = document.getElementById('modalContentBody');
+        const filterControls = document.getElementById('filterControls');
+
+        // Teacher Login Modal elements
+        const teacherLoginModal = document.getElementById('teacherLoginModal');
+        const initialTeacherSearchInput = document.getElementById('initialTeacherSearchInput');
+        const initialTeacherSearchButton = document.getElementById('initialTeacherSearchButton');
+        const initialSearchMessage = document.getElementById('initialSearchMessage');
+
+
+        // Filter elements
+        const teacherStaffIdFilter = document.getElementById('teacherStaffIdFilter');
+        const studentNameFilter = document.getElementById('studentNameFilter');
+        const monthFilter = document.getElementById('monthFilter');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+
+        /**
+         * Fetches data from the Google Apps Script web app.
+         * @returns {Promise<Array>} A promise that resolves to an array of data objects.
+         */
+        async function fetchData() {
+            loadingIndicator.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            tableContainer.classList.add('hidden');
+            filterControls.classList.add('hidden'); // Hide filters during loading
+
+            console.log("Attempting to fetch data from:", GOOGLE_SHEET_WEB_APP_URL);
+
+            try {
+                if (GOOGLE_SHEET_WEB_APP_URL === 'YOUR_DEPLOYED_WEB_APP_URL_HERE' || !GOOGLE_SHEET_WEB_APP_URL) {
+                    throw new Error("Google Apps Script Web App URL is not configured. Please update 'GOOGLE_SHEET_WEB_APP_URL' in the script.");
+                }
+
+                const response = await fetch(GOOGLE_SHEET_WEB_APP_URL);
+                if (!response.ok) {
+                    const errorDetails = await response.text();
+                    console.error("HTTP error details:", errorDetails);
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText || 'Unknown Error'}`);
+                }
+                const result = await response.json();
+
+                if (result.error) {
+                    throw new Error(`Apps Script Error: ${result.error}`);
+                }
+
+                allData = result.data || []; // Store all fetched data
+                populateMonthFilter(allData); // Populate month dropdown
+                // filterControls.classList.remove('hidden'); // Filters will be shown after initial search
+                return allData;
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+                errorText.textContent = `Failed to load data. Please check your internet connection and ensure the Google Apps Script is deployed correctly with 'Anyone' access. Details: ${error.message}`;
+                errorMessage.classList.remove('hidden');
+                return [];
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Populates the month filter dropdown with unique months from the data.
+         * @param {Array} data - The array of data objects.
+         */
+        function populateMonthFilter(data) {
+            const months = new Set();
+            data.forEach(row => {
+                // Use the 'Date' column for month filtering
+                if (row.Date) {
+                    const date = new Date(row.Date);
+                    const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`; // YYYY-MM for sorting
+                    months.add(monthYear);
+                }
+            });
+
+            monthFilter.innerHTML = '<option value="">All Months</option>'; // Reset
+            Array.from(months).sort((a, b) => b.localeCompare(a)).forEach(monthYear => {
+                const [year, monthNum] = monthYear.split('-');
+                const monthName = monthNames[parseInt(monthNum) - 1];
+                const option = document.createElement('option');
+                option.value = monthYear; // Keep YYYY-MM as value for filtering
+                option.textContent = `${monthName} ${year}`; // Display full name
+                monthFilter.appendChild(option);
+            });
+        }
+
+        /**
+         * Applies filters to the data and returns the filtered array.
+         * @param {Array} data - The array of data to filter.
+         * @returns {Array} The filtered data array.
+         */
+        function applyFilters(data) {
+            let filtered = [...data];
+
+            const teacherStaffId = teacherStaffIdFilter.value.toLowerCase().trim();
+            const studentName = studentNameFilter.value.toLowerCase().trim();
+            const selectedMonth = monthFilter.value.toLowerCase().trim(); // Value is YYYY-MM
+
+            if (teacherStaffId) {
+                filtered = filtered.filter(row => {
+                    const teacherMatch = (row['Teacher Name'] || '').toLowerCase().includes(teacherStaffId);
+                    const staffIdMatch = (row['Staff ID'] || '').toLowerCase().includes(teacherStaffId);
+                    return teacherMatch || staffIdMatch;
+                });
+            }
+
+            if (studentName) {
+                filtered = filtered.filter(row => {
+                    return (row['Student Name'] || '').toLowerCase().includes(studentName);
+                });
+            }
+
+            if (selectedMonth) {
+                filtered = filtered.filter(row => {
+                    // Use the 'Date' column for filtering by month
+                    if (row.Date) {
+                        const date = new Date(row.Date);
+                        const rowMonthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`.toLowerCase();
+                        return rowMonthYear === selectedMonth;
+                    }
+                    return false;
+                });
+            }
+
+            return filtered;
+        }
+
+        /**
+         * Determines the Tailwind CSS color class for student engagement based on keywords.
+         * This function now directly uses the raw 'Student Engagement' text.
+         * @param {string} engagementText - The raw content from 'Student Engagement' column.
+         * @returns {string} Tailwind CSS class.
+         */
+        function getEngagementColor(engagementText) {
+            const lowerEngagement = (engagementText || '').toLowerCase();
+            if (lowerEngagement.includes('very good') || lowerEngagement.includes('excellent') || lowerEngagement.includes('outstanding') || lowerEngagement.includes('great') || lowerEngagement.includes('highly engaged') || lowerEngagement.includes('mastered') || lowerEngagement.includes('exceptional')) {
+                return 'bg-green-200 text-green-800';
+            } else if (lowerEngagement.includes('good') || lowerEngagement.includes('engaged') || lowerEngagement.includes('understood') || lowerEngagement.includes('satisfactory') || lowerEngagement.includes('progressing well') || lowerEngagement.includes('moderate')) {
+                return 'bg-yellow-200 text-yellow-800';
+            } else if (lowerEngagement.includes('bad') || lowerEngagement.includes('poor') || lowerEngagement.includes('struggled') || lowerEngagement.includes('low') || lowerEngagement.includes('disengaged') || lowerEngagement.includes('needs improvement')) {
+                return 'bg-red-200 text-red-800';
+            }
+            return 'bg-gray-200 text-gray-800'; // Default if no keywords match
+        }
+
+        /**
+         * Renders the data into the main table.
+         * @param {Array} dataToRender - The array of data objects to display.
+         */
+        function renderTable(dataToRender) {
+            dataTableBody.innerHTML = ''; // Clear existing rows
+
+            // Sort data by the 'Date' column in descending order (newest first)
+            dataToRender.sort((a, b) => {
+                const dateA = new Date(a.Date); // Use 'Date' column for sorting
+                const dateB = new Date(b.Date); // Use 'Date' column for sorting
+                return dateB - dateA; // For descending order
+            });
+
+            currentFilteredAndSortedData = dataToRender; // Store for index-based access
+
+            if (dataToRender.length === 0) {
+                dataTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-gray-500 text-lg">
+                            No data matches your current filters.
+                        </td>
+                    </tr>
+                `;
+                tableContainer.classList.remove('hidden');
+                return;
+            }
+
+            dataToRender.forEach((rowData, index) => {
+                const row = document.createElement('tr');
+                // Add data-index attribute to the row
+                row.setAttribute('data-index', index);
+                row.classList.add('hover:bg-blue-50', 'transition-all', 'duration-200', 'ease-in-out', 'transform', 'hover:scale-[1.01]', 'hover:shadow-md');
+
+                // Format 'Date' column for display in the main table
+                const dateFromData = new Date(rowData.Date);
+                const formattedDate = dateFromData.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                // Use the raw 'Student Engagement' value for display and color logic
+                const rawEngagementText = rowData['Student Engagement'] || 'N/A';
+
+                row.innerHTML = `
+                    <td class="py-3 px-4 whitespace-nowrap text-sm">${formattedDate}</td>
+                    <td class="py-3 px-4 whitespace-nowrap text-sm font-medium">${rowData['Teacher Name'] || 'N/A'}</td>
+                    <td class="py-3 px-4 whitespace-nowrap text-sm">${rowData['Staff ID'] || 'N/A'}</td>
+                    <td class="py-3 px-4 whitespace-nowrap text-sm">${rowData['Class Room Name'] || 'N/A'}</td>
+                    <td class="py-3 px-4 whitespace-nowrap text-sm">${rowData['Student Name'] || 'N/A'}</td>
+                    <td class="py-3 px-4 whitespace-nowrap text-sm">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${getEngagementColor(rawEngagementText)}">
+                            ${rawEngagementText}
+                        </span>
+                    </td>
+                `;
+                dataTableBody.appendChild(row);
+            });
+            tableContainer.classList.remove('hidden');
+            addTableRowClickListeners(); // Call the new listener function
+        }
+
+        /**
+         * Adds click listeners to all table rows.
+         */
+        function addTableRowClickListeners() {
+            document.querySelectorAll('#dataTableBody tr').forEach(rowElement => {
+                rowElement.onclick = (event) => {
+                    // Get the index from the clicked row's data-index attribute
+                    const index = event.currentTarget.getAttribute('data-index');
+                    // Retrieve the full row data from the globally stored array
+                    const rowData = currentFilteredAndSortedData[index];
+                    if (rowData) {
+                        showDetails(rowData);
+                    } else {
+                        console.error("Row data not found for index:", index);
+                        showCustomMessage("Could not retrieve full details for this entry.");
+                    }
+                };
+            });
+        }
+
+        /**
+         * Populates and displays the modal with full details of a row.
+         * @param {Object} rowData - The data object for the selected row.
+         */
+        function showDetails(rowData) {
+            modalContentBody.innerHTML = ''; // Clear previous content
+
+            // Define the order and labels for display in the modal
+            const displayOrder = [
+                { key: 'Date', label: 'Date' }, // Display 'Date' column as date only
+                { key: 'Timestamp', label: 'Timestamp' }, // Display 'Timestamp' column with full date and time
+                { key: 'Teacher Name', label: 'Teacher' },
+                { key: 'Staff ID', label: 'Staff ID' },
+                { key: 'Program', label: 'Program' },
+                { key: 'Class Room Name', label: 'Class Room' },
+                { key: 'Student Name', label: 'Student' },
+                { key: 'Student ID', label: 'Student ID' },
+                { key: 'Subject', label: 'Subject' },
+                { key: 'Class In', label: 'Class In Time' }, // This will be formatted to time only
+                { key: 'Class Duration', label: 'Duration' },
+                { key: 'What Taught Today', label: 'What Taught' },
+                // 'Student Engagement' is intentionally excluded from modal details as per request
+                { key: 'Any Work', label: 'Any Work' },
+                { key: 'Anything you\'d like to share?', label: 'Teacher Notes' } // Changed label to be more explicit
+            ];
+
+            displayOrder.forEach(item => {
+                let value = rowData[item.key];
+                if (item.key === 'Date' && value) {
+                    const dateObj = new Date(value);
+                    // Format 'Date' to show only date in the modal
+                    value = dateObj.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                } else if (item.key === 'Timestamp' && value) {
+                    const dateObj = new Date(value);
+                    // Format 'Timestamp' to show full date and time in the modal
+                    value = dateObj.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                } else if (item.key === 'Class In' && value) { // Specific formatting for Class In
+                    const dateObj = new Date(value);
+                    value = dateObj.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } else if (value === undefined || value === null || value === '') {
+                    value = 'N/A';
+                }
+
+                const detailItem = document.createElement('div');
+                // For "Teacher Notes" make it span two columns if possible for better readability
+                if (item.key === 'Anything you\'d like to share?') {
+                    detailItem.classList.add('md:col-span-2'); // Span full width on medium screens and up
+                }
+                detailItem.classList.add('mb-2', 'flex', 'flex-col', 'md:flex-row', 'md:items-baseline');
+                detailItem.innerHTML = `
+                    <span class="font-semibold text-blue-600 md:w-1/3">${item.label}:</span>
+                    <span class="text-gray-700 md:w-2/3">${value}</span>
+                `;
+                modalContentBody.appendChild(detailItem);
+            });
+
+            detailsModal.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the modal.
+         */
+        function hideDetails() {
+            detailsModal.classList.add('hidden');
+        }
+
+        /**
+         * Downloads the current table view as a PDF.
+         */
+        function downloadPdf() {
+            const element = document.getElementById('tableContainer'); // Element to convert to PDF
+            const selectedMonthForDownload = monthFilter.value;
+            const filename = selectedMonthForDownload ?
+                                `classroom_log_${selectedMonthForDownload.replace(/ /g, '_')}.pdf` :
+                                `classroom_log_all_filtered.pdf`;
+
+            // Options for html2pdf
+            const options = {
+                margin: 10,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // Landscape for wider tables
+            };
+
+            html2pdf().set(options).from(element).save();
+        }
+
+
+        // Event listeners
+        closeModalButton.addEventListener('click', hideDetails);
+        detailsModal.addEventListener('click', (e) => {
+            if (e.target === detailsModal) {
+                hideDetails();
+            }
+        });
+
+        // Filter input event listeners
+        teacherStaffIdFilter.addEventListener('keyup', () => {
+            const filteredData = applyFilters(allData);
+            renderTable(filteredData);
+        });
+        studentNameFilter.addEventListener('keyup', () => {
+            const filteredData = applyFilters(allData);
+            renderTable(filteredData);
+        });
+        monthFilter.addEventListener('change', () => {
+            const filteredData = applyFilters(allData);
+            renderTable(filteredData);
+        });
+
+        // Download PDF button listener
+        downloadPdfBtn.addEventListener('click', downloadPdf);
+
+        /**
+         * Shows a custom message box instead of alert().
+         * @param {string} message - The message to display.
+         */
+        function showCustomMessage(message) {
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('fixed', 'inset-0', 'bg-gray-900', 'bg-opacity-75', 'flex', 'items-center', 'justify-center', 'z-50', 'modal-overlay');
+            messageBox.innerHTML = `
+                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full text-center relative border-t-8 border-blue-500">
+                    <h3 class="text-xl font-bold text-blue-700 mb-4">Notification</h3>
+                    <p class="text-gray-700 mb-6">${message}</p>
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300" onclick="this.closest('.modal-overlay').remove()">
+                        OK
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(messageBox);
+        }
+
+
+        // Initial data fetch and render when the page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Show the teacher login modal first
+            teacherLoginModal.classList.remove('hidden');
+
+            initialTeacherSearchButton.addEventListener('click', async () => {
+                const initialSearchTerm = initialTeacherSearchInput.value.trim();
+                initialSearchMessage.classList.add('hidden'); // Hide previous messages
+
+                if (!initialSearchTerm) {
+                    initialSearchMessage.textContent = "Please enter a Staff ID or Name.";
+                    initialSearchMessage.classList.remove('hidden');
+                    return;
+                }
+
+                teacherLoginModal.classList.add('hidden'); // Hide login modal
+                loadingIndicator.classList.remove('hidden'); // Show loading indicator
+
+                const data = await fetchData(); // Fetch all data
+
+                // Set the main filter input with the initial search term
+                teacherStaffIdFilter.value = initialSearchTerm;
+
+                const filteredData = applyFilters(data); // Apply filter based on initial search
+                renderTable(filteredData); // Render the filtered data
+
+                if (filteredData.length === 0) {
+                    showCustomMessage(`No logs found for "${initialSearchTerm}". Please try again.`);
+                    // Optionally, re-show the login modal or keep the dashboard empty
+                    // For now, we'll keep the dashboard empty and show a message.
+                } else {
+                    filterControls.classList.remove('hidden'); // Show filters if data is found
+                }
+            });
+        });
+    </script>
+</body>
+</html>
