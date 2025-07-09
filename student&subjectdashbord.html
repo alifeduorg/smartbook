@@ -11,10 +11,11 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1e3a8a, #0c4a6e, #1f2937); /* Deep blue to dark gray gradient */
+            /* Light, subtle gradient for a premium feel */
+            background: linear-gradient(135deg, #e0f2fe, #f0f9ff, #e0f2fe); /* Light blue to very light blue gradient */
             background-size: 400% 400%;
             animation: gradientAnimation 15s ease infinite;
-            color: #e0e7ff; /* Light blue text */
+            color: #1a202c; /* Dark text for readability on light background */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -31,22 +32,24 @@
         }
 
         .card {
-            background-color: rgba(31, 41, 55, 0.9); /* Dark gray with transparency */
-            backdrop-filter: blur(8px); /* Frosted glass effect */
-            border: 1px solid rgba(71, 85, 105, 0.5); /* Subtle border */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow for 3D */
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            background-color: rgba(255, 255, 255, 0.95); /* Near white with slight transparency */
+            backdrop-filter: blur(10px); /* Enhanced frosted glass effect */
+            border: 1px solid rgba(200, 220, 255, 0.7); /* Lighter, subtle border */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.05); /* Lighter, more refined shadow for 3D */
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .card:hover {
-            transform: translateY(-8px) scale(1.02); /* Lift and slightly enlarge on hover */
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-10px) scale(1.01); /* More pronounced lift and slight enlarge on hover */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 25px rgba(0, 0, 0, 0.1);
         }
 
         .table-container {
             max-height: 60vh; /* Limit height for scrollability */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            background-color: rgba(255, 255, 255, 0.8); /* Light background for table */
+            border: 1px solid rgba(220, 230, 255, 0.7);
         }
 
         /* Custom scrollbar for better aesthetics */
@@ -55,18 +58,18 @@
         }
 
         .table-container::-webkit-scrollbar-track {
-            background: rgba(31, 41, 55, 0.7);
+            background: rgba(240, 248, 255, 0.7); /* Very light track */
             border-radius: 10px;
         }
 
         .table-container::-webkit-scrollbar-thumb {
-            background: #60a5fa; /* Light blue */
+            background: #90cdf4; /* Soft blue */
             border-radius: 10px;
-            border: 2px solid rgba(31, 41, 55, 0.7);
+            border: 2px solid rgba(240, 248, 255, 0.7);
         }
 
         .table-container::-webkit-scrollbar-thumb:hover {
-            background: #3b82f6; /* Darker blue on hover */
+            background: #63b3ed; /* Darker blue on hover */
         }
 
         th, td {
@@ -76,24 +79,25 @@
         }
 
         th {
-            background-color: #1e3a8a; /* Dark blue header */
+            background-color: #dbeafe; /* Very light blue header */
+            color: #1e40af; /* Darker blue text for headers */
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
         tr:nth-child(even) {
-            background-color: rgba(55, 65, 81, 0.7); /* Slightly lighter row for zebra striping */
+            background-color: rgba(240, 248, 255, 0.7); /* Slightly lighter row for zebra striping */
         }
 
         tr:hover {
-            background-color: rgba(71, 85, 105, 0.8); /* Highlight row on hover */
+            background-color: rgba(220, 230, 255, 0.8); /* Highlight row on hover */
         }
 
-        /* Updated Status Colors */
-        .status-ongoing { background-color: #10b981; } /* Green */
-        .status-left { background-color: #ef4444; } /* Red */
-        .status-pending { background-color: #3b82f6; } /* Blue (Tailwind blue-500) */
+        /* Updated Status Colors for light theme */
+        .status-ongoing { background-color: #34d399; } /* Green */
+        .status-left { background-color: #f87171; } /* Red */
+        .status-pending { background-color: #60a5fa; } /* Blue (Tailwind blue-400) */
         .status-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 9999px; /* Pill shape */
@@ -106,10 +110,10 @@
 
         /* Highlight row for LEFT status */
         .row-status-left {
-            background-color: rgba(239, 68, 68, 0.5) !important; /* Red with transparency */
+            background-color: rgba(254, 202, 202, 0.7) !important; /* Lighter red with transparency */
         }
         .row-status-left:hover {
-            background-color: rgba(239, 68, 68, 0.7) !important; /* Darker red on hover */
+            background-color: rgba(252, 165, 165, 0.8) !important; /* Darker red on hover */
         }
 
         /* Modal specific styles */
@@ -119,8 +123,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly lighter overlay */
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -136,17 +140,17 @@
         }
 
         .modal-content {
-            background-color: rgba(31, 41, 55, 0.95); /* Darker gray with more transparency */
-            border: 1px solid rgba(71, 85, 105, 0.6);
+            background-color: rgba(255, 255, 255, 0.98); /* Near white, slightly less transparent */
+            border: 1px solid rgba(200, 220, 255, 0.8);
             border-radius: 1.5rem; /* More rounded */
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), 0 0 25px rgba(0, 0, 0, 0.1);
             padding: 2.5rem;
             max-width: 90%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s ease-in-out;
+            transform: scale(0.9); /* Start smaller for a pop-in effect */
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .modal-overlay.open .modal-content {
@@ -159,21 +163,23 @@
             right: 1.5rem;
             background: none;
             border: none;
-            font-size: 2rem;
-            color: #cbd5e1;
+            font-size: 2.5rem; /* Larger close button */
+            line-height: 1;
+            color: #6b7280; /* Darker gray for contrast */
             cursor: pointer;
-            transition: color 0.2s ease-in-out;
+            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
         }
 
         .modal-close-button:hover {
-            color: #e0e7ff;
+            color: #1f2937; /* Even darker on hover */
+            transform: rotate(90deg); /* Spin on hover */
         }
 
         .detail-item {
             display: flex;
             justify-content: space-between;
             padding: 0.5rem 0;
-            border-bottom: 1px dashed rgba(71, 85, 105, 0.4);
+            border-bottom: 1px dashed rgba(156, 163, 175, 0.4); /* Lighter dashed line */
         }
 
         .detail-item:last-child {
@@ -182,11 +188,11 @@
 
         .detail-label {
             font-weight: 500;
-            color: #a7c0f1; /* Lighter blue for labels */
+            color: #4a5568; /* Darker gray for labels */
         }
 
         .detail-value {
-            color: #e0e7ff;
+            color: #1a202c; /* Dark text for values */
             text-align: right;
             flex-grow: 1;
             margin-left: 1rem;
@@ -198,32 +204,81 @@
                 display: none;
             }
         }
+
+        /* Button styling for premium look */
+        .action-button {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6); /* Blue gradient */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+            background: linear-gradient(135deg, #3b82f6, #2563eb); /* Darker blue gradient on hover */
+        }
+
+        .action-button.green {
+            background: linear-gradient(135deg, #34d399, #10b981); /* Green gradient */
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .action-button.green:hover {
+            background: linear-gradient(135deg, #10b981, #059669); /* Darker green gradient on hover */
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Input field styling */
+        input[type="text"], select {
+            background-color: #f8fafc; /* Very light background for inputs */
+            border: 1px solid #e2e8f0; /* Light border */
+            color: #334155; /* Dark text */
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem; /* More rounded */
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle inner shadow */
+            transition: all 0.2s ease-in-out;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #60a5fa; /* Blue focus border */
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3); /* Blue ring on focus */
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="max-w-6xl w-full mx-auto p-6 bg-gray-800 rounded-2xl shadow-xl card mb-8">
-        <h1 class="text-4xl font-bold text-center mb-4 text-blue-300">Student Enrollment Dashboard</h1>
-        <p class="text-center text-lg text-gray-300 mb-6">
+    <div class="max-w-6xl w-full mx-auto p-6 rounded-2xl shadow-xl card mb-8">
+        <h1 class="text-4xl font-bold text-center mb-4 text-blue-700">Student Enrollment Dashboard</h1>
+        <p class="text-center text-lg text-gray-600 mb-6">
             Displaying key student details. Click a row for full information.
         </p>
 
         <!-- Filter Options -->
         <div class="mb-6 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div class="w-full sm:w-1/3">
-                <label for="nameFilter" class="block text-gray-300 text-sm font-bold mb-2">Filter by Name:</label>
+                <label for="nameFilter" class="block text-gray-700 text-sm font-bold mb-2">Filter by Name:</label>
                 <input type="text" id="nameFilter" placeholder="Enter student name..."
-                       class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-200 border-gray-300">
+                       class="w-full">
             </div>
             <div class="w-full sm:w-1/3">
-                <label for="studentIdFilter" class="block text-gray-300 text-sm font-bold mb-2">Filter by Student ID:</label>
+                <label for="studentIdFilter" class="block text-gray-700 text-sm font-bold mb-2">Filter by Student ID:</label>
                 <input type="text" id="studentIdFilter" placeholder="Enter student ID..."
-                       class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-200 border-gray-300">
+                       class="w-full">
             </div>
             <div class="w-full sm:w-1/3">
-                <label for="statusFilter" class="block text-gray-300 text-sm font-bold mb-2">Filter by Status:</label>
-                <select id="statusFilter"
-                        class="shadow border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-200 border-gray-300">
+                <label for="statusFilter" class="block text-gray-700 text-sm font-bold mb-2">Filter by Status:</label>
+                <select id="statusFilter" class="w-full">
                     <option value="">All Statuses</option>
                     <option value="ONGOING">ONGOING</option>
                     <option value="LEFT">LEFT</option>
@@ -232,8 +287,8 @@
             </div>
         </div>
 
-        <div id="data-container" class="table-container rounded-lg shadow-inner bg-gray-900/70">
-            <p class="text-center text-gray-400 p-8" id="loading-message">Loading student data...</p>
+        <div id="data-container" class="table-container rounded-lg shadow-inner">
+            <p class="text-center text-gray-500 p-8" id="loading-message">Loading student data...</p>
         </div>
     </div>
 
@@ -241,17 +296,17 @@
     <div id="student-details-modal" class="modal-overlay">
         <div class="modal-content w-full md:w-2/3 lg:w-1/2">
             <button class="modal-close-button" onclick="closeModal()">&times;</button>
-            <h2 class="text-3xl font-bold text-blue-300 mb-6 text-center">Student Details</h2>
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">Student Details</h2>
             <div id="modal-body" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Details will be populated here -->
             </div>
             <div class="flex justify-center mt-6 space-x-4">
-                <button id="modal-call-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684L10.5 9l2.5-2.5L15 9l-1.5 1.5L16 12l2-2 2 2-1.5 1.5L21 15l-2.5 2.5 1.5 1.5L19 21a2 2 0 01-2 2h-3.28a1 1 0 01-.948-.684L13.5 15l-2.5 2.5L9 15l1.5-1.5L8 12l-2 2-2-2 1.5-1.5L3 9l2.5-2.5L3 5z"></path></svg>
+                <button id="modal-call-button" class="action-button green">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684L10.5 9l2.5-2.5L15 9l-1.5 1.5L16 12l2-2 2 2-1.5 1.5L21 15l-2.5 2.5 1.5 1.5L19 21a2 2 0 01-2 2h-3.28a1 1 0 01-.948-.684L13.5 15l-2.5 2.5L9 15l1.5-1.5L8 12l-2 2-2-2 1.5-1.5L3 9l2.5-2.5L3 5z"></path></svg>
                     Call Student
                 </button>
-                <button id="modal-whatsapp-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.5 3.42 1.45 4.88l-1.53 5.58 5.73-1.51c1.36.79 2.91 1.25 4.16 1.25 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm4.72 13.24c-.2-.1-.8-.4-1.1-.55-.3-.15-.5-.1-.7.1s-.8.9-.9 1.1c-.2.2-.35.2-.65.1-.3-.15-1.2-.45-2.3-1.4s-1.8-2.2-2.1-2.7c-.3-.5-.05-.7.1-.85.1-.1.2-.25.3-.4.1-.15.15-.25.2-.4s0-.3-.1-.5c-.1-.2-.9-2.2-.9-3c0-.8-.6-1.1-.8-1.1-.2 0-.4 0-.6.1-.2.1-.7.25-1.1.65-.4.4-.9 1.1-.9 2.6s.9 3.1 1 3.3c.1.2 1.8 2.8 4.4 3.9 2.6 1.1 2.6 1 3.1.9.5-.1.8-.6 1-.9s.4-.6.6-.8c.2-.2.4-.3.6-.4.2-.1.8-.2.9-.4.2-.2.2-.4.1-.5z"/></svg>
+                <button id="modal-whatsapp-button" class="action-button">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.5 3.42 1.45 4.88l-1.53 5.58 5.73-1.51c1.36.79 2.91 1.25 4.16 1.25 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm4.72 13.24c-.2-.1-.8-.4-1.1-.55-.3-.15-.5-.1-.7.1s-.8.9-.9 1.1c-.2.2-.35.2-.65.1-.3-.15-1.2-.45-2.3-1.4s-1.8-2.2-2.1-2.7c-.3-.5-.05-.7.1-.85.1-.1.2-.25.3-.4.1-.15.15-.25.2-.4s0-.3-.1-.5c-.1-.2-.9-2.2-.9-3c0-.8-.6-1.1-.8-1.1-.2 0-.4 0-.6.1-.2.1-.7.25-1.1.65-.4.4-.9 1.1-.9 2.6s.9 3.1 1 3.3c.1.2 1.8 2.8 4.4 3.9 2.6 1.1 2.6 1 3.1.9.5-.1.8-.6 1-.9s.4-.6.6-.8c.2-.2.4-.3.6-.4.2-.1.8-.2.9-.4.2-.2.2-.4.1-.5z"/></svg>
                     WhatsApp Chat
                 </button>
             </div>
@@ -343,7 +398,7 @@
             }
 
             if (data.length === 0) {
-                dataContainer.innerHTML = '<p class="text-center text-gray-400 p-8">No matching student data available.</p>';
+                dataContainer.innerHTML = '<p class="text-center text-gray-500 p-8">No matching student data available.</p>';
                 return;
             }
 
@@ -359,19 +414,19 @@
 
             // Create table structure
             let tableHTML = `
-                <table class="min-w-full divide-y divide-gray-700 rounded-lg overflow-hidden">
-                    <thead class="bg-gray-700">
+                <table class="min-w-full divide-y divide-gray-300 rounded-lg overflow-hidden">
+                    <thead class="bg-blue-50">
                         <tr>
             `;
             // Add headers dynamically based on the defined order
             mainTableHeaders.forEach(headerInfo => {
                 const additionalClass = headerInfo.key === 'Actions' ? ' call-button-cell' : ''; // Apply class for mobile-only display
-                tableHTML += `<th class="px-6 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider${additionalClass}">${headerInfo.label}</th>`;
+                tableHTML += `<th class="px-6 py-3 text-xs font-medium text-blue-800 uppercase tracking-wider${additionalClass}">${headerInfo.label}</th>`;
             });
             tableHTML += `
                         </tr>
                     </thead>
-                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                    <tbody class="bg-white divide-y divide-gray-200">
             `;
 
             data.forEach((student, index) => {
@@ -384,7 +439,7 @@
                 const rowClass = cleanStatus === 'left' ? 'row-status-left' : '';
 
                 tableHTML += `
-                    <tr class="cursor-pointer hover:bg-gray-700 ${rowClass}" onclick="openModal(${index})">
+                    <tr class="cursor-pointer hover:bg-blue-50 ${rowClass}" onclick="openModal(${index})">
                 `;
 
                 // Add table data dynamically based on the defined order
@@ -394,7 +449,7 @@
 
                     if (headerInfo.key === 'Actions') {
                         tdContent = `
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                            <button class="action-button"
                                     onclick="event.stopPropagation(); window.location.href='tel:${phoneNumber}';">
                                 Call
                             </button>
@@ -407,7 +462,7 @@
                         tdContent = student[headerInfo.key] || 'N/A';
                     }
 
-                    tableHTML += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200${additionalClass}">${tdContent}</td>`;
+                    tableHTML += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800${additionalClass}">${tdContent}</td>`;
                 });
 
                 tableHTML += `
@@ -467,7 +522,7 @@
                     </div>
                 </div>
                 <div class="col-span-1 md:col-span-2">
-                    <h3 class="text-xl font-semibold text-blue-200 mt-4 mb-2">Subjects & Teachers:</h3>
+                    <h3 class="text-xl font-semibold text-blue-600 mt-4 mb-2">Subjects & Teachers:</h3>
                     <div class="space-y-2">
             `;
 
@@ -493,7 +548,7 @@
                     `;
                 }
             } else {
-                modalBody.querySelector('.space-y-2').innerHTML += '<p class="text-gray-400 text-center">No subjects assigned.</p>';
+                modalBody.querySelector('.space-y-2').innerHTML += '<p class="text-gray-500 text-center">No subjects assigned.</p>';
             }
 
             modalBody.innerHTML += `</div></div>`; // Close the subject/teacher div and modal-body
@@ -551,7 +606,7 @@
                 console.error("Could not fetch data:", error);
                 // Provide a more specific error message to the user
                 dataContainer.innerHTML = `
-                    <div class="text-center text-red-400 p-8">
+                    <div class="text-center text-red-600 p-8">
                         <p class="font-bold mb-2">Failed to load data.</p>
                         <p>This is often due to Google Apps Script deployment settings or data issues.</p>
                         <p>Please ensure:</p>
