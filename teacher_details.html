@@ -5,213 +5,297 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Details</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-     <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
-      color: #333;
-    }
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
 
-    header {
-      background-color: #001f3f;
-      color: #fff;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+        header {
+            background-color: #001f3f;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-    header img {
-      height: 50px;
-    }
+        header img {
+            height: 50px;
+        }
 
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
 
-    .container {
-      padding: 2rem;
-    }
+        .container {
+            padding: 2rem;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-    th {
-      background-color: #ffc107;
-      color: #000;
-    }
+        th {
+            background-color: #ffc107;
+            color: #000;
+        }
 
-    td img {
-      height: 50px;
-      border-radius: 50%;
-    }
+        td img {
+            height: 50px;
+            border-radius: 50%;
+        }
 
-    button {
-      padding: 6px 12px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+        /* Removed old button styles, replaced by .action-button */
+        /*
+        button {
+            padding: 6px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
 
-    button:hover {
-      background-color: #0056b3;
-    }
+        button:hover {
+            background-color: #0056b3;
+        }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #001f3f;
-      color: #fff;
-      margin-top: 2rem;
-    }
+        .whatsapp-btn {
+            background-color: #25D366;
+        }
 
-    .dashboard-btn {
-      margin-bottom: 1rem;
-      background-color: #28a745;
-    }
+        .whatsapp-btn:hover {
+            background-color: #1DA851;
+        }
+        */
 
-   .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.7);
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+        /* New button styling from Student Data Dashboard */
+        .action-button {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6); /* Blue gradient */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease-in-out;
+            display: inline-flex; /* Changed to inline-flex for buttons within table cells */
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none; /* Ensure no underline if used as a link */
+            margin-right: 5px; /* Keep spacing between buttons */
+            font-size: 0.875rem; /* Smaller font for table buttons */
+            padding: 0.5rem 1rem; /* Smaller padding for table buttons */
+        }
 
-    .modal-content {
-      background: #fff;
-      padding: 30px;
-      width: 90%;
-      max-width: 850px;
-      border-radius: 12px;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    }
+        .action-button:hover {
+            transform: translateY(-2px) scale(1.02); /* Slightly less pronounced lift for table */
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+            background: linear-gradient(135deg, #3b82f6, #2563eb); /* Darker blue gradient on hover */
+        }
 
-    .close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 24px;
-  color: #000;
-  cursor: pointer;
-}
+        .action-button.green {
+            background: linear-gradient(135deg, #34d399, #10b981); /* Green gradient */
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
 
+        .action-button.green:hover {
+            background: linear-gradient(135deg, #10b981, #059669); /* Darker green gradient on hover */
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+        }
 
-    .header-img {
-      display: block;
-      margin: auto;
-      max-width: 100%;
-      height: auto;
-      margin-bottom: 20px;
-    }
+        /* Updated Footer Styles */
+        footer {
+            text-align: center;
+            padding: 1.5rem; /* Increased padding */
+            background-color: #001f3f;
+            color: #fff;
+            margin-top: 2rem;
+            font-size: 0.95rem; /* Slightly larger font */
+        }
 
-    .admission-number-box {
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
+        .dashboard-btn {
+            margin-bottom: 1rem;
+            background-color: #28a745;
+            /* Applying action-button like styles to dashboard button for consistency */
+            background: linear-gradient(135deg, #4ade80, #22c55e); /* Green gradient */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            transition: all 0.3s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
 
-    .boxes {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    .boxes div {
-      width: 35px;
-      height: 40px;
-      border: 2px solid #333;
-      text-align: center;
-      line-height: 40px;
-      font-weight: bold;
-      font-size: 16px;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-    }
-
-    .photo-box {
-  border: 1px solid #ccc;
-  width: 50px;     /* narrower width */
-  height: 100px;    /* more height */
-  margin-left: auto;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: #555;
-  background-color: #f2f2f2;
-  border-radius: 8px;
-}
+        .dashboard-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+            background: linear-gradient(135deg, #22c55e, #16a34a); /* Darker green on hover */
+        }
 
 
-    .section-title {
-      background-color: navy;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 20px;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 30px;
-      margin-bottom: 20px;
-    }
+        /* Loading Indicator Styles */
+        .loading-indicator {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #555;
+            display: none; /* Hidden by default */
+        }
 
-    .info-grid {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 12px;
-    }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    .info-grid div {
-      flex: 1;
-    }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            width: 90%;
+            max-width: 850px;
+            border-radius: 12px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
 
-    .info-label {
-      font-weight: bold;
-    }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #000;
+            cursor: pointer;
+        }
 
-    .footer-sign {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 40px;
-    }
+        .header-img {
+            display: block;
+            margin: auto;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
 
-    .print-btn {
-      margin-top: 30px;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-  </style>
+        .admission-number-box {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .boxes {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .boxes div {
+            width: 35px;
+            height: 40px;
+            border: 2px solid #333;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .photo-box {
+            border: 1px solid #ccc;
+            width: 50px;
+            height: 100px;
+            margin-left: auto;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #555;
+            background-color: #f2f2f2;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            background-color: navy;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .info-grid div {
+            flex: 1;
+        }
+
+        .info-label {
+            font-weight: bold;
+        }
+
+        .footer-sign {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .print-btn {
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* Add pointer cursor to table rows for better UX */
+        #teacherTable tbody tr {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -222,7 +306,12 @@
     <div class="container">
         <button class="dashboard-btn" onclick="goToDashboard()">🏠 Go to Dashboard</button>
 
-        <table id="teacherTable"> <!-- Changed id to teacherTable for clarity -->
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator">
+            Loading teacher data...
+        </div>
+
+        <table id="teacherTable">
             <thead>
                 <tr>
                     <th>Joining Date</th>
@@ -239,7 +328,8 @@
     </div>
 
     <footer>
-        © 2025 Alif Edu. All rights reserved.
+        <!-- Dynamically updated copyright year -->
+        © <span id="currentYear"></span> Alif Edu. All rights reserved.
     </footer>
 
     <!-- Modal -->
@@ -293,7 +383,7 @@
             </div>
             <div class="info-grid">
                 <div><span class="info-label">Joining Date:</span> <span id="JoiningDate"></span></div>
-                <div><span class="info-label">Remarks:</span> <span id="teacherRemarks"></span></div> <!-- Changed ID for clarity -->
+                <div><span class="info-label">Remarks:</span> <span id="teacherRemarks"></span></div>
             </div>
             <div class="info-grid">
                 <div><strong>Seal</strong></div>
@@ -309,6 +399,12 @@
         
         let teacherData = []; // Changed variable name for clarity
 
+        // Set the current year in the footer
+        document.getElementById('currentYear').innerText = new Date().getFullYear();
+
+        // Get the loading indicator element
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
         // Helper function to format date to DD/MM/YYYY
         function formatDate(dateString) {
             if (!dateString) return '';
@@ -323,7 +419,16 @@
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         }
+
+        // Helper function to format phone number for links (remove non-digits)
+        function formatPhoneNumberForLink(phoneNumber) {
+            // Ensure phoneNumber is treated as a string before calling .replace()
+            return phoneNumber ? String(phoneNumber).replace(/\D/g, '') : '';
+        }
         
+        // Show loading indicator before fetching data
+        loadingIndicator.style.display = 'block';
+
         fetch(webAppUrl)
             .then(res => res.json())
             .then(data => {
@@ -334,8 +439,11 @@
                     data.forEach((teacher, index) => { // Looping through teacher data
                         // Format Joining Date for the table
                         const formattedJoiningDate = formatDate(teacher['Joining Date']);
+                        const phoneNumber = formatPhoneNumberForLink(teacher['Phone Number']);
 
                         const tr = document.createElement('tr');
+                        // Add onclick directly to the table row
+                        tr.onclick = () => viewDetails(index); 
                         tr.innerHTML = `
                             <td>${formattedJoiningDate}</td>
                             <td>${teacher['Staff id'] || ''}</td>
@@ -343,15 +451,36 @@
                             <td>${teacher['Assigned Classes'] || ''}</td>
                             <td>${teacher['Phone Number'] || ''}</td>
                             <td>${teacher["Email ID"] || ''}</td>
-                            <td><button onclick="viewDetails(${index})">View</button></td>
+                            <td>
+                                <button class="action-button green"
+                                    onclick="event.stopPropagation(); window.location.href='tel:${phoneNumber}'"
+                                    ${phoneNumber ? '' : 'disabled'}
+                                    title="${phoneNumber ? 'Call ' + teacher['Full Name'] : 'Phone number not available'}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684L10.5 9l2.5-2.5L15 9l-1.5 1.5L16 12l2-2 2 2-1.5 1.5L21 15l-2.5 2.5 1.5 1.5L19 21a2 2 0 01-2 2h-3.28a1 1 0 01-.948-.684L13.5 15l-2.5 2.5L9 15l1.5-1.5L8 12l-2 2-2-2 1.5-1.5L3 9l2.5-2.5L3 5z"></path></svg>
+                                    Call
+                                </button>
+                                <button class="action-button"
+                                    onclick="event.stopPropagation(); window.open('https://wa.me/${phoneNumber}', '_blank')"
+                                    ${phoneNumber ? '' : 'disabled'}
+                                    title="${phoneNumber ? 'WhatsApp ' + teacher['Full Name'] : 'Phone number not available'}">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.5 3.42 1.45 4.88l-1.53 5.58 5.73-1.51c1.36.79 2.91 1.25 4.16 1.25 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm4.72 13.24c-.2-.1-.8-.4-1.1-.55-.3-.15-.5-.1-.7.1s-.8.9-.9 1.1c-.2.2-.35.2-.65.1-.3-.15-1.2-.45-2.3-1.4s-1.8-2.2-2.1-2.7c-.3-.5-.05-.7.1-.85.1-.1.2-.25.3-.4.1-.15.15-.25.2-.4s0-.3-.1-.5c-.1-.2-.9-2.2-.9-3c0-.8-.6-1.1-.8-1.1-.2 0-.4 0-.6.1-.2.1-.7.25-1.1.65-.4.4-.9 1.1-.9 2.6s.9 3.1 1 3.3c.1.2 1.8 2.8 4.4 3.9 2.6 1.1 2.6 1 3.1.9.5-.1.8-.6 1-.9s.4-.6.6-.8c.2-.2.4-.3.6-.4.2-.1.8-.2.9-.4.2-.2.2-.4.1-.5z"/></svg>
+                                    WhatsApp
+                                </button>
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     });
+                    // Hide loading indicator after data is loaded and rendered
+                    loadingIndicator.style.display = 'none';
                 }, 100);
             })
             .catch(error => {
                 console.error("Error fetching teacher data:", error);
+                // Hide loading indicator even if there's an error
+                loadingIndicator.style.display = 'none';
                 // You might want to display a user-friendly error message here
+                const tbody = document.querySelector('#teacherTable tbody');
+                tbody.innerHTML = '<tr><td colspan="7" style="texat-align: center; color: red;">Failed to load teacher data. Please try again later.</td></tr>';
             });
 
         function viewDetails(index) {
@@ -361,22 +490,22 @@
             document.getElementById("detailModal").style.display = "flex";
 
             // Fill data safely
-            document.getElementById("FullName").innerText = teacher["Full Name  "] || "-";
+            document.getElementById("FullName").innerText = teacher['Full Name  '] || "-";
             document.getElementById("teacherDOB").innerText = teacher["Date of Birth"] ? formatDate(teacher["Date of Birth"]) : "-"; // Format DOB
             document.getElementById("teachergender").innerText = teacher["Gender"] || "-";
             document.getElementById("teacheremail").innerText = teacher["Email ID"] || "-";
             document.getElementById("teacherPhone").innerText = teacher["Phone Number"] || "-";
             document.getElementById("Religion").innerText = teacher["Religion "] || "-";
             document.getElementById("Address").innerText = teacher["Address"] || "-";
-            document.getElementById("SubjectsCanTeach").innerText = teacher["  Subjects You Can Teach  "] || "-";
-            document.getElementById("ClassesCanTeach").innerText = teacher["  Classes You Can Teach  "] || "-";
-            document.getElementById("PreferredTimeSlots").innerText = teacher["  Preferred Time Slots  "] || "-";
+            document.getElementById("SubjectsCanTeach").innerText = teacher[" Subjects You Can Teach "] || "-";
+            document.getElementById("ClassesCanTeach").innerText = teacher[" Classes You Can Teach "] || "-";
+            document.getElementById("PreferredTimeSlots").innerText = teacher[" Preferred Time Slots "] || "-";
             document.getElementById("Experience").innerText = teacher["Experience (in years)"] || "-";
             document.getElementById("Qualification").innerText = teacher["Qualification "]  || "-";
-            document.getElementById("EmploymentType").innerText = teacher["  Employment Type  "] || "-";
-            document.getElementById("SalaryPlan").innerText = teacher["  Salary Plan  "] || "-";
+            document.getElementById("EmploymentType").innerText = teacher[" Employment Type "] || "-";
+            document.getElementById("SalaryPlan").innerText = teacher[" Salary Plan "] || "-";
             document.getElementById("JoiningDate").innerText = teacher["Joining Date"] ? formatDate(teacher["Joining Date"]) : "-"; // Format Joining Date
-            document.getElementById("teacherRemarks").innerText = teacher["  Remarks   "]|| "-"; // Changed ID for clarity
+            document.getElementById("teacherRemarks").innerText = teacher[" Remarks "]|| "-";
 
 
             // Fill Staff ID box visually
@@ -398,7 +527,7 @@
             const element = document.getElementById('modalContent');
             const opt = {
                 margin: 10,
-                filename: 'teacher-details.pdf', // Changed filename
+                filename: 'teacher-details.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
                     scale: 2,
