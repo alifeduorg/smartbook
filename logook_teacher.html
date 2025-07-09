@@ -450,6 +450,10 @@
             const submitButton = document.getElementById('submitButton');
             const dashboardButton = document.getElementById('dashboardButton');
 
+            // Ensure the submit button is enabled and ready for a new entry on page load
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submit Log';
+
             // Set current date
             const today = new Date();
             const year = today.getFullYear();
@@ -501,19 +505,21 @@
                     // For demonstration, we'll assume success if no fetch error.
 
                     console.log('Google Apps Script response (check network tab for actual status):', response);
-                    showMessage("Log submitted successfully!");
+                    showMessage("Log submitted successfully! Refreshing for new entry...");
                     logForm.reset(); // Clear the form after successful submission
-                    // For the requirement "dont show submit button till the page refresh",
-                    // the button will remain disabled and show "Submitted!".
-                    // To re-enable it, the user would need to refresh the page.
+                    
+                    // Refresh the page for a new entry
+                    setTimeout(() => {
+                        location.reload(); 
+                    }, 1000); // Give a short delay for the message to be seen
+                    
 
                 } catch (error) {
                     console.error('Error submitting log:', error);
                     showMessage("Failed to submit log. Please try again.", "error");
-                } finally {
-                    // This block will execute regardless of success or failure
-                    submitButton.disabled = true;
-                    submitButton.textContent = 'Submitted!';
+                    // Re-enable button on error so user can try again without refreshing
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Log';
                 }
             });
         });
