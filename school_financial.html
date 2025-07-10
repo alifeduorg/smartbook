@@ -12,15 +12,20 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Light gray background */
+            background-color: #f8fafc; /* Very light blue-gray background */
         }
         .container {
             max-width: 1200px;
         }
         .card {
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 16px; /* Slightly more rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced shadow for depth */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+        }
+        .card:hover {
+            transform: translateY(-5px) scale(1.01); /* Subtle lift and slight scale on hover */
+            box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.15), 0 6px 8px -3px rgba(0, 0, 0, 0.08); /* Deeper shadow on hover */
         }
         .chart-container {
             position: relative;
@@ -45,20 +50,34 @@
         /* Tab styling */
         .tab-button {
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 10px; /* Slightly more rounded */
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            background-color: #e5e7eb; /* Light gray */
-            color: #4b5563; /* Dark gray text */
+            transition: all 0.3s ease-in-out; /* Smooth transitions */
+            background-color: #e0e7ff; /* Light indigo */
+            color: #4338ca; /* Darker indigo text */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         .tab-button:hover {
-            background-color: #d1d5db; /* Slightly darker gray on hover */
+            background-color: #c7d2fe; /* Lighter indigo on hover */
+            transform: translateY(-2px); /* Subtle lift */
         }
         .tab-button.active {
-            background-color: #3b82f6; /* Blue */
+            background-color: #4f46e5; /* Stronger indigo */
             color: #ffffff;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4); /* More prominent shadow */
+            transform: translateY(-2px); /* Keep lifted when active */
+        }
+
+        /* Fade-in animation for tab content */
+        .tab-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .tab-content.active-fade-in {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -142,7 +161,7 @@
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
-                                <th class="py-3 px-6">Teacher Name</th>
+                                <th class="py-3 px-6">Teacher ID (Name)</th>
                                 <th class="py-3 px-6">Salary</th>
                             </tr>
                         </thead>
@@ -163,7 +182,7 @@
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
-                                <th class="py-3 px-6">Student Name</th>
+                                <th class="py-3 px-6">Student ID (Name)</th>
                                 <th class="py-3 px-6">Fee</th>
                             </tr>
                         </thead>
@@ -272,6 +291,16 @@
                 monthlyProfits = [monthlyData[selectedMonth] ? monthlyData[selectedMonth].monthlyProfit : 0];
             }
 
+            // Define a consistent color palette for charts
+            const chartColors = {
+                profitPositive: 'rgba(75, 192, 192, 0.7)', // Teal
+                profitNegative: 'rgba(255, 99, 132, 0.7)', // Red
+                teacherSalary: 'rgba(79, 70, 229, 0.7)', // Indigo
+                studentFee: 'rgba(234, 179, 8, 0.7)',    // Amber
+                borderColor: (color) => color.replace('0.7', '1') // Solid border
+            };
+
+
             // Destroy existing charts if they exist to prevent re-rendering issues
             if (monthlyProfitChart) monthlyProfitChart.destroy();
             if (monthlyTeacherSalaryChart) monthlyTeacherSalaryChart.destroy();
@@ -286,8 +315,8 @@
                     datasets: [{
                         label: 'Monthly Profit',
                         data: monthlyProfits,
-                        backgroundColor: monthlyProfits.map(profit => profit >= 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)'),
-                        borderColor: monthlyProfits.map(profit => profit >= 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)'),
+                        backgroundColor: monthlyProfits.map(profit => profit >= 0 ? chartColors.profitPositive : chartColors.profitNegative),
+                        borderColor: monthlyProfits.map(profit => profit >= 0 ? chartColors.borderColor(chartColors.profitPositive) : chartColors.borderColor(chartColors.profitNegative)),
                         borderWidth: 1
                     }]
                 },
@@ -322,8 +351,8 @@
                     datasets: [{
                         label: 'Total Teacher Salary',
                         data: totalMonthlySalaries,
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: chartColors.teacherSalary,
+                        borderColor: chartColors.borderColor(chartColors.teacherSalary),
                         borderWidth: 2,
                         fill: false,
                         tension: 0.1
@@ -360,8 +389,8 @@
                     datasets: [{
                         label: 'Total Student Fees',
                         data: totalMonthlyFees,
-                        backgroundColor: 'rgba(255, 206, 86, 0.6)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: chartColors.studentFee,
+                        borderColor: chartColors.borderColor(chartColors.studentFee),
                         borderWidth: 2,
                         fill: false,
                         tension: 0.1
@@ -404,9 +433,9 @@
             const netProfitElement = document.getElementById('netProfit');
             if (yearlyTotals.netProfit >= 0) {
                 netProfitElement.classList.remove('text-red-600');
-                netProfitElement.classList.add('text-blue-600');
+                netProfitElement.classList.add('text-green-600'); /* Changed to green for positive profit */
             } else {
-                netProfitElement.classList.remove('text-blue-600');
+                netProfitElement.classList.remove('text-green-600');
                 netProfitElement.classList.add('text-red-600');
             }
         }
@@ -421,26 +450,55 @@
             tableBody.innerHTML = ''; // Clear existing rows
 
             const monthlyData = data.monthlyData;
-            const monthsToDisplay = selectedMonth === 'all' ? sortedMonths : [selectedMonth];
-
             let hasData = false;
-            monthsToDisplay.forEach(month => {
-                const teachers = monthlyData[month] ? monthlyData[month].teachers : {};
-                const sortedTeacherNames = Object.keys(teachers).sort();
 
-                if (sortedTeacherNames.length > 0) {
+            if (selectedMonth === 'all') {
+                const yearlyTeacherTotals = {};
+                sortedMonths.forEach(month => {
+                    const teachersInMonth = monthlyData[month] ? monthlyData[month].teachers : {};
+                    for (const teacherId in teachersInMonth) {
+                        if (!yearlyTeacherTotals[teacherId]) {
+                            yearlyTeacherTotals[teacherId] = {
+                                name: teachersInMonth[teacherId].name,
+                                totalSalary: 0
+                            };
+                        }
+                        yearlyTeacherTotals[teacherId].totalSalary += teachersInMonth[teacherId].totalSalary;
+                        hasData = true;
+                    }
+                });
+
+                const sortedTeacherIds = Object.keys(yearlyTeacherTotals).sort();
+                sortedTeacherIds.forEach(teacherId => {
+                    const teacherInfo = yearlyTeacherTotals[teacherId];
+                    const row = tableBody.insertRow();
+                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                    row.innerHTML = `
+                        <td class="py-3 px-6 whitespace-nowrap">All Months</td>
+                        <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td> <!-- Display ID and Name -->
+                        <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
+                    `;
+                });
+
+            } else { // Specific month selected
+                const month = selectedMonth;
+                const teachers = monthlyData[month] ? monthlyData[month].teachers : {};
+                const sortedTeacherIds = Object.keys(teachers).sort();
+
+                if (sortedTeacherIds.length > 0) {
                     hasData = true;
-                    sortedTeacherNames.forEach(teacherName => {
+                    sortedTeacherIds.forEach(teacherId => {
+                        const teacherInfo = teachers[teacherId];
                         const row = tableBody.insertRow();
                         row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${teacherName}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${teachers[teacherName].toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td> <!-- Display ID and Name -->
+                            <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
                         `;
                     });
                 }
-            });
+            }
 
             if (!hasData) {
                 const row = tableBody.insertRow();
@@ -459,26 +517,55 @@
             tableBody.innerHTML = ''; // Clear existing rows
 
             const monthlyData = data.monthlyData;
-            const monthsToDisplay = selectedMonth === 'all' ? sortedMonths : [selectedMonth];
-
             let hasData = false;
-            monthsToDisplay.forEach(month => {
-                const students = monthlyData[month] ? monthlyData[month].students : {};
-                const sortedStudentNames = Object.keys(students).sort();
 
-                if (sortedStudentNames.length > 0) {
+            if (selectedMonth === 'all') {
+                const yearlyStudentTotals = {};
+                sortedMonths.forEach(month => {
+                    const studentsInMonth = monthlyData[month] ? monthlyData[month].students : {};
+                    for (const studentId in studentsInMonth) {
+                        if (!yearlyStudentTotals[studentId]) {
+                            yearlyStudentTotals[studentId] = {
+                                name: studentsInMonth[studentId].name,
+                                totalFee: 0
+                            };
+                        }
+                        yearlyStudentTotals[studentId].totalFee += studentsInMonth[studentId].totalFee;
+                        hasData = true;
+                    }
+                });
+
+                const sortedStudentIds = Object.keys(yearlyStudentTotals).sort();
+                sortedStudentIds.forEach(studentId => {
+                    const studentInfo = yearlyStudentTotals[studentId];
+                    const row = tableBody.insertRow();
+                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                    row.innerHTML = `
+                        <td class="py-3 px-6 whitespace-nowrap">All Months</td>
+                        <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td> <!-- Display ID and Name -->
+                        <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
+                    `;
+                });
+
+            } else { // Specific month selected
+                const month = selectedMonth;
+                const students = monthlyData[month] ? monthlyData[month].students : {};
+                const sortedStudentIds = Object.keys(students).sort();
+
+                if (sortedStudentIds.length > 0) {
                     hasData = true;
-                    sortedStudentNames.forEach(studentName => {
+                    sortedStudentIds.forEach(studentId => {
+                        const studentInfo = students[studentId];
                         const row = tableBody.insertRow();
                         row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${studentName}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${students[studentName].toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td> <!-- Display ID and Name -->
+                            <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
                         `;
                     });
                 }
-            });
+            }
 
             if (!hasData) {
                 const row = tableBody.insertRow();
@@ -492,19 +579,23 @@
          * @param {string} tabId The ID of the tab content to show.
          */
         function showTab(tabId) {
-            // Hide all tab contents
+            // Hide all tab contents and remove active-fade-in class
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
+                content.classList.remove('active-fade-in');
             });
             // Deactivate all tab buttons
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
 
-            // Show the selected tab content
+            // Show the selected tab content and add active-fade-in class
             const selectedContent = document.getElementById(tabId);
             if (selectedContent) {
                 selectedContent.classList.remove('hidden');
+                // Trigger reflow to ensure transition plays
+                void selectedContent.offsetWidth;
+                selectedContent.classList.add('active-fade-in');
             }
 
             // Activate the corresponding tab button
