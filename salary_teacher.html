@@ -1036,7 +1036,8 @@
 
             emailContent += `--------------------------------------\n`;
             emailContent += `Teacher's Grand Total Amount: ${teacherGrandTotal}\n`;
-            emailContent += `--------------------------------------\n`;
+            emailContent += `--------------------------------------\n\n`;
+            emailContent += `Kindly confirm whether the salary details mentioned above are accurate.`; // Added confirmation message
 
             // Create a temporary textarea to hold the content for copying
             const tempTextArea = document.createElement('textarea');
