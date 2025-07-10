@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Financial Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Fixed height for charts */
+            width: 100%;
+        }
+        /* Custom scrollbar for overflow content */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 8px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Tab styling */
+        .tab-button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: #e5e7eb; /* Light gray */
+            color: #4b5563; /* Dark gray text */
+        }
+        .tab-button:hover {
+            background-color: #d1d5db; /* Slightly darker gray on hover */
+        }
+        .tab-button.active {
+            background-color: #3b82f6; /* Blue */
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="container mx-auto">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8 text-center">School Financial Dashboard</h1>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="fixed inset-0 bg-gray-200 bg-opacity-75 flex items-center justify-center z-50 hidden">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            <p class="ml-4 text-lg text-gray-700">Loading data...</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button class="tab-button active" data-tab="overview">Overview</button>
+            <button class="tab-button" data-tab="teacher-salaries">Teacher Monthly Salaries</button>
+            <button class="tab-button" data-tab="student-fees">Student Monthly Fees</button>
+        </div>
+
+        <!-- Month Selection Dropdown -->
+        <div class="flex justify-center mb-8">
+            <label for="monthSelect" class="block text-lg font-medium text-gray-700 mr-4 self-center">Select Month:</label>
+            <select id="monthSelect" class="mt-1 block w-auto pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm">
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+
+        <!-- Overview Section (Summary Cards & Monthly Charts) -->
+        <div id="overview" class="tab-content">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="card p-6 text-center">
+                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Total Earnings (Yearly)</h2>
+                    <p id="totalEarnings" class="text-3xl font-bold text-green-600">₹0.00</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Total Expenditure (Yearly)</h2>
+                    <p id="totalExpenditure" class="text-3xl font-bold text-red-600">₹0.00</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Net Profit (Yearly)</h2>
+                    <p id="netProfit" class="text-3xl font-bold text-blue-600">₹0.00</p>
+                </div>
+            </div>
+
+            <!-- Monthly Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Monthly Profit Chart -->
+                <div class="card p-6">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Profit Chart</h2>
+                    <div class="chart-container">
+                        <canvas id="monthlyProfitChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Monthly Teacher Salary Chart -->
+                <div class="card p-6">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Teacher Salary Chart</h2>
+                    <div class="chart-container">
+                        <canvas id="monthlyTeacherSalaryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Monthly Student Fee Chart -->
+                <div class="card p-6">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Student Fee Chart</h2>
+                    <div class="chart-container">
+                        <canvas id="monthlyStudentFeeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Monthly Salaries Section -->
+        <div id="teacher-salaries" class="tab-content hidden">
+            <div class="card p-6">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Teacher Monthly Salaries</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Month</th>
+                                <th class="py-3 px-6">Teacher Name</th>
+                                <th class="py-3 px-6">Salary</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherSalariesTableBody" class="text-gray-700 text-sm font-light">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Monthly Fees Section -->
+        <div id="student-fees" class="tab-content hidden">
+            <div class="card p-6">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Student Monthly Fees</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Month</th>
+                                <th class="py-3 px-6">Student Name</th>
+                                <th class="py-3 px-6">Fee</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentFeesTableBody" class="text-gray-700 text-sm font-light">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby2i1vfoOPV8ey2p8hS1nXhPra0J27djweqbt-8G-uA1SfC9dkm9FZ4h_Q6k7u3wChf/exec';
+
+        let monthlyProfitChart;
+        let monthlyTeacherSalaryChart;
+        let monthlyStudentFeeChart;
+
+        let dashboardData = null; // Store fetched data globally
+        let sortedMonths = []; // To store sorted month names
+
+        /**
+         * Fetches data from the Google Apps Script web app.
+         * Shows a loading spinner during the fetch operation.
+         * @returns {Promise<Object>} A promise that resolves with the fetched data.
+         */
+        async function fetchData() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            loadingSpinner.classList.remove('hidden'); // Show spinner
+
+            try {
+                const response = await fetch(WEB_APP_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Fetched data:", data); // Log data for debugging
+                return data;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                alert("Failed to load data. Please check the web app URL and script deployment. Error: " + error.message);
+                return null;
+            } finally {
+                loadingSpinner.classList.add('hidden'); // Hide spinner
+            }
+        }
+
+        /**
+         * Sorts months chronologically.
+         * @param {Array<string>} monthsArray The array of month names.
+         * @returns {Array<string>} The sorted array of month names.
+         */
+        function sortMonthsChronologically(monthsArray) {
+            const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            return monthsArray.sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
+        }
+
+        /**
+         * Populates the month selection dropdown.
+         * @param {Object} monthlyData The monthly aggregated data.
+         */
+        function populateMonthSelect(monthlyData) {
+            const monthSelect = document.getElementById('monthSelect');
+            monthSelect.innerHTML = ''; // Clear existing options
+
+            sortedMonths = sortMonthsChronologically(Object.keys(monthlyData));
+
+            // Add "All Months" option
+            const allMonthsOption = document.createElement('option');
+            allMonthsOption.value = 'all';
+            allMonthsOption.textContent = 'All Months';
+            monthSelect.appendChild(allMonthsOption);
+
+            sortedMonths.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+
+            // Set default to "All Months" or the first month if no data
+            if (sortedMonths.length > 0) {
+                monthSelect.value = 'all'; // Default to 'All Months'
+            }
+        }
+
+        /**
+         * Renders the charts using Chart.js based on the selected month.
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         */
+        function renderCharts(data, selectedMonth) {
+            const monthlyData = data.monthlyData;
+            let labels, totalMonthlySalaries, totalMonthlyFees, monthlyProfits;
+
+            if (selectedMonth === 'all') {
+                labels = sortedMonths;
+                totalMonthlySalaries = sortedMonths.map(month => monthlyData[month].totalTeacherSalary);
+                totalMonthlyFees = sortedMonths.map(month => monthlyData[month].totalStudentFee);
+                monthlyProfits = sortedMonths.map(month => monthlyData[month].monthlyProfit);
+            } else {
+                labels = [selectedMonth];
+                totalMonthlySalaries = [monthlyData[selectedMonth] ? monthlyData[selectedMonth].totalTeacherSalary : 0];
+                totalMonthlyFees = [monthlyData[selectedMonth] ? monthlyData[selectedMonth].totalStudentFee : 0];
+                monthlyProfits = [monthlyData[selectedMonth] ? monthlyData[selectedMonth].monthlyProfit : 0];
+            }
+
+            // Destroy existing charts if they exist to prevent re-rendering issues
+            if (monthlyProfitChart) monthlyProfitChart.destroy();
+            if (monthlyTeacherSalaryChart) monthlyTeacherSalaryChart.destroy();
+            if (monthlyStudentFeeChart) monthlyStudentFeeChart.destroy();
+
+            // Monthly Profit Chart
+            const profitCtx = document.getElementById('monthlyProfitChart').getContext('2d');
+            monthlyProfitChart = new Chart(profitCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Monthly Profit',
+                        data: monthlyProfits,
+                        backgroundColor: monthlyProfits.map(profit => profit >= 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)'),
+                        borderColor: monthlyProfits.map(profit => profit >= 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: selectedMonth === 'all' ? 'Monthly Profit/Loss (All Months)' : `Profit/Loss for ${selectedMonth}`,
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Monthly Teacher Salary Chart
+            const teacherSalaryCtx = document.getElementById('monthlyTeacherSalaryChart').getContext('2d');
+            monthlyTeacherSalaryChart = new Chart(teacherSalaryCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Teacher Salary',
+                        data: totalMonthlySalaries,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: selectedMonth === 'all' ? 'Total Monthly Teacher Salaries (All Months)' : `Total Teacher Salary for ${selectedMonth}`,
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Monthly Student Fee Chart
+            const studentFeeCtx = document.getElementById('monthlyStudentFeeChart').getContext('2d');
+            monthlyStudentFeeChart = new Chart(studentFeeCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Student Fees',
+                        data: totalMonthlyFees,
+                        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: selectedMonth === 'all' ? 'Total Monthly Student Fees (All Months)' : `Total Student Fee for ${selectedMonth}`,
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Updates the summary cards with yearly totals.
+         * @param {Object} data The processed financial data.
+         */
+        function updateSummary(data) {
+            const yearlyTotals = data.yearlyTotals;
+            document.getElementById('totalEarnings').textContent = `₹${yearlyTotals.totalEarnings.toFixed(2)}`;
+            document.getElementById('totalExpenditure').textContent = `₹${yearlyTotals.totalExpenditure.toFixed(2)}`;
+            document.getElementById('netProfit').textContent = `₹${yearlyTotals.netProfit.toFixed(2)}`;
+
+            // Apply color based on profit/loss
+            const netProfitElement = document.getElementById('netProfit');
+            if (yearlyTotals.netProfit >= 0) {
+                netProfitElement.classList.remove('text-red-600');
+                netProfitElement.classList.add('text-blue-600');
+            } else {
+                netProfitElement.classList.remove('text-blue-600');
+                netProfitElement.classList.add('text-red-600');
+            }
+        }
+
+        /**
+         * Populates the teacher monthly salaries table based on the selected month.
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         */
+        function populateTeacherSalariesTable(data, selectedMonth) {
+            const tableBody = document.getElementById('teacherSalariesTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const monthlyData = data.monthlyData;
+            const monthsToDisplay = selectedMonth === 'all' ? sortedMonths : [selectedMonth];
+
+            let hasData = false;
+            monthsToDisplay.forEach(month => {
+                const teachers = monthlyData[month] ? monthlyData[month].teachers : {};
+                const sortedTeacherNames = Object.keys(teachers).sort();
+
+                if (sortedTeacherNames.length > 0) {
+                    hasData = true;
+                    sortedTeacherNames.forEach(teacherName => {
+                        const row = tableBody.insertRow();
+                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                        row.innerHTML = `
+                            <td class="py-3 px-6 whitespace-nowrap">${month}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${teacherName}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${teachers[teacherName].toFixed(2)}</td>
+                        `;
+                    });
+                }
+            });
+
+            if (!hasData) {
+                const row = tableBody.insertRow();
+                row.classList.add('border-b', 'border-gray-200');
+                row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No teacher salary data for the selected month(s).</td>`;
+            }
+        }
+
+        /**
+         * Populates the student monthly fees table based on the selected month.
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         */
+        function populateStudentFeesTable(data, selectedMonth) {
+            const tableBody = document.getElementById('studentFeesTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const monthlyData = data.monthlyData;
+            const monthsToDisplay = selectedMonth === 'all' ? sortedMonths : [selectedMonth];
+
+            let hasData = false;
+            monthsToDisplay.forEach(month => {
+                const students = monthlyData[month] ? monthlyData[month].students : {};
+                const sortedStudentNames = Object.keys(students).sort();
+
+                if (sortedStudentNames.length > 0) {
+                    hasData = true;
+                    sortedStudentNames.forEach(studentName => {
+                        const row = tableBody.insertRow();
+                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                        row.innerHTML = `
+                            <td class="py-3 px-6 whitespace-nowrap">${month}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${studentName}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${students[studentName].toFixed(2)}</td>
+                        `;
+                    });
+                }
+            });
+
+            if (!hasData) {
+                const row = tableBody.insertRow();
+                row.classList.add('border-b', 'border-gray-200');
+                row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td>`;
+            }
+        }
+
+        /**
+         * Shows the selected tab content and hides others.
+         * @param {string} tabId The ID of the tab content to show.
+         */
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show the selected tab content
+            const selectedContent = document.getElementById(tabId);
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+            }
+
+            // Activate the corresponding tab button
+            const selectedButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
+
+            // Update content based on current tab and selected month
+            const selectedMonth = document.getElementById('monthSelect').value;
+            if (dashboardData) {
+                if (tabId === 'overview') {
+                    renderCharts(dashboardData, selectedMonth);
+                } else if (tabId === 'teacher-salaries') {
+                    populateTeacherSalariesTable(dashboardData, selectedMonth);
+                } else if (tabId === 'student-fees') {
+                    populateStudentFeesTable(dashboardData, selectedMonth);
+                }
+            }
+        }
+
+        /**
+         * Initializes the dashboard by fetching data and rendering all components.
+         */
+        async function initializeDashboard() {
+            dashboardData = await fetchData(); // Store fetched data
+            if (dashboardData) {
+                populateMonthSelect(dashboardData.monthlyData); // Populate month dropdown first
+                updateSummary(dashboardData);
+
+                // Add event listener for month selection change
+                document.getElementById('monthSelect').addEventListener('change', (event) => {
+                    const selectedMonth = event.target.value;
+                    const currentTab = document.querySelector('.tab-button.active').dataset.tab;
+                    showTab(currentTab); // Re-render current tab with new month
+                });
+
+                // Show the default tab (Overview)
+                showTab('overview');
+            }
+        }
+
+        // Add event listeners for tab buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const tabId = event.target.dataset.tab;
+                    showTab(tabId);
+                });
+            });
+            initializeDashboard();
+        });
+    </script>
+</body>
+</html>
