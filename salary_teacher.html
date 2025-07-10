@@ -439,9 +439,6 @@
             'ALI001': 'Principal' // UPDATED ID for Principal
         };
 
-        // Removed sampleLogBookData as per user request. All data will now come from Google Sheet API.
-        // const sampleLogBookData = [...];
-
         let currentTeachersSalaryData = []; // This will hold the processed data for the current month, flattened for table rendering
         let teachersOverallAggregatedData = {}; // Stores aggregated data per teacher for modal details
         let overallTotalHoursForAllTeachers = 0; // Global variable for overall total hours
@@ -495,8 +492,7 @@
 
         /**
          * Loads teacher logbook data from the Google Sheet API or uses sample data,
-         * aggregates total hours per teacher-student pair and overall per teacher,
-         * and displays it in a dynamic HTML table as a salary sheet.
+         * aggregates total hours per teacher and displays it in a dynamic HTML table as a salary sheet.
          */
         async function loadSalaryData() {
             const monthPicker = document.getElementById('monthPicker');
@@ -565,7 +561,7 @@
                 return isMatchingMonth && isMatchingYear;
             });
 
-            // Aggregate total hours and class details per teacher-student pair
+            // Aggregate total hours and class details per teacher
             teachersOverallAggregatedData = {}; // Reset for current month
 
             filteredData.forEach(entry => {
@@ -587,24 +583,21 @@
                         teacherName: teacherName,
                         teacherType: teacherTypes[teacherId] || 'Unknown',
                         overallTotalMinutes: 0,
-                        students: {}
+                        students: {} // Keep students for detailed modal view if needed
                     };
                 }
                 teachersOverallAggregatedData[teacherId].overallTotalMinutes += classDurationMinutes;
 
-                // For regular teachers, aggregate by student. For MD/Principal, aggregate all their hours under 'OVERALL'.
-                const effectiveStudentId = (teacherId === 'AL1002' || teacherId === 'ALI001') ? 'OVERALL' : studentId;
-                const effectiveStudentName = (teacherId === 'AL1002' || teacherId === 'ALI001') ? 'N/A' : studentName; // Student name is N/A for MD/Principal in main table
-
-                if (!teachersOverallAggregatedData[teacherId].students[effectiveStudentId]) {
-                    teachersOverallAggregatedData[teacherId].students[effectiveStudentId] = {
-                        studentName: effectiveStudentName,
+                // Store class details under the specific student for the modal breakdown
+                if (!teachersOverallAggregatedData[teacherId].students[studentId]) {
+                    teachersOverallAggregatedData[teacherId].students[studentId] = {
+                        studentName: studentName,
                         totalMinutesForStudent: 0,
                         classes: []
                     };
                 }
-                teachersOverallAggregatedData[teacherId].students[effectiveStudentId].totalMinutesForStudent += classDurationMinutes;
-                teachersOverallAggregatedData[teacherId].students[effectiveStudentId].classes.push({
+                teachersOverallAggregatedData[teacherId].students[studentId].totalMinutesForStudent += classDurationMinutes;
+                teachersOverallAggregatedData[teacherId].students[studentId].classes.push({
                     date: entry.Date,
                     program: entry.Program,
                     classroom: entry['Class Room Name'],
@@ -620,14 +613,11 @@
                 // The MD and Principal's own recorded hours are still used for their *individual* modal calculation if needed,
                 // but they don't contribute to this specific 'overallTotalHoursForAllTeachers' sum to avoid confusion.
                 if (teacherId !== 'AL1002' && teacherId !== 'ALI001') {
-                    const teacherData = teachersOverallAggregatedData[teacherId];
-                    Object.values(teacherData.students).forEach(studentData => {
-                        overallTotalHoursForAllTeachers += (studentData.totalMinutesForStudent / 60);
-                    });
+                    overallTotalHoursForAllTeachers += (teachersOverallAggregatedData[teacherId].overallTotalMinutes / 60);
                 }
             });
 
-            // Prepare data for the main salary sheet table (flattened with rowspan flags)
+            // Prepare data for the main salary sheet table (one row per teacher)
             currentTeachersSalaryData = [];
             
             // Custom sorting order: AL1002, ALI001, then others alphabetically
@@ -641,54 +631,34 @@
 
             sortedTeacherIds.forEach(teacherId => {
                 const teacherData = teachersOverallAggregatedData[teacherId];
-                let studentKeys = Object.keys(teacherData.students);
+                let totalHoursForDisplay;
+                // Student Name and Student ID columns are no longer needed in the main table
+                // let studentNameForDisplay = '';
+                // let studentIdForDisplay = '';
 
-                // For AL1002 and ALI001, we only want one row representing the overall hours
                 if (teacherId === 'AL1002' || teacherId === 'ALI001') {
-                    studentKeys = ['OVERALL'];
+                    totalHoursForDisplay = overallTotalHoursForAllTeachers; // MD/Principal show overall total for all other teachers
                 } else {
-                    studentKeys.sort((a, b) =>
-                        teacherData.students[a].studentName.localeCompare(teacherData.students[b].studentName)
-                    );
+                    totalHoursForDisplay = (teacherData.overallTotalMinutes / 60); // Regular teachers show their own aggregated total
                 }
 
-                const rowspanCount = studentKeys.length;
-
-                studentKeys.forEach((studentId, index) => {
-                    const studentData = teacherData.students[studentId];
-                    const pairKey = `${teacherId}_${studentId}`;
-                    let totalHoursForDisplay;
-
-                    // Special logic for MD and Principal: display overall total hours of ALL teachers
-                    if (teacherId === 'AL1002' || teacherId === 'ALI001') {
-                         totalHoursForDisplay = overallTotalHoursForAllTeachers;
-                    } else {
-                        totalHoursForDisplay = (studentData.totalMinutesForStudent / 60);
-                    }
-
-                    currentTeachersSalaryData.push({
-                        pairKey: pairKey,
-                        teacherId: teacherId,
-                        teacherName: teacherData.teacherName,
-                        studentId: studentId,
-                        studentName: studentData.studentName,
-                        totalHours: totalHoursForDisplay, // Use the adjusted total for display
-                        classes: studentData.classes,
-                        isFirstStudentForTeacher: (index === 0), // Flag for rowspan
-                        rowspanCount: rowspanCount // How many rows this teacher's name/ID spans
-                    });
+                currentTeachersSalaryData.push({
+                    teacherId: teacherId,
+                    teacherName: teacherData.teacherName,
+                    // studentName: studentNameForDisplay, // Removed
+                    // studentId: studentIdForDisplay,     // Removed
+                    totalHours: totalHoursForDisplay,
                 });
             });
 
             // Generate table HTML
+            // Updated table headers to remove Student Name and Student ID
             let tableHTML = `
                 <table>
                     <thead>
                         <tr>
                             <th>Teacher Name</th>
                             <th>Teacher ID</th>
-                            <th>Student Name</th>
-                            <th>Student ID</th>
                             <th>Total Hours</th>
                         </tr>
                     </thead>
@@ -696,42 +666,17 @@
             `;
 
             if (currentTeachersSalaryData.length === 0) {
-                tableHTML += `<tr><td colspan="5">No salary data found for ${selectedMonthName} ${year}.</td></tr>`;
+                // Adjusted colspan for the "No data found" message
+                tableHTML += `<tr><td colspan="3">No salary data found for ${selectedMonthName} ${year}.</td></tr>`;
             } else {
-                let currentTeacherId = null;
                 currentTeachersSalaryData.forEach(entry => {
-                    // Removed the teacher-separator row generation logic
-                    // if (currentTeacherId !== null && entry.teacherId !== currentTeacherId && entry.isFirstStudentForTeacher) {
-                    //     tableHTML += `<tr class="teacher-separator"><td colspan="5">&nbsp;</td></tr>`;
-                    // }
-                    currentTeacherId = entry.teacherId;
-
-                    // Add special class for MD and Principal rows
                     const rowClass = (entry.teacherId === 'AL1002' || entry.teacherId === 'ALI001') ? 'special-teacher-row' : '';
 
-                    // Removed inline onclick. Event listener will be attached via JS.
+                    // Updated table rows to remove Student Name and Student ID columns
                     tableHTML += `
                         <tr data-teacher-id="${entry.teacherId}" class="${rowClass}" style="cursor: pointer;">
-                    `;
-                    // Apply rowspan for teacher name and ID
-                    if (entry.isFirstStudentForTeacher) {
-                        tableHTML += `<td rowspan="${entry.rowspanCount}">${entry.teacherName}</td>`;
-                        tableHTML += `<td rowspan="${entry.rowspanCount}">${entry.teacherId}</td>`;
-                    }
-
-                    // Special handling for ABHINAV AK (AL1002) and Principal (ALI001): blank student name and ID
-                    if (entry.teacherId === 'AL1002' || entry.teacherId === 'ALI001') {
-                        tableHTML += `
-                            <td></td>
-                            <td></td>
-                        `;
-                    } else {
-                        tableHTML += `
-                            <td>${entry.studentName}</td>
-                            <td>${entry.studentId}</td>
-                        `;
-                    }
-                    tableHTML += `
+                            <td>${entry.teacherName}</td>
+                            <td>${entry.teacherId}</td>
                             <td>${entry.totalHours.toFixed(2)}</td>
                         </tr>
                     `;
@@ -749,7 +694,10 @@
             overallTotalHoursDiv.style.display = 'block';
         }
 
-        // Function to open the salary entry modal for a specific teacher
+        /**
+         * Opens the salary entry modal for a specific teacher, showing detailed hours and allowing rate input.
+         * @param {string} teacherId The ID of the teacher to display details for.
+         */
         function openSalaryEntryModal(teacherId) {
             const teacherData = teachersOverallAggregatedData[teacherId];
 
@@ -768,7 +716,7 @@
                 modalContentArea.innerHTML = '';
 
                 if (teacherId === 'AL1002' || teacherId === 'ALI001') {
-                    // For MD and Principal: show overall total hours for all teachers
+                    // For MD and Principal: show overall total hours for all other teachers
                     modalOverallHoursLabel.textContent = `Overall Total Hours for Month (All Teachers): `;
                     modalTeacherOverallHoursSpan.textContent = overallTotalHoursForAllTeachers.toFixed(2);
 
@@ -781,8 +729,6 @@
                                     <tr>
                                         <th>Teacher Name</th>
                                         <th>Teacher ID</th>
-                                        <th>Student Name</th>
-                                        <th>Student ID</th>
                                         <th>Total Hours</th>
                                         <th>Hourly Rate (₹)</th>
                                         <th>Total Amount (₹)</th>
@@ -797,44 +743,29 @@
                     );
 
                     if (otherTeacherIds.length === 0) {
-                        otherTeachersTableHTML += `<tr><td colspan="7">No other teacher data available for this month.</td></tr>`;
+                        otherTeachersTableHTML += `<tr><td colspan="5">No other teacher data available for this month.</td></tr>`;
                     } else {
                         otherTeacherIds.forEach(otherTeacherId => {
                             const otherTeacherData = teachersOverallAggregatedData[otherTeacherId];
-                            const otherStudentKeys = Object.keys(otherTeacherData.students).sort((a, b) =>
-                                otherTeacherData.students[a].studentName.localeCompare(otherTeacherData.students[b].studentName)
-                            );
-                            const otherRowspanCount = otherStudentKeys.length;
+                            const otherTotalHours = (otherTeacherData.overallTotalMinutes / 60);
+                            const defaultHourlyRate = (teacherTypes[otherTeacherId] === 'International') ? 30 : 20;
+                            const initialAmount = (otherTotalHours * defaultHourlyRate);
 
-                            otherStudentKeys.forEach((otherStudentId, index) => {
-                                const otherStudentData = otherTeacherData.students[otherStudentId];
-                                const otherPairKey = `${otherTeacherId}_${otherStudentId}`;
-                                const otherTotalHours = (otherStudentData.totalMinutesForStudent / 60);
-                                const defaultHourlyRate = (otherTeacherId === 'T002') ? 30 : 20; // T002 is International, others default to 20
-                                const initialAmount = (otherTotalHours * defaultHourlyRate);
-
-                                otherTeachersTableHTML += `
-                                    <tr>
-                                `;
-                                if (index === 0) { // Apply rowspan for teacher name and ID
-                                    otherTeachersTableHTML += `<td rowspan="${otherRowspanCount}">${otherTeacherData.teacherName}</td>`;
-                                    otherTeachersTableHTML += `<td rowspan="${otherRowspanCount}">${otherTeacherId}</td>`;
-                                }
-                                otherTeachersTableHTML += `
-                                        <td>${otherStudentData.studentName}</td>
-                                        <td>${otherStudentId}</td>
-                                        <td>${otherTotalHours.toFixed(2)}</td>
-                                        <td>
-                                            <input type="number" id="hourlyRate_${otherPairKey}"
-                                                   value="${defaultHourlyRate.toFixed(2)}"
-                                                   min="0" step="0.01"
-                                                   data-pair-key="${otherPairKey}"
-                                                   oninput="updateModalSubTableTotal('${otherPairKey}')">
-                                        </td>
-                                        <td><span id="subTableTotalAmount_${otherPairKey}">₹${initialAmount.toFixed(2)}</span></td>
-                                    </tr>
-                                `;
-                            });
+                            otherTeachersTableHTML += `
+                                <tr>
+                                    <td>${otherTeacherData.teacherName}</td>
+                                    <td>${otherTeacherId}</td>
+                                    <td>${otherTotalHours.toFixed(2)}</td>
+                                    <td>
+                                        <input type="number" id="hourlyRate_${otherTeacherId}"
+                                               value="${defaultHourlyRate.toFixed(2)}"
+                                               min="0" step="0.01"
+                                               data-teacher-id="${otherTeacherId}"
+                                               oninput="updateModalSubTableTotal('${otherTeacherId}')">
+                                    </td>
+                                    <td><span id="subTableTotalAmount_${otherTeacherId}">₹${initialAmount.toFixed(2)}</span></td>
+                                </tr>
+                            `;
                         });
                     }
 
@@ -846,38 +777,41 @@
                     modalContentArea.innerHTML = otherTeachersTableHTML;
 
                 } else {
-                    // For regular teachers: show their individual overall hours and class list
+                    // For regular teachers: show their individual overall hours and breakdown per student
                     modalOverallHoursLabel.textContent = `Overall Total Hours for Teacher: `;
                     modalTeacherOverallHoursSpan.textContent = (teacherData.overallTotalMinutes / 60).toFixed(2);
 
-                    const studentSectionDiv = document.createElement('div');
-                    studentSectionDiv.classList.add('student-salary-section');
-                    studentSectionDiv.innerHTML = `
-                        <h4>${`Student: ${Object.keys(teacherData.students)[0] === 'OVERALL' ? 'Overall Hours' : teacherData.students[Object.keys(teacherData.students)[0]].studentName} (ID: ${Object.keys(teacherData.students)[0] === 'OVERALL' ? 'N/A' : Object.keys(teacherData.students)[0]})`}</h4>
-                        <p>Total Hours for this Teacher: <strong>${(teacherData.overallTotalMinutes / 60).toFixed(2)}</strong></p>
-                        <div class="class-list-container">
-                            <h5>Classes Taught:</h5>
-                            <div id="modalClassList_${teacherId}_${Object.keys(teacherData.students)[0]}">
-                                <!-- Class details will be populated here -->
-                            </div>
-                        </div>
-                        <label for="hourlyRate_${teacherId}_${Object.keys(teacherData.students)[0]}">Hourly Rate (₹):</label>
-                        <input type="number" id="hourlyRate_${teacherId}_${Object.keys(teacherData.students)[0]}"
-                               placeholder="Enter hourly rate" min="0" step="0.01"
-                               value="${(teacherTypes[teacherId] === 'International' ? 30 : 20).toFixed(2)}"
-                               data-pair-key="${teacherId}_${Object.keys(teacherData.students)[0]}"
-                               oninput="updateModalStudentTotal('${teacherId}_${Object.keys(teacherData.students)[0]}')">
-                        <p>Total Amount for this Teacher: <strong id="studentTotalAmount_${teacherId}_${Object.keys(teacherData.students)[0]}">₹${((teacherData.overallTotalMinutes / 60) * (teacherTypes[teacherId] === 'International' ? 30 : 20)).toFixed(2)}</strong></p>
-                    `;
-                    modalContentArea.appendChild(studentSectionDiv);
+                    // Iterate through each student for this teacher
+                    Object.keys(teacherData.students).forEach(studentId => {
+                        const studentData = teacherData.students[studentId];
+                        const pairKey = `${teacherId}_${studentId}`; // Unique ID for student-specific elements
 
-                    const studentClassListDiv = document.getElementById(`modalClassList_${teacherId}_${Object.keys(teacherData.students)[0]}`);
-                    if (studentClassListDiv && teacherData.students[Object.keys(teacherData.students)[0]] && teacherData.students[Object.keys(teacherData.students)[0]].classes.length > 0) {
-                        teacherData.students[Object.keys(teacherData.students)[0]].classes.forEach(cls => {
-                            const classDiv = document.createElement('div');
-                            classDiv.classList.add('class-entry');
-                            // Only show class if its duration was not excluded for AL1002 (though this branch is for non-MD/Principal)
-                            if (!(teacherId === 'AL1002' && cls.program === 'International School')) {
+                        const studentSectionDiv = document.createElement('div');
+                        studentSectionDiv.classList.add('student-salary-section');
+                        studentSectionDiv.innerHTML = `
+                            <h4>Student: ${studentData.studentName} (ID: ${studentId})</h4>
+                            <p>Total Hours for this Student: <strong>${(studentData.totalMinutesForStudent / 60).toFixed(2)}</strong></p>
+                            <div class="class-list-container">
+                                <h5>Classes Taught to this Student:</h5>
+                                <div id="modalClassList_${pairKey}">
+                                    <!-- Class details for this specific student will be populated here -->
+                                </div>
+                            </div>
+                            <label for="hourlyRate_${pairKey}">Hourly Rate (₹) for this Student:</label>
+                            <input type="number" id="hourlyRate_${pairKey}"
+                                   placeholder="Enter hourly rate" min="0" step="0.01"
+                                   value="${(teacherTypes[teacherId] === 'International' ? 30 : 20).toFixed(2)}"
+                                   data-pair-key="${pairKey}"
+                                   oninput="updateModalStudentTotal('${pairKey}')">
+                            <p>Total Amount for this Student: <strong id="studentTotalAmount_${pairKey}">₹${((studentData.totalMinutesForStudent / 60) * (teacherTypes[teacherId] === 'International' ? 30 : 20)).toFixed(2)}</strong></p>
+                        `;
+                        modalContentArea.appendChild(studentSectionDiv);
+
+                        const studentClassListDiv = document.getElementById(`modalClassList_${pairKey}`);
+                        if (studentClassListDiv && studentData.classes.length > 0) {
+                            studentData.classes.forEach(cls => {
+                                const classDiv = document.createElement('div');
+                                classDiv.classList.add('class-entry');
                                 classDiv.innerHTML = `
                                     <strong>Date:</strong> ${cls.date}<br>
                                     <strong>Program:</strong> ${cls.program}<br>
@@ -886,14 +820,11 @@
                                     <strong>Duration:</strong> ${cls.duration} minutes
                                 `;
                                 studentClassListDiv.appendChild(classDiv);
-                            }
-                        });
-                        if (studentClassListDiv.children.length === 0) {
-                            studentClassListDiv.innerHTML = '<p>No class details available for this period.</p>';
+                            });
+                        } else if (studentClassListDiv) {
+                            studentClassListDiv.innerHTML = '<p>No class details available for this student for this period.</p>';
                         }
-                    } else if (studentClassListDiv) {
-                        studentClassListDiv.innerHTML = '<p>No class details available for this period.</p>';
-                    }
+                    });
                 }
 
                 // Initial calculation of teacher's grand total in the modal
@@ -906,42 +837,46 @@
             }
         }
 
-        // Function to update individual student total for regular teachers in modal dynamically
+        /**
+         * Updates the total amount for an individual student within a regular teacher's modal.
+         * This also triggers a recalculation of the teacher's overall grand total in the modal.
+         * @param {string} pairKey The combined teacherId_studentId key for the specific student.
+         */
         function updateModalStudentTotal(pairKey) {
             const hourlyRateInput = document.getElementById(`hourlyRate_${pairKey}`);
             const newHourlyRate = parseFloat(hourlyRateInput.value);
 
-            const teacherId = pairKey.split('_')[0];
-            const teacherData = teachersOverallAggregatedData[teacherId];
-            const totalHoursForTeacher = (teacherData.overallTotalMinutes / 60);
+            const [teacherId, studentId] = pairKey.split('_');
+            const studentData = teachersOverallAggregatedData[teacherId].students[studentId];
+            const totalHoursForStudent = (studentData.totalMinutesForStudent / 60);
 
-            if (!isNaN(newHourlyRate) && !isNaN(totalHoursForTeacher) && newHourlyRate >= 0) {
-                const calculatedTotal = (totalHoursForTeacher * newHourlyRate).toFixed(2);
+            if (!isNaN(newHourlyRate) && !isNaN(totalHoursForStudent) && newHourlyRate >= 0) {
+                const calculatedTotal = (totalHoursForStudent * newHourlyRate).toFixed(2);
                 document.getElementById(`studentTotalAmount_${pairKey}`).textContent = `₹${calculatedTotal}`;
             } else {
                 document.getElementById(`studentTotalAmount_${pairKey}`).textContent = `₹0.00`;
             }
 
-            // Recalculate teacher's grand total in the modal (for regular teachers, this is just their own total)
+            // Recalculate the teacher's grand total in the modal
             updateTeacherGrandTotalInModal(teacherId);
         }
 
-        // Function to update individual teacher's total within the MD/Principal sub-table
-        function updateModalSubTableTotal(otherPairKey) {
-            const hourlyRateInput = document.getElementById(`hourlyRate_${otherPairKey}`);
+        /**
+         * Updates individual teacher's total within the MD/Principal modal's sub-table.
+         * @param {string} otherTeacherId The ID of the teacher in the sub-table whose total needs to be updated.
+         */
+        function updateModalSubTableTotal(otherTeacherId) {
+            const hourlyRateInput = document.getElementById(`hourlyRate_${otherTeacherId}`);
             const newHourlyRate = parseFloat(hourlyRateInput.value);
 
-            const otherTeacherId = otherPairKey.split('_')[0];
-            const otherStudentId = otherPairKey.split('_')[1];
             const otherTeacherData = teachersOverallAggregatedData[otherTeacherId];
-            const otherStudentData = otherTeacherData.students[otherStudentId];
-            const otherTotalHours = (otherStudentData.totalMinutesForStudent / 60);
+            const otherTotalHours = (otherTeacherData.overallTotalMinutes / 60);
 
             if (!isNaN(newHourlyRate) && !isNaN(otherTotalHours) && newHourlyRate >= 0) {
                 const calculatedTotal = (otherTotalHours * newHourlyRate).toFixed(2);
-                document.getElementById(`subTableTotalAmount_${otherPairKey}`).textContent = `₹${calculatedTotal}`;
+                document.getElementById(`subTableTotalAmount_${otherTeacherId}`).textContent = `₹${calculatedTotal}`;
             } else {
-                document.getElementById(`subTableTotalAmount_${otherPairKey}`).textContent = `₹0.00`;
+                document.getElementById(`subTableTotalAmount_${otherTeacherId}`).textContent = `₹0.00`;
             }
 
             // Recalculate the MD/Principal's grand total based on all sub-table entries
@@ -950,7 +885,11 @@
         }
 
 
-        // Helper function to update the teacher's grand total in the modal
+        /**
+         * Helper function to update the teacher's grand total in the modal.
+         * This function is called after any rate input changes within the modal.
+         * @param {string} teacherId The ID of the teacher currently displayed in the modal.
+         */
         function updateTeacherGrandTotalInModal(teacherId) {
             let teacherGrandTotal = 0;
             const teacherType = teacherTypes[teacherId];
@@ -963,13 +902,12 @@
                     teacherGrandTotal += parseFloat(amountText) || 0;
                 });
             } else {
-                // For regular teachers, sum from their single student section
-                // Need to get the correct student ID for the regular teacher's single entry
-                const studentIdForRegularTeacher = Object.keys(teachersOverallAggregatedData[teacherId].students)[0];
-                const hourlyRateInput = document.getElementById(`hourlyRate_${teacherId}_${studentIdForRegularTeacher}`);
-                const hourlyRate = parseFloat(hourlyRateInput.value) || 0;
-                const totalHours = parseFloat(modalTeacherOverallHoursSpan.textContent) || 0;
-                teacherGrandTotal = totalHours * hourlyRate;
+                // For regular teachers, sum from each student's total amount in their section
+                const studentAmountSpans = modalContentArea.querySelectorAll('[id^="studentTotalAmount_"]');
+                studentAmountSpans.forEach(span => {
+                    const amountText = span.textContent.replace('₹', '');
+                    teacherGrandTotal += parseFloat(amountText) || 0;
+                });
             }
             modalTeacherGrandTotalSpan.textContent = `₹${teacherGrandTotal.toFixed(2)}`; // Use global variable
         }
@@ -1035,7 +973,7 @@
             const teacherGrandTotal = modalTeacherGrandTotalSpan.textContent; // Use global variable
 
             let emailContent = `Teacher Salary Details - ${teacherName} (ID: ${teacherId})\n`;
-            emailContent += `Overall Total Hours for Month (All Teachers): ${overallTeacherHoursDisplay}\n\n`;
+            emailContent += `Overall Total Hours for Teacher: ${overallTeacherHoursDisplay}\n\n`; // Changed label to reflect teacher's overall hours
 
             const isSpecialTeacher = (teacherId === 'AL1002' || teacherId === 'ALI001');
 
@@ -1046,16 +984,13 @@
                     const rows = otherTeachersTable.querySelectorAll('tbody tr');
                     rows.forEach(row => {
                         const cols = row.querySelectorAll('td');
-                        if (cols.length === 7) { // Ensure it's a data row
+                        if (cols.length === 5) { // Ensure it's a data row for the updated table structure
                             const otherTeacherName = cols[0].textContent;
                             const otherTeacherId = cols[1].textContent;
-                            const studentName = cols[2].textContent;
-                            const studentId = cols[3].textContent;
-                            const totalHours = cols[4].textContent;
-                            const hourlyRate = cols[5].querySelector('input').value;
-                            const totalAmount = cols[6].textContent;
+                            const totalHours = cols[2].textContent;
+                            const hourlyRate = cols[3].querySelector('input').value;
+                            const totalAmount = cols[4].textContent;
                             emailContent += `--- Teacher: ${otherTeacherName} (ID: ${otherTeacherId}) ---\n`;
-                            emailContent += `  Student: ${studentName} (ID: ${studentId})\n`;
                             emailContent += `  Total Hours: ${totalHours}\n`;
                             emailContent += `  Hourly Rate: ₹${hourlyRate}\n`;
                             emailContent += `  Total Amount: ${totalAmount}\n\n`;
@@ -1065,10 +1000,9 @@
                     });
                 }
             } else {
-                // Existing logic for regular teachers
-                // Ensure modalContentArea is not null before querying
+                // Logic for regular teachers: breakdown per student
                 if (modalContentArea) {
-                    const studentSections = modalContentArea.querySelectorAll('.student-salary-section'); // Use global variable
+                    const studentSections = modalContentArea.querySelectorAll('.student-salary-section');
 
                     studentSections.forEach(section => {
                         const studentName = section.querySelector('h4').textContent.split(': ')[1].split(' (ID:')[0];
@@ -1080,20 +1014,20 @@
                         const totalAmountForStudent = section.querySelector(`strong[id^="studentTotalAmount_"]`).textContent;
 
                         emailContent += `--- Student: ${studentName} (ID: ${studentId}) ---\n`;
-                        emailContent += `Total Hours: ${totalHoursForStudent}\n`;
-                        emailContent += `Hourly Rate: ₹${hourlyRate}\n`;
-                        emailContent += `Total Amount: ${totalAmountForStudent}\n`;
+                        emailContent += `  Total Hours for this Student: ${totalHoursForStudent}\n`;
+                        emailContent += `  Hourly Rate for this Student: ₹${hourlyRate}\n`;
+                        emailContent += `  Total Amount for this Student: ${totalAmountForStudent}\n`;
 
                         const classListDiv = section.querySelector('.class-list-container div');
                         const classEntries = classListDiv.querySelectorAll('.class-entry');
                         if (classEntries.length > 0) {
-                            emailContent += `Classes Taught:\n`;
+                            emailContent += `  Classes Taught to this Student:\n`;
                             classEntries.forEach(classEntry => {
                                 const lines = classEntry.innerHTML.split('<br>').map(line => line.replace(/<\/?strong>/g, '').trim());
-                                emailContent += `  - ${lines.join(', ')}\n`;
+                                emailContent += `    - ${lines.join(', ')}\n`;
                             });
                         } else {
-                            emailContent += `No class details available for this period.\n`;
+                            emailContent += `  No class details available for this student for this period.\n`;
                         }
                         emailContent += `\n`;
                     });
