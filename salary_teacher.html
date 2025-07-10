@@ -511,10 +511,11 @@
             let overallTotalHoursForAllTeachers = 0;
 
             filteredData.forEach(entry => {
-                const teacherId = entry['Staff ID'];
-                const teacherName = entry['Teacher Name'];
-                const studentId = entry['Student ID'];
-                const studentName = entry['Student Name'];
+                // Trim whitespace and carriage returns from IDs
+                const teacherId = (entry['Staff ID'] || '').trim();
+                const teacherName = (entry['Teacher Name'] || '').trim();
+                const studentId = (entry['Student ID'] || '').trim();
+                const studentName = (entry['Student Name'] || '').trim();
                 const classDurationMinutes = parseFloat(entry['Class Duration']) || 0;
                 const pairKey = `${teacherId}_${studentId}`;
 
@@ -673,11 +674,13 @@
                                oninput="updateModalStudentTotal('${pairKey}')">
                         <p>Total Amount for this Student: <strong id="studentTotalAmount_${pairKey}">₹${totalAmountForStudent.toFixed(2)}</strong></p>
                     `;
+                    
+                    // Append the student section to the modal content first
                     modalStudentSections.appendChild(studentSectionDiv);
 
-                    // Populate class list for this specific student
+                    // Now that the student section is in the DOM, get the class list div
                     const studentClassListDiv = document.getElementById(`modalClassList_${pairKey}`);
-                    if (studentData.classes && studentData.classes.length > 0) {
+                    if (studentClassListDiv && studentData.classes && studentData.classes.length > 0) {
                         studentData.classes.forEach(cls => {
                             const classDiv = document.createElement('div');
                             classDiv.classList.add('class-entry');
@@ -690,7 +693,7 @@
                             `;
                             studentClassListDiv.appendChild(classDiv);
                         });
-                    } else {
+                    } else if (studentClassListDiv) {
                         studentClassListDiv.innerHTML = '<p>No class details available for this period.</p>';
                     }
                 });
