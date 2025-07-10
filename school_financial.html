@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <!-- jsPDF and html2canvas CDNs for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -126,6 +130,23 @@
         }
         .modal-close-button:hover {
             color: #1f2937;
+        }
+        .download-button {
+            background-color: #10b981; /* Emerald green */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .download-button:hover {
+            background-color: #059669; /* Darker green */
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -251,6 +272,12 @@
             <div id="modalBody" class="text-gray-700">
                 <!-- Details will be loaded here -->
             </div>
+            <button id="downloadPdfButton" class="download-button hidden" onclick="downloadModalContentAsPdf()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Download as PDF
+            </button>
         </div>
     </div>
 
@@ -728,9 +755,11 @@
             const modal = document.getElementById('detailsModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
+            const downloadButton = document.getElementById('downloadPdfButton');
 
             modalTitle.textContent = title;
             modalBody.innerHTML = `<p>${message}</p>`;
+            downloadButton.classList.add('hidden'); // Hide download button for generic messages
             modal.classList.add('show');
         }
 
@@ -749,6 +778,7 @@
         function showTeacherDetailsModal(teacherId, month) {
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
+            const downloadButton = document.getElementById('downloadPdfButton');
             
             let filteredClasses = [];
             if (month === 'all') {
@@ -760,12 +790,14 @@
             if (filteredClasses.length === 0) {
                 modalTitle.textContent = `Classes Taught by ${teacherId}`;
                 modalBody.innerHTML = `<p>No detailed class data found for Teacher ID: ${teacherId} for ${month === 'all' ? 'all months' : month}.</p>`;
+                downloadButton.classList.add('hidden');
             } else {
                 const teacherName = filteredClasses[0].teacherName; // Get name from first entry
                 modalTitle.textContent = `Classes Taught by ${teacherId} (${teacherName})`;
 
                 let tableHtml = `
-                    <div class="overflow-x-auto">
+                    <div id="pdfContent" class="overflow-x-auto"> <!-- Added ID for PDF export -->
+                        <h4 class="text-lg font-semibold mb-2">Details for ${teacherId} (${teacherName}) - ${month === 'all' ? 'All Months' : month}</h4>
                         <table class="min-w-full bg-white rounded-lg shadow-md">
                             <thead>
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
@@ -806,6 +838,7 @@
                     </div>
                 `;
                 modalBody.innerHTML = tableHtml;
+                downloadButton.classList.remove('hidden'); // Show download button
             }
             document.getElementById('detailsModal').classList.add('show');
         }
@@ -818,6 +851,7 @@
         function showStudentDetailsModal(studentId, month) {
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
+            const downloadButton = document.getElementById('downloadPdfButton');
             
             let filteredClasses = [];
             if (month === 'all') {
@@ -829,12 +863,14 @@
             if (filteredClasses.length === 0) {
                 modalTitle.textContent = `Classes Attended by ${studentId}`;
                 modalBody.innerHTML = `<p>No detailed class data found for Student ID: ${studentId} for ${month === 'all' ? 'all months' : month}.</p>`;
+                downloadButton.classList.add('hidden');
             } else {
                 const studentName = filteredClasses[0].studentName; // Get name from first entry
                 modalTitle.textContent = `Classes Attended by ${studentId} (${studentName})`;
 
                 let tableHtml = `
-                    <div class="overflow-x-auto">
+                    <div id="pdfContent" class="overflow-x-auto"> <!-- Added ID for PDF export -->
+                        <h4 class="text-lg font-semibold mb-2">Details for ${studentId} (${studentName}) - ${month === 'all' ? 'All Months' : month}</h4>
                         <table class="min-w-full bg-white rounded-lg shadow-md">
                             <thead>
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
@@ -875,8 +911,65 @@
                     </div>
                 `;
                 modalBody.innerHTML = tableHtml;
+                downloadButton.classList.remove('hidden'); // Show download button
             }
             document.getElementById('detailsModal').classList.add('show');
+        }
+
+        /**
+         * Downloads the content of the modal body as a PDF.
+         */
+        async function downloadModalContentAsPdf() {
+            const element = document.getElementById('pdfContent'); // Element to convert to PDF
+            const modalTitleText = document.getElementById('modalTitle').textContent;
+            const filename = `${modalTitleText.replace(/[^a-zA-Z0-9]/g, '_')}_Details.pdf`;
+
+            // Temporarily remove overflow-x-auto to ensure full table width is captured
+            const originalOverflow = element.style.overflowX;
+            element.style.overflowX = 'visible';
+            element.style.width = 'fit-content'; // Ensure content is not truncated
+
+            try {
+                const canvas = await html2canvas(element, { 
+                    scale: 2, // Increase scale for better resolution
+                    logging: true, // Enable logging for debugging
+                    useCORS: true // Important for images, though not directly used here
+                });
+
+                // Revert styles after canvas creation
+                element.style.overflowX = originalOverflow;
+                element.style.width = '';
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' size
+
+                const imgWidth = 210; // A4 width in mm (210mm)
+                const pageHeight = 297; // A4 height in mm (297mm)
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save(filename);
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                showMessageBox("PDF Generation Error", "Failed to generate PDF. Please try again. Error: " + error.message);
+            } finally {
+                // Ensure styles are reverted even if an error occurs
+                element.style.overflowX = originalOverflow;
+                element.style.width = '';
+            }
         }
 
 
