@@ -188,7 +188,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             width: 80%;
-            max-width: 700px; /* Adjusted max-width for more content */
+            max-width: 900px; /* Adjusted max-width for more content in MD/Principal modal */
             position: relative;
             animation: fadeIn 0.3s ease-out;
             max-height: 80vh; /* Max height for scrollable content */
@@ -223,7 +223,7 @@
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .modal-content input[type="number"]:focus {
+        input[type="number"]:focus {
             border-color: #1a73e8;
             box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25);
             outline: none;
@@ -329,6 +329,57 @@
             color: #0056b3;
             text-align: right;
         }
+
+        /* Removed .teacher-separator styles */
+
+        /* New style for MD/Principal rows in the main table */
+        .special-teacher-row {
+            background-color: #e0f2f7; /* Light blue background */
+            font-weight: bold;
+            border-left: 5px solid #007bff; /* Blue left border */
+        }
+        .special-teacher-row:hover {
+            background-color: #cce9f0 !important; /* Darker blue on hover */
+        }
+
+        /* Styles for the new teacher list table in MD/Principal modal */
+        #otherTeachersSummaryTableContainer {
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden; /* For rounded corners */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        #otherTeachersSummaryTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        #otherTeachersSummaryTable th,
+        #otherTeachersSummaryTable td {
+            border: 1px solid #eee;
+            padding: 8px;
+            text-align: center;
+        }
+        #otherTeachersSummaryTable th {
+            background-color: #f5faff;
+            color: #333;
+            font-weight: 600;
+        }
+        #otherTeachersSummaryTable tbody tr:nth-child(even) {
+            background-color: #fafcff;
+        }
+        #otherTeachersSummaryTable tbody tr:hover {
+            background-color: #e6f7ff;
+        }
+        #otherTeachersSummaryTable input[type="number"] {
+            width: 80px; /* Smaller input for rate */
+            padding: 5px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -360,16 +411,16 @@
         <div class="modal-content" id="modalPrintArea">
             <span class="close-button" onclick="closeSalaryModal()">&times;</span>
             <h3>Salary Details for <span id="modalTeacherName"></span> (ID: <span id="modalTeacherId"></span>)</h3>
-            <p>Overall Total Hours for Teacher: <strong id="modalTeacherOverallHours"></strong></p>
+            <!-- This will display overall hours for MD/Principal, individual for others -->
+            <p id="modalOverallHoursLabel">Overall Total Hours for Teacher: <strong id="modalTeacherOverallHours"></strong></p>
 
-            <div id="modalStudentSections">
-                <!-- Individual student salary sections will be populated here -->
+            <div id="modalContentArea">
+                <!-- Content will be dynamically loaded here based on teacher type -->
             </div>
 
             <div class="total-summary">
                 Teacher's Grand Total Amount: <strong id="modalTeacherGrandTotal">₹0.00</strong>
             </div>
-            <!-- Removed "Save All Hourly Rates" button -->
             <button class="action-btn" onclick="copyModalContentToClipboard()">📋 Copy to Clipboard</button>
         </div>
     </div>
@@ -379,33 +430,31 @@
         // This URL should point to the Apps Script that fetches data from your combined Google Sheet.
         const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwdKvar_uKqoAg1wX60NTThwVHBul14wroJj0QqBQZ3WtQ5zx2hAWXe8hqXqifFI3diSA/exec';
 
-        // Sample Log Book Data (used if fetching fails or URL is not set)
-        const sampleLogBookData = [
-            { Date: '2025-06-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 60, 'What Taught Today': 'Equations', 'Student Engagement': 'High', 'Any Work': 'Homework 1', 'Anything you\'d like to share?': '' },
-            { Date: '2025-06-01', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Biology', 'Class In': '11:00 AM', 'Class Duration': 45, 'What Taught Today': 'Cells', 'Student Engagement': 'Medium', 'Any Work': '', 'Anything you\'d like to share?': '' },
-            { Date: '2025-06-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Geometry', 'Class In': '01:00 PM', 'Class Duration': 30, 'What Taught Today': 'Shapes', 'Student Engagement': 'High', 'Any Work': '', 'Anything you\'d like to share?': '' },
-            { Date: '2025-06-02', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Calculus', 'Class In': '09:00 AM', 'Class Duration': 90, 'What Taught Today': 'Derivatives', 'Student Engagement': 'High', 'Any Work': 'Quiz', 'Anything you\'d like to share?': '' },
-            { Date: '2025-06-02', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'World War II', 'Class In': '10:30 AM', 'Class Duration': 60, 'What Taught Today': 'Causes of WWII', 'Student Engagement': 'Medium', 'Any Work': 'Reading', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 120, 'What Taught Today': 'Advanced Equations', 'Student Engagement': 'High', 'Any Work': 'Project', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-01', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Chemistry', 'Class In': '11:00 AM', 'Class Duration': 60, 'What Taught Today': 'Periodic Table', 'Student Engagement': 'High', 'Any Work': 'Lab Report', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-02', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Geometry', 'Class In': '09:00 AM', 'Class Duration': 90, 'What Taught Today': 'Theorems', 'Student Engagement': 'Medium', 'Any Work': 'Practice Problems', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-03', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'Ancient Civilizations', 'Class In': '10:30 AM', 'Class Duration': 70, 'What Taught Today': 'Egypt', 'Student Engagement': 'High', 'Any Work': 'Research', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-03', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Calculus', 'Class In': '01:00 PM', 'Class Duration': 40, 'What Taught Today': 'Integrals', 'Student Engagement': 'Low', 'Any Work': '', 'Anything you\'d like to share?': 'Student seemed distracted today.' },
-            { Date: '2025-07-04', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Physics', 'Class In': '11:00 AM', 'Class Duration': 80, 'What Taught Today': 'Motion', 'Student Engagement': 'High', 'Any Work': 'Problem Set', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-05', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'Modern History', 'Class In': '10:30 AM', 'Class Duration': 50, 'What Taught Today': 'Cold War', 'Student Engagement': 'Medium', 'Any Work': 'Essay Outline', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-10', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 60, 'What Taught Today': 'Review', 'Student Engagement': 'High', 'Any Work': 'Test Prep', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-15', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Biology', 'Class In': '11:00 AM', 'Class Duration': 90, 'What Taught Today': 'Ecosystems', 'Student Engagement': 'High', 'Any Work': 'Field Trip Prep', 'Anything you\'d like to share?': '' },
-            { Date: '2025-07-20', 'Teacher Name': 'Charlie Brown', 'Staff ID': 'T003', 'Program': 'History', 'Class Room Name': 'Room 103', 'Student Name': 'Mike Johnson', 'Student ID': 'S003', 'Subject': 'Civics', 'Class In': '10:30 AM', 'Class Duration': 100, 'What Taught Today': 'Government Structures', 'Student Engagement': 'High', 'Any Work': 'Debate Prep', 'Anything you\'d like to share?': '' },
-        ];
+        // Define teacher types for rate calculation and special handling (ensure MD/Principal are defined globally)
+        const teacherTypes = {
+            'T001': 'Local',
+            'T002': 'International',
+            'T003': 'Local',
+            'AL1002': 'MD', // New type for MD
+            'ALI001': 'Principal' // UPDATED ID for Principal
+        };
 
-        // This Map used to store salary per hour for each teacher-student pair.
-        // As per the latest request, hourly rates are NOT saved persistently.
-        // This map is now effectively removed.
-        // const teacherStudentHourlyRates = new Map(); 
-        // No initialization needed as rates are not saved.
+        // Removed sampleLogBookData as per user request. All data will now come from Google Sheet API.
+        // const sampleLogBookData = [...];
 
         let currentTeachersSalaryData = []; // This will hold the processed data for the current month, flattened for table rendering
         let teachersOverallAggregatedData = {}; // Stores aggregated data per teacher for modal details
+        let overallTotalHoursForAllTeachers = 0; // Global variable for overall total hours
+
+        // Global variables for modal elements, initialized on DOMContentLoaded
+        let modalOverallHoursLabel;
+        let modalTeacherOverallHoursSpan;
+        let modalTeacherNameSpan;
+        let modalTeacherIdSpan;
+        let modalContentArea;
+        let modalTeacherGrandTotalSpan;
+        let salaryEntryModalElement; // Reference to the modal itself
+
 
         // Function to navigate to dashboard (placeholder)
         function goToDashboard() {
@@ -483,16 +532,27 @@
                 fetchedData = await res.json();
             } catch (error) {
                 console.error('Error fetching data from Google Sheet API:', error);
-                // Fallback to sample data if fetching fails
-                fetchedData = sampleLogBookData;
-                showAlert('Failed to load data from Google Sheet. Using sample data.', 'error');
+                showAlert('Failed to load data from Google Sheet. Please ensure the Google Sheet URL is correct and accessible.', 'error');
             } finally {
                 loadingIndicator.style.display = 'none'; // Hide loading indicator
             }
 
+            // Define MD and Principal data to ensure they are always present
+            const mdPrincipalData = [
+                { Date: `${year}-${monthIndex.toString().padStart(2, '0')}-01`, 'Teacher Name': 'ABHINAV AK', 'Staff ID': 'AL1002', 'Program': 'Management', 'Class Room Name': 'Office', 'Student Name': 'N/A', 'Student ID': 'N/A', 'Subject': 'Admin', 'Class In': '09:00 AM', 'Class Duration': 0, 'What Taught Today': '', 'Student Engagement': '', 'Any Work': '', 'Anything you\'d like to share?': '' },
+                { Date: `${year}-${monthIndex.toString().padStart(2, '0')}-01`, 'Teacher Name': 'AFLAH ZAMAN K.', 'Staff ID': 'ALI001', 'Program': 'Management', 'Class Room Name': 'Office', 'Student Name': 'N/A', 'Student ID': 'N/A', 'Subject': 'Admin', 'Class In': '09:00 AM', 'Class Duration': 0, 'What Taught Today': '', 'Student Engagement': '', 'Any Work': '', 'Anything you\'d like to share?': '' },
+            ];
+
+            // Combine only MD/Principal data with fetched data.
+            // Filter fetchedData to avoid duplicates if Staff ID exists in mdPrincipalData.
+            const combinedData = [
+                ...mdPrincipalData, // Ensure MD and Principal are always at the top
+                ...fetchedData.filter(f => !mdPrincipalData.some(md => md['Staff ID'] === f['Staff ID']))
+            ];
+
             // Filter data for the selected month and year
-            const filteredData = fetchedData.filter(row => {
-                if (typeof row.Date !== 'string' || !row.Date || !row['Staff ID'] || !row['Class Duration'] || !row['Student ID']) {
+            const filteredData = combinedData.filter(row => {
+                if (typeof row.Date !== 'string' || !row.Date || !row['Staff ID'] || row['Class Duration'] === undefined || row['Student ID'] === undefined) {
                     return false; // Skip invalid entries
                 }
                 const d = new Date(row.Date + 'T00:00:00Z'); // Use 'Z' for UTC to avoid timezone issues
@@ -506,65 +566,105 @@
             });
 
             // Aggregate total hours and class details per teacher-student pair
-            // Also aggregate overall hours per teacher
             teachersOverallAggregatedData = {}; // Reset for current month
-            let overallTotalHoursForAllTeachers = 0;
 
             filteredData.forEach(entry => {
-                // Trim whitespace and carriage returns from IDs
                 const teacherId = (entry['Staff ID'] || '').trim();
-                const teacherName = (entry['Teacher Name'] || '').trim();
+                const teacherName = (entry['Teacher Name'] || '').trim(); // Trim teacher name
                 const studentId = (entry['Student ID'] || '').trim();
-                const studentName = (entry['Student Name'] || '').trim();
-                const classDurationMinutes = parseFloat(entry['Class Duration']) || 0;
-                const pairKey = `${teacherId}_${studentId}`;
+                const studentName = (entry['Student Name'] || '').trim(); // Trim student name
+                let classDurationMinutes = parseFloat(entry['Class Duration']) || 0;
+                const program = (entry['Program'] || '').trim();
 
-                // Aggregate for overall teacher data (for modal)
+                // Special handling for ABHINAV AK (AL1002): exclude 'International School' hours
+                if (teacherId === 'AL1002' && program === 'International School') {
+                    classDurationMinutes = 0; // Exclude these hours from calculation
+                }
+                // For Principal (ALI001), all hours are included, no exclusion based on program.
+
                 if (!teachersOverallAggregatedData[teacherId]) {
                     teachersOverallAggregatedData[teacherId] = {
                         teacherName: teacherName,
+                        teacherType: teacherTypes[teacherId] || 'Unknown',
                         overallTotalMinutes: 0,
-                        students: {} // Nested for student-specific data
+                        students: {}
                     };
                 }
                 teachersOverallAggregatedData[teacherId].overallTotalMinutes += classDurationMinutes;
 
-                // Aggregate for teacher-student pair data (for main table and modal student sections)
-                if (!teachersOverallAggregatedData[teacherId].students[studentId]) {
-                    teachersOverallAggregatedData[teacherId].students[studentId] = {
-                        studentName: studentName,
+                // For regular teachers, aggregate by student. For MD/Principal, aggregate all their hours under 'OVERALL'.
+                const effectiveStudentId = (teacherId === 'AL1002' || teacherId === 'ALI001') ? 'OVERALL' : studentId;
+                const effectiveStudentName = (teacherId === 'AL1002' || teacherId === 'ALI001') ? 'N/A' : studentName; // Student name is N/A for MD/Principal in main table
+
+                if (!teachersOverallAggregatedData[teacherId].students[effectiveStudentId]) {
+                    teachersOverallAggregatedData[teacherId].students[effectiveStudentId] = {
+                        studentName: effectiveStudentName,
                         totalMinutesForStudent: 0,
                         classes: []
                     };
                 }
-                teachersOverallAggregatedData[teacherId].students[studentId].totalMinutesForStudent += classDurationMinutes;
-                teachersOverallAggregatedData[teacherId].students[studentId].classes.push({
+                teachersOverallAggregatedData[teacherId].students[effectiveStudentId].totalMinutesForStudent += classDurationMinutes;
+                teachersOverallAggregatedData[teacherId].students[effectiveStudentId].classes.push({
                     date: entry.Date,
                     program: entry.Program,
                     classroom: entry['Class Room Name'],
                     subject: entry.Subject,
-                    duration: classDurationMinutes
+                    duration: parseFloat(entry['Class Duration']) || 0
                 });
+            });
+
+            // Calculate overallTotalHoursForAllTeachers (sum of all *actual* teaching hours, excluding MD/Principal's own recorded hours if they are just placeholders)
+            overallTotalHoursForAllTeachers = 0;
+            Object.keys(teachersOverallAggregatedData).forEach(teacherId => {
+                // Only sum up hours from teachers who are NOT MD or Principal, as their entries in the main table will show the grand total.
+                // The MD and Principal's own recorded hours are still used for their *individual* modal calculation if needed,
+                // but they don't contribute to this specific 'overallTotalHoursForAllTeachers' sum to avoid confusion.
+                if (teacherId !== 'AL1002' && teacherId !== 'ALI001') {
+                    const teacherData = teachersOverallAggregatedData[teacherId];
+                    Object.values(teacherData.students).forEach(studentData => {
+                        overallTotalHoursForAllTeachers += (studentData.totalMinutesForStudent / 60);
+                    });
+                }
             });
 
             // Prepare data for the main salary sheet table (flattened with rowspan flags)
             currentTeachersSalaryData = [];
-            Object.keys(teachersOverallAggregatedData).sort((a, b) => 
-                teachersOverallAggregatedData[a].teacherName.localeCompare(teachersOverallAggregatedData[b].teacherName)
-            ).forEach(teacherId => {
+            
+            // Custom sorting order: AL1002, ALI001, then others alphabetically
+            const sortedTeacherIds = Object.keys(teachersOverallAggregatedData).sort((a, b) => {
+                if (a === 'AL1002') return -1;
+                if (b === 'AL1002') return 1;
+                if (a === 'ALI001') return -1;
+                if (b === 'ALI001') return 1;
+                return teachersOverallAggregatedData[a].teacherName.localeCompare(teachersOverallAggregatedData[b].teacherName);
+            });
+
+            sortedTeacherIds.forEach(teacherId => {
                 const teacherData = teachersOverallAggregatedData[teacherId];
-                const studentKeys = Object.keys(teacherData.students).sort((a, b) => 
-                    teacherData.students[a].studentName.localeCompare(teacherData.students[b].studentName)
-                );
+                let studentKeys = Object.keys(teacherData.students);
+
+                // For AL1002 and ALI001, we only want one row representing the overall hours
+                if (teacherId === 'AL1002' || teacherId === 'ALI001') {
+                    studentKeys = ['OVERALL'];
+                } else {
+                    studentKeys.sort((a, b) =>
+                        teacherData.students[a].studentName.localeCompare(teacherData.students[b].studentName)
+                    );
+                }
+
                 const rowspanCount = studentKeys.length;
 
                 studentKeys.forEach((studentId, index) => {
                     const studentData = teacherData.students[studentId];
                     const pairKey = `${teacherId}_${studentId}`;
-                    const totalHoursForStudent = (studentData.totalMinutesForStudent / 60);
-                    // Hourly rate and total salary are not needed for main table display
-                    // const hourlyRate = teacherStudentHourlyRates.has(pairKey) ? teacherStudentHourlyRates.get(pairKey) : 0;
-                    // const totalSalary = (totalHoursForStudent * hourlyRate);
+                    let totalHoursForDisplay;
+
+                    // Special logic for MD and Principal: display overall total hours of ALL teachers
+                    if (teacherId === 'AL1002' || teacherId === 'ALI001') {
+                         totalHoursForDisplay = overallTotalHoursForAllTeachers;
+                    } else {
+                        totalHoursForDisplay = (studentData.totalMinutesForStudent / 60);
+                    }
 
                     currentTeachersSalaryData.push({
                         pairKey: pairKey,
@@ -572,14 +672,11 @@
                         teacherName: teacherData.teacherName,
                         studentId: studentId,
                         studentName: studentData.studentName,
-                        totalHours: totalHoursForStudent, // Total hours for this specific student
-                        // hourlyRate: hourlyRate, // Not needed for main table
-                        // totalSalary: totalSalary, // Not needed for main table
+                        totalHours: totalHoursForDisplay, // Use the adjusted total for display
                         classes: studentData.classes,
                         isFirstStudentForTeacher: (index === 0), // Flag for rowspan
                         rowspanCount: rowspanCount // How many rows this teacher's name/ID spans
                     });
-                    overallTotalHoursForAllTeachers += totalHoursForStudent; // Sum up for grand total
                 });
             });
 
@@ -601,18 +698,40 @@
             if (currentTeachersSalaryData.length === 0) {
                 tableHTML += `<tr><td colspan="5">No salary data found for ${selectedMonthName} ${year}.</td></tr>`;
             } else {
+                let currentTeacherId = null;
                 currentTeachersSalaryData.forEach(entry => {
+                    // Removed the teacher-separator row generation logic
+                    // if (currentTeacherId !== null && entry.teacherId !== currentTeacherId && entry.isFirstStudentForTeacher) {
+                    //     tableHTML += `<tr class="teacher-separator"><td colspan="5">&nbsp;</td></tr>`;
+                    // }
+                    currentTeacherId = entry.teacherId;
+
+                    // Add special class for MD and Principal rows
+                    const rowClass = (entry.teacherId === 'AL1002' || entry.teacherId === 'ALI001') ? 'special-teacher-row' : '';
+
+                    // Removed inline onclick. Event listener will be attached via JS.
                     tableHTML += `
-                        <tr data-teacher-id="${entry.teacherId}" onclick="openSalaryEntryModal('${entry.teacherId}')" style="cursor: pointer;">
+                        <tr data-teacher-id="${entry.teacherId}" class="${rowClass}" style="cursor: pointer;">
                     `;
                     // Apply rowspan for teacher name and ID
                     if (entry.isFirstStudentForTeacher) {
                         tableHTML += `<td rowspan="${entry.rowspanCount}">${entry.teacherName}</td>`;
                         tableHTML += `<td rowspan="${entry.rowspanCount}">${entry.teacherId}</td>`;
                     }
-                    tableHTML += `
+
+                    // Special handling for ABHINAV AK (AL1002) and Principal (ALI001): blank student name and ID
+                    if (entry.teacherId === 'AL1002' || entry.teacherId === 'ALI001') {
+                        tableHTML += `
+                            <td></td>
+                            <td></td>
+                        `;
+                    } else {
+                        tableHTML += `
                             <td>${entry.studentName}</td>
                             <td>${entry.studentId}</td>
+                        `;
+                    }
+                    tableHTML += `
                             <td>${entry.totalHours.toFixed(2)}</td>
                         </tr>
                     `;
@@ -634,136 +753,239 @@
         function openSalaryEntryModal(teacherId) {
             const teacherData = teachersOverallAggregatedData[teacherId];
 
+            // Defensive check: Ensure all necessary modal elements are initialized
+            if (!modalTeacherNameSpan || !modalTeacherIdSpan || !modalOverallHoursLabel || !modalTeacherOverallHoursSpan || !modalContentArea || !modalTeacherGrandTotalSpan || !salaryEntryModalElement) {
+                console.error("Error: One or more modal elements are null. Cannot open modal. This indicates a DOM loading issue.");
+                showAlert("An internal error occurred. Please try reloading the page.", 'error');
+                return; // Exit the function if elements are not ready
+            }
+
             if (teacherData) {
-                document.getElementById('modalTeacherName').textContent = teacherData.teacherName;
-                document.getElementById('modalTeacherId').textContent = teacherId;
-                document.getElementById('modalTeacherOverallHours').textContent = (teacherData.overallTotalMinutes / 60).toFixed(2);
+                modalTeacherNameSpan.textContent = teacherData.teacherName;
+                modalTeacherIdSpan.textContent = teacherId;
 
-                const modalStudentSections = document.getElementById('modalStudentSections');
-                modalStudentSections.innerHTML = ''; // Clear previous content
+                // Clear previous content
+                modalContentArea.innerHTML = '';
 
-                // Sort students by name for consistent display in modal
-                const sortedStudentIds = Object.keys(teacherData.students).sort((a, b) =>
-                    teacherData.students[a].studentName.localeCompare(teacherData.students[b].studentName)
-                );
+                if (teacherId === 'AL1002' || teacherId === 'ALI001') {
+                    // For MD and Principal: show overall total hours for all teachers
+                    modalOverallHoursLabel.textContent = `Overall Total Hours for Month (All Teachers): `;
+                    modalTeacherOverallHoursSpan.textContent = overallTotalHoursForAllTeachers.toFixed(2);
 
-                sortedStudentIds.forEach(studentId => {
-                    const studentData = teacherData.students[studentId];
-                    const pairKey = `${teacherId}_${studentId}`;
-                    const totalHoursForStudent = (studentData.totalMinutesForStudent / 60);
-                    // Hourly rate is not persistently saved, so default to 0 for manual entry
-                    const currentHourlyRate = 0; 
-                    const totalAmountForStudent = (totalHoursForStudent * currentHourlyRate);
+                    // Create the table for other teachers
+                    let otherTeachersTableHTML = `
+                        <div id="otherTeachersSummaryTableContainer">
+                            <h4>Detailed Breakdown of Other Teachers:</h4>
+                            <table id="otherTeachersSummaryTable">
+                                <thead>
+                                    <tr>
+                                        <th>Teacher Name</th>
+                                        <th>Teacher ID</th>
+                                        <th>Student Name</th>
+                                        <th>Student ID</th>
+                                        <th>Total Hours</th>
+                                        <th>Hourly Rate (₹)</th>
+                                        <th>Total Amount (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    // Filter and sort other teachers (excluding MD and Principal)
+                    const otherTeacherIds = Object.keys(teachersOverallAggregatedData).filter(id => id !== 'AL1002' && id !== 'ALI001').sort((a, b) =>
+                        teachersOverallAggregatedData[a].teacherName.localeCompare(teachersOverallAggregatedData[b].teacherName)
+                    );
+
+                    if (otherTeacherIds.length === 0) {
+                        otherTeachersTableHTML += `<tr><td colspan="7">No other teacher data available for this month.</td></tr>`;
+                    } else {
+                        otherTeacherIds.forEach(otherTeacherId => {
+                            const otherTeacherData = teachersOverallAggregatedData[otherTeacherId];
+                            const otherStudentKeys = Object.keys(otherTeacherData.students).sort((a, b) =>
+                                otherTeacherData.students[a].studentName.localeCompare(otherTeacherData.students[b].studentName)
+                            );
+                            const otherRowspanCount = otherStudentKeys.length;
+
+                            otherStudentKeys.forEach((otherStudentId, index) => {
+                                const otherStudentData = otherTeacherData.students[otherStudentId];
+                                const otherPairKey = `${otherTeacherId}_${otherStudentId}`;
+                                const otherTotalHours = (otherStudentData.totalMinutesForStudent / 60);
+                                const defaultHourlyRate = (otherTeacherId === 'T002') ? 30 : 20; // T002 is International, others default to 20
+                                const initialAmount = (otherTotalHours * defaultHourlyRate);
+
+                                otherTeachersTableHTML += `
+                                    <tr>
+                                `;
+                                if (index === 0) { // Apply rowspan for teacher name and ID
+                                    otherTeachersTableHTML += `<td rowspan="${otherRowspanCount}">${otherTeacherData.teacherName}</td>`;
+                                    otherTeachersTableHTML += `<td rowspan="${otherRowspanCount}">${otherTeacherId}</td>`;
+                                }
+                                otherTeachersTableHTML += `
+                                        <td>${otherStudentData.studentName}</td>
+                                        <td>${otherStudentId}</td>
+                                        <td>${otherTotalHours.toFixed(2)}</td>
+                                        <td>
+                                            <input type="number" id="hourlyRate_${otherPairKey}"
+                                                   value="${defaultHourlyRate.toFixed(2)}"
+                                                   min="0" step="0.01"
+                                                   data-pair-key="${otherPairKey}"
+                                                   oninput="updateModalSubTableTotal('${otherPairKey}')">
+                                        </td>
+                                        <td><span id="subTableTotalAmount_${otherPairKey}">₹${initialAmount.toFixed(2)}</span></td>
+                                    </tr>
+                                `;
+                            });
+                        });
+                    }
+
+                    otherTeachersTableHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    modalContentArea.innerHTML = otherTeachersTableHTML;
+
+                } else {
+                    // For regular teachers: show their individual overall hours and class list
+                    modalOverallHoursLabel.textContent = `Overall Total Hours for Teacher: `;
+                    modalTeacherOverallHoursSpan.textContent = (teacherData.overallTotalMinutes / 60).toFixed(2);
 
                     const studentSectionDiv = document.createElement('div');
                     studentSectionDiv.classList.add('student-salary-section');
                     studentSectionDiv.innerHTML = `
-                        <h4>Student: ${studentData.studentName} (ID: ${studentId})</h4>
-                        <p>Total Hours for this Student: <strong>${totalHoursForStudent.toFixed(2)}</strong></p>
+                        <h4>${`Student: ${Object.keys(teacherData.students)[0] === 'OVERALL' ? 'Overall Hours' : teacherData.students[Object.keys(teacherData.students)[0]].studentName} (ID: ${Object.keys(teacherData.students)[0] === 'OVERALL' ? 'N/A' : Object.keys(teacherData.students)[0]})`}</h4>
+                        <p>Total Hours for this Teacher: <strong>${(teacherData.overallTotalMinutes / 60).toFixed(2)}</strong></p>
                         <div class="class-list-container">
                             <h5>Classes Taught:</h5>
-                            <div id="modalClassList_${pairKey}">
+                            <div id="modalClassList_${teacherId}_${Object.keys(teacherData.students)[0]}">
                                 <!-- Class details will be populated here -->
                             </div>
                         </div>
-                        <label for="hourlyRate_${pairKey}">Hourly Rate (₹):</label>
-                        <input type="number" id="hourlyRate_${pairKey}" 
-                               placeholder="Enter hourly rate" min="0" step="0.01" 
-                               value="${currentHourlyRate.toFixed(2)}" 
-                               data-pair-key="${pairKey}" 
-                               oninput="updateModalStudentTotal('${pairKey}')">
-                        <p>Total Amount for this Student: <strong id="studentTotalAmount_${pairKey}">₹${totalAmountForStudent.toFixed(2)}</strong></p>
+                        <label for="hourlyRate_${teacherId}_${Object.keys(teacherData.students)[0]}">Hourly Rate (₹):</label>
+                        <input type="number" id="hourlyRate_${teacherId}_${Object.keys(teacherData.students)[0]}"
+                               placeholder="Enter hourly rate" min="0" step="0.01"
+                               value="${(teacherTypes[teacherId] === 'International' ? 30 : 20).toFixed(2)}"
+                               data-pair-key="${teacherId}_${Object.keys(teacherData.students)[0]}"
+                               oninput="updateModalStudentTotal('${teacherId}_${Object.keys(teacherData.students)[0]}')">
+                        <p>Total Amount for this Teacher: <strong id="studentTotalAmount_${teacherId}_${Object.keys(teacherData.students)[0]}">₹${((teacherData.overallTotalMinutes / 60) * (teacherTypes[teacherId] === 'International' ? 30 : 20)).toFixed(2)}</strong></p>
                     `;
-                    
-                    // Append the student section to the modal content first
-                    modalStudentSections.appendChild(studentSectionDiv);
+                    modalContentArea.appendChild(studentSectionDiv);
 
-                    // Now that the student section is in the DOM, get the class list div
-                    const studentClassListDiv = document.getElementById(`modalClassList_${pairKey}`);
-                    if (studentClassListDiv && studentData.classes && studentData.classes.length > 0) {
-                        studentData.classes.forEach(cls => {
+                    const studentClassListDiv = document.getElementById(`modalClassList_${teacherId}_${Object.keys(teacherData.students)[0]}`);
+                    if (studentClassListDiv && teacherData.students[Object.keys(teacherData.students)[0]] && teacherData.students[Object.keys(teacherData.students)[0]].classes.length > 0) {
+                        teacherData.students[Object.keys(teacherData.students)[0]].classes.forEach(cls => {
                             const classDiv = document.createElement('div');
                             classDiv.classList.add('class-entry');
-                            classDiv.innerHTML = `
-                                <strong>Date:</strong> ${cls.date}<br>
-                                <strong>Program:</strong> ${cls.program}<br>
-                                <strong>Classroom:</strong> ${cls.classroom}<br>
-                                <strong>Subject:</strong> ${cls.subject}<br>
-                                <strong>Duration:</strong> ${cls.duration} minutes
-                            `;
-                            studentClassListDiv.appendChild(classDiv);
+                            // Only show class if its duration was not excluded for AL1002 (though this branch is for non-MD/Principal)
+                            if (!(teacherId === 'AL1002' && cls.program === 'International School')) {
+                                classDiv.innerHTML = `
+                                    <strong>Date:</strong> ${cls.date}<br>
+                                    <strong>Program:</strong> ${cls.program}<br>
+                                    <strong>Classroom:</strong> ${cls.classroom}<br>
+                                    <strong>Subject:</strong> ${cls.subject}<br>
+                                    <strong>Duration:</strong> ${cls.duration} minutes
+                                `;
+                                studentClassListDiv.appendChild(classDiv);
+                            }
                         });
+                        if (studentClassListDiv.children.length === 0) {
+                            studentClassListDiv.innerHTML = '<p>No class details available for this period.</p>';
+                        }
                     } else if (studentClassListDiv) {
                         studentClassListDiv.innerHTML = '<p>No class details available for this period.</p>';
                     }
-                });
+                }
 
-                // Initial calculation of teacher's grand total
+                // Initial calculation of teacher's grand total in the modal
                 updateTeacherGrandTotalInModal(teacherId);
 
-                document.getElementById('salaryEntryModal').style.display = 'flex'; // Use flex to center
+                salaryEntryModalElement.style.display = 'flex'; // Use flex to center
 
             } else {
                 showAlert("Error: Teacher data not found.", 'error');
             }
         }
 
-        // Function to update individual student total and overall teacher total in modal dynamically
+        // Function to update individual student total for regular teachers in modal dynamically
         function updateModalStudentTotal(pairKey) {
             const hourlyRateInput = document.getElementById(`hourlyRate_${pairKey}`);
             const newHourlyRate = parseFloat(hourlyRateInput.value);
 
-            // Find the corresponding entry in currentTeachersSalaryData to get totalHours for this student
-            const entry = currentTeachersSalaryData.find(e => e.pairKey === pairKey);
-            const totalHoursForStudent = entry ? entry.totalHours : 0;
+            const teacherId = pairKey.split('_')[0];
+            const teacherData = teachersOverallAggregatedData[teacherId];
+            const totalHoursForTeacher = (teacherData.overallTotalMinutes / 60);
 
-            if (!isNaN(newHourlyRate) && !isNaN(totalHoursForStudent) && newHourlyRate >= 0) {
-                const calculatedTotal = (totalHoursForStudent * newHourlyRate).toFixed(2);
+            if (!isNaN(newHourlyRate) && !isNaN(totalHoursForTeacher) && newHourlyRate >= 0) {
+                const calculatedTotal = (totalHoursForTeacher * newHourlyRate).toFixed(2);
                 document.getElementById(`studentTotalAmount_${pairKey}`).textContent = `₹${calculatedTotal}`;
             } else {
                 document.getElementById(`studentTotalAmount_${pairKey}`).textContent = `₹0.00`;
             }
 
-            // Recalculate teacher's grand total in the modal
-            const teacherId = pairKey.split('_')[0];
+            // Recalculate teacher's grand total in the modal (for regular teachers, this is just their own total)
             updateTeacherGrandTotalInModal(teacherId);
         }
+
+        // Function to update individual teacher's total within the MD/Principal sub-table
+        function updateModalSubTableTotal(otherPairKey) {
+            const hourlyRateInput = document.getElementById(`hourlyRate_${otherPairKey}`);
+            const newHourlyRate = parseFloat(hourlyRateInput.value);
+
+            const otherTeacherId = otherPairKey.split('_')[0];
+            const otherStudentId = otherPairKey.split('_')[1];
+            const otherTeacherData = teachersOverallAggregatedData[otherTeacherId];
+            const otherStudentData = otherTeacherData.students[otherStudentId];
+            const otherTotalHours = (otherStudentData.totalMinutesForStudent / 60);
+
+            if (!isNaN(newHourlyRate) && !isNaN(otherTotalHours) && newHourlyRate >= 0) {
+                const calculatedTotal = (otherTotalHours * newHourlyRate).toFixed(2);
+                document.getElementById(`subTableTotalAmount_${otherPairKey}`).textContent = `₹${calculatedTotal}`;
+            } else {
+                document.getElementById(`subTableTotalAmount_${otherPairKey}`).textContent = `₹0.00`;
+            }
+
+            // Recalculate the MD/Principal's grand total based on all sub-table entries
+            const currentModalTeacherId = modalTeacherIdSpan.textContent; // Use global variable
+            updateTeacherGrandTotalInModal(currentModalTeacherId);
+        }
+
 
         // Helper function to update the teacher's grand total in the modal
         function updateTeacherGrandTotalInModal(teacherId) {
             let teacherGrandTotal = 0;
-            const teacherData = teachersOverallAggregatedData[teacherId];
-            if (teacherData) {
-                Object.keys(teacherData.students).forEach(studentId => {
-                    const studentPairKey = `${teacherId}_${studentId}`;
-                    const inputElement = document.getElementById(`hourlyRate_${studentPairKey}`);
-                    let studentHourlyRate = parseFloat(inputElement ? inputElement.value : 0);
-                    if (isNaN(studentHourlyRate) || studentHourlyRate < 0) studentHourlyRate = 0;
+            const teacherType = teacherTypes[teacherId];
 
-                    const studentEntry = currentTeachersSalaryData.find(e => e.pairKey === studentPairKey);
-                    const studentHours = studentEntry ? studentEntry.totalHours : 0;
-                    teacherGrandTotal += (studentHours * studentHourlyRate);
+            if (teacherType === 'MD' || teacherType === 'Principal') {
+                // For MD/Principal, sum totals from the dynamically generated sub-table
+                const subTableAmounts = document.querySelectorAll('#otherTeachersSummaryTable [id^="subTableTotalAmount_"]');
+                subTableAmounts.forEach(span => {
+                    const amountText = span.textContent.replace('₹', '');
+                    teacherGrandTotal += parseFloat(amountText) || 0;
                 });
+            } else {
+                // For regular teachers, sum from their single student section
+                // Need to get the correct student ID for the regular teacher's single entry
+                const studentIdForRegularTeacher = Object.keys(teachersOverallAggregatedData[teacherId].students)[0];
+                const hourlyRateInput = document.getElementById(`hourlyRate_${teacherId}_${studentIdForRegularTeacher}`);
+                const hourlyRate = parseFloat(hourlyRateInput.value) || 0;
+                const totalHours = parseFloat(modalTeacherOverallHoursSpan.textContent) || 0;
+                teacherGrandTotal = totalHours * hourlyRate;
             }
-            document.getElementById('modalTeacherGrandTotal').textContent = `₹${teacherGrandTotal.toFixed(2)}`;
+            modalTeacherGrandTotalSpan.textContent = `₹${teacherGrandTotal.toFixed(2)}`; // Use global variable
         }
-
-        // Removed saveAllStudentSalaries function as per request
-        /*
-        function saveAllStudentSalaries() {
-            // ... (previous implementation)
-        }
-        */
 
         // Function to close the salary entry modal
         function closeSalaryModal() {
-            document.getElementById('salaryEntryModal').style.display = 'none';
+            if (salaryEntryModalElement) {
+                salaryEntryModalElement.style.display = 'none';
+            }
             // Remove all oninput listeners from dynamically created inputs
-            const modalStudentSections = document.getElementById('modalStudentSections');
-            const hourlyRateInputs = modalStudentSections.querySelectorAll('input[type="number"]');
-            hourlyRateInputs.forEach(input => {
-                input.oninput = null;
-            });
+            if (modalContentArea) {
+                const hourlyRateInputs = modalContentArea.querySelectorAll('input[type="number"]'); // Use global variable
+                hourlyRateInputs.forEach(input => {
+                    input.oninput = null;
+                });
+            }
         }
 
         // Function to download the main sheet as PDF
@@ -800,43 +1022,83 @@
 
         // Function to copy the modal content to clipboard in email format
         function copyModalContentToClipboard() {
-            const teacherName = document.getElementById('modalTeacherName').textContent;
-            const teacherId = document.getElementById('modalTeacherId').textContent;
-            const overallTeacherHours = document.getElementById('modalTeacherOverallHours').textContent;
-            const teacherGrandTotal = document.getElementById('modalTeacherGrandTotal').textContent;
+            // Ensure elements are not null before using them
+            if (!modalTeacherNameSpan || !modalTeacherIdSpan || !modalOverallHoursLabel || !modalTeacherOverallHoursSpan || !modalTeacherGrandTotalSpan) {
+                console.error("Error: One or more modal elements are null. Cannot copy content.");
+                showAlert("An internal error occurred. Cannot copy content.", 'error');
+                return;
+            }
+
+            const teacherName = modalTeacherNameSpan.textContent; // Use global variable
+            const teacherId = modalTeacherIdSpan.textContent; // Use global variable
+            const overallTeacherHoursDisplay = modalTeacherOverallHoursSpan.textContent; // Use global variable
+            const teacherGrandTotal = modalTeacherGrandTotalSpan.textContent; // Use global variable
 
             let emailContent = `Teacher Salary Details - ${teacherName} (ID: ${teacherId})\n`;
-            emailContent += `Overall Total Hours for Teacher: ${overallTeacherHours}\n\n`;
+            emailContent += `Overall Total Hours for Month (All Teachers): ${overallTeacherHoursDisplay}\n\n`;
 
-            const modalStudentSections = document.getElementById('modalStudentSections');
-            const studentSections = modalStudentSections.querySelectorAll('.student-salary-section');
+            const isSpecialTeacher = (teacherId === 'AL1002' || teacherId === 'ALI001');
 
-            studentSections.forEach(section => {
-                const studentName = section.querySelector('h4').textContent.split(': ')[1].split(' (ID:')[0];
-                const studentId = section.querySelector('h4').textContent.split('(ID: ')[1].replace(')', '');
-                const totalHoursForStudent = section.querySelector('p strong').textContent;
-                const hourlyRateInput = section.querySelector('input[type="number"]');
-                const hourlyRate = parseFloat(hourlyRateInput.value).toFixed(2);
-                const totalAmountForStudent = section.querySelector(`strong[id^="studentTotalAmount_"]`).textContent;
-
-                emailContent += `--- Student: ${studentName} (ID: ${studentId}) ---\n`;
-                emailContent += `Total Hours for this Student: ${totalHoursForStudent}\n`;
-                emailContent += `Hourly Rate: ₹${hourlyRate}\n`;
-                emailContent += `Total Amount for this Student: ${totalAmountForStudent}\n`;
-
-                const classListDiv = section.querySelector('.class-list-container div');
-                const classEntries = classListDiv.querySelectorAll('.class-entry');
-                if (classEntries.length > 0) {
-                    emailContent += `Classes Taught:\n`;
-                    classEntries.forEach(classEntry => {
-                        const lines = classEntry.innerHTML.split('<br>').map(line => line.replace(/<\/?strong>/g, '').trim());
-                        emailContent += `  - ${lines.join(', ')}\n`;
+            if (isSpecialTeacher) {
+                emailContent += `Detailed Breakdown of Other Teachers:\n`;
+                const otherTeachersTable = document.getElementById('otherTeachersSummaryTable');
+                if (otherTeachersTable) {
+                    const rows = otherTeachersTable.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const cols = row.querySelectorAll('td');
+                        if (cols.length === 7) { // Ensure it's a data row
+                            const otherTeacherName = cols[0].textContent;
+                            const otherTeacherId = cols[1].textContent;
+                            const studentName = cols[2].textContent;
+                            const studentId = cols[3].textContent;
+                            const totalHours = cols[4].textContent;
+                            const hourlyRate = cols[5].querySelector('input').value;
+                            const totalAmount = cols[6].textContent;
+                            emailContent += `--- Teacher: ${otherTeacherName} (ID: ${otherTeacherId}) ---\n`;
+                            emailContent += `  Student: ${studentName} (ID: ${studentId})\n`;
+                            emailContent += `  Total Hours: ${totalHours}\n`;
+                            emailContent += `  Hourly Rate: ₹${hourlyRate}\n`;
+                            emailContent += `  Total Amount: ${totalAmount}\n\n`;
+                        } else if (cols.length === 1 && cols[0].textContent.includes('No other teacher data')) {
+                            emailContent += `  No other teacher data available for this month.\n\n`;
+                        }
                     });
-                } else {
-                    emailContent += `No class details available for this period.\n`;
                 }
-                emailContent += `\n`;
-            });
+            } else {
+                // Existing logic for regular teachers
+                // Ensure modalContentArea is not null before querying
+                if (modalContentArea) {
+                    const studentSections = modalContentArea.querySelectorAll('.student-salary-section'); // Use global variable
+
+                    studentSections.forEach(section => {
+                        const studentName = section.querySelector('h4').textContent.split(': ')[1].split(' (ID:')[0];
+                        const studentId = section.querySelector('h4').textContent.split('(ID: ')[1].replace(')', '');
+
+                        const totalHoursForStudent = section.querySelector('p strong').textContent;
+                        const hourlyRateInput = section.querySelector('input[type="number"]');
+                        const hourlyRate = parseFloat(hourlyRateInput.value).toFixed(2);
+                        const totalAmountForStudent = section.querySelector(`strong[id^="studentTotalAmount_"]`).textContent;
+
+                        emailContent += `--- Student: ${studentName} (ID: ${studentId}) ---\n`;
+                        emailContent += `Total Hours: ${totalHoursForStudent}\n`;
+                        emailContent += `Hourly Rate: ₹${hourlyRate}\n`;
+                        emailContent += `Total Amount: ${totalAmountForStudent}\n`;
+
+                        const classListDiv = section.querySelector('.class-list-container div');
+                        const classEntries = classListDiv.querySelectorAll('.class-entry');
+                        if (classEntries.length > 0) {
+                            emailContent += `Classes Taught:\n`;
+                            classEntries.forEach(classEntry => {
+                                const lines = classEntry.innerHTML.split('<br>').map(line => line.replace(/<\/?strong>/g, '').trim());
+                                emailContent += `  - ${lines.join(', ')}\n`;
+                            });
+                        } else {
+                            emailContent += `No class details available for this period.\n`;
+                        }
+                        emailContent += `\n`;
+                    });
+                }
+            }
 
             emailContent += `--------------------------------------\n`;
             emailContent += `Teacher's Grand Total Amount: ${teacherGrandTotal}\n`;
@@ -855,11 +1117,32 @@
 
         // Set current month as default and load data
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize global modal elements here
+            modalOverallHoursLabel = document.getElementById('modalOverallHoursLabel');
+            modalTeacherOverallHoursSpan = document.getElementById('modalTeacherOverallHours');
+            modalTeacherNameSpan = document.getElementById('modalTeacherName');
+            modalTeacherIdSpan = document.getElementById('modalTeacherId');
+            modalContentArea = document.getElementById('modalContentArea');
+            modalTeacherGrandTotalSpan = document.getElementById('modalTeacherGrandTotal');
+            salaryEntryModalElement = document.getElementById('salaryEntryModal'); // Initialize the modal element itself
+
             const today = new Date();
             const year = today.getFullYear();
             const month = (today.getMonth() + 1).toString().padStart(2, '0');
             document.getElementById('monthPicker').value = `${year}-${month}`;
             loadSalaryData(); // Load data on page load for the current month
+
+            // Event delegation for table row clicks
+            const salarySheetContainer = document.getElementById('salarySheetContainer');
+            if (salarySheetContainer) {
+                salarySheetContainer.addEventListener('click', (event) => {
+                    const clickedRow = event.target.closest('tr[data-teacher-id]');
+                    if (clickedRow) {
+                        const teacherId = clickedRow.dataset.teacherId;
+                        openSalaryEntryModal(teacherId);
+                    }
+                });
+            }
         });
     </script>
 </body>
