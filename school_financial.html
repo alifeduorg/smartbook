@@ -111,15 +111,15 @@
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="card p-6 text-center">
-                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Total Earnings (Yearly)</h2>
+                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Total Earnings</h2>
                     <p id="totalEarnings" class="text-3xl font-bold text-green-600">₹0.00</p>
                 </div>
                 <div class="card p-6 text-center">
-                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Total Expenditure (Yearly)</h2>
+                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Total Expenditure</h2>
                     <p id="totalExpenditure" class="text-3xl font-bold text-red-600">₹0.00</p>
                 </div>
                 <div class="card p-6 text-center">
-                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Net Profit (Yearly)</h2>
+                    <h2 class="text-xl font-semibold text-gray-600 mb-2">Net Profit</h2>
                     <p id="netProfit" class="text-3xl font-bold text-blue-600">₹0.00</p>
                 </div>
             </div>
@@ -420,20 +420,33 @@
         }
 
         /**
-         * Updates the summary cards with yearly totals.
+         * Updates the summary cards with yearly totals or selected month's totals.
          * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
          */
-        function updateSummary(data) {
-            const yearlyTotals = data.yearlyTotals;
-            document.getElementById('totalEarnings').textContent = `₹${yearlyTotals.totalEarnings.toFixed(2)}`;
-            document.getElementById('totalExpenditure').textContent = `₹${yearlyTotals.totalExpenditure.toFixed(2)}`;
-            document.getElementById('netProfit').textContent = `₹${yearlyTotals.netProfit.toFixed(2)}`;
+        function updateSummary(data, selectedMonth) {
+            let earnings, expenditure, profit;
+
+            if (selectedMonth === 'all') {
+                earnings = data.yearlyTotals.totalEarnings;
+                expenditure = data.yearlyTotals.totalExpenditure;
+                profit = data.yearlyTotals.netProfit;
+            } else {
+                const monthData = data.monthlyData[selectedMonth];
+                earnings = monthData ? monthData.totalStudentFee : 0;
+                expenditure = monthData ? monthData.totalTeacherSalary : 0;
+                profit = monthData ? monthData.monthlyProfit : 0;
+            }
+
+            document.getElementById('totalEarnings').textContent = `₹${earnings.toFixed(2)}`;
+            document.getElementById('totalExpenditure').textContent = `₹${expenditure.toFixed(2)}`;
+            document.getElementById('netProfit').textContent = `₹${profit.toFixed(2)}`;
 
             // Apply color based on profit/loss
             const netProfitElement = document.getElementById('netProfit');
-            if (yearlyTotals.netProfit >= 0) {
+            if (profit >= 0) {
                 netProfitElement.classList.remove('text-red-600');
-                netProfitElement.classList.add('text-green-600'); /* Changed to green for positive profit */
+                netProfitElement.classList.add('text-green-600');
             } else {
                 netProfitElement.classList.remove('text-green-600');
                 netProfitElement.classList.add('text-red-600');
@@ -475,7 +488,7 @@
                     row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
                     row.innerHTML = `
                         <td class="py-3 px-6 whitespace-nowrap">All Months</td>
-                        <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td> <!-- Display ID and Name -->
+                        <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
                         <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
                     `;
                 });
@@ -493,7 +506,7 @@
                         row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td> <!-- Display ID and Name -->
+                            <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
                         `;
                     });
@@ -542,7 +555,7 @@
                     row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
                     row.innerHTML = `
                         <td class="py-3 px-6 whitespace-nowrap">All Months</td>
-                        <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td> <!-- Display ID and Name -->
+                        <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
                         <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
                     `;
                 });
@@ -560,7 +573,7 @@
                         row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td> <!-- Display ID and Name -->
+                            <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
                         `;
                     });
@@ -608,6 +621,7 @@
             const selectedMonth = document.getElementById('monthSelect').value;
             if (dashboardData) {
                 if (tabId === 'overview') {
+                    updateSummary(dashboardData, selectedMonth); // Update summary for selected month
                     renderCharts(dashboardData, selectedMonth);
                 } else if (tabId === 'teacher-salaries') {
                     populateTeacherSalariesTable(dashboardData, selectedMonth);
@@ -624,8 +638,7 @@
             dashboardData = await fetchData(); // Store fetched data
             if (dashboardData) {
                 populateMonthSelect(dashboardData.monthlyData); // Populate month dropdown first
-                updateSummary(dashboardData);
-
+                
                 // Add event listener for month selection change
                 document.getElementById('monthSelect').addEventListener('change', (event) => {
                     const selectedMonth = event.target.value;
@@ -634,7 +647,7 @@
                 });
 
                 // Show the default tab (Overview)
-                showTab('overview');
+                showTab('overview'); // This will call updateSummary and renderCharts with 'all' initially
             }
         }
 
