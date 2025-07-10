@@ -14,7 +14,7 @@
             margin: 0;
             padding: 0;
             /* Adjusted gradient colors for a slightly softer, yet clear look */
-            background: linear-gradient(45deg, #b3e0e6, #e6f7ff, #c9e6e0, #f7fbe6); 
+            background: linear-gradient(45deg, #b3e0e6, #e6f7ff, #c9e6e0, #f7fbe6);
             background-size: 400% 400%; /* Larger background for smooth animation */
             animation: gradient 15s ease infinite; /* Gradient animation */
             display: flex;
@@ -125,6 +125,7 @@
             border: 1px solid #e0e0e0; /* Lighter border for cells */
             padding: 12px 10px;
             text-align: center;
+            vertical-align: middle; /* Ensures content is vertically centered */
         }
 
         th {
@@ -167,10 +168,6 @@
             display: inline-block;
         }
 
-        /* The 'late' status is not directly derived from 'Class Duration' > 0.
-           Keeping it for completeness if you decide to add a specific 'Status' column in your sheet.
-           For now, 'Class Duration' > 0 will map to 'present'.
-        */
         .late {
             color: #ffc107; /* Orange */
             font-weight: bold;
@@ -178,6 +175,25 @@
             padding: 4px 8px;
             border-radius: 6px;
             display: inline-block;
+        }
+
+        /* Styling for student entries within daily cells */
+        .student-entry-summary {
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 3px; /* Space between student entries */
+            border-bottom: 1px dashed #e0e0e0; /* Separator */
+        }
+
+        .student-entry-summary:last-child {
+            border-bottom: none; /* No border for the last entry */
+            margin-bottom: 0;
+        }
+
+        .student-entry-summary span {
+            font-size: 0.95em; /* Adjusted font size for duration */
+            color: #444;
+            font-weight: bold;
         }
 
         /* Container for the attendance table */
@@ -193,6 +209,81 @@
             font-size: 1.5em;
             color: #1a73e8; /* Match button color */
             font-weight: 600;
+        }
+
+        /* Modal Styles - Kept for structure but display: none by default */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Blurred background */
+            -webkit-backdrop-filter: blur(5px); /* Safari support */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            max-height: 80vh; /* Max height for scrollable content */
+            overflow-y: auto; /* Enable scrolling for modal content */
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            color: #1a73e8;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .modal-content p strong {
+            color: #333;
+            margin-right: 5px;
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Responsive adjustments */
@@ -224,6 +315,11 @@
             th, td {
                 padding: 8px 5px;
                 font-size: 13px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
             }
         }
 
@@ -264,13 +360,23 @@
         <div id="attendanceContainer"></div>
     </div>
 
+    <!-- Logbook Details Modal - Kept in HTML but hidden by default and no longer triggered by cell clicks -->
+    <div id="logbookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3>Logbook Details</h3>
+            <div id="modalDetails">
+                <!-- Details will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // Google Apps Script Web App URL - REPLACE THIS WITH YOUR ACTUAL DEPLOYED URL
         // This URL should point to the Apps Script that fetches data from your combined Google Sheet.
-        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwdKvar_uKqoAg1wX60NTThwVHBul14wroJj0QqBQZ3WtQ5zx2hAWXe8hqXqifFI3diSA/exec'; 
+        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwdKvar_uKqoAg1wX60NTThwVHBul14wroJj0QqBQZ3WtQ5zx2hAWXe8hqXqifFI3diSA/exec';
 
         // Sample Log Book Data (used if fetching fails or URL is not set)
-        // This sample data now reflects the columns you mentioned.
         const sampleLogBookData = [
             { Date: '2025-06-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 60, 'What Taught Today': 'Equations', 'Student Engagement': 'High', 'Any Work': 'Homework 1', 'Anything you\'d like to share?': '' },
             { Date: '2025-06-01', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Biology', 'Class In': '11:00 AM', 'Class Duration': 45, 'What Taught Today': 'Cells', 'Student Engagement': 'Medium', 'Any Work': '', 'Anything you\'d like to share?': '' },
@@ -310,6 +416,40 @@
             } else {
                 return { symbol: '❌', class: 'absent' }; // Cross for absent
             }
+        }
+
+        /**
+         * The showLogbookDetails function is no longer called from the table cells,
+         * but is kept here in case you wish to re-enable it or use it elsewhere.
+         * @param {string} encodedDetailsString - The URL-encoded JSON string of the logbook entry.
+         */
+        function showLogbookDetails(encodedDetailsString) {
+            const details = JSON.parse(decodeURIComponent(encodedDetailsString)); // Decode and parse here
+            const modal = document.getElementById('logbookModal');
+            const modalDetails = document.getElementById('modalDetails');
+            modalDetails.innerHTML = `
+                <p><strong>Date:</strong> ${details.Date}</p>
+                <p><strong>Teacher:</strong> ${details['Teacher Name']} (ID: ${details['Staff ID']})</p>
+                <p><strong>Student:</strong> ${details['Student Name']} (ID: ${details['Student ID']})</p>
+                <p><strong>Program:</strong> ${details.Program}</p>
+                <p><strong>Classroom:</strong> ${details['Class Room Name']}</p>
+                <p><strong>Subject:</strong> ${details.Subject}</p>
+                <p><strong>Class In:</strong> ${details['Class In']}</p>
+                <p><strong>Class Duration:</strong> ${details['Class Duration']} minutes</p>
+                <p><strong>What Taught Today:</strong> ${details['What Taught Today']}</p>
+                <p><strong>Student Engagement:</strong> ${details['Student Engagement']}</p>
+                <p><strong>Any Work:</strong> ${details['Any Work'] || 'N/A'}</p>
+                <p><strong>Anything to share:</strong> ${details['Anything you\'d like to share?'] || 'N/A'}</p>
+            `;
+            modal.style.display = 'flex'; // Use flex to center the modal
+        }
+
+        /**
+         * Closes the logbook details modal.
+         */
+        function closeModal() {
+            const modal = document.getElementById('logbookModal');
+            modal.style.display = 'none';
         }
 
         /**
@@ -358,84 +498,117 @@
                 const data = await res.json();
                 currentLogBookData = data; // Store fetched data
 
-                // Filter data for the selected month and year, and for teacher entries
+                // Filter data for the selected month and year, and for valid entries
                 const filtered = currentLogBookData.filter(row => {
-                    // Ensure 'Date' property exists and is a string (expected YYYY-MM-DD from Apps Script)
-                    if (typeof row.Date !== 'string' || !row.Date) {
+                    if (typeof row.Date !== 'string' || !row.Date || !row['Teacher Name'] || !row['Staff ID'] || !row['Student Name'] || !row['Student ID']) {
                         return false;
                     }
-
-                    // Parse the date string as UTC to avoid local timezone shifts
-                    const d = new Date(row.Date + 'T00:00:00Z'); 
+                    const d = new Date(row.Date + 'T00:00:00Z');
                     if (isNaN(d.getTime())) {
                         console.warn("Invalid date string encountered after parsing for filtering:", row.Date);
                         return false;
                     }
-
-                    // Use UTC methods for comparison
-                    const isMatchingMonth = d.getUTCMonth() === monthIndex - 1; // monthIndex is 1-based, getUTCMonth is 0-based
+                    const isMatchingMonth = d.getUTCMonth() === monthIndex - 1;
                     const isMatchingYear = d.getUTCFullYear() === year;
-                    
-                    // Only include entries that have a Teacher Name and Staff ID
-                    return isMatchingMonth && isMatchingYear && row['Teacher Name'] && row['Staff ID'];
+                    return isMatchingMonth && isMatchingYear;
                 });
-                console.log("Filtered Data for Month/Year (Teachers Only):", filtered);
+                console.log("Filtered Data for Month/Year:", filtered);
 
+                // Aggregate data by teacher, then by student
                 const teachers = {}; // Object to store processed teacher data
 
-                // Process each row of filtered data
                 filtered.forEach(row => {
-                    const id = row['Staff ID'];
-                    // Initialize teacher data if not already present
-                    if (!teachers.hasOwnProperty(id)) {
-                        teachers[id] = {
+                    const teacherId = row['Staff ID'];
+                    const studentId = row['Student ID'];
+                    const day = new Date(row.Date + 'T00:00:00Z').getUTCDate();
+                    const durationInMinutes = parseFloat(row['Class Duration']) || 0;
+
+                    if (!teachers.hasOwnProperty(teacherId)) {
+                        teachers[teacherId] = {
                             name: row['Teacher Name'],
-                            dailyDurations: {}, // Will store total duration for each day
-                            totalMonthlyMinutes: 0 // Initialize total minutes for the teacher for the month
+                            students: {}, // Nested object to hold student-specific data
+                            totalMonthlyMinutes: 0 // Overall total for the teacher
                         };
                     }
 
-                    const day = new Date(row.Date + 'T00:00:00Z').getUTCDate(); // Get UTC day
-                    const durationInMinutes = parseFloat(row['Class Duration']) || 0;
-
-                    if (!teachers[id].dailyDurations.hasOwnProperty(day)) {
-                        teachers[id].dailyDurations[day] = 0;
+                    if (!teachers[teacherId].students.hasOwnProperty(studentId)) {
+                        teachers[teacherId].students[studentId] = {
+                            name: row['Student Name'],
+                            id: studentId,
+                            dailyEntries: {}, // Stores an array of full logbook entries for each day for this teacher-student pair
+                            totalMonthlyMinutes: 0 // Total for this teacher-student pair
+                        };
                     }
-                    teachers[id].dailyDurations[day] += durationInMinutes;
 
-                    // Accumulate total minutes for the teacher for the month
-                    teachers[id].totalMonthlyMinutes += durationInMinutes;
+                    if (!teachers[teacherId].students[studentId].dailyEntries.hasOwnProperty(day)) {
+                        teachers[teacherId].students[studentId].dailyEntries[day] = [];
+                    }
+                    // Store the entire row object for detailed display later
+                    teachers[teacherId].students[studentId].dailyEntries[day].push(row);
+                    teachers[teacherId].students[studentId].totalMonthlyMinutes += durationInMinutes;
+                    teachers[teacherId].totalMonthlyMinutes += durationInMinutes; // Accumulate for overall teacher total
                 });
-                console.log("Teacher Attendance Structure (aggregated):", teachers);
+                console.log("Teacher-Student Attendance Structure (aggregated):", teachers);
 
                 // Determine the number of days in the selected month
-                const daysInMonth = new Date(year, monthIndex, 0).getDate(); // monthIndex is 1-based here
+                const daysInMonth = new Date(year, monthIndex, 0).getDate();
 
-                let html = '<table><thead><tr><th>Teacher Name</th><th>Staff ID</th>';
+                let html = '<table><thead><tr><th>Teacher Name</th><th>Staff ID</th><th>Student Name</th><th>Student ID</th>';
 
                 // Generate table headers for each day of the month
                 for (let d = 1; d <= daysInMonth; d++) {
-                    html += `<th>${d}<br>Mins</th>`;
+                    html += `<th>${d}</th>`;
                 }
                 html += '<th>Total Hrs</th></tr></thead><tbody>';
 
                 // Sort teachers by name for consistent display
-                const sortedTeacherIds = Object.keys(teachers).sort((a, b) => 
+                const sortedTeacherIds = Object.keys(teachers).sort((a, b) =>
                     teachers[a].name.localeCompare(teachers[b].name)
                 );
 
-                // Populate table rows with teacher attendance data
-                sortedTeacherIds.forEach(id => {
-                    const info = teachers[id];
-                    html += `<tr><td>${info.name}</td><td>${id}</td>`;
-                    for (let d = 1; d <= daysInMonth; d++) {
-                        const dailyTotalMinutes = info.dailyDurations[d] || 0;
-                        const statusDisplay = getStatusSymbol(dailyTotalMinutes); // Get symbol and class based on duration
-                        html += `<td><span class="${statusDisplay.class}">${statusDisplay.symbol}</span><br>${dailyTotalMinutes}</td>`;
-                    }
-                    // Calculate and display total hours for the month
-                    const totalHours = (info.totalMonthlyMinutes / 60).toFixed(2);
-                    html += `<td><strong>${totalHours}</strong></td></tr>`;
+                // Populate table rows
+                sortedTeacherIds.forEach(teacherId => {
+                    const teacherInfo = teachers[teacherId];
+                    const sortedStudentIds = Object.keys(teacherInfo.students).sort((a, b) =>
+                        teacherInfo.students[a].name.localeCompare(teacherInfo.students[b].name)
+                    );
+
+                    sortedStudentIds.forEach((studentId) => { // Removed index as it's no longer used for rowspan
+                        const studentInfo = teachers[teacherId].students[studentId];
+                        html += `<tr>`;
+
+                        // Display teacher name and ID on every row
+                        html += `<td>${teacherInfo.name}</td>`;
+                        html += `<td>${teacherId}</td>`;
+
+                        html += `<td>${studentInfo.name}</td>`;
+                        html += `<td>${studentInfo.id}</td>`;
+
+                        for (let d = 1; d <= daysInMonth; d++) {
+                            const dailyClasses = studentInfo.dailyEntries[d] || [];
+                            let cellContent = '';
+
+                            if (dailyClasses.length > 0) {
+                                dailyClasses.forEach(entry => {
+                                    const statusDisplay = getStatusSymbol(parseFloat(entry['Class Duration']) || 0);
+                                    cellContent += `
+                                        <div class="student-entry-summary">
+                                            <span>${entry['Class Duration']}</span>
+                                            <span class="${statusDisplay.class}">${statusDisplay.symbol}</span>
+                                        </div>
+                                    `;
+                                });
+                            } else {
+                                const statusDisplay = getStatusSymbol(0);
+                                cellContent = `<span>0</span><span class="${statusDisplay.class}">${statusDisplay.symbol}</span>`;
+                            }
+                            html += `<td>${cellContent}</td>`;
+                        }
+                        // Total hours for this specific teacher-student pair
+                        const totalHoursForPair = (studentInfo.totalMonthlyMinutes / 60).toFixed(2);
+                        html += `<td><strong>${totalHoursForPair}</strong></td>`;
+                        html += `</tr>`;
+                    });
                 });
 
                 html += '</tbody></table>';
@@ -477,7 +650,7 @@
                 `;
                 alertDiv.textContent = 'Please load data first before downloading PDF!';
                 document.body.appendChild(alertDiv);
-                setTimeout(() => alertDiv.remove(), 3000); 
+                setTimeout(() => alertDiv.remove(), 3000);
                 return;
             }
 
@@ -496,7 +669,10 @@
             body.classList.add('pdf-export-mode'); // Apply class for general overrides
 
             // Force elements to expand to their full content width
-            table.style.width = `${table.scrollWidth}px`; // Set table width to its full scrollWidth
+            const computedTableStyle = window.getComputedStyle(table);
+            const tableWidth = parseFloat(computedTableStyle.width) || table.scrollWidth;
+
+            table.style.width = `${tableWidth}px`; // Set table width to its full content width
             table.style.minWidth = 'auto'; // Remove min-width constraint
             element.style.width = 'auto'; // Allow printArea to expand
             element.style.maxWidth = 'none'; // Remove max-width constraint
@@ -508,9 +684,8 @@
 
             // A small delay to ensure styles are applied before rendering
             setTimeout(() => {
-                // Calculate the required width for the PDF based on the table's actual rendered width
-                // Use offsetWidth as it reflects the rendered width after styles are applied
-                const pdfContentWidth = table.offsetWidth + 100; // Add some padding
+                // Recalculate content width after styles are applied and elements have potentially expanded
+                const pdfContentWidth = element.offsetWidth + 100; // Use element's offsetWidth as it's the container
                 const pdfHeight = 2000; // A large enough height for typical reports
 
                 html2pdf().set({
@@ -520,7 +695,6 @@
                     html2canvas: {
                         scale: 2, // Increased scale for better quality
                         useCORS: true,
-                        // Explicitly set width to capture full content
                         width: pdfContentWidth // Use the calculated content width for html2canvas
                     },
                     jsPDF: {
