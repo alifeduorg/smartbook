@@ -79,6 +79,54 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .modal-close-button:hover {
+            color: #1f2937;
+        }
     </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
@@ -195,6 +243,17 @@
         </div>
     </div>
 
+    <!-- Teacher/Student Details Modal -->
+    <div id="detailsModal" class="modal-overlay">
+        <div class="modal-content relative">
+            <button class="modal-close-button" onclick="closeModal()">&times;</button>
+            <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mb-4">Details</h3>
+            <div id="modalBody" class="text-gray-700">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby2i1vfoOPV8ey2p8hS1nXhPra0J27djweqbt-8G-uA1SfC9dkm9FZ4h_Q6k7u3wChf/exec';
 
@@ -224,7 +283,8 @@
                 return data;
             } catch (error) {
                 console.error("Error fetching data:", error);
-                alert("Failed to load data. Please check the web app URL and script deployment. Error: " + error.message);
+                // Use a custom message box instead of alert()
+                showMessageBox("Error", "Failed to load data. Please check the web app URL and script deployment. Error: " + error.message);
                 return null;
             } finally {
                 loadingSpinner.classList.add('hidden'); // Hide spinner
@@ -455,6 +515,7 @@
 
         /**
          * Populates the teacher monthly salaries table based on the selected month.
+         * Adds click handlers to rows for detailed view.
          * @param {Object} data The processed financial data.
          * @param {string} selectedMonth The month to display, or 'all' for all months.
          */
@@ -485,7 +546,9 @@
                 sortedTeacherIds.forEach(teacherId => {
                     const teacherInfo = yearlyTeacherTotals[teacherId];
                     const row = tableBody.insertRow();
-                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
+                    row.dataset.teacherId = teacherId; // Store teacher ID
+                    row.dataset.month = selectedMonth; // Store 'all' for all months
                     row.innerHTML = `
                         <td class="py-3 px-6 whitespace-nowrap">All Months</td>
                         <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
@@ -503,7 +566,9 @@
                     sortedTeacherIds.forEach(teacherId => {
                         const teacherInfo = teachers[teacherId];
                         const row = tableBody.insertRow();
-                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
+                        row.dataset.teacherId = teacherId; // Store teacher ID
+                        row.dataset.month = selectedMonth; // Store specific month
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
@@ -518,10 +583,20 @@
                 row.classList.add('border-b', 'border-gray-200');
                 row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No teacher salary data for the selected month(s).</td>`;
             }
+
+            // Add click event listeners to the newly created rows
+            tableBody.querySelectorAll('tr[data-teacher-id]').forEach(row => {
+                row.addEventListener('click', (event) => {
+                    const teacherId = event.currentTarget.dataset.teacherId;
+                    const month = event.currentTarget.dataset.month;
+                    showTeacherDetailsModal(teacherId, month);
+                });
+            });
         }
 
         /**
          * Populates the student monthly fees table based on the selected month.
+         * Adds click handlers to rows for detailed view.
          * @param {Object} data The processed financial data.
          * @param {string} selectedMonth The month to display, or 'all' for all months.
          */
@@ -552,7 +627,9 @@
                 sortedStudentIds.forEach(studentId => {
                     const studentInfo = yearlyStudentTotals[studentId];
                     const row = tableBody.insertRow();
-                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
+                    row.dataset.studentId = studentId; // Store student ID
+                    row.dataset.month = selectedMonth; // Store 'all' for all months
                     row.innerHTML = `
                         <td class="py-3 px-6 whitespace-nowrap">All Months</td>
                         <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
@@ -570,7 +647,9 @@
                     sortedStudentIds.forEach(studentId => {
                         const studentInfo = students[studentId];
                         const row = tableBody.insertRow();
-                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
+                        row.dataset.studentId = studentId; // Store student ID
+                        row.dataset.month = selectedMonth; // Store specific month
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
@@ -585,6 +664,15 @@
                 row.classList.add('border-b', 'border-gray-200');
                 row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td>`;
             }
+
+            // Add click event listeners to the newly created rows
+            tableBody.querySelectorAll('tr[data-student-id]').forEach(row => {
+                row.addEventListener('click', (event) => {
+                    const studentId = event.currentTarget.dataset.studentId;
+                    const month = event.currentTarget.dataset.month;
+                    showStudentDetailsModal(studentId, month);
+                });
+            });
         }
 
         /**
@@ -630,6 +718,167 @@
                 }
             }
         }
+
+        /**
+         * Shows a custom message box.
+         * @param {string} title The title of the message box.
+         * @param {string} message The message content.
+         */
+        function showMessageBox(title, message) {
+            const modal = document.getElementById('detailsModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = title;
+            modalBody.innerHTML = `<p>${message}</p>`;
+            modal.classList.add('show');
+        }
+
+        /**
+         * Closes the modal.
+         */
+        function closeModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        /**
+         * Displays a modal with detailed class information for a specific teacher.
+         * @param {string} teacherId The ID of the teacher.
+         * @param {string} month The month (or 'all').
+         */
+        function showTeacherDetailsModal(teacherId, month) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            let filteredClasses = [];
+            if (month === 'all') {
+                filteredClasses = dashboardData.detailedLogData.filter(entry => entry.staffId === teacherId);
+            } else {
+                filteredClasses = dashboardData.detailedLogData.filter(entry => entry.staffId === teacherId && entry.month === month);
+            }
+
+            if (filteredClasses.length === 0) {
+                modalTitle.textContent = `Classes Taught by ${teacherId}`;
+                modalBody.innerHTML = `<p>No detailed class data found for Teacher ID: ${teacherId} for ${month === 'all' ? 'all months' : month}.</p>`;
+            } else {
+                const teacherName = filteredClasses[0].teacherName; // Get name from first entry
+                modalTitle.textContent = `Classes Taught by ${teacherId} (${teacherName})`;
+
+                let tableHtml = `
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-md">
+                            <thead>
+                                <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6">Date</th>
+                                    <th class="py-3 px-6">Student ID (Name)</th>
+                                    <th class="py-3 px-6">Subject</th>
+                                    <th class="py-3 px-6">Duration (Hours)</th>
+                                    <th class="py-3 px-6">Salary/Hr (₹)</th>
+                                    <th class="py-3 px-6">Total Salary (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700 text-sm font-light">
+                `;
+                let totalSalaryForTeacher = 0;
+
+                filteredClasses.forEach(entry => {
+                    tableHtml += `
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.studentId} (${entry.studentName})</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalaryPerHour.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalary.toFixed(2)}</td>
+                        </tr>
+                    `;
+                    totalSalaryForTeacher += entry.teacherSalary;
+                });
+                tableHtml += `
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
+                                    <td class="py-3 px-6" colspan="5">Total Salary for ${teacherName} (${month === 'all' ? 'All Months' : month}):</td>
+                                    <td class="py-3 px-6">₹${totalSalaryForTeacher.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                `;
+                modalBody.innerHTML = tableHtml;
+            }
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
+        /**
+         * Displays a modal with detailed class information for a specific student.
+         * @param {string} studentId The ID of the student.
+         * @param {string} month The month (or 'all').
+         */
+        function showStudentDetailsModal(studentId, month) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            let filteredClasses = [];
+            if (month === 'all') {
+                filteredClasses = dashboardData.detailedLogData.filter(entry => entry.studentId === studentId);
+            } else {
+                filteredClasses = dashboardData.detailedLogData.filter(entry => entry.studentId === studentId && entry.month === month);
+            }
+
+            if (filteredClasses.length === 0) {
+                modalTitle.textContent = `Classes Attended by ${studentId}`;
+                modalBody.innerHTML = `<p>No detailed class data found for Student ID: ${studentId} for ${month === 'all' ? 'all months' : month}.</p>`;
+            } else {
+                const studentName = filteredClasses[0].studentName; // Get name from first entry
+                modalTitle.textContent = `Classes Attended by ${studentId} (${studentName})`;
+
+                let tableHtml = `
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-md">
+                            <thead>
+                                <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6">Date</th>
+                                    <th class="py-3 px-6">Teacher ID (Name)</th>
+                                    <th class="py-3 px-6">Subject</th>
+                                    <th class="py-3 px-6">Duration (Hours)</th>
+                                    <th class="py-3 px-6">Fee/Hr (₹)</th>
+                                    <th class="py-3 px-6">Total Fee (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700 text-sm font-light">
+                `;
+                let totalFeeForStudent = 0;
+
+                filteredClasses.forEach(entry => {
+                    tableHtml += `
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.staffId} (${entry.teacherName})</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFeePerHour.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFee.toFixed(2)}</td>
+                        </tr>
+                    `;
+                    totalFeeForStudent += entry.studentFee;
+                });
+                tableHtml += `
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
+                                    <td class="py-3 px-6" colspan="5">Total Fee for ${studentName} (${month === 'all' ? 'All Months' : month}):</td>
+                                    <td class="py-3 px-6">₹${totalFeeForStudent.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                `;
+                modalBody.innerHTML = tableHtml;
+            }
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
 
         /**
          * Initializes the dashboard by fetching data and rendering all components.
