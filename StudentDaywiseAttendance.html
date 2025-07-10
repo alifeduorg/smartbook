@@ -168,10 +168,6 @@
             display: inline-block;
         }
 
-        /* The 'late' status is not directly derived from 'Class Duration' > 0.
-           Keeping it for completeness if you decide to add a specific 'Status' column in your sheet.
-           For now, 'Class Duration' > 0 will map to 'present'.
-        */
         .late {
             color: #ffc107; /* Orange */
             font-weight: bold;
@@ -271,7 +267,6 @@
         const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwdKvar_uKqoAg1wX60NTThwVHBul14wroJj0QqBQZ3WtQ5zx2hAWXe8hqXqifFI3diSA/exec';
 
         // Sample Log Book Data for Students (used if fetching fails or URL is not set)
-        // This sample data now reflects the columns you mentioned, including Student Name and Student ID.
         const sampleLogBookData = [
             { Date: '2025-06-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 60, 'What Taught Today': 'Equations', 'Student Engagement': 'High', 'Any Work': 'Homework 1', 'Anything you\'d like to share?': '' },
             { Date: '2025-06-01', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Biology', 'Class In': '11:00 AM', 'Class Duration': 45, 'What Taught Today': 'Cells', 'Student Engagement': 'Medium', 'Any Work': '', 'Anything you\'d like to share?': '' },
@@ -361,46 +356,75 @@
 
                 // Filter data for the selected month and year, and for student entries
                 const filtered = currentLogBookData.filter(row => {
+                    // Trim IDs to handle potential hidden characters like carriage returns
+                    const studentId = (row['Student ID'] || '').trim();
+                    const staffId = (row['Staff ID'] || '').trim();
+
+                    if (typeof row.Date !== 'string' || !row.Date || !studentId || !staffId || !row['Class Duration']) {
+                        return false; // Skip invalid entries
+                    }
                     const d = new Date(row.Date + 'T00:00:00Z'); // Parse as UTC to avoid timezone issues
-                    return d.getUTCFullYear() === year && d.getUTCMonth() === monthIndex - 1 && row['Student Name'] && row['Student ID'];
+                    if (isNaN(d.getTime())) {
+                        console.warn("Invalid date string encountered:", row.Date);
+                        return false;
+                    }
+                    const isMatchingMonth = d.getUTCMonth() === monthIndex - 1;
+                    const isMatchingYear = d.getUTCFullYear() === year;
+                    return isMatchingMonth && isMatchingYear;
                 });
 
                 const students = {}; // Object to store processed student data
 
                 // Process each row of filtered data
                 filtered.forEach(row => {
-                    const id = row['Student ID'];
-                    // Initialize student data if not already present
-                    if (!students.hasOwnProperty(id)) {
-                        students[id] = {
-                            name: row['Student Name'],
-                            dailyDurations: {}, // Will store total duration for each day
-                            totalMonthlyMinutes: 0 // Initialize total minutes for the student for the month
-                        };
-                    }
-
+                    const studentId = (row['Student ID'] || '').trim();
+                    const studentName = (row['Student Name'] || '').trim();
+                    const teacherId = (row['Staff ID'] || '').trim();
+                    const teacherName = (row['Teacher Name'] || '').trim();
                     const day = new Date(row.Date + 'T00:00:00Z').getUTCDate(); // Get UTC day
                     const durationInMinutes = parseFloat(row['Class Duration']) || 0;
 
-                    if (!students[id].dailyDurations.hasOwnProperty(day)) {
-                        students[id].dailyDurations[day] = 0;
+                    // Initialize student data if not already present
+                    if (!students.hasOwnProperty(studentId)) {
+                        students[studentId] = {
+                            name: studentName,
+                            totalMonthlyMinutes: 0, // Overall total for student
+                            teacherData: {} // Nested object to store data per teacher
+                        };
                     }
-                    students[id].dailyDurations[day] += durationInMinutes;
 
-                    // Accumulate total minutes for the student for the month
-                    students[id].totalMonthlyMinutes += durationInMinutes;
+                    // Initialize teacher data for this student if not already present
+                    if (!students[studentId].teacherData.hasOwnProperty(teacherId)) {
+                        students[studentId].teacherData[teacherId] = {
+                            name: teacherName,
+                            totalMinutesWithStudent: 0, // Total for this teacher-student pair for the month
+                            dailyDurations: {} // Map<day, minutes> for this teacher-student pair
+                        };
+                    }
+
+                    // Aggregate daily durations for this specific teacher-student pair
+                    if (!students[studentId].teacherData[teacherId].dailyDurations.hasOwnProperty(day)) {
+                        students[studentId].teacherData[teacherId].dailyDurations[day] = 0;
+                    }
+                    students[studentId].teacherData[teacherId].dailyDurations[day] += durationInMinutes;
+
+                    // Accumulate total minutes for this teacher-student pair
+                    students[studentId].teacherData[teacherId].totalMinutesWithStudent += durationInMinutes;
+
+                    // Accumulate overall total minutes for the student for the month
+                    students[studentId].totalMonthlyMinutes += durationInMinutes;
                 });
 
                 // Determine the number of days in the selected month
                 const daysInMonth = new Date(year, monthIndex, 0).getDate(); // monthIndex is 1-based here
 
-                let html = '<table><thead><tr><th>Student Name</th><th>Student ID</th>';
+                let html = '<table><thead><tr><th>Student Name</th><th>Student ID</th><th>Teacher Name</th><th>Teacher ID</th>';
 
                 // Generate table headers for each day of the month
                 for (let d = 1; d <= daysInMonth; d++) {
                     html += `<th>${d}<br>Mins</th>`;
                 }
-                html += '<th>Total Hrs</th></tr></thead><tbody>';
+                html += '<th>Total Hrs (Teacher-Student)</th><th>Overall Student Total Hrs</th></tr></thead><tbody>';
 
                 // Sort students by name for consistent display
                 const sortedStudentIds = Object.keys(students).sort((a, b) => 
@@ -408,17 +432,45 @@
                 );
 
                 // Populate table rows with student attendance data
-                sortedStudentIds.forEach(id => {
-                    const info = students[id];
-                    html += `<tr><td>${info.name}</td><td>${id}</td>`;
-                    for (let d = 1; d <= daysInMonth; d++) {
-                        const dailyTotalMinutes = info.dailyDurations[d] || 0;
-                        const statusDisplay = getStatusSymbol(dailyTotalMinutes); // Get symbol and class based on duration
-                        html += `<td><span class="${statusDisplay.class}">${statusDisplay.symbol}</span><br>${dailyTotalMinutes}</td>`;
-                    }
-                    // Calculate and display total hours for the month
-                    const totalHours = (info.totalMonthlyMinutes / 60).toFixed(2);
-                    html += `<td><strong>${totalHours}</strong></td></tr>`;
+                sortedStudentIds.forEach(studentId => {
+                    const studentInfo = students[studentId];
+                    const teacherKeys = Object.keys(studentInfo.teacherData).sort((a, b) =>
+                        studentInfo.teacherData[a].name.localeCompare(studentInfo.teacherData[b].name)
+                    );
+                    const rowspanCount = teacherKeys.length;
+
+                    teacherKeys.forEach((teacherId, index) => {
+                        const teacherInfo = studentInfo.teacherData[teacherId];
+                        html += `<tr>`;
+
+                        // Student Name and ID (rowspan for the first teacher entry)
+                        if (index === 0) {
+                            html += `<td rowspan="${rowspanCount}">${studentInfo.name}</td>`;
+                            html += `<td rowspan="${rowspanCount}">${studentId}</td>`;
+                        }
+
+                        // Teacher Name and ID
+                        html += `<td>${teacherInfo.name}</td>`;
+                        html += `<td>${teacherId}</td>`;
+
+                        // Daily minutes for this teacher-student pair
+                        for (let d = 1; d <= daysInMonth; d++) {
+                            const dailyTotalMinutes = teacherInfo.dailyDurations[d] || 0;
+                            const statusDisplay = getStatusSymbol(dailyTotalMinutes);
+                            html += `<td><span class="${statusDisplay.class}">${statusDisplay.symbol}</span><br>${dailyTotalMinutes}</td>`;
+                        }
+
+                        // Total hours for this teacher-student pair
+                        const totalHoursTeacherStudent = (teacherInfo.totalMinutesWithStudent / 60).toFixed(2);
+                        html += `<td><strong>${totalHoursTeacherStudent}</strong></td>`;
+
+                        // Overall Student Total Hours (rowspan for the first teacher entry)
+                        if (index === 0) {
+                            const overallTotalHoursStudent = (studentInfo.totalMonthlyMinutes / 60).toFixed(2);
+                            html += `<td rowspan="${rowspanCount}"><strong>${overallTotalHoursStudent}</strong></td>`;
+                        }
+                        html += `</tr>`;
+                    });
                 });
 
                 html += '</tbody></table>';
@@ -450,7 +502,7 @@
             const table = attendanceContainer.querySelector('table');
             const body = document.body;
 
-            if (!table) {
+            if (!table || table.querySelector('tbody').children.length === 0 || table.querySelector('tbody').children[0].textContent.includes('No salary data found')) {
                 const alertDiv = document.createElement('div');
                 alertDiv.style.cssText = `
                     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
