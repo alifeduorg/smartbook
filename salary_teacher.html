@@ -82,6 +82,16 @@
             font-weight: 700;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); /* Subtle text shadow */
         }
+        h3.section-heading {
+            color: #1a73e8; /* Blue for section headings */
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: 600;
+            text-align: left; /* Align section headings to left */
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
 
         /* Label for month picker */
         label {
@@ -110,7 +120,7 @@
 
         /* Table styling */
         table {
-            margin-top: 40px;
+            margin-top: 20px; /* Adjusted margin for tables */
             width: 100%;
             border-collapse: separate; /* Use separate for rounded corners on cells */
             border-spacing: 0; /* Remove default spacing */
@@ -330,15 +340,13 @@
             text-align: right;
         }
 
-        /* Removed .teacher-separator styles */
-
-        /* New style for MD/Principal rows in the main table */
-        .special-teacher-row {
+        /* New style for Leadership rows in the main table */
+        .leadership-row {
             background-color: #e0f2f7; /* Light blue background */
             font-weight: bold;
             border-left: 5px solid #007bff; /* Blue left border */
         }
-        .special-teacher-row:hover {
+        .leadership-row:hover {
             background-color: #cce9f0 !important; /* Darker blue on hover */
         }
 
@@ -399,7 +407,7 @@
         <div id="loadingIndicator" class="loading-indicator">Loading salary data...</div>
 
         <div id="salarySheetContainer">
-            <!-- Salary sheet table will be generated here by JavaScript -->
+            <!-- Salary sheet tables will be generated here by JavaScript -->
         </div>
         <div id="overallTotalHours" class="total-summary grand-total" style="display: none;">
             Overall Total Hours for Month: <span id="overallHoursValue">0.00</span>
@@ -430,18 +438,23 @@
         // This URL should point to the Apps Script that fetches data from your combined Google Sheet.
         const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwdKvar_uKqoAg1wX60NTThwVHBul14wroJj0QqBQZ3WtQ5zx2hAWXe8hqXqifFI3diSA/exec';
 
-        // Define teacher types for rate calculation and special handling (ensure MD/Principal are defined globally)
+        // Define teacher types for rate calculation and special handling
+        // Only MD is designated for showing aggregated teacher hours in their modal.
+        // Principal, Clerk, Mentor, Coordinator are now treated as regular staff whose data comes from the sheet
+        // and will show individual hours in their modals.
         const teacherTypes = {
             'T001': 'Local',
             'T002': 'International',
             'T003': 'Local',
-            'AL1002': 'MD', // New type for MD
-            'ALI001': 'Principal' // UPDATED ID for Principal
+            'AL1002': 'MD',
+            'ALI-PR-001': 'Teacher', // ALI-PR-001 is now explicitly a 'Teacher' for individual hours
+            'CL001': 'Clerk',
+            'MT001': 'Mentor',
+            'CO001': 'Coordinator'
         };
 
-        let currentTeachersSalaryData = []; // This will hold the processed data for the current month, flattened for table rendering
         let teachersOverallAggregatedData = {}; // Stores aggregated data per teacher for modal details
-        let overallTotalHoursForAllTeachers = 0; // Global variable for overall total hours
+        let overallTotalHoursForAllTeachers = 0; // Global variable for overall total hours (excluding MD and Principal)
 
         // Global variables for modal elements, initialized on DOMContentLoaded
         let modalOverallHoursLabel;
@@ -492,7 +505,7 @@
 
         /**
          * Loads teacher logbook data from the Google Sheet API or uses sample data,
-         * aggregates total hours per teacher and displays it in a dynamic HTML table as a salary sheet.
+         * aggregates total hours per teacher and displays it in dynamic HTML tables as a salary sheet.
          */
         async function loadSalaryData() {
             const monthPicker = document.getElementById('monthPicker');
@@ -533,17 +546,17 @@
                 loadingIndicator.style.display = 'none'; // Hide loading indicator
             }
 
-            // Define MD and Principal data to ensure they are always present
-            const mdPrincipalData = [
+            // Define MD and Principal data to ensure they are always present in the Leadership table
+            const fixedAdminStaffData = [
                 { Date: `${year}-${monthIndex.toString().padStart(2, '0')}-01`, 'Teacher Name': 'ABHINAV AK', 'Staff ID': 'AL1002', 'Program': 'Management', 'Class Room Name': 'Office', 'Student Name': 'N/A', 'Student ID': 'N/A', 'Subject': 'Admin', 'Class In': '09:00 AM', 'Class Duration': 0, 'What Taught Today': '', 'Student Engagement': '', 'Any Work': '', 'Anything you\'d like to share?': '' },
-                { Date: `${year}-${monthIndex.toString().padStart(2, '0')}-01`, 'Teacher Name': 'AFLAH ZAMAN K.', 'Staff ID': 'ALI001', 'Program': 'Management', 'Class Room Name': 'Office', 'Student Name': 'N/A', 'Student ID': 'N/A', 'Subject': 'Admin', 'Class In': '09:00 AM', 'Class Duration': 0, 'What Taught Today': '', 'Student Engagement': '', 'Any Work': '', 'Anything you\'d like to share?': '' },
+                { Date: `${year}-${monthIndex.toString().padStart(2, '0')}-01`, 'Teacher Name': 'AFLAH ZAMAN K', 'Staff ID': 'ALI-PR-001', 'Program': 'Management', 'Class Room Name': 'Office', 'Student Name': 'N/A', 'Student ID': 'N/A', 'Subject': 'Admin', 'Class In': '09:00 AM', 'Class Duration': 0, 'What Taught Today': '', 'Student Engagement': '', 'Any Work': '', 'Anything you\'d like to share?': '' },
             ];
 
-            // Combine only MD/Principal data with fetched data.
-            // Filter fetchedData to avoid duplicates if Staff ID exists in mdPrincipalData.
+            // Combine fixed admin staff data with fetched data.
+            // Filter fetchedData to avoid duplicates if Staff ID exists in fixedAdminStaffData.
             const combinedData = [
-                ...mdPrincipalData, // Ensure MD and Principal are always at the top
-                ...fetchedData.filter(f => !mdPrincipalData.some(md => md['Staff ID'] === f['Staff ID']))
+                ...fixedAdminStaffData, // Ensure fixed admin staff are always at the top
+                ...fetchedData.filter(f => !fixedAdminStaffData.some(admin => admin['Staff ID'] === f['Staff ID']))
             ];
 
             // Filter data for the selected month and year
@@ -576,12 +589,12 @@
                 if (teacherId === 'AL1002' && program === 'International School') {
                     classDurationMinutes = 0; // Exclude these hours from calculation
                 }
-                // For Principal (ALI001), all hours are included, no exclusion based on program.
+                // For other staff (including ALI-PR-001, CL001, MT001, CO001), all hours are included.
 
                 if (!teachersOverallAggregatedData[teacherId]) {
                     teachersOverallAggregatedData[teacherId] = {
                         teacherName: teacherName,
-                        teacherType: teacherTypes[teacherId] || 'Unknown',
+                        teacherType: teacherTypes[teacherId] || 'Teacher', // Default to 'Teacher' if not in teacherTypes
                         overallTotalMinutes: 0,
                         students: {} // Keep students for detailed modal view if needed
                     };
@@ -606,75 +619,90 @@
                 });
             });
 
-            // Calculate overallTotalHoursForAllTeachers (sum of all *actual* teaching hours, excluding MD/Principal's own recorded hours if they are just placeholders)
+            // Calculate overallTotalHoursForAllTeachers (sum of all *actual* teaching hours, excluding MD and Principal)
             overallTotalHoursForAllTeachers = 0;
+            const fixedAdminStaffIdsForTotal = ['AL1002', 'ALI-PR-001']; // Both MD and Principal excluded from this total
             Object.keys(teachersOverallAggregatedData).forEach(teacherId => {
-                // Only sum up hours from teachers who are NOT MD or Principal, as their entries in the main table will show the grand total.
-                // The MD and Principal's own recorded hours are still used for their *individual* modal calculation if needed,
-                // but they don't contribute to this specific 'overallTotalHoursForAllTeachers' sum to avoid confusion.
-                if (teacherId !== 'AL1002' && teacherId !== 'ALI001') {
+                // Only sum up hours from teachers who are NOT MD or Principal for the overall total
+                if (!fixedAdminStaffIdsForTotal.includes(teacherId)) {
                     overallTotalHoursForAllTeachers += (teachersOverallAggregatedData[teacherId].overallTotalMinutes / 60);
                 }
             });
 
-            // Prepare data for the main salary sheet table (one row per teacher)
-            currentTeachersSalaryData = [];
+            // Separate data for leadership and teaching faculty
+            let leadershipStaffData = [];
+            let teachingFacultyData = [];
             
-            // Custom sorting order: AL1002, ALI001, then others alphabetically
+            // Custom sorting order for display: AL1002, ALI-PR-001, then others alphabetically
             const sortedTeacherIds = Object.keys(teachersOverallAggregatedData).sort((a, b) => {
-                if (a === 'AL1002') return -1;
-                if (b === 'AL1002') return 1;
-                if (a === 'ALI001') return -1;
-                if (b === 'ALI001') return 1;
+                const order = { 'AL1002': 1, 'ALI-PR-001': 2 }; // MD and Principal have fixed order for leadership table
+                const orderA = order[a] || Infinity;
+                const orderB = order[b] || Infinity;
+
+                if (orderA !== Infinity && orderB !== Infinity) {
+                    return orderA - orderB;
+                }
+                if (orderA !== Infinity) {
+                    return -1;
+                }
+                if (orderB !== Infinity) {
+                    return 1;
+                }
                 return teachersOverallAggregatedData[a].teacherName.localeCompare(teachersOverallAggregatedData[b].teacherName);
             });
 
             sortedTeacherIds.forEach(teacherId => {
                 const teacherData = teachersOverallAggregatedData[teacherId];
-                let totalHoursForDisplay;
-                // Student Name and Student ID columns are no longer needed in the main table
-                // let studentNameForDisplay = '';
-                // let studentIdForDisplay = '';
-
-                if (teacherId === 'AL1002' || teacherId === 'ALI001') {
-                    totalHoursForDisplay = overallTotalHoursForAllTeachers; // MD/Principal show overall total for all other teachers
-                } else {
-                    totalHoursForDisplay = (teacherData.overallTotalMinutes / 60); // Regular teachers show their own aggregated total
+                
+                // Add MD and Principal to leadershipStaffData with the overall total
+                if (teacherId === 'AL1002' || teacherId === 'ALI-PR-001') {
+                    leadershipStaffData.push({
+                        teacherId: teacherId,
+                        teacherName: teacherData.teacherName,
+                        totalHours: overallTotalHoursForAllTeachers, // They show overall total for other teachers
+                    });
                 }
 
-                currentTeachersSalaryData.push({
-                    teacherId: teacherId,
-                    teacherName: teacherData.teacherName,
-                    // studentName: studentNameForDisplay, // Removed
-                    // studentId: studentIdForDisplay,     // Removed
-                    totalHours: totalHoursForDisplay,
-                });
+                // Add all staff *except* MD to teachingFacultyData (now includes Principal)
+                if (teacherId !== 'AL1002') { // Exclude only MD from this list
+                    teachingFacultyData.push({
+                        teacherId: teacherId,
+                        teacherName: teacherData.teacherName,
+                        totalHours: (teacherData.overallTotalMinutes / 60), // Individual hours
+                    });
+                }
             });
 
-            // Generate table HTML
-            // Updated table headers to remove Student Name and Student ID
-            let tableHTML = `
+            // Generate HTML for Leadership & Administration table
+            let leadershipTableHTML = `
+                <h3 class="section-heading">Leadership & Administration Salary Summary</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Teacher Name</th>
-                            <th>Teacher ID</th>
-                            <th>Total Hours</th>
+                            <th>Role</th>
+                            <th>Name</th>
+                            <th>Staff ID</th>
+                            <th>Total Hours (All Other Staff)</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
-            if (currentTeachersSalaryData.length === 0) {
-                // Adjusted colspan for the "No data found" message
-                tableHTML += `<tr><td colspan="3">No salary data found for ${selectedMonthName} ${year}.</td></tr>`;
+            if (leadershipStaffData.length === 0) {
+                leadershipTableHTML += `<tr><td colspan="4">No leadership staff data found for ${selectedMonthName} ${year}.</td></tr>`;
             } else {
-                currentTeachersSalaryData.forEach(entry => {
-                    const rowClass = (entry.teacherId === 'AL1002' || entry.teacherId === 'ALI001') ? 'special-teacher-row' : '';
-
-                    // Updated table rows to remove Student Name and Student ID columns
-                    tableHTML += `
-                        <tr data-teacher-id="${entry.teacherId}" class="${rowClass}" style="cursor: pointer;">
+                // Filter leadershipData to only include MD and Principal for this table view
+                const displayLeadership = leadershipStaffData.filter(entry => entry.teacherId === 'AL1002' || entry.teacherId === 'ALI-PR-001');
+                displayLeadership.forEach(entry => {
+                    let role;
+                    switch (entry.teacherId) {
+                        case 'AL1002': role = 'Managing Director'; break;
+                        case 'ALI-PR-001': role = 'Principal (Admin)'; break; // Specific role for Principal in admin table
+                        default: role = 'Admin Staff (Error)'; // Should not happen with current filtering
+                    }
+                    leadershipTableHTML += `
+                        <tr data-teacher-id="${entry.teacherId}" class="leadership-row" style="cursor: pointer;">
+                            <td>${role}</td>
                             <td>${entry.teacherName}</td>
                             <td>${entry.teacherId}</td>
                             <td>${entry.totalHours.toFixed(2)}</td>
@@ -682,12 +710,51 @@
                     `;
                 });
             }
-
-            tableHTML += `
+            leadershipTableHTML += `
                     </tbody>
                 </table>
             `;
-            salarySheetContainer.innerHTML = tableHTML;
+
+            // Generate HTML for Teaching Faculty table
+            let teachingFacultyTableHTML = `
+                <h3 class="section-heading">Teaching Faculty & Other Staff Salary Details</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th> <!-- Added Role column -->
+                            <th>Name</th>
+                            <th>Staff ID</th>
+                            <th>Total Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            if (teachingFacultyData.length === 0) {
+                teachingFacultyTableHTML += `<tr><td colspan="4">No teaching faculty or other staff data found for ${selectedMonthName} ${year}.</td></tr>`;
+            } else {
+                // Sort teachingFacultyData alphabetically by name for consistent display
+                teachingFacultyData.sort((a, b) => a.teacherName.localeCompare(b.teacherName));
+
+                teachingFacultyData.forEach(entry => {
+                    const role = teacherTypes[entry.teacherId] || 'Teacher'; // Get role from teacherTypes or default to Teacher
+                    teachingFacultyTableHTML += `
+                        <tr data-teacher-id="${entry.teacherId}" style="cursor: pointer;">
+                            <td>${role}</td>
+                            <td>${entry.teacherName}</td>
+                            <td>${entry.teacherId}</td>
+                            <td>${entry.totalHours.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+            }
+            teachingFacultyTableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            // Append both tables to the container
+            salarySheetContainer.innerHTML = leadershipTableHTML + teachingFacultyTableHTML;
 
             // Display overall total hours at the bottom of the main page
             overallHoursValueSpan.textContent = overallTotalHoursForAllTeachers.toFixed(2);
@@ -715,20 +782,24 @@
                 // Clear previous content
                 modalContentArea.innerHTML = '';
 
-                if (teacherId === 'AL1002' || teacherId === 'ALI001') {
-                    // For MD and Principal: show overall total hours for all other teachers
-                    modalOverallHoursLabel.textContent = `Overall Total Hours for Month (All Teachers): `;
+                // Only MD (AL1002) will show aggregated teacher hours in their modal
+                const rolesShowingAggregatedTeacherHoursInModal = ['AL1002'];
+
+                if (rolesShowingAggregatedTeacherHoursInModal.includes(teacherId)) {
+                    // For MD: show overall total hours for all other teachers
+                    modalOverallHoursLabel.textContent = `Overall Total Hours for Month (All Other Staff): `;
                     modalTeacherOverallHoursSpan.textContent = overallTotalHoursForAllTeachers.toFixed(2);
 
-                    // Create the table for other teachers
+                    // Create the table for other teachers (excluding MD and Principal)
                     let otherTeachersTableHTML = `
                         <div id="otherTeachersSummaryTableContainer">
                             <h4>Detailed Breakdown of Other Teachers:</h4>
                             <table id="otherTeachersSummaryTable">
                                 <thead>
                                     <tr>
-                                        <th>Teacher Name</th>
-                                        <th>Teacher ID</th>
+                                        <th>Role</th>
+                                        <th>Name</th>
+                                        <th>Staff ID</th>
                                         <th>Total Hours</th>
                                         <th>Hourly Rate (₹)</th>
                                         <th>Total Amount (₹)</th>
@@ -738,21 +809,23 @@
                     `;
 
                     // Filter and sort other teachers (excluding MD and Principal)
-                    const otherTeacherIds = Object.keys(teachersOverallAggregatedData).filter(id => id !== 'AL1002' && id !== 'ALI001').sort((a, b) =>
+                    const otherTeacherIds = Object.keys(teachersOverallAggregatedData).filter(id => id !== 'AL1002' && id !== 'ALI-PR-001').sort((a, b) =>
                         teachersOverallAggregatedData[a].teacherName.localeCompare(teachersOverallAggregatedData[b].teacherName)
                     );
 
                     if (otherTeacherIds.length === 0) {
-                        otherTeachersTableHTML += `<tr><td colspan="5">No other teacher data available for this month.</td></tr>`;
+                        otherTeachersTableHTML += `<tr><td colspan="6">No other teacher data available for this month.</td></tr>`;
                     } else {
                         otherTeacherIds.forEach(otherTeacherId => {
                             const otherTeacherData = teachersOverallAggregatedData[otherTeacherId];
                             const otherTotalHours = (otherTeacherData.overallTotalMinutes / 60);
                             const defaultHourlyRate = (teacherTypes[otherTeacherId] === 'International') ? 30 : 20;
                             const initialAmount = (otherTotalHours * defaultHourlyRate);
+                            const role = teacherTypes[otherTeacherId] || 'Teacher';
 
                             otherTeachersTableHTML += `
                                 <tr>
+                                    <td>${role}</td>
                                     <td>${otherTeacherData.teacherName}</td>
                                     <td>${otherTeacherId}</td>
                                     <td>${otherTotalHours.toFixed(2)}</td>
@@ -777,7 +850,7 @@
                     modalContentArea.innerHTML = otherTeachersTableHTML;
 
                 } else {
-                    // For regular teachers: show their individual overall hours and breakdown per student
+                    // For Principal, Clerk, Mentor, Coordinator, and regular teachers: show their individual overall hours and breakdown per student
                     modalOverallHoursLabel.textContent = `Overall Total Hours for Teacher: `;
                     modalTeacherOverallHoursSpan.textContent = (teacherData.overallTotalMinutes / 60).toFixed(2);
 
@@ -826,15 +899,12 @@
                         }
                     });
                 }
-
                 // Initial calculation of teacher's grand total in the modal
                 updateTeacherGrandTotalInModal(teacherId);
-
-                salaryEntryModalElement.style.display = 'flex'; // Use flex to center
-
             } else {
                 showAlert("Error: Teacher data not found.", 'error');
             }
+            salaryEntryModalElement.style.display = 'flex'; // Use flex to center
         }
 
         /**
@@ -862,7 +932,7 @@
         }
 
         /**
-         * Updates individual teacher's total within the MD/Principal modal's sub-table.
+         * Updates individual teacher's total within the MD's modal's sub-table.
          * @param {string} otherTeacherId The ID of the teacher in the sub-table whose total needs to be updated.
          */
         function updateModalSubTableTotal(otherTeacherId) {
@@ -879,7 +949,7 @@
                 document.getElementById(`subTableTotalAmount_${otherTeacherId}`).textContent = `₹0.00`;
             }
 
-            // Recalculate the MD/Principal's grand total based on all sub-table entries
+            // Recalculate the MD's grand total based on all sub-table entries
             const currentModalTeacherId = modalTeacherIdSpan.textContent; // Use global variable
             updateTeacherGrandTotalInModal(currentModalTeacherId);
         }
@@ -892,17 +962,18 @@
          */
         function updateTeacherGrandTotalInModal(teacherId) {
             let teacherGrandTotal = 0;
-            const teacherType = teacherTypes[teacherId];
+            // Only MD (AL1002) will sum totals from the sub-table
+            const rolesShowingAggregatedTeacherHoursInModal = ['AL1002'];
 
-            if (teacherType === 'MD' || teacherType === 'Principal') {
-                // For MD/Principal, sum totals from the dynamically generated sub-table
+            if (rolesShowingAggregatedTeacherHoursInModal.includes(teacherId)) {
+                // For MD, sum totals from the dynamically generated sub-table
                 const subTableAmounts = document.querySelectorAll('#otherTeachersSummaryTable [id^="subTableTotalAmount_"]');
                 subTableAmounts.forEach(span => {
                     const amountText = span.textContent.replace('₹', '');
                     teacherGrandTotal += parseFloat(amountText) || 0;
                 });
             } else {
-                // For regular teachers, sum from each student's total amount in their section
+                // For Principal, Clerk, Mentor, Coordinator, and regular teachers, sum from each student's total amount in their section
                 const studentAmountSpans = modalContentArea.querySelectorAll('[id^="studentTotalAmount_"]');
                 studentAmountSpans.forEach(span => {
                     const amountText = span.textContent.replace('₹', '');
@@ -930,13 +1001,21 @@
         function downloadPDF() {
             const element = document.getElementById('printArea');
             const salarySheetContainer = document.getElementById('salarySheetContainer');
-            const table = salarySheetContainer.querySelector('table');
-            const body = document.body;
+            // Check if any table exists and has content
+            const tables = salarySheetContainer.querySelectorAll('table');
+            let hasData = false;
+            tables.forEach(table => {
+                if (table.querySelector('tbody') && table.querySelector('tbody').children.length > 0 && !table.querySelector('tbody').children[0].textContent.includes('No data found')) {
+                    hasData = true;
+                }
+            });
 
-            if (!table || table.querySelector('tbody').children.length === 0 || table.querySelector('tbody').children[0].textContent.includes('No salary data found')) {
+            if (!hasData) {
                 showAlert('Please load data first before downloading PDF!');
                 return;
             }
+
+            const body = document.body;
 
             // Add a class to adjust styles specifically for PDF export
             body.classList.add('pdf-export-mode');
@@ -975,32 +1054,35 @@
             let emailContent = `Teacher Salary Details - ${teacherName} (ID: ${teacherId})\n`;
             emailContent += `Overall Total Hours for Teacher: ${overallTeacherHoursDisplay}\n\n`; // Changed label to reflect teacher's overall hours
 
-            const isSpecialTeacher = (teacherId === 'AL1002' || teacherId === 'ALI001');
+            // Only MD (AL1002) will show aggregated teacher hours in their modal
+            const rolesShowingAggregatedTeacherHoursInModal = ['AL1002'];
 
-            if (isSpecialTeacher) {
+            if (rolesShowingAggregatedTeacherHoursInModal.includes(teacherId)) {
                 emailContent += `Detailed Breakdown of Other Teachers:\n`;
                 const otherTeachersTable = document.getElementById('otherTeachersSummaryTable');
                 if (otherTeachersTable) {
                     const rows = otherTeachersTable.querySelectorAll('tbody tr');
                     rows.forEach(row => {
                         const cols = row.querySelectorAll('td');
-                        if (cols.length === 5) { // Ensure it's a data row for the updated table structure
-                            const otherTeacherName = cols[0].textContent;
-                            const otherTeacherId = cols[1].textContent;
-                            const totalHours = cols[2].textContent;
-                            const hourlyRate = cols[3].querySelector('input').value;
-                            const totalAmount = cols[4].textContent;
-                            emailContent += `--- Teacher: ${otherTeacherName} (ID: ${otherTeacherId}) ---\n`;
+                        if (cols.length === 6) { // Ensure it's a data row for the updated table structure (with Role column)
+                            const role = cols[0].textContent; // Get role from the sub-table
+                            const otherTeacherName = cols[1].textContent;
+                            const otherTeacherId = cols[2].textContent;
+                            const totalHours = cols[3].textContent;
+                            const hourlyRate = cols[4].querySelector('input').value;
+                            const totalAmount = cols[5].textContent;
+                            emailContent += `--- Role: ${role}, Name: ${otherTeacherName} (ID: ${otherTeacherId}) ---\n`;
                             emailContent += `  Total Hours: ${totalHours}\n`;
                             emailContent += `  Hourly Rate: ₹${hourlyRate}\n`;
-                            emailContent += `  Total Amount: ${totalAmount}\n\n`;
+                            emailContent += `  Total Amount: ₹${totalAmount}\n\n`;
+
                         } else if (cols.length === 1 && cols[0].textContent.includes('No other teacher data')) {
                             emailContent += `  No other teacher data available for this month.\n\n`;
                         }
                     });
                 }
             } else {
-                // Logic for regular teachers: breakdown per student
+                // Logic for Principal, Clerk, Mentor, Coordinator, and regular teachers: breakdown per student
                 if (modalContentArea) {
                     const studentSections = modalContentArea.querySelectorAll('.student-salary-section');
 
@@ -1016,7 +1098,7 @@
                         emailContent += `--- Student: ${studentName} (ID: ${studentId}) ---\n`;
                         emailContent += `  Total Hours for this Student: ${totalHoursForStudent}\n`;
                         emailContent += `  Hourly Rate for this Student: ₹${hourlyRate}\n`;
-                        emailContent += `  Total Amount for this Student: ${totalAmountForStudent}\n`;
+                        emailContent += `  Total Amount for this Student: ₹${totalAmountForStudent}\n`;
 
                         const classListDiv = section.querySelector('.class-list-container div');
                         const classEntries = classListDiv.querySelectorAll('.class-entry');
