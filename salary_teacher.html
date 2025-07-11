@@ -782,11 +782,11 @@
                 // Clear previous content
                 modalContentArea.innerHTML = '';
 
-                // Only MD (AL1002) will show aggregated teacher hours in their modal
-                const rolesShowingAggregatedTeacherHoursInModal = ['AL1002'];
+                // MD (AL1002) AND Principal (ALI-PR-001) will show aggregated teacher hours in their modal
+                const rolesShowingAggregatedTeacherHoursInModal = ['AL1002', 'ALI-PR-001']; // Added ALI-PR-001 here
 
                 if (rolesShowingAggregatedTeacherHoursInModal.includes(teacherId)) {
-                    // For MD: show overall total hours for all other teachers
+                    // For MD and Principal: show overall total hours for all other teachers
                     modalOverallHoursLabel.textContent = `Overall Total Hours for Month (All Other Staff): `;
                     modalTeacherOverallHoursSpan.textContent = overallTotalHoursForAllTeachers.toFixed(2);
 
@@ -850,7 +850,7 @@
                     modalContentArea.innerHTML = otherTeachersTableHTML;
 
                 } else {
-                    // For Principal, Clerk, Mentor, Coordinator, and regular teachers: show their individual overall hours and breakdown per student
+                    // For Clerk, Mentor, Coordinator, and regular teachers: show their individual overall hours and breakdown per student
                     modalOverallHoursLabel.textContent = `Overall Total Hours for Teacher: `;
                     modalTeacherOverallHoursSpan.textContent = (teacherData.overallTotalMinutes / 60).toFixed(2);
 
@@ -962,18 +962,18 @@
          */
         function updateTeacherGrandTotalInModal(teacherId) {
             let teacherGrandTotal = 0;
-            // Only MD (AL1002) will sum totals from the sub-table
-            const rolesShowingAggregatedTeacherHoursInModal = ['AL1002'];
+            // MD (AL1002) and Principal (ALI-PR-001) will sum totals from the sub-table
+            const rolesShowingAggregatedTeacherHoursInModal = ['AL1002', 'ALI-PR-001']; // Updated here
 
             if (rolesShowingAggregatedTeacherHoursInModal.includes(teacherId)) {
-                // For MD, sum totals from the dynamically generated sub-table
+                // For MD and Principal, sum totals from the dynamically generated sub-table
                 const subTableAmounts = document.querySelectorAll('#otherTeachersSummaryTable [id^="subTableTotalAmount_"]');
                 subTableAmounts.forEach(span => {
                     const amountText = span.textContent.replace('₹', '');
                     teacherGrandTotal += parseFloat(amountText) || 0;
                 });
             } else {
-                // For Principal, Clerk, Mentor, Coordinator, and regular teachers, sum from each student's total amount in their section
+                // For Clerk, Mentor, Coordinator, and regular teachers, sum from each student's total amount in their section
                 const studentAmountSpans = modalContentArea.querySelectorAll('[id^="studentTotalAmount_"]');
                 studentAmountSpans.forEach(span => {
                     const amountText = span.textContent.replace('₹', '');
@@ -1054,8 +1054,8 @@
             let emailContent = `Teacher Salary Details - ${teacherName} (ID: ${teacherId})\n`;
             emailContent += `Overall Total Hours for Teacher: ${overallTeacherHoursDisplay}\n\n`; // Changed label to reflect teacher's overall hours
 
-            // Only MD (AL1002) will show aggregated teacher hours in their modal
-            const rolesShowingAggregatedTeacherHoursInModal = ['AL1002'];
+            // Only MD (AL1002) and Principal (ALI-PR-001) will show aggregated teacher hours in their modal
+            const rolesShowingAggregatedTeacherHoursInModal = ['AL1002', 'ALI-PR-001']; // Updated here for copy function
 
             if (rolesShowingAggregatedTeacherHoursInModal.includes(teacherId)) {
                 emailContent += `Detailed Breakdown of Other Teachers:\n`;
@@ -1082,7 +1082,7 @@
                     });
                 }
             } else {
-                // Logic for Principal, Clerk, Mentor, Coordinator, and regular teachers: breakdown per student
+                // Logic for Clerk, Mentor, Coordinator, and regular teachers: breakdown per student
                 if (modalContentArea) {
                     const studentSections = modalContentArea.querySelectorAll('.student-salary-section');
 
