@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Attendance Sheet</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN (kept for potential utility classes, though custom CSS is dominant) -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <!-- html2pdf.js CDN for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -15,7 +13,8 @@
             font-family: 'Inter', sans-serif; /* Using Inter font */
             margin: 0;
             padding: 0;
-            background: linear-gradient(45deg, #a7d9ed, #e0f7fa, #a1d0c9, #f0fbe2); /* Soft, colorful gradient */
+            /* Adjusted gradient colors for a slightly softer, yet clear look */
+            background: linear-gradient(45deg, #b3e0e6, #e6f7ff, #c9e6e0, #f7fbe6);
             background-size: 400% 400%; /* Larger background for smooth animation */
             animation: gradient 15s ease infinite; /* Gradient animation */
             display: flex;
@@ -53,7 +52,7 @@
 
         /* Button styling */
         .dashboard-btn, .action-btn {
-            background: linear-gradient(to right, #007bff, #00c6ff); /* Blue gradient */
+            background: linear-gradient(to right, #1a73e8, #4285f4); /* Google Blue gradient */
             color: white;
             padding: 14px 28px;
             margin: 10px 10px;
@@ -63,16 +62,16 @@
             font-size: 17px;
             font-weight: 600;
             transition: all 0.3s ease; /* Smooth transition for hover effects */
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); /* Soft shadow */
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.2); /* Soft shadow */
             display: inline-flex; /* Align icon and text */
             align-items: center;
             gap: 8px; /* Space between icon and text */
         }
 
         .dashboard-btn:hover, .action-btn:hover {
-            background: linear-gradient(to right, #0056b3, #0099e6); /* Darker gradient on hover */
+            background: linear-gradient(to right, #176ac1, #3c78d8); /* Darker gradient on hover */
             transform: translateY(-2px); /* Slight lift effect */
-            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3); /* Enhanced shadow on hover */
+            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3); /* Enhanced shadow on hover */
         }
 
         /* Heading style */
@@ -104,8 +103,8 @@
         }
 
         input[type="month"]:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus ring */
+            border-color: #1a73e8; /* Match button color on focus */
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25); /* Focus ring */
             outline: none;
         }
 
@@ -126,10 +125,11 @@
             border: 1px solid #e0e0e0; /* Lighter border for cells */
             padding: 12px 10px;
             text-align: center;
+            vertical-align: middle; /* Ensures content is vertically centered */
         }
 
         th {
-            background-color: #eaf6ff; /* Light blue header background */
+            background-color: #e6f0ff; /* Light blue header background, slightly adjusted */
             color: #333;
             font-weight: 700;
             text-transform: uppercase;
@@ -140,16 +140,16 @@
 
         /* Striped rows */
         tr:nth-child(even) {
-            background-color: #f8fcfd; /* Very light blue for even rows */
+            background-color: #f0f8ff; /* Very light blue for even rows */
         }
 
         /* Hover effect on table rows */
         tr:hover {
-            background-color: #e6f7ff; /* Light blue on hover */
+            background-color: #d9edf7; /* Light blue on hover */
             transition: background-color 0.2s ease;
         }
 
-        /* Status specific styling */
+        /* Status specific styling (kept clear and distinct) */
         .present {
             color: #28a745; /* Green */
             font-weight: bold;
@@ -177,6 +177,25 @@
             display: inline-block;
         }
 
+        /* Styling for student entries within daily cells */
+        .student-entry-summary {
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 3px; /* Space between student entries */
+            border-bottom: 1px dashed #e0e0e0; /* Separator */
+        }
+
+        .student-entry-summary:last-child {
+            border-bottom: none; /* No border for the last entry */
+            margin-bottom: 0;
+        }
+
+        .student-entry-summary span {
+            font-size: 0.95em; /* Adjusted font size for duration */
+            color: #444;
+            font-weight: bold;
+        }
+
         /* Container for the attendance table */
         #attendanceContainer {
             margin-top: 30px;
@@ -188,8 +207,83 @@
             display: none; /* Hidden by default */
             margin-top: 30px;
             font-size: 1.5em;
-            color: #007bff;
+            color: #1a73e8; /* Match button color */
             font-weight: 600;
+        }
+
+        /* Modal Styles - Kept for structure but display: none by default */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Blurred background */
+            -webkit-backdrop-filter: blur(5px); /* Safari support */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            max-height: 80vh; /* Max height for scrollable content */
+            overflow-y: auto; /* Enable scrolling for modal content */
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            color: #1a73e8;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .modal-content p strong {
+            color: #333;
+            margin-right: 5px;
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Responsive adjustments */
@@ -222,6 +316,11 @@
                 padding: 8px 5px;
                 font-size: 13px;
             }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
         }
 
         /* Styles for PDF generation to ensure full content is captured */
@@ -229,6 +328,7 @@
             width: auto !important; /* Allow printArea to expand */
             max-width: none !important; /* Remove max-width constraint */
             overflow-x: visible !important; /* Ensure content is not clipped */
+            padding: 20px; /* Adjust padding for PDF if needed */
         }
 
         .pdf-export-mode #attendanceContainer {
@@ -237,8 +337,75 @@
         }
 
         .pdf-export-mode table {
-            width: max-content !important; /* Make table expand to its full content width */
-            min-width: 100% !important; /* Ensure it's at least 100% wide */
+            table-layout: fixed !important; /* Force fixed layout */
+            width: auto !important; /* Let table determine its width based on fixed columns */
+            min-width: unset !important;
+        }
+
+        .pdf-export-mode #attendanceContainer table th,
+        .pdf-export-mode #attendanceContainer table td {
+            white-space: normal !important; /* Allow text to wrap within cells */
+            word-wrap: break-word !important; /* Ensure long words break */
+            text-align: center !important; /* Ensure consistent text alignment */
+            padding: 8px 5px !important; /* Reduce padding for more content space in PDF */
+            box-sizing: border-box !important; /* Include padding in width */
+            overflow: hidden; /* Hide overflow if text is too long */
+        }
+
+        /* Specific styling for Student Name column (1st column) in PDF export mode */
+        .pdf-export-mode #attendanceContainer table th:nth-child(1),
+        .pdf-export-mode #attendanceContainer table td:nth-child(1) {
+            width: 250px !important; /* Increased width for Student Names */
+            min-width: 250px !important;
+            text-align: left !important;
+        }
+
+        /* Fixed width for other key columns */
+        .pdf-export-mode #attendanceContainer table th:nth-child(2), /* Student ID */
+        .pdf-export-mode #attendanceContainer table td:nth-child(2) {
+            width: 100px !important;
+            min-width: 100px !important;
+        }
+
+        .pdf-export-mode #attendanceContainer table th:nth-child(3), /* Teacher Name */
+        .pdf-export-mode #attendanceContainer table td:nth-child(3) {
+            width: 180px !important; /* Adjusted width for Teacher Name */
+            min-width: 180px !important;
+            text-align: left !important;
+        }
+
+        .pdf-export-mode #attendanceContainer table th:nth-child(4), /* Teacher ID */
+        .pdf-export-mode #attendanceContainer table td:nth-child(4) {
+            width: 100px !important;
+            min-width: 100px !important;
+        }
+
+        /* Total Hours columns */
+        .pdf-export-mode #attendanceContainer table th:last-child, /* Overall Student Total Hrs */
+        .pdf-export-mode #attendanceContainer table td:last-child {
+            width: 120px !important;
+            min-width: 120px !important;
+        }
+        .pdf-export-mode #attendanceContainer table th:nth-last-child(2), /* Total Hrs (Teacher-Student) */
+        .pdf-export-mode #attendanceContainer table td:nth-last-child(2) {
+            width: 120px !important;
+            min-width: 120px !important;
+        }
+
+        /* Daily columns will automatically fill remaining space with table-layout: fixed if no explicit width */
+        .pdf-export-mode #attendanceContainer table th:nth-child(n+5):nth-last-child(n+3),
+        .pdf-export-mode #attendanceContainer table td:nth-child(n+5):nth-last-child(n+3) {
+            min-width: 50px !important; /* Give daily columns a minimum width */
+            width: auto !important; /* Let them auto-adjust within fixed layout */
+        }
+
+        /* Separator for each student group in PDF export */
+        .pdf-export-mode table tr.student-group-start td {
+            border-top: 3px solid #6c757d !important; /* Thicker, distinct border */
+        }
+        /* Ensure the first row of the table doesn't get an extra top border from this rule */
+        .pdf-export-mode table tbody tr:first-child.student-group-start td {
+            border-top: 1px solid #e0e0e0 !important; /* Revert to normal border for the very first row */
         }
     </style>
 </head>
@@ -261,12 +428,23 @@
         <div id="attendanceContainer"></div>
     </div>
 
+    <!-- Logbook Details Modal - Kept in HTML but hidden by default and no longer triggered by cell clicks -->
+    <div id="logbookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3>Logbook Details</h3>
+            <div id="modalDetails">
+                <!-- Details will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // Google Apps Script Web App URL - REPLACE THIS WITH YOUR ACTUAL DEPLOYED URL
         // This URL should point to the Apps Script that fetches data from your combined Google Sheet.
         const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwdKvar_uKqoAg1wX60NTThwVHBul14wroJj0QqBQZ3WtQ5zx2hAWXe8hqXqifFI3diSA/exec';
 
-        // Sample Log Book Data for Students (used if fetching fails or URL is not set)
+        // Sample Log Book Data (used if fetching fails or URL is not set)
         const sampleLogBookData = [
             { Date: '2025-06-01', 'Teacher Name': 'Alice Smith', 'Staff ID': 'T001', 'Program': 'Math', 'Class Room Name': 'Room 101', 'Student Name': 'John Doe', 'Student ID': 'S001', 'Subject': 'Algebra', 'Class In': '10:00 AM', 'Class Duration': 60, 'What Taught Today': 'Equations', 'Student Engagement': 'High', 'Any Work': 'Homework 1', 'Anything you\'d like to share?': '' },
             { Date: '2025-06-01', 'Teacher Name': 'Bob Johnson', 'Staff ID': 'T002', 'Program': 'Science', 'Class Room Name': 'Room 102', 'Student Name': 'Jane Smith', 'Student ID': 'S002', 'Subject': 'Biology', 'Class In': '11:00 AM', 'Class Duration': 45, 'What Taught Today': 'Cells', 'Student Engagement': 'Medium', 'Any Work': '', 'Anything you\'d like to share?': '' },
@@ -306,6 +484,40 @@
             } else {
                 return { symbol: '❌', class: 'absent' }; // Cross for absent
             }
+        }
+
+        /**
+         * The showLogbookDetails function is no longer called from the table cells,
+         * but is kept here in case you wish to re-enable it or use it elsewhere.
+         * @param {string} encodedDetailsString - The URL-encoded JSON string of the logbook entry.
+         */
+        function showLogbookDetails(encodedDetailsString) {
+            const details = JSON.parse(decodeURIComponent(encodedDetailsString)); // Decode and parse here
+            const modal = document.getElementById('logbookModal');
+            const modalDetails = document.getElementById('modalDetails');
+            modalDetails.innerHTML = `
+                <p><strong>Date:</strong> ${details.Date}</p>
+                <p><strong>Teacher:</strong> ${details['Teacher Name']} (ID: ${details['Staff ID']})</p>
+                <p><strong>Student:</strong> ${details['Student Name']} (ID: ${details['Student ID']})</p>
+                <p><strong>Program:</strong> ${details.Program}</p>
+                <p><strong>Classroom:</strong> ${details['Class Room Name']}</p>
+                <p><strong>Subject:</strong> ${details.Subject}</p>
+                <p><strong>Class In:</strong> ${details['Class In']}</p>
+                <p><strong>Class Duration:</strong> ${details['Class Duration']} minutes</p>
+                <p><strong>What Taught Today:</strong> ${details['What Taught Today']}</p>
+                <p><strong>Student Engagement:</strong> ${details['Student Engagement']}</p>
+                <p><strong>Any Work:</strong> ${details['Any Work'] || 'N/A'}</p>
+                <p><strong>Anything to share:</strong> ${details['Anything you\'d like to share?'] || 'N/A'}</p>
+            `;
+            modal.style.display = 'flex'; // Use flex to center the modal
+        }
+
+        /**
+         * Closes the logbook details modal.
+         */
+        function closeModal() {
+            const modal = document.getElementById('logbookModal');
+            modal.style.display = 'none';
         }
 
         /**
@@ -427,7 +639,7 @@
                 html += '<th>Total Hrs (Teacher-Student)</th><th>Overall Student Total Hrs</th></tr></thead><tbody>';
 
                 // Sort students by name for consistent display
-                const sortedStudentIds = Object.keys(students).sort((a, b) => 
+                const sortedStudentIds = Object.keys(students).sort((a, b) =>
                     students[a].name.localeCompare(students[b].name)
                 );
 
@@ -437,17 +649,19 @@
                     const teacherKeys = Object.keys(studentInfo.teacherData).sort((a, b) =>
                         studentInfo.teacherData[a].name.localeCompare(studentInfo.teacherData[b].name)
                     );
-                    const rowspanCount = teacherKeys.length;
+
+                    // Calculate overall student total hours once per student
+                    const overallTotalHoursStudent = (studentInfo.totalMonthlyMinutes / 60).toFixed(2);
 
                     teacherKeys.forEach((teacherId, index) => {
                         const teacherInfo = studentInfo.teacherData[teacherId];
-                        html += `<tr>`;
+                        // Add 'student-group-start' class to the first row of each student
+                        const rowClass = (index === 0) ? 'student-group-start' : '';
+                        html += `<tr class="${rowClass}">`; // Add the class here
 
-                        // Student Name and ID (rowspan for the first teacher entry)
-                        if (index === 0) {
-                            html += `<td rowspan="${rowspanCount}">${studentInfo.name}</td>`;
-                            html += `<td rowspan="${rowspanCount}">${studentId}</td>`;
-                        }
+                        // Student Name and ID (repeated for each teacher, no rowspan)
+                        html += `<td>${studentInfo.name}</td>`;
+                        html += `<td>${studentId}</td>`;
 
                         // Teacher Name and ID
                         html += `<td>${teacherInfo.name}</td>`;
@@ -464,11 +678,8 @@
                         const totalHoursTeacherStudent = (teacherInfo.totalMinutesWithStudent / 60).toFixed(2);
                         html += `<td><strong>${totalHoursTeacherStudent}</strong></td>`;
 
-                        // Overall Student Total Hours (rowspan for the first teacher entry)
-                        if (index === 0) {
-                            const overallTotalHoursStudent = (studentInfo.totalMonthlyMinutes / 60).toFixed(2);
-                            html += `<td rowspan="${rowspanCount}"><strong>${overallTotalHoursStudent}</strong></td>`;
-                        }
+                        // Overall Student Total Hours (repeated for each teacher, no rowspan)
+                        html += `<td><strong>${overallTotalHoursStudent}</strong></td>`;
                         html += `</tr>`;
                     });
                 });
@@ -502,7 +713,7 @@
             const table = attendanceContainer.querySelector('table');
             const body = document.body;
 
-            if (!table || table.querySelector('tbody').children.length === 0 || table.querySelector('tbody').children[0].textContent.includes('No salary data found')) {
+            if (!table || table.querySelector('tbody').children.length === 0) {
                 const alertDiv = document.createElement('div');
                 alertDiv.style.cssText = `
                     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -512,7 +723,7 @@
                 `;
                 alertDiv.textContent = 'Please load data first before downloading PDF!';
                 document.body.appendChild(alertDiv);
-                setTimeout(() => alertDiv.remove(), 3000); 
+                setTimeout(() => alertDiv.remove(), 3000);
                 return;
             }
 
@@ -527,11 +738,32 @@
             const originalTableWidth = table.style.width;
             const originalTableMinWidth = table.style.minWidth;
 
+            // Store original cell styles for all cells to be modified
+            const originalCellStyles = [];
+            const cells = table.querySelectorAll('td, th');
+            cells.forEach(cell => {
+                originalCellStyles.push({
+                    element: cell,
+                    whiteSpace: cell.style.whiteSpace,
+                    wordWrap: cell.style.wordWrap,
+                    textAlign: cell.style.textAlign,
+                    minWidth: cell.style.minWidth,
+                    width: cell.style.width, /* Store original width */
+                    padding: cell.style.padding,
+                    boxSizing: cell.style.boxSizing /* Store original box-sizing */
+                });
+            });
+
+
             // Apply PDF-specific styles
             body.classList.add('pdf-export-mode'); // Apply class for general overrides
 
             // Force elements to expand to their full content width
-            table.style.width = `${table.scrollWidth}px`; // Set table width to its full scrollWidth
+            // The tableWidth calculation should now be more accurate as there are no rowspans to complicate it.
+            const computedTableStyle = window.getComputedStyle(table);
+            const tableWidth = parseFloat(computedTableStyle.width) || table.scrollWidth;
+
+            table.style.width = `${tableWidth}px`; // Set table width to its full content width
             table.style.minWidth = 'auto'; // Remove min-width constraint
             element.style.width = 'auto'; // Allow printArea to expand
             element.style.maxWidth = 'none'; // Remove max-width constraint
@@ -543,19 +775,17 @@
 
             // A small delay to ensure styles are applied before rendering
             setTimeout(() => {
-                // Calculate the required width for the PDF based on the table's actual rendered width
-                // Use offsetWidth as it reflects the rendered width after styles are applied
-                const pdfContentWidth = table.offsetWidth + 100; // Add some padding
+                // Recalculate content width after styles are applied and elements have potentially expanded
+                const pdfContentWidth = element.offsetWidth + 60; // Use element's offsetWidth as it's the container
                 const pdfHeight = 2000; // A large enough height for typical reports
 
                 html2pdf().set({
-                    margin: 0,
+                    margin: [10, 10, 10, 10], // Top, Left, Bottom, Right margins
                     filename: 'Student_Attendance_Report.pdf', // Changed filename
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: {
                         scale: 2, // Increased scale for better quality
                         useCORS: true,
-                        // Explicitly set width to capture full content
                         width: pdfContentWidth // Use the calculated content width for html2canvas
                     },
                     jsPDF: {
@@ -576,6 +806,18 @@
 
                     table.style.width = originalTableWidth;
                     table.style.minWidth = originalTableMinWidth;
+
+                    // Restore original cell styles
+                    originalCellStyles.forEach(style => {
+                        style.element.style.whiteSpace = style.whiteSpace;
+                        style.element.style.wordWrap = style.wordWrap;
+                        style.element.style.textAlign = style.textAlign;
+                        style.element.style.minWidth = style.minWidth;
+                        style.element.style.width = style.width; /* Restore original width */
+                        style.element.style.padding = style.padding;
+                        style.element.style.boxSizing = style.boxSizing; /* Restore original box-sizing */
+                    });
+
                 });
             }, 300); // Increased delay to 300ms
         }
