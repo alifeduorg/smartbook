@@ -6,14 +6,14 @@
     <title>Daily Class Log</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Poppins Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Three.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light gray background */
+            font-family: 'Poppins', sans-serif; /* Changed font to Poppins */
+            background-color: #F0F2F5; /* Light cool gray background */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -33,7 +33,7 @@
             opacity: 0.3; /* Increased opacity for more visibility */
         }
         .container {
-            background-color: #ffffff;
+            background-color: #FFFFFF; /* Pure white container */
             padding: 2.5rem; /* Increased padding */
             border-radius: 1.5rem; /* More rounded corners */
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Deeper shadow */
@@ -44,47 +44,56 @@
             z-index: 1; /* Ensure form is above canvas */
         }
         h1 {
-            color: #000080; /* Navy Blue color for the title */
+            color: #2C3E50; /* Dark slate blue/gray for the title */
             font-weight: 700; /* Bold heading */
             margin-bottom: 2rem; /* More space below heading */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* Subtle 3D effect for text */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Subtle 3D effect for text */
         }
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500; /* Medium weight for labels */
-            color: #4a5568; /* Slightly darker gray for labels */
+            color: #5C6F80; /* Muted blue-gray for labels */
         }
-        input[type="text"],
-        input[type="number"],
         input[type="date"],
-        input[type="time"], /* Added time input type */
-        select,
-        textarea {
+        input[type="time"],
+        input[type="number"],
+        input[type="text"], /* Added for new text inputs */
+        select { /* Apply consistent height to select elements */
+            height: 3rem; /* Explicit height for consistent visual size */
             width: 100%;
             padding: 0.75rem 1rem; /* More padding for inputs */
             margin-bottom: 1.5rem; /* More space below inputs */
-            border: 1px solid #cbd5e0; /* Lighter border */
+            border: 1px solid #D1D9E0; /* Soft gray border */
             border-radius: 0.75rem; /* Rounded input fields */
             font-size: 1rem;
-            color: #2d3748; /* Darker text for input values */
-            background-color: #edf2f7; /* Light background for inputs */
+            color: #343A40; /* Dark charcoal gray for input values */
+            background-color: #F8F9FA; /* Off-white background for inputs */
             transition: all 0.2s ease-in-out; /* Smooth transitions */
         }
-        input[type="text"]:focus,
-        input[type="number"]:focus,
+        textarea { /* Textarea remains flexible */
+            width: 100%;
+            padding: 0.75rem 1rem; /* More padding for inputs */
+            margin-bottom: 1.5rem; /* More space below inputs */
+            border: 1px solid #D1D9E0; /* Soft gray border */
+            border-radius: 0.75rem; /* Rounded input fields */
+            font-size: 1rem;
+            color: #343A40; /* Dark charcoal gray for input values */
+            background-color: #F8F9FA; /* Off-white background for inputs */
+            transition: all 0.2s ease-in-out; /* Smooth transitions */
+            min-height: 100px; /* Larger text area */
+            resize: vertical; /* Allow vertical resizing */
+        }
         input[type="date"]:focus,
-        input[type="time"]:focus, /* Added time input type focus */
+        input[type="time"]:focus,
+        input[type="number"]:focus,
+        input[type="text"]:focus,
         select:focus,
         textarea:focus {
             outline: none;
-            border-color: #6366f1; /* Indigo focus border */
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Focus ring */
+            border-color: #6C7BFF; /* A slightly brighter, but still professional blue focus border */
+            box-shadow: 0 0 0 3px rgba(108, 123, 255, 0.2); /* Focus ring */
             background-color: #ffffff; /* White background on focus */
-        }
-        textarea {
-            min-height: 100px; /* Larger text area */
-            resize: vertical; /* Allow vertical resizing */
         }
         .button-group {
             display: flex;
@@ -108,24 +117,24 @@
             transform: translateY(-2px); /* Slight lift effect */
         }
         .button-group button:disabled {
-            background-color: #a7a7a7; /* Gray for disabled state */
+            background-color: #AAB7C4; /* Gray for disabled state */
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
         }
         #submitButton {
-            background-color: #6366f1; /* Indigo for submit button */
+            background-color: #4A69BD; /* Rich medium blue for submit button */
             color: white;
         }
         #submitButton:hover:not(:disabled) {
-            background-color: #4f46e5; /* Darker indigo on hover */
+            background-color: #3A52A0; /* Darker rich blue on hover */
         }
         #dashboardButton {
-            background-color: #10b981; /* Green for dashboard button */
+            background-color: #2ECC71; /* Pleasant green for dashboard button */
             color: white;
         }
         #dashboardButton:hover:not(:disabled) {
-            background-color: #059669; /* Darker green on hover */
+            background-color: #27AE60; /* Darker green on hover */
         }
 
         .grid-cols-2 {
@@ -209,14 +218,14 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2">
-                <div>
-                    <label for="teacherName">Teacher Name:</label>
-                    <input type="text" id="teacherName" name="teacherName" placeholder="Enter teacher's name" required class="rounded-xl">
-                </div>
-                <div>
-                    <label for="staffId">Staff ID:</label>
-                    <input type="text" id="staffId" name="staffId" placeholder="Enter staff ID" required class="rounded-xl">
+            <!-- Combined Teacher Name and ID dropdown -->
+            <div>
+                <label for="teacherCombined">Teacher Name (ID):</label>
+                <select id="teacherCombined" name="teacherCombined" required class="rounded-xl w-full">
+                    <option value="">Select Teacher</option>
+                </select>
+                <div id="newTeacherInputContainer" style="display: none; margin-top: 0.5rem;">
+                    <input type="text" id="newTeacherCombined" name="newTeacherCombined" placeholder="e.g., New Teacher (NEWID001)" class="rounded-xl w-full">
                 </div>
             </div>
 
@@ -229,19 +238,24 @@
                 <option value="EPISTEM">EPISTEM</option>
                 <option value="AL ILM ISLAMIC SCHOOL">AL ILM ISLAMIC SCHOOL</option>
             </select>
+            
+            <!-- Combined Student Name and ID dropdown - Moved Here -->
+            <div>
+                <label for="studentCombined">Student Name (ID):</label>
+                <select id="studentCombined" name="studentCombined" required class="rounded-xl w-full">
+                    <option value="">Select Student</option>
+                </select>
+                <div id="newStudentInputContainer" style="display: none; margin-top: 0.5rem;">
+                    <input type="text" id="newStudentCombined" name="newStudentCombined" placeholder="e.g., New Student (NEWSTU001)" class="rounded-xl w-full">
+                </div>
+            </div>
 
             <label for="classroomName">Class Room Name:</label>
-            <input type="text" id="classroomName" name="classroomName" placeholder="e.g., Grade 5A" required class="rounded-xl">
-
-            <div class="grid grid-cols-2">
-                <div>
-                    <label for="studentName">Student Name:</label>
-                    <input type="text" id="studentName" name="studentName" placeholder="Enter student's name" required class="rounded-xl">
-                </div>
-                <div>
-                    <label for="studentId">Student ID:</label>
-                    <input type="text" id="studentId" name="studentId" placeholder="Enter student ID" required class="rounded-xl">
-                </div>
+            <select id="classroomName" name="classroomName" required class="rounded-xl">
+                <option value="">Select Classroom</option>
+            </select>
+            <div id="newClassroomInputContainer" style="display: none; margin-top: 0.5rem;">
+                <input type="text" id="newClassroomName" name="newClassroomName" placeholder="e.g., New Class 101" class="rounded-xl w-full">
             </div>
 
             <div class="grid grid-cols-2">
@@ -303,14 +317,14 @@
         const particleCount = 200; // More particles for a denser field
         const glowingSphereCount = 5; // Fewer, larger glowing spheres
         const colors = [
-            0x6366f1, // Indigo
-            0x06b6d4, // Cyan
-            0x8b5cf6, // Purple
-            0x14b8a6, // Teal
-            0xec4899, // Pink
-            0xf59e0b, // Amber
-            0x3b82f6  // Blue
-        ]; // A wider palette of vibrant colors
+            0x4A69BD, // Rich medium blue
+            0x6C7BFF, // Brighter blue for focus
+            0x2ECC71, // Pleasant green
+            0x27AE60, // Darker green
+            0xF59E0B, // Amber (retained for some contrast)
+            0xEC4899, // Pink (retained for some contrast)
+            0x8B5CF6  // Purple (retained for some contrast)
+        ]; // Updated color palette for 3D animation
 
         function initThreeJS() {
             const canvas = document.getElementById('three-canvas');
@@ -450,6 +464,175 @@
             const submitButton = document.getElementById('submitButton');
             const dashboardButton = document.getElementById('dashboardButton');
 
+            // Combined dropdown elements
+            const teacherCombinedSelect = document.getElementById('teacherCombined');
+            const studentCombinedSelect = document.getElementById('studentCombined');
+            const classroomNameSelect = document.getElementById('classroomName');
+
+            // New input containers and fields
+            const newTeacherInputContainer = document.getElementById('newTeacherInputContainer');
+            const newTeacherCombinedInput = document.getElementById('newTeacherCombined');
+            const newStudentInputContainer = document.getElementById('newStudentInputContainer');
+            const newStudentCombinedInput = document.getElementById('newStudentCombined');
+            const newClassroomInputContainer = document.getElementById('newClassroomInputContainer');
+            const newClassroomNameInput = document.getElementById('newClassroomName');
+
+
+            // Data provided by the user, parsed for dropdowns
+            const teachers = [
+                { id: "ALFTT25001", name: "Minha Anam V" },
+                { id: "ALFTT25002", name: "Akshai S" },
+                { id: "ALFTT25003", name: "Rahmath. M" },
+                { id: "ALFTT25004", name: "JANNATH N" },
+                { id: "ALFTT25005", name: "Hasna Sherin P" },
+                { id: "ALFTT25006", name: "Fathima Nifna m" },
+                { id: "ALFTT25007", name: "Ummu habeeba pk" },
+                { id: "ALFTT25008", name: "Juvairiyya" },
+                { id: "ALFTT25009", name: "Rihila -k" },
+                { id: "ALFTT25010", name: "Shifa.k" },
+                { id: "ALFTT25011", name: "SHIFNA. M" },
+                { id: "ALFTT25012", name: "Zeenath. K" },
+                { id: "ALFTT25013", name: "Amna pv" },
+                { id: "ALFTT25014", name: "Avandika T" },
+                { id: "ALFTT25015", name: "Shamila pk" },
+                { id: "ALFTT25016", name: "JAHANA SHERIN A" },
+                { id: "ALFTT25017", name: "SAFEERA THASNEEM K" },
+                { id: "ALFTT25018", name: "AKHILA CB" }
+            ];
+
+            const students = [
+                { id: "ALF25001", name: "ADHIL RAHMAN.K", classroom: "C1-10" },
+                { id: "ALF25004", name: "LIYANA", classroom: "C2-8" },
+                { id: "ALF25005", name: "MUHAMMED SHIMIL", classroom: "C3-9" },
+                { id: "ALF25003", name: "AYISHA SAEEDA.K", classroom: "C4-3" },
+                { id: "ALF25006", name: "AYISHA MEHAVISH", classroom: "C5-3" },
+                { id: "ALF25011", name: "ANSILA", classroom: "C6-1" },
+                { id: "ALF25010", name: "MEHZA ABBAS", classroom: "C7-1" },
+                { id: "ALF25007", name: "Lamha fathima CK", classroom: "C8-7" }, // Using full name from previous data
+                { id: "ALF25009", name: "Faizan", classroom: "C9-3" },
+                { id: "ALF25008", name: "Ansha. K", classroom: "C10-6" }, // Using full name from previous data
+                // Students from previous list without new classroom mapping:
+                { id: "ALF25002", name: "SHAMAS HAMEED", classroom: "D1-1" }
+            ];
+
+            // All classroom names, deduplicated and sorted
+            const allClassrooms = [
+                 "D1-1",
+                "C1-10", "C2-8", "C3-9", "C4-3", "C5-3", "C6-1", "C7-1", "C8-7", "C9-3", "C10-6"
+            ].sort();
+
+
+            /**
+             * Populates a select element with options from a data array,
+             * combining name and ID for display, and adds an "other_entry" option.
+             * The option value will be a JSON string containing all item properties.
+             * @param {HTMLSelectElement} selectElement - The select element to populate.
+             * @param {Array<Object>} dataArray - The array of data objects (must have 'name' and 'id' properties, can have 'classroom').
+             */
+            function populateCombinedDropdown(selectElement, dataArray) {
+                // Clear existing options, keeping the default "Select..." option
+                while (selectElement.options.length > 1) {
+                    selectElement.remove(1);
+                }
+
+                dataArray.forEach(item => {
+                    const option = document.createElement('option');
+                    // Store the full item object as a JSON string in the value
+                    option.value = JSON.stringify(item);
+                    option.textContent = `${item.name} (${item.id})`;
+                    selectElement.appendChild(option);
+                });
+                const otherOption = document.createElement('option');
+                otherOption.value = "other_entry";
+                otherOption.textContent = "Add New / Other...";
+                selectElement.appendChild(otherOption);
+            }
+
+            /**
+             * Populates a select element with simple string options and adds an "other_entry" option.
+             * @param {HTMLSelectElement} selectElement - The select element to populate.
+             * @param {Array<string>} dataArray - The array of string data.
+             */
+            function populateSimpleDropdown(selectElement, dataArray) {
+                while (selectElement.options.length > 1) {
+                    selectElement.remove(1);
+                }
+                dataArray.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    selectElement.appendChild(option);
+                });
+                const otherOption = document.createElement('option');
+                otherOption.value = "other_entry";
+                otherOption.textContent = "Add New / Other...";
+                selectElement.appendChild(otherOption);
+            }
+
+            // Populate Teacher Name (ID) dropdown
+            populateCombinedDropdown(teacherCombinedSelect, teachers);
+
+            // Populate Student Name (ID) dropdown
+            populateCombinedDropdown(studentCombinedSelect, students);
+
+            // Populate Classroom Name dropdown
+            populateSimpleDropdown(classroomNameSelect, allClassrooms);
+
+            // Event listeners for "Add New / Other" functionality
+            teacherCombinedSelect.addEventListener('change', () => {
+                if (teacherCombinedSelect.value === 'other_entry') {
+                    newTeacherInputContainer.style.display = 'block';
+                    newTeacherCombinedInput.required = true;
+                } else {
+                    newTeacherInputContainer.style.display = 'none';
+                    newTeacherCombinedInput.value = '';
+                    newTeacherCombinedInput.required = false;
+                }
+            });
+
+            studentCombinedSelect.addEventListener('change', () => {
+                if (studentCombinedSelect.value === 'other_entry') {
+                    newStudentInputContainer.style.display = 'block';
+                    newStudentCombinedInput.required = true;
+                    classroomNameSelect.value = ''; // Clear classroom if "Other" student is selected
+                    newClassroomInputContainer.style.display = 'none'; // Hide new classroom input
+                    newClassroomNameInput.value = '';
+                    newClassroomNameInput.required = false;
+                } else {
+                    newStudentInputContainer.style.display = 'none';
+                    newStudentCombinedInput.value = '';
+                    newStudentCombinedInput.required = false;
+
+                    try {
+                        const selectedStudentData = JSON.parse(studentCombinedSelect.value);
+                        if (selectedStudentData.classroom) {
+                            classroomNameSelect.value = selectedStudentData.classroom;
+                            // If classroom is set, ensure "Add New Classroom" is hidden
+                            newClassroomInputContainer.style.display = 'none';
+                            newClassroomNameInput.value = '';
+                            newClassroomNameInput.required = false;
+                        } else {
+                            classroomNameSelect.value = ''; // Clear if no classroom is associated
+                        }
+                    } catch (e) {
+                        console.error("Error parsing student data:", e);
+                        classroomNameSelect.value = ''; // Fallback
+                    }
+                }
+            });
+
+            classroomNameSelect.addEventListener('change', () => {
+                if (classroomNameSelect.value === 'other_entry') {
+                    newClassroomInputContainer.style.display = 'block';
+                    newClassroomNameInput.required = true;
+                } else {
+                    newClassroomInputContainer.style.display = 'none';
+                    newClassroomNameInput.value = '';
+                    newClassroomNameInput.required = false;
+                }
+            });
+
+
             // Ensure the submit button is enabled and ready for a new entry on page load
             submitButton.disabled = false;
             submitButton.textContent = 'Submit Log';
@@ -482,6 +665,70 @@
                 for (let [key, value] of formData.entries()) {
                     data[key] = value;
                 }
+
+                // Handle "other_entry" for teacher
+                if (data['teacherCombined'] === 'other_entry') {
+                    data['teacherCombined'] = data['newTeacherCombined'];
+                }
+                const selectedTeacherCombined = data['teacherCombined'];
+                if (selectedTeacherCombined && selectedTeacherCombined !== "other_entry") {
+                    try {
+                        const parsedTeacherData = JSON.parse(selectedTeacherCombined);
+                        data['teacherName'] = parsedTeacherData.name;
+                        data['staffId'] = parsedTeacherData.id;
+                    } catch (e) {
+                        // Fallback for manually entered "other" teacher, or malformed data
+                        const match = selectedTeacherCombined.match(/(.*) \((.*)\)/);
+                        if (match) {
+                            data['teacherName'] = match[1];
+                            data['staffId'] = match[2];
+                        } else {
+                            data['teacherName'] = selectedTeacherCombined;
+                            data['staffId'] = '';
+                        }
+                    }
+                } else if (selectedTeacherCombined === "other_entry") {
+                    data['teacherName'] = '';
+                    data['staffId'] = '';
+                }
+                delete data['teacherCombined']; // Remove the combined field from the final data
+                delete data['newTeacherCombined']; // Remove the temporary new input field
+
+                // Handle "other_entry" for student
+                if (data['studentCombined'] === 'other_entry') {
+                    data['studentCombined'] = data['newStudentCombined'];
+                }
+                const selectedStudentCombined = data['studentCombined'];
+                if (selectedStudentCombined && selectedStudentCombined !== "other_entry") {
+                    try {
+                        const parsedStudentData = JSON.parse(selectedStudentCombined);
+                        data['studentName'] = parsedStudentData.name;
+                        data['studentId'] = parsedStudentData.id;
+                        // Classroom is now handled by the classroomName field directly, which might have been auto-filled or manually selected/entered
+                    } catch (e) {
+                        // Fallback for manually entered "other" student, or malformed data
+                        const match = selectedStudentCombined.match(/(.*) \((.*)\)/);
+                        if (match) {
+                            data['studentName'] = match[1];
+                            data['studentId'] = match[2];
+                        } else {
+                            data['studentName'] = selectedStudentCombined;
+                            data['studentId'] = '';
+                        }
+                    }
+                } else if (selectedStudentCombined === "other_entry") {
+                    data['studentName'] = '';
+                    data['studentId'] = '';
+                }
+                delete data['studentCombined']; // Remove the combined field from the final data
+                delete data['newStudentCombined']; // Remove the temporary new input field
+
+                // Handle "other_entry" for classroom
+                if (data['classroomName'] === 'other_entry') {
+                    data['classroomName'] = data['newClassroomName'];
+                }
+                delete data['newClassroomName']; // Remove the temporary new input field
+
 
                 console.log('Form Data:', data);
 
