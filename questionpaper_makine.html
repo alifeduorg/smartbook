@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Paper Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter and Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        /* Main layout container for two columns */
+        .main-app-container {
+            display: flex;
+            flex-direction: column; /* Stack columns on small screens */
+            gap: 1.5rem; /* gap-6 */
+            padding: 1.5rem; /* p-6 */
+            min-height: 100vh;
+        }
+        @media (min-width: 1024px) { /* lg breakpoint */
+            .main-app-container {
+                flex-direction: row; /* Side-by-side on large screens */
+            }
+        }
+
+        /* Styles for the black box code (for HTML preview) */
+        .code-box {
+            background-color: black;
+            padding: 2px 8px;
+            border-radius: 0; /* Sharp edges */
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            display: inline-block; /* To make padding work */
+            box-sizing: border-box;
+            text-align: center; /* Center text inside the span */
+        }
+
+        /* Styles for the question paper preview area (both live and hidden for PDF) */
+        #questionPaperPreviewLive,
+        #questionPaperPreviewPdfContent {
+            width: 210mm; /* A4 width */
+            min-height: 297mm; /* A4 height */
+            background-color: white;
+            padding: 25mm; /* Roughly 1 inch margin on all sides */
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif; /* Use Roboto for content as per image */
+            color: #000;
+            position: relative; /* For absolute positioning of code and PTO */
+            overflow: hidden; /* Ensure content doesn't spill */
+        }
+
+        /* Specific styles for the live preview container */
+        #questionPaperPreviewLive {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto; /* Center in its column */
+            max-width: 100%; /* Ensure it doesn't overflow its column */
+        }
+
+        /* Hidden div for PDF content, only visible to html2canvas */
+        #questionPaperPreviewPdfContent {
+            display: none;
+        }
+
+        /* Header/Footer code wrappers for PDF content (html2canvas will render these) */
+        #questionPaperPreviewPdfContent .header-code-wrapper {
+            position: absolute;
+            top: 20mm;
+            right: 20mm;
+        }
+
+        #questionPaperPreviewPdfContent .footer-code-wrapper {
+            position: absolute;
+            bottom: 20mm;
+            left: 20mm;
+        }
+
+        #questionPaperPreviewPdfContent .pto-text {
+            position: absolute;
+            bottom: 20mm;
+            right: 20mm;
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #questionPaperPreviewLive .main-title,
+        #questionPaperPreviewPdfContent .main-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #questionPaperPreviewLive .sub-title,
+        #questionPaperPreviewPdfContent .sub-title {
+            text-align: center;
+            font-size: 28px; /* Increased for highlight */
+            font-weight: 900; /* Extra bold for highlight */
+            margin-top: 10px;
+            margin-bottom: 25px; /* Added margin after header part */
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* New styles for header rows */
+        #questionPaperPreviewLive .details-row-std,
+        #questionPaperPreviewPdfContent .details-row-std {
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif;
+            margin-top: 30px; /* Initial margin for the STD row */
+        }
+        #questionPaperPreviewLive .details-row-time-mark,
+        #questionPaperPreviewPdfContent .details-row-time-mark {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif;
+            margin-top: 5px; /* Space between STD and Time/Mark */
+        }
+        #questionPaperPreviewLive .details-row-time-mark .detail-right,
+        #questionPaperPreviewPdfContent .details-row-time-mark .detail-right {
+            text-align: right;
+        }
+
+
+        #questionPaperPreviewLive .horizontal-line,
+        #questionPaperPreviewPdfContent .horizontal-line {
+            border-top: 1px solid black;
+            margin-top: 20px; /* Space after details row */
+            margin-bottom: 20px; /* Space before sections */
+        }
+
+        /* Section Heading Styles for Live Preview and PDF Content */
+        #questionPaperPreviewLive .section-container-for-pdf,
+        #questionPaperPreviewPdfContent .section-container-for-pdf {
+            margin-top: 30px;
+            margin-bottom: 15px; /* Space before questions */
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+        }
+        /* Line containing SECTION A */
+        #questionPaperPreviewLive .section-letter-line,
+        #questionPaperPreviewPdfContent .section-letter-line {
+            font-size: 20px;
+            text-align: center; /* Center "SECTION A" */
+            margin-bottom: 5px; /* Space before description line */
+        }
+        #questionPaperPreviewLive .section-letter-text,
+        #questionPaperPreviewPdfContent .section-letter-text {
+            /* No flex-grow here as it's centered */
+        }
+        /* Line containing descriptive heading and marks */
+        #questionPaperPreviewLive .section-heading-description-line,
+        #questionPaperPreviewPdfContent .section-heading-description-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 18px; /* Slightly smaller than main section heading */
+            margin-bottom: 15px; /* Space after this line and before questions */
+        }
+        #questionPaperPreviewLive .section-heading-description,
+        #questionPaperPreviewPdfContent .section-heading-description {
+            text-align: left; /* Left-aligned descriptive heading */
+            flex-grow: 1; /* Allow it to take space */
+        }
+        #questionPaperPreviewLive .section-marks-text,
+        #questionPaperPreviewPdfContent .section-marks-text {
+            white-space: nowrap;
+            margin-left: 10px; /* Space between description and marks */
+        }
+
+
+        #questionPaperPreviewLive .question-item,
+        #questionPaperPreviewPdfContent .question-item {
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Styling for sub-questions and MCQ options */
+        #questionPaperPreviewLive .question-item .sub-question,
+        #questionPaperPreviewPdfContent .question-item .sub-question {
+            margin-left: 20px;
+            display: block; /* Ensure it takes its own line */
+        }
+        /* MCQ options container - flex for multi-column layout */
+        #questionPaperPreviewLive .mcq-options-container,
+        #questionPaperPreviewPdfContent .mcq-options-container {
+            display: flex;
+            flex-wrap: wrap; /* Allow options to wrap to next line */
+            justify-content: flex-start; /* Align options to the start */
+            margin-top: 5px; /* Small space above options */
+        }
+        /* Individual MCQ option styling */
+        #questionPaperPreviewLive .mcq-option,
+        #questionPaperPreviewPdfContent .mcq-option {
+            display: block; /* Start as block */
+            width: 100%; /* Default to one per line */
+            padding-right: 10px; /* Space between options */
+            box-sizing: border-box;
+        }
+
+        /* Responsive MCQ options: 2 per line on larger screens, 4 per line on even larger */
+        @media (min-width: 640px) { /* sm breakpoint */
+            #questionPaperPreviewLive .mcq-option,
+            #questionPaperPreviewPdfContent .mcq-option {
+                width: 49%; /* Roughly 2 per line */
+            }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            #questionPaperPreviewLive .mcq-option,
+            #questionPaperPreviewPdfContent .mcq-option {
+                width: 32%; /* Roughly 3 per line */
+            }
+        }
+        @media (min-width: 1024px) { /* lg breakpoint */
+            #questionPaperPreviewLive .mcq-option,
+            #questionPaperPreviewPdfContent .mcq-option {
+                width: 24%; /* Roughly 4 per line */
+            }
+        }
+
+        /* Indentation for sub-question MCQs */
+        #questionPaperPreviewLive .question-item .sub-question .mcq-options-container,
+        #questionPaperPreviewPdfContent .question-item .sub-question .mcq-options-container {
+            padding-left: 20px; /* Further indent for sub-question MCQs */
+        }
+
+
+        #questionPaperPreviewLive .end-marker,
+        #questionPaperPreviewPdfContent .end-marker {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 50px; /* Ample space before the marker */
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="p-0 m-0"> <!-- Remove default body padding/margin -->
+    <div class="main-app-container">
+        <!-- Left Column: Form -->
+        <div class="w-full lg:w-1/2 bg-white p-8 rounded-lg shadow-md">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Question Paper Generator</h1>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label for="examName" class="block text-sm font-medium text-gray-700 mb-1">Exam Name:</label>
+                    <select id="examName" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select Exam</option>
+                        <option value="Academic Test 1">Academic Test 1</option>
+                        <option value="Academic Test 2">Academic Test 2</option>
+                        <option value="Academic Test 3">Academic Test 3</option>
+                        <option value="Academic Test 4">Academic Test 4</option>
+                        <option value="Periodic Test 1">Periodic Test 1</option>
+                        <option value="Periodic Test 2">Periodic Test 2</option>
+                        <option value="Periodic Test 3">Periodic Test 3</option>
+                        <option value="Periodic Test 4">Periodic Test 4</option>
+                        <option value="Term 1">Term 1</option>
+                        <option value="Term 2">Term 2</option>
+                        <option value="Term 3">Term 3</option>
+                        <option value="Half Yearly">Half Yearly</option>
+                        <option value="Revision Test">Revision Test</option>
+                        <option value="Admission Test">Admission Test</option>
+                        <option value="Model Exam">Model Exam</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="academicYear" class="block text-sm font-medium text-gray-700 mb-1">Academic Year (e.g., 2024-2025):</label>
+                    <input type="text" id="academicYear" placeholder="e.g., 2024-2025" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="class" class="block text-sm font-medium text-gray-700 mb-1">Class (e.g., C7-1, C8-3):</label>
+                    <input type="text" id="class" placeholder="e.g., C7-1" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject:</label>
+                    <select id="subject" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select Subject</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="English">English</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="IT">IT</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Biology">Biology</option>
+                        <option value="History">History</option>
+                        <option value="Geography">Geography</option>
+                        <option value="Economics">Economics</option>
+                        <option value="Politics">Politics</option>
+                        <option value="General Science">General Science (Physics, Chemistry, Biology)</option>
+                        <option value="Social Studies">Social Studies (History, Geography, Politics, Economics)</option>
+                        <!-- Add more subjects as needed -->
+                    </select>
+                </div>
+
+                <div>
+                    <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration (Hours):</label>
+                    <input type="number" id="duration" min="0.5" step="0.5" placeholder="e.g., 2" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="marks" class="block text-sm font-medium text-gray-700 mb-1">Total Marks (Overall - Auto-calculated):</label>
+                    <input type="number" id="marks" min="1" value="0" readonly class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
+                </div>
+
+                <div>
+                    <label for="serialNumber" class="block text-sm font-medium text-gray-700 mb-1">Paper Serial Number (N):</label>
+                    <input type="number" id="serialNumber" min="1" placeholder="e.g., 1" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <div id="sectionsContainer" class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Sections and Questions</h2>
+                <!-- Section A will be added by default -->
+            </div>
+            <button id="addSectionBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out">
+                Add Section
+            </button>
+
+            <div class="flex justify-center space-x-4 mt-8">
+                <button id="generatePdfBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    Generate Question Paper PDF
+                </button>
+                <button id="clearFormBtn" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-md shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    Clear Form
+                </button>
+            </div>
+
+            <div id="messageBox" class="mt-6 p-4 rounded-md text-center hidden"></div>
+        </div>
+
+        <!-- Right Column: Live Preview -->
+        <div class="w-full lg:w-1/2 bg-white p-4 rounded-lg shadow-md flex flex-col">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 lg:hidden text-center">Question Paper Preview</h2>
+            <!-- Mobile-only preview button -->
+            <button id="togglePreviewBtn" class="lg:hidden bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out mb-4 self-center">
+                Toggle Preview
+            </button>
+            <div id="questionPaperPreviewLive" class="flex-grow overflow-auto border border-gray-300 rounded-md bg-white p-4">
+                <p class="text-center text-gray-500 p-4">Generate PDF to see preview here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden div for actual PDF generation content (html2canvas will render this) -->
+    <div id="questionPaperPreviewPdfContent" class="hidden">
+        <!-- Content will be dynamically inserted here by JS for html2canvas -->
+    </div>
+
+    <!-- jsPDF and html2canvas CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        // Subject code mapping
+        const subjectCodes = {
+            "Mathematics": "MT",
+            "English": "EN",
+            "Malayalam": "ML",
+            "Hindi": "HI",
+            "Arabic": "AR",
+            "IT": "IT",
+            "Physics": "PH",
+            "Chemistry": "CH",
+            "Biology": "BI",
+            "History": "HS",
+            "Geography": "GE",
+            "Economics": "EC",
+            "Politics": "PO",
+            "General Science": "GS", // Keep for combined science
+            "Social Studies": "SS" // Keep for combined social studies
+        };
+
+        // Exam type code mapping
+        const examTypeCodes = {
+            "Academic Test": "AT",
+            "Periodic Test": "PT",
+            "Term": "TM",
+            "Half Yearly": "HY",
+            "Revision Test": "RT",
+            "Admission Test": "AD",
+            "Model Exam": "ME"
+        };
+
+
+        // DOM Elements
+        const examNameInput = document.getElementById('examName');
+        const academicYearInput = document.getElementById('academicYear');
+        const classInput = document.getElementById('class'); // Changed to text input
+        const subjectInput = document.getElementById('subject');
+        const durationInput = document.getElementById('duration');
+        const marksInput = document.getElementById('marks'); // Now auto-calculated
+        const serialNumberInput = document.getElementById('serialNumber');
+        const sectionsContainer = document.getElementById('sectionsContainer');
+        const addSectionBtn = document.getElementById('addSectionBtn');
+        const generatePdfBtn = document.getElementById('generatePdfBtn');
+        const clearFormBtn = document.getElementById('clearFormBtn');
+        const questionPaperPreviewLive = document.getElementById('questionPaperPreviewLive'); // Live preview div
+        const questionPaperPreviewPdfContent = document.getElementById('questionPaperPreviewPdfContent'); // Hidden div for html2canvas
+        const messageBox = document.getElementById('messageBox');
+        const togglePreviewBtn = document.getElementById('togglePreviewBtn');
+
+        let sectionCount = 0; // To keep track of sections (A, B, C...)
+
+        // Function to convert number to lower roman numeral (for sub-questions)
+        function toLowerRoman(num) {
+            const roman = {
+                m: 1000, cm: 900, d: 500, cd: 400, c: 100, xc: 90, l: 50, xl: 40, x: 10, ix: 9, v: 5, iv: 4, i: 1
+            };
+            let str = '';
+            for (let i of Object.keys(roman)) {
+                let q = Math.floor(num / roman[i]);
+                num -= q * roman[i];
+                str += i.repeat(q);
+            }
+            return str;
+        }
+
+        // Function to show messages
+        function showMessage(message, type = 'info') {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-700');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-700');
+            } else {
+                messageBox.classList.add('bg-blue-100', 'text-blue-700');
+            }
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000); // Hide after 5 seconds
+        }
+
+        // Function to update overall total marks (by summing all section totals)
+        function updateOverallTotalMarks() {
+            let overallTotalMarks = 0;
+            document.querySelectorAll('.section-block').forEach(sectionDiv => {
+                const numQuestions = parseInt(sectionDiv.querySelector('input[id^="sectionNumQuestions"]').value) || 0;
+                const marksPerQuestion = parseInt(sectionDiv.querySelector('input[id^="sectionMarksPerQuestion"]').value) || 0;
+                overallTotalMarks += (numQuestions * marksPerQuestion);
+            });
+            marksInput.value = overallTotalMarks; // Update the overall marks input field
+        }
+
+        // Function to update section total marks (by multiplying num questions and marks per question)
+        function updateSectionTotalMarksDisplay(sectionDiv) {
+            const numQuestions = parseInt(sectionDiv.querySelector('input[id^="sectionNumQuestions"]').value) || 0;
+            const marksPerQuestion = parseInt(sectionDiv.querySelector('input[id^="sectionMarksPerQuestion"]').value) || 0;
+            const total = numQuestions * marksPerQuestion;
+            sectionDiv.querySelector('input[id^="sectionTotalMarks"]').value = total;
+            updateOverallTotalMarks(); // Also update overall total when a section's total changes
+        }
+
+        // Function to add a single MCQ option input field
+        function addMcqOptionInput(optionsContainer) {
+            const optionId = `mcqOption${Date.now()}${Math.floor(Math.random() * 10000)}`;
+            const optionCount = optionsContainer.querySelectorAll('.mcq-option-input-group').length;
+            const optionLetter = String.fromCharCode(97 + optionCount); // 'a', 'b', 'c', ...
+
+            const optionDiv = document.createElement('div');
+            optionDiv.classList.add('mcq-option-input-group', 'flex', 'items-center', 'mb-2');
+            optionDiv.innerHTML = `
+                <label for="${optionId}" class="block text-sm font-medium text-gray-700 w-6">(${optionLetter})</label>
+                <input type="text" id="${optionId}" placeholder="Option ${optionLetter.toUpperCase()}" class="flex-grow p-2 border border-gray-300 rounded-md shadow-sm mr-2">
+                <button type="button" class="remove-mcq-option-btn bg-red-300 hover:bg-red-400 text-white text-xs py-0.5 px-1.5 rounded-md">Remove</button>
+            `;
+            optionsContainer.insertBefore(optionDiv, optionsContainer.querySelector('.add-mcq-option-btn')); // Insert before the add button
+
+            optionDiv.querySelector('.remove-mcq-option-btn').addEventListener('click', () => {
+                optionDiv.remove();
+                // Re-letter options after removal
+                optionsContainer.querySelectorAll('.mcq-option-input-group').forEach((group, index) => {
+                    group.querySelector('label').textContent = `(${String.fromCharCode(97 + index)})`;
+                    group.querySelector('input').placeholder = `Option ${String.fromCharCode(97 + index).toUpperCase()}`;
+                });
+            });
+        }
+
+        // Function to add a single sub-question input block
+        function addSubQuestionInput(parentQuestionDiv) {
+            // Generate a unique ID that is valid for CSS selectors (no decimals)
+            const subQuestionId = `${Date.now()}${Math.floor(Math.random() * 10000)}`; 
+            const subQuestionDiv = document.createElement('div');
+            subQuestionDiv.classList.add('sub-question-input-block', 'pl-4', 'border-l-2', 'border-gray-100', 'mb-2');
+            subQuestionDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Sub-Question Text:</label>
+                    <button type="button" class="remove-sub-question-btn bg-red-300 hover:bg-red-400 text-white text-xs py-0.5 px-1.5 rounded-md">Remove</button>
+                </div>
+                <textarea id="subQuestionText${subQuestionId}" rows="1" placeholder="Enter sub-question text here." class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                
+                <div class="grid grid-cols-2 gap-4 mt-2 mb-2">
+                    <div>
+                        <label for="isSubDiagram${subQuestionId}" class="block text-sm font-medium text-gray-700 mb-1">Is Diagram Question?</label>
+                        <input type="checkbox" id="isSubDiagram${subQuestionId}" class="mt-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="isSubMCQ${subQuestionId}" class="block text-sm font-medium text-gray-700 mb-1">Is an MCQ for this sub-question?</label>
+                        <input type="checkbox" id="isSubMCQ${subQuestionId}" class="mt-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div id="subMcqOptionsContainer${subQuestionId}" class="mcq-options-container pl-6 border-l-2 border-gray-200 hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">MCQ Options for Sub-Question:</label>
+                    <!-- Dynamic MCQ options will go here -->
+                    <button type="button" class="add-mcq-option-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs py-1 px-2 rounded-md mt-2">Add Option</button>
+                </div>
+            `;
+            parentQuestionDiv.querySelector('.sub-questions-container').appendChild(subQuestionDiv);
+
+            // Event listener for sub-MCQ checkbox
+            const isSubMCQCheckbox = subQuestionDiv.querySelector(`#isSubMCQ${subQuestionId}`);
+            const subMcqOptionsContainer = subQuestionDiv.querySelector(`#subMcqOptionsContainer${subQuestionId}`);
+            isSubMCQCheckbox.addEventListener('change', () => {
+                subMcqOptionsContainer.classList.toggle('hidden', !isSubMCQCheckbox.checked);
+            });
+
+            // Event listener for add MCQ option button for sub-question
+            subMcqOptionsContainer.querySelector('.add-mcq-option-btn').addEventListener('click', () => addMcqOptionInput(subMcqOptionsContainer));
+            addMcqOptionInput(subMcqOptionsContainer); // Add a default option
+
+            subQuestionDiv.querySelector('.remove-sub-question-btn').addEventListener('click', () => {
+                subQuestionDiv.remove();
+            });
+        }
+
+        // Function to add a single question input block within a section
+        function addQuestionInput(sectionQuestionsContainer) {
+            // Generate a unique ID that is valid for CSS selectors (no decimals)
+            const questionId = `${Date.now()}${Math.floor(Math.random() * 10000)}`; 
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('question-input-block', 'p-3', 'border', 'border-gray-200', 'rounded-md', 'bg-white', 'mb-4', 'shadow-sm');
+            questionDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-sm font-medium text-gray-700">Question Text:</label>
+                    <button type="button" class="remove-question-btn bg-red-400 hover:bg-red-500 text-white text-xs py-1 px-2 rounded-md">Remove Question</button>
+                </div>
+                <textarea id="questionText${questionId}" rows="3" placeholder="Enter main question text here." class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-2"></textarea>
+                
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="isDiagram${questionId}" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="isDiagram${questionId}" class="ml-2 block text-sm text-gray-900">Is a Diagram Question?</label>
+                </div>
+
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="isMCQ${questionId}" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="isMCQ${questionId}" class="ml-2 block text-sm text-gray-900">Is an MCQ for this main question?</label>
+                </div>
+
+                <div id="mcqOptionsContainer${questionId}" class="mcq-options-container pl-6 border-l-2 border-gray-200 hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">MCQ Options for Main Question:</label>
+                    <!-- Dynamic MCQ options will go here -->
+                    <button type="button" class="add-mcq-option-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs py-1 px-2 rounded-md mt-2">Add Option</button>
+                </div>
+
+                <div class="sub-questions-container mt-3">
+                    <!-- Sub-question inputs will go here -->
+                </div>
+                <button type="button" class="add-sub-question-btn bg-purple-400 hover:bg-purple-500 text-white text-xs py-1 px-2 rounded-md shadow-sm transition duration-300 ease-in-out mt-2">Add Sub-Question</button>
+            `;
+            sectionQuestionsContainer.appendChild(questionDiv);
+
+            // Event listener for MCQ checkbox
+            const isMCQCheckbox = questionDiv.querySelector(`#isMCQ${questionId}`);
+            const mcqOptionsContainer = questionDiv.querySelector(`#mcqOptionsContainer${questionId}`);
+            isMCQCheckbox.addEventListener('change', () => {
+                mcqOptionsContainer.classList.toggle('hidden', !isMCQCheckbox.checked);
+            });
+
+            // Event listener for add MCQ option button for main question
+            mcqOptionsContainer.querySelector('.add-mcq-option-btn').addEventListener('click', () => addMcqOptionInput(mcqOptionsContainer));
+            addMcqOptionInput(mcqOptionsContainer); // Add a default option
+
+            // Event listener for remove question button
+            questionDiv.querySelector('.remove-question-btn').addEventListener('click', () => {
+                questionDiv.remove();
+                updateSectionTotalMarksDisplay(sectionQuestionsContainer.closest('.section-block'));
+            });
+
+            // Event listener for add sub-question button
+            questionDiv.querySelector('.add-sub-question-btn').addEventListener('click', () => {
+                addSubQuestionInput(questionDiv);
+            });
+        }
+
+        // Function to add a new section
+        function addSection() {
+            sectionCount++; // Increment before using to get 1-based index
+            const sectionLetter = String.fromCharCode(65 + sectionCount - 1); // A, B, C...
+
+            const sectionDiv = document.createElement('div');
+            sectionDiv.classList.add('section-block', 'mb-6', 'p-4', 'border', 'border-gray-200', 'rounded-md', 'bg-gray-50');
+            sectionDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <label for="sectionHeading${sectionCount}" class="block text-md font-medium text-gray-700">Section ${sectionLetter} Heading (e.g., Multiple Choice Questions):</label>
+                    <button type="button" class="remove-section-btn bg-red-500 hover:bg-red-600 text-white text-sm py-1 px-3 rounded-md shadow-sm transition duration-300 ease-in-out">Remove</button>
+                </div>
+                <input type="text" id="sectionHeading${sectionCount}" placeholder="e.g., Multiple Choice Questions" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-3">
+                
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <label for="sectionNumQuestions${sectionCount}" class="block text-sm font-medium text-gray-700 mb-1">Number of Questions in Section:</label>
+                        <input type="number" id="sectionNumQuestions${sectionCount}" min="0" value="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="sectionMarksPerQuestion${sectionCount}" class="block text-sm font-medium text-gray-700 mb-1">Marks per Question in Section:</label>
+                        <input type="number" id="sectionMarksPerQuestion${sectionCount}" min="0" value="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <label for="sectionTotalMarks${sectionCount}" class="block text-md font-medium text-gray-700 mb-1">Calculated Section Total Marks:</label>
+                <input type="number" id="sectionTotalMarks${sectionCount}" min="0" value="0" readonly class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed mb-3">
+
+                <div id="questionsContainer${sectionCount}" class="questions-container">
+                    <!-- Individual question inputs will go here -->
+                </div>
+                <button type="button" class="add-question-btn bg-blue-400 hover:bg-blue-500 text-white text-sm py-1 px-3 rounded-md shadow-sm transition duration-300 ease-in-out mt-3">Add Question</button>
+            `;
+            sectionsContainer.appendChild(sectionDiv);
+
+            // Add event listeners to update total marks
+            sectionDiv.querySelector('input[id^="sectionNumQuestions"]').addEventListener('input', () => updateSectionTotalMarksDisplay(sectionDiv));
+            sectionDiv.querySelector('input[id^="sectionMarksPerQuestion"]').addEventListener('input', () => updateSectionTotalMarksDisplay(sectionDiv));
+
+            // Add event listener for add question button
+            const questionsContainer = sectionDiv.querySelector(`#questionsContainer${sectionCount}`);
+            sectionDiv.querySelector('.add-question-btn').addEventListener('click', () => addQuestionInput(questionsContainer));
+
+            // Add event listener for remove section button
+            sectionDiv.querySelector('.remove-section-btn').addEventListener('click', (event) => {
+                event.target.closest('.section-block').remove();
+                updateOverallTotalMarks(); // Update overall total when a section is removed
+            });
+
+            // Add one default question input when a new section is added
+            addQuestionInput(questionsContainer);
+            updateSectionTotalMarksDisplay(sectionDiv); // Update initial total
+        }
+
+        // Set academic year automatically on page load
+        window.addEventListener('load', () => {
+            const currentYear = new Date().getFullYear();
+            academicYearInput.value = `${currentYear}-${currentYear + 1}`;
+            addSection(); // Add default section after academic year is set
+        });
+
+        // Event Listeners
+        addSectionBtn.addEventListener('click', addSection);
+
+        clearFormBtn.addEventListener('click', () => {
+            examNameInput.value = '';
+            // academicYearInput.value will be re-set by load listener if page reloaded, otherwise keep current year
+            const currentYear = new Date().getFullYear();
+            academicYearInput.value = `${currentYear}-${currentYear + 1}`;
+            classInput.value = '';
+            subjectInput.value = '';
+            durationInput.value = '';
+            marksInput.value = '0'; // Reset overall marks
+            serialNumberInput.value = '';
+            sectionsContainer.innerHTML = ''; // Clear all sections
+            sectionCount = 0; // Reset section count
+            addSection(); // Add default Section A
+            showMessage('Form cleared successfully!', 'success');
+        });
+
+        // Function to generate the HTML content for the preview (both live and for PDF)
+        function generatePreviewHtml() {
+            const examNameFull = examNameInput.value.trim();
+            const academicYear = academicYearInput.value;
+            const className = classInput.value.trim();
+            const subject = subjectInput.value.trim();
+            const duration = durationInput.value;
+            const overallMarks = marksInput.value;
+            const serialNumber = serialNumberInput.value;
+
+            // Generate Question Paper Code: [ExamCode][TestNumber if applicable][ClassCode][SubjectCode][SerialNumber]
+            const subjectCode = subjectCodes[subject] || '';
+            let examType = '';
+            let testNumber = '';
+            const examNameParts = examNameFull.split(' ');
+            if (examNameParts.length > 1 && !isNaN(parseInt(examNameParts[examNameParts.length - 1]))) {
+                testNumber = examNameParts[examNameParts.length - 1];
+                examType = examNameParts.slice(0, -1).join(' ');
+            } else {
+                examType = examNameFull;
+            }
+            const examCode = examTypeCodes[examType] || '';
+            // Fix: Ensure 'C' is only added if className doesn't already start with it
+            const cleanedClassName = className.replace(/[^a-zA-Z0-9]/g, ''); // Remove non-alphanumeric characters
+            const classCodeForPaper = cleanedClassName.startsWith('C') || cleanedClassName.startsWith('c') ? cleanedClassName : `C${cleanedClassName}`;
+
+            const questionPaperCode = `${examCode}${testNumber}${classCodeForPaper}${subjectCode}${serialNumber}`;
+
+            // Extract last two digits of the academic year for exam name display
+            const academicYearSuffix = academicYear.includes('-') ? "'" + academicYear.split('-')[1].slice(-2) : '';
+            const displayExamName = `${examNameFull} ${academicYearSuffix}`.trim();
+
+            const sectionsData = [];
+            const sectionBlocks = sectionsContainer.querySelectorAll('.section-block');
+            let currentQuestionNumber = 1;
+            let diagramCounter = 1.0;
+
+            for (let i = 0; i < sectionBlocks.length; i++) {
+                const block = sectionBlocks[i];
+                const sectionHeadingInput = block.querySelector(`input[id^="sectionHeading"]`);
+                const sectionNumQuestions = parseInt(block.querySelector('input[id^="sectionNumQuestions"]').value) || 0;
+                const marksPerQuestion = parseInt(block.querySelector('input[id^="sectionMarksPerQuestion"]').value) || 0;
+                const sectionCalculatedMarks = sectionNumQuestions * marksPerQuestion;
+                
+                const sectionLetter = String.fromCharCode(65 + i); // A, B, C...
+                const headingText = sectionHeadingInput ? sectionHeadingInput.value.trim() : ``;
+                
+                const sectionQuestionsHtml = [];
+                const questionInputBlocks = block.querySelectorAll('.question-input-block');
+
+                questionInputBlocks.forEach(qBlock => {
+                    const questionText = qBlock.querySelector('textarea[id^="questionText"]').value.trim();
+                    const isDiagram = qBlock.querySelector('input[id^="isDiagram"]').checked;
+                    const isMCQ = qBlock.querySelector('input[id^="isMCQ"]').checked;
+
+                    let formattedQuestion = '';
+                    let mcqOptionsHtml = '';
+                    let subQuestionsHtml = '';
+
+                    // Process sub-questions
+                    const subQuestionBlocks = qBlock.querySelectorAll('.sub-question-input-block');
+                    let currentSubQuestionNumber = 1;
+                    subQuestionBlocks.forEach(subQBlock => {
+                        const subQText = subQBlock.querySelector('textarea[id^="subQuestionText"]').value.trim();
+                        const isSubMCQ = subQBlock.querySelector('input[id^="isSubMCQ"]').checked;
+                        const isSubDiagram = subQBlock.querySelector('input[id^="isSubDiagram"]').checked;
+                        let subMcqOptionsHtml = '';
+                        let subDiagramRef = '';
+
+                        if (isSubDiagram) {
+                            subDiagramRef = ` (Diagram ${diagramCounter.toFixed(1)})`;
+                            diagramCounter += 0.1;
+                        }
+
+                        if (isSubMCQ) {
+                            subQBlock.querySelectorAll('.mcq-option-input-group input[id^="mcqOption"]').forEach((optionInput, idx) => {
+                                const optionLetter = String.fromCharCode(97 + idx);
+                                const optionText = optionInput.value.trim();
+                                if (optionText) {
+                                    subMcqOptionsHtml += `<span class="mcq-option">(${optionLetter}) ${optionText}</span>`;
+                                }
+                            });
+                        }
+
+                        if (subQText) {
+                            subQuestionsHtml += `
+                                <span class="sub-question">
+                                    ${toLowerRoman(currentSubQuestionNumber)}. ${subQText}${subDiagramRef}
+                                    ${subMcqOptionsHtml ? `<div class="mcq-options-container">${subMcqOptionsHtml}</div>` : ''}
+                                </span>
+                            `;
+                            currentSubQuestionNumber++;
+                        }
+                    });
+
+                    // Main question text
+                    formattedQuestion = questionText;
+
+                    // Add diagram reference if checked for main question
+                    let diagramRef = '';
+                    if (isDiagram) {
+                        diagramRef = ` (Diagram ${diagramCounter.toFixed(1)})`;
+                        diagramCounter += 0.1;
+                    }
+
+                    // Add MCQ options if checked for main question
+                    if (isMCQ) {
+                        qBlock.querySelectorAll('.mcq-option-input-group input[id^="mcqOption"]').forEach((optionInput, idx) => {
+                            const optionLetter = String.fromCharCode(97 + idx);
+                            const optionText = optionInput.value.trim();
+                            if (optionText) {
+                                mcqOptionsHtml += `<span class="mcq-option">(${optionLetter}) ${optionText}</span>`;
+                            }
+                        });
+                    }
+
+                    if (formattedQuestion || subQuestionsHtml || mcqOptionsHtml) {
+                        sectionQuestionsHtml.push(`
+                            <div class="question-item">
+                                ${currentQuestionNumber}. ${formattedQuestion}${diagramRef}
+                                ${mcqOptionsHtml ? `<div class="mcq-options-container">${mcqOptionsHtml}</div>` : ''}
+                                ${subQuestionsHtml}
+                            </div>
+                        `);
+                        currentQuestionNumber++;
+                    }
+                });
+
+                sectionsData.push({ 
+                    sectionLetter,
+                    headingText, 
+                    sectionQuestionsHtml: sectionQuestionsHtml.join(''),
+                    sectionNumQuestions,
+                    marksPerQuestion,
+                    sectionCalculatedMarks 
+                });
+            }
+
+            return {
+                html: `
+                    <div class="header-code-wrapper"><span class="code-box">${questionPaperCode}</span></div>
+                    <div class="main-title">${displayExamName.toUpperCase()}</div>
+                    <div class="sub-title">${subject.toUpperCase()}</div>
+                    <div class="details-row-std">
+                        <span>STD : ${className}</span>
+                    </div>
+                    <div class="details-row-time-mark">
+                        <span>TIME : ${duration} HOURS</span>
+                        <span class="detail-right">MARK : ${overallMarks}</span>
+                    </div>
+                    <div class="horizontal-line"></div>
+                    <div class="mt-8" id="questionContent">
+                        ${sectionsData.map((section) => `
+                            <div class="section-container-for-pdf">
+                                <div class="section-letter-line">
+                                    <span class="section-letter-text">SECTION ${section.sectionLetter}</span>
+                                </div>
+                                <div class="section-heading-description-line">
+                                    <span class="section-heading-description">${section.headingText}</span>
+                                    ${section.sectionCalculatedMarks > 0 ? 
+                                        `<span class="section-marks-text">(${section.sectionNumQuestions} x ${section.marksPerQuestion} = ${section.sectionCalculatedMarks})</span>` : ''
+                                    }
+                                </div>
+                                ${section.sectionQuestionsHtml}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="end-marker">*****</div>
+                    <div class="footer-code-wrapper"><span class="code-box">${questionPaperCode}</span></div>
+                    <!-- PTO will be added dynamically by jsPDF if needed -->
+                `,
+                questionPaperCode: questionPaperCode,
+                examNameFull: examNameFull,
+                subject: subject
+            };
+        }
+
+        // Update live preview whenever form inputs change
+        function updateLivePreview() {
+            const { html } = generatePreviewHtml();
+            questionPaperPreviewLive.innerHTML = html;
+        }
+
+        // Attach input event listeners to form fields to update preview
+        document.querySelectorAll('#examName, #academicYear, #class, #subject, #duration, #serialNumber, #sectionsContainer').forEach(element => {
+            element.addEventListener('input', updateLivePreview);
+            element.addEventListener('change', updateLivePreview); // For select elements
+        });
+        // Also listen for changes within sections (adding/removing questions, marks, MCQs)
+        sectionsContainer.addEventListener('input', updateLivePreview);
+        sectionsContainer.addEventListener('change', updateLivePreview);
+
+
+        generatePdfBtn.addEventListener('click', async () => {
+            const { html, questionPaperCode, examNameFull, subject } = generatePreviewHtml();
+
+            // Perform validation checks
+            if (!examNameFull || !academicYearInput.value.trim() || !classInput.value.trim() || !subject.trim() || !durationInput.value || !marksInput.value || !serialNumberInput.value) {
+                showMessage('Please fill in all general details (including adding at least one question to a section and setting its marks).', 'error');
+                return;
+            }
+            if (parseInt(marksInput.value) <= 0) {
+                 showMessage('Please add at least one question to a section and set its marks to generate the paper.', 'error');
+                 return;
+            }
+            if (parseFloat(durationInput.value) <= 0) {
+                showMessage('Duration must be a positive number.', 'error');
+                return;
+            }
+            if (parseInt(serialNumberInput.value) <= 0) {
+                showMessage('Paper Serial Number must be a positive number.', 'error');
+                return;
+            }
+
+            if (!subjectCodes[subject]) {
+                showMessage(`Invalid subject selected for code generation: "${subject}". Please select a subject from the list.`, 'error');
+                return;
+            }
+            let examType = '';
+            const examNameParts = examNameFull.split(' ');
+            if (examNameParts.length > 1 && !isNaN(parseInt(examNameParts[examNameParts.length - 1]))) {
+                examType = examNameParts.slice(0, -1).join(' ');
+            } else {
+                examType = examNameFull;
+            }
+            if (!examTypeCodes[examType]) {
+                showMessage(`Invalid exam name selected for code generation: "${examType}". Please select a valid exam type.`, 'error');
+                return;
+            }
+
+
+            // Populate the hidden div for html2canvas
+            questionPaperPreviewPdfContent.innerHTML = html;
+            questionPaperPreviewPdfContent.style.display = 'block'; // Make it visible for html2canvas
+
+            // Generate PDF
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4'); // Portrait, millimeters, A4 size
+
+                // Use html2canvas to render the content
+                const canvas = await html2canvas(questionPaperPreviewPdfContent, {
+                    scale: 2, // Higher scale for better resolution
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true,
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0; // Y position on the image
+
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                // Add more pages if content exceeds one page
+                while (heightLeft > 0.1) { // Changed from -1 to 0.1 to prevent blank page
+                    position = heightLeft - imgHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+                    // Re-add header and footer code with black box and centered text on every new page
+                    doc.setFont('Roboto', '900'); // Use 900 for very thick
+                    doc.setFontSize(16); // Slightly larger font size for the code
+                    doc.setTextColor(255, 255, 255); // White color for text
+                    doc.setFillColor(0, 0, 0); // Black background for box
+
+                    // Header code box and text (centered)
+                    const headerCodeText = questionPaperCode;
+                    const headerCodeTextWidth = doc.getTextWidth(headerCodeText);
+                    const headerBoxWidth = headerCodeTextWidth + 10; // Add padding
+                    const headerBoxHeight = 8; // Fixed height
+                    const headerBoxX = 210 - 20 - headerBoxWidth; // Right align, then subtract box width
+                    const headerBoxY = 17;
+                    doc.rect(headerBoxX, headerBoxY, headerBoxWidth, headerBoxHeight, 'F'); // Use rect for sharp corners
+                    doc.text(headerCodeText, headerBoxX + (headerBoxWidth / 2), headerBoxY + (headerBoxHeight / 2), { align: 'center', baseline: 'middle' });
+
+                    // Footer code box and text (centered)
+                    const footerCodeText = questionPaperCode;
+                    const footerCodeTextWidth = doc.getTextWidth(footerCodeText);
+                    const footerBoxWidth = footerCodeTextWidth + 10; // Add padding
+                    const footerBoxHeight = 8; // Fixed height
+                    const footerBoxX = 20; // Left align
+                    const footerBoxY = 284;
+                    doc.rect(footerBoxX, footerBoxY, footerBoxWidth, footerBoxHeight, 'F'); // Use rect for sharp corners
+                    doc.text(footerCodeText, footerBoxX + (footerBoxWidth / 2), footerBoxY + (footerBoxHeight / 2), { align: 'center', baseline: 'middle' });
+
+                    // PTO text - only if there's more content left for *another* page
+                    if (heightLeft > pageHeight) {
+                        doc.setTextColor(0, 0, 0); // Black color for PTO text
+                        doc.setFont('Roboto', 'bold'); // Reset font for PTO
+                        doc.setFontSize(14);
+                        doc.text('PTO', 180, 289.5, { align: 'right' }); // Bottom right
+                    }
+
+                    heightLeft -= pageHeight;
+                }
+
+                doc.save(`${examNameFull.replace(/\s/g, '-')}-${subject.replace(/\s/g, '-')}-QuestionPaper.pdf`);
+                showMessage('PDF generated successfully!', 'success');
+
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showMessage('Error generating PDF. Please check console for details.', 'error');
+            } finally {
+                questionPaperPreviewPdfContent.style.display = 'none'; // Hide it again
+            }
+        });
+
+        // Mobile preview toggle logic
+        togglePreviewBtn.addEventListener('click', () => {
+            const previewContainer = document.querySelector('.main-app-container > div:last-child'); // The right column
+            previewContainer.classList.toggle('hidden'); // Toggle visibility
+            if (previewContainer.classList.contains('hidden')) {
+                togglePreviewBtn.textContent = 'Show Preview';
+            } else {
+                togglePreviewBtn.textContent = 'Hide Preview';
+            }
+        });
+
+        // Hide preview on small screens initially, show on large screens
+        function setInitialPreviewVisibility() {
+            const previewContainer = document.querySelector('.main-app-container > div:last-child');
+            if (window.innerWidth < 1024) { // Less than lg breakpoint
+                previewContainer.classList.add('hidden');
+                togglePreviewBtn.textContent = 'Show Preview';
+            } else {
+                previewContainer.classList.remove('hidden');
+                togglePreviewBtn.textContent = 'Hide Preview'; // Or just 'Preview'
+            }
+        }
+
+        window.addEventListener('resize', setInitialPreviewVisibility);
+        setInitialPreviewVisibility(); // Call on load
+        updateLivePreview(); // Initial populate of live preview
+    </script>
+</body>
+</html>
