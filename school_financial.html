@@ -48,7 +48,7 @@
             background: #888;
             border-radius: 10px;
         }
-        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+        ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
         /* Tab styling */
@@ -238,6 +238,30 @@
                         <canvas id="monthlyStudentFeeChart"></canvas>
                     </div>
                 </div>
+
+                <!-- New: Overall Counts Chart -->
+                <div class="card p-6 col-span-1 lg:col-span-2">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Overall Counts (Teachers, Students, Staff)</h2>
+                    <div class="chart-container">
+                        <canvas id="overallCountsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New: Overall Download Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mt-8">
+                <button id="downloadOverallReportButton" class="action-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download Overall Report as PDF
+                </button>
+                <button id="downloadCombinedSalariesExpensesButton" class="action-button copy-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download Combined Salaries & Expenses Report as PDF
+                </button>
             </div>
         </div>
 
@@ -246,7 +270,7 @@
             <div class="card p-6">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-4">Teacher Monthly Salaries</h2>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <table class="min-w-full bg-white rounded-lg shadow-md" id="teacherSalariesTable"> <!-- Added ID for PDF download -->
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
@@ -259,6 +283,14 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="flex justify-center mt-8">
+                    <button id="downloadTeacherSalariesPdfButton" class="action-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Download Monthly Teacher Salaries Report
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -267,7 +299,7 @@
             <div class="card p-6">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-4">Student Monthly Fees</h2>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <table class="min-w-full bg-white rounded-lg shadow-md" id="studentFeesTable"> <!-- Added ID for PDF download -->
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
@@ -280,6 +312,14 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="flex justify-center mt-8">
+                    <button id="downloadStudentFeesPdfButton" class="action-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Download Monthly Student Fees Report
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -288,7 +328,7 @@
             <div class="card p-6">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-4">Office Staff Expenses</h2>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <table class="min-w-full bg-white rounded-lg shadow-md" id="officeStaffExpensesTable"> <!-- Added ID for PDF download -->
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Staff Role</th>
@@ -301,6 +341,14 @@
                             <!-- Data will be inserted here by JavaScript -->
                         </tbody>
                     </table>
+                </div>
+                <div class="flex justify-center mt-8">
+                    <button id="downloadOfficeStaffExpensesPdfButton" class="action-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Download Monthly Office Staff Expenses Report
+                    </button>
                 </div>
             </div>
         </div>
@@ -376,12 +424,16 @@
         </div>
     </div>
 
+    <!-- Hidden div for combined PDF content -->
+    <div id="combinedPdfContent" style="position: absolute; left: -9999px; top: -9999px; width: 100%; padding: 20px; box-sizing: border-box;"></div>
+
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwV4LmZMayHNWpmaRtxx5lF3-J0kXAVylCieGIMF4j0ZBlpbEVDJ0-_fef28NYF4M7r/exec';
 
         let monthlyProfitChart;
         let monthlyTeacherSalaryChart;
         let monthlyStudentFeeChart;
+        let overallCountsChart; // New chart variable
 
         let dashboardData = null; // Store fetched data globally
         let sortedMonths = []; // To store sorted month names (e.g., "January", "February")
@@ -482,6 +534,7 @@
                 profitNegative: 'rgba(255, 99, 132, 0.7)', // Red
                 teacherSalary: 'rgba(79, 70, 229, 0.7)', // Indigo
                 studentFee: 'rgba(234, 179, 8, 0.7)',    // Amber
+                overallCounts: ['rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)'], // Blue, Yellow, Purple
                 borderColor: (color) => color.replace('0.7', '1') // Solid border
             };
 
@@ -489,6 +542,7 @@
             if (monthlyProfitChart) monthlyProfitChart.destroy();
             if (monthlyTeacherSalaryChart) monthlyTeacherSalaryChart.destroy();
             if (monthlyStudentFeeChart) monthlyStudentFeeChart.destroy();
+            // No need to destroy overallCountsChart here, it's handled by its own render function
 
             // Monthly Profit Chart
             const profitCtx = document.getElementById('monthlyProfitChart').getContext('2d');
@@ -604,6 +658,80 @@
         }
 
         /**
+         * Renders the overall counts chart for teachers, students, and staff.
+         * @param {Object} data The processed financial data.
+         */
+        function renderOverallCountsChart(data) {
+            const teacherIds = new Set();
+            const studentIds = new Set();
+            const officeStaffPositions = new Set();
+
+            // Collect unique teacher and student IDs from detailed log data
+            data.detailedLogData.forEach(entry => {
+                if (entry.staffId) teacherIds.add(entry.staffId);
+                if (entry.studentId) studentIds.add(entry.studentId);
+            });
+
+            // Collect unique office staff positions from config
+            for (const position in data.officeStaffConfig) {
+                officeStaffPositions.add(position);
+            }
+
+            const teacherCount = teacherIds.size;
+            const studentCount = studentIds.size;
+            const officeStaffCount = officeStaffPositions.size;
+
+            const chartColors = {
+                overallCounts: ['rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)'], // Blue, Yellow, Purple
+                borderColor: (color) => color.replace('0.7', '1') // Solid border
+            };
+
+            if (overallCountsChart) overallCountsChart.destroy(); // Destroy existing chart
+
+            const countsCtx = document.getElementById('overallCountsChart').getContext('2d');
+            overallCountsChart = new Chart(countsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Teachers', 'Students', 'Office Staff'],
+                    datasets: [{
+                        label: 'Total Count',
+                        data: [teacherCount, studentCount, officeStaffCount],
+                        backgroundColor: chartColors.overallCounts,
+                        borderColor: chartColors.overallCounts.map(color => chartColors.borderColor(color)),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Overall Counts of Personnel & Students',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            display: false // No need for legend as labels are clear
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Individuals'
+                            },
+                            ticks: {
+                                precision: 0 // Ensure whole numbers for counts
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        /**
          * Updates the summary cards with yearly totals or selected month's totals.
          * @param {Object} data The processed financial data.
          * @param {string} selectedMonth The month to display, or 'all' for all months.
@@ -638,17 +766,17 @@
         }
 
         /**
-         * Populates the teacher monthly salaries table based on the selected month.
-         * Adds click handlers to rows for detailed view.
+         * Generates the HTML table for teacher monthly salaries.
+         * This function is now reusable for display and PDF generation.
          * @param {Object} data The processed financial data.
          * @param {string} selectedMonth The month to display, or 'all' for all months.
+         * @returns {string} The HTML string for the teacher salaries table.
          */
-        function populateTeacherSalariesTable(data, selectedMonth) {
-            const tableBody = document.getElementById('teacherSalariesTableBody');
-            tableBody.innerHTML = ''; // Clear existing rows
-
+        function getTeacherSalariesTableHtml(data, selectedMonth) {
             const monthlyData = data.monthlyData;
+            let tableRowsHtml = '';
             let hasData = false;
+            let overallTotalSalary = 0;
 
             if (selectedMonth === 'all') {
                 const yearlyTeacherTotals = {};
@@ -659,12 +787,12 @@
                             yearlyTeacherTotals[teacherId] = {
                                 name: teachersInMonth[teacherId].name,
                                 totalSalary: 0,
-                                totalHours: 0, // Initialize total hours
-                                classDates: [] // Initialize class dates for email
+                                totalHours: 0,
+                                classDates: []
                             };
                         }
                         yearlyTeacherTotals[teacherId].totalSalary += teachersInMonth[teacherId].totalSalary;
-                        yearlyTeacherTotals[teacherId].totalHours += teachersInMonth[teacherId].totalHours; // Sum hours
+                        yearlyTeacherTotals[teacherId].totalHours += teachersInMonth[teacherId].totalHours;
                         yearlyTeacherTotals[teacherId].classDates = yearlyTeacherTotals[teacherId].classDates.concat(
                             data.detailedLogData.filter(entry => entry.staffId === teacherId)
                                 .map(entry => new Date(entry.date).toLocaleDateString())
@@ -676,15 +804,14 @@
                 const sortedTeacherIds = Object.keys(yearlyTeacherTotals).sort();
                 sortedTeacherIds.forEach(teacherId => {
                     const teacherInfo = yearlyTeacherTotals[teacherId];
-                    const row = tableBody.insertRow();
-                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
-                    row.dataset.teacherId = teacherId; // Store teacher ID
-                    row.dataset.month = selectedMonth; // Store 'all' for all months
-                    row.innerHTML = `
-                        <td class="py-3 px-6 whitespace-nowrap">All Months</td>
-                        <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
-                        <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
+                    tableRowsHtml += `
+                        <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-teacher-id="${teacherId}" data-month="${selectedMonth}">
+                            <td class="py-3 px-6 whitespace-nowrap">All Months</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
+                        </tr>
                     `;
+                    overallTotalSalary += teacherInfo.totalSalary;
                 });
 
             } else { // Specific month selected
@@ -696,27 +823,62 @@
                     hasData = true;
                     sortedTeacherIds.forEach(teacherId => {
                         const teacherInfo = teachers[teacherId];
-                        const row = tableBody.insertRow();
-                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
-                        row.dataset.teacherId = teacherId; // Store teacher ID
-                        row.dataset.month = selectedMonth; // Store specific month
-                        row.innerHTML = `
-                            <td class="py-3 px-6 whitespace-nowrap">${month}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
+                        tableRowsHtml += `
+                            <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-teacher-id="${teacherId}" data-month="${selectedMonth}">
+                                <td class="py-3 px-6 whitespace-nowrap">${month}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
+                                <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
+                            </tr>
                         `;
+                        overallTotalSalary += teacherInfo.totalSalary;
                     });
                 }
             }
 
             if (!hasData) {
-                const row = tableBody.insertRow();
-                row.classList.add('border-b', 'border-gray-200');
-                row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No teacher salary data for the selected month(s).</td>`;
+                tableRowsHtml = `<tr><td colspan="3" class="py-3 px-6 text-center text-gray-500">No teacher salary data for the selected month(s).</td></tr>`;
             }
 
+            const title = selectedMonth === 'all' ? 'Overall Teacher Salaries Report' : `Teacher Salaries Report for ${selectedMonth}`;
+
+            return `
+                <div class="overflow-x-auto">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">${title}</h3>
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Month</th>
+                                <th class="py-3 px-6">Teacher ID (Name)</th>
+                                <th class="py-3 px-6">Salary</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 text-sm font-light">
+                            ${tableRowsHtml}
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
+                                <td class="py-3 px-6" colspan="2">Overall Sum:</td>
+                                <td class="py-3 px-6">₹${overallTotalSalary.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+        }
+
+
+        /**
+         * Populates the teacher monthly salaries table based on the selected month.
+         * Adds click handlers to rows for detailed view.
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         */
+        function populateTeacherSalariesTable(data, selectedMonth) {
+            const tableContainer = document.getElementById('teacherSalariesTable');
+            tableContainer.innerHTML = getTeacherSalariesTableHtml(data, selectedMonth);
+
             // Add click event listeners to the newly created rows
-            tableBody.querySelectorAll('tr[data-teacher-id]').forEach(row => {
+            tableContainer.querySelectorAll('tr[data-teacher-id]').forEach(row => {
                 row.addEventListener('click', (event) => {
                     const teacherId = event.currentTarget.dataset.teacherId;
                     const month = event.currentTarget.dataset.month;
@@ -726,17 +888,17 @@
         }
 
         /**
-         * Populates the student monthly fees table based on the selected month.
-         * Adds click handlers to rows for detailed view.
+         * Generates the HTML table for student monthly fees.
+         * This function is now reusable for display and PDF generation.
          * @param {Object} data The processed financial data.
          * @param {string} selectedMonth The month to display, or 'all' for all months.
+         * @returns {string} The HTML string for the student fees table.
          */
-        function populateStudentFeesTable(data, selectedMonth) {
-            const tableBody = document.getElementById('studentFeesTableBody');
-            tableBody.innerHTML = ''; // Clear existing rows
-
+        function getStudentFeesTableHtml(data, selectedMonth) {
             const monthlyData = data.monthlyData;
+            let tableRowsHtml = '';
             let hasData = false;
+            let overallTotalFee = 0;
 
             if (selectedMonth === 'all') {
                 const yearlyStudentTotals = {};
@@ -747,12 +909,12 @@
                             yearlyStudentTotals[studentId] = {
                                 name: studentsInMonth[studentId].name,
                                 totalFee: 0,
-                                totalHours: 0, // Initialize total hours
-                                classDates: [] // Initialize class dates for email
+                                totalHours: 0,
+                                classDates: []
                             };
                         }
                         yearlyStudentTotals[studentId].totalFee += studentsInMonth[studentId].totalFee;
-                        yearlyStudentTotals[studentId].totalHours += studentsInMonth[studentId].totalHours; // Sum hours
+                        yearlyStudentTotals[studentId].totalHours += studentsInMonth[studentId].totalHours;
                         yearlyStudentTotals[studentId].classDates = yearlyStudentTotals[studentId].classDates.concat(
                             data.detailedLogData.filter(entry => entry.studentId === studentId)
                                 .map(entry => new Date(entry.date).toLocaleDateString())
@@ -764,15 +926,14 @@
                 const sortedStudentIds = Object.keys(yearlyStudentTotals).sort();
                 sortedStudentIds.forEach(studentId => {
                     const studentInfo = yearlyStudentTotals[studentId];
-                    const row = tableBody.insertRow();
-                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
-                    row.dataset.studentId = studentId; // Store student ID
-                    row.dataset.month = selectedMonth; // Store 'all' for all months
-                    row.innerHTML = `
-                        <td class="py-3 px-6 whitespace-nowrap">All Months</td>
-                        <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
-                        <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
+                    tableRowsHtml += `
+                        <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-student-id="${studentId}" data-month="${selectedMonth}">
+                            <td class="py-3 px-6 whitespace-nowrap">All Months</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
+                        </tr>
                     `;
+                    overallTotalFee += studentInfo.totalFee;
                 });
 
             } else { // Specific month selected
@@ -784,27 +945,61 @@
                     hasData = true;
                     sortedStudentIds.forEach(studentId => {
                         const studentInfo = students[studentId];
-                        const row = tableBody.insertRow();
-                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
-                        row.dataset.studentId = studentId; // Store student ID
-                        row.dataset.month = selectedMonth; // Store specific month
-                        row.innerHTML = `
-                            <td class="py-3 px-6 whitespace-nowrap">${month}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
+                        tableRowsHtml += `
+                            <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-student-id="${studentId}" data-month="${selectedMonth}">
+                                <td class="py-3 px-6 whitespace-nowrap">${month}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
+                                <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
+                            </tr>
                         `;
+                        overallTotalFee += studentInfo.totalFee;
                     });
                 }
             }
 
             if (!hasData) {
-                const row = tableBody.insertRow();
-                row.classList.add('border-b', 'border-gray-200');
-                row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td>`;
+                tableRowsHtml = `<tr><td colspan="3" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td></tr>`;
             }
 
+            const title = selectedMonth === 'all' ? 'Overall Student Fees Report' : `Student Fees Report for ${selectedMonth}`;
+
+            return `
+                <div class="overflow-x-auto">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">${title}</h3>
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Month</th>
+                                <th class="py-3 px-6">Student ID (Name)</th>
+                                <th class="py-3 px-6">Fee</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 text-sm font-light">
+                            ${tableRowsHtml}
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
+                                <td class="py-3 px-6" colspan="2">Overall Sum:</td>
+                                <td class="py-3 px-6">₹${overallTotalFee.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+        }
+
+        /**
+         * Populates the student monthly fees table based on the selected month.
+         * Adds click handlers to rows for detailed view.
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         */
+        function populateStudentFeesTable(data, selectedMonth) {
+            const tableContainer = document.getElementById('studentFeesTable');
+            tableContainer.innerHTML = getStudentFeesTableHtml(data, selectedMonth);
+
             // Add click event listeners to the newly created rows
-            tableBody.querySelectorAll('tr[data-student-id]').forEach(row => {
+            tableContainer.querySelectorAll('tr[data-student-id]').forEach(row => {
                 row.addEventListener('click', (event) => {
                     const studentId = event.currentTarget.dataset.studentId;
                     const month = event.currentTarget.dataset.month;
@@ -814,31 +1009,29 @@
         }
 
         /**
-         * Populates the office staff expenses table.
+         * Generates the HTML table for office staff expenses.
+         * This function is now reusable for display and PDF generation.
          * @param {Object} data The processed financial data.
          * @param {string} selectedMonth The month to display, or 'all' for all months.
+         * @returns {string} The HTML string for the office staff expenses table.
          */
-        function populateOfficeStaffTable(data, selectedMonth) {
-            const tableBody = document.getElementById('officeStaffTableBody');
-            tableBody.innerHTML = ''; // Clear existing rows
-
+        function getOfficeStaffTableHtml(data, selectedMonth) {
             const detailedLogData = data.detailedLogData;
-            const officeStaffConfig = data.officeStaffConfig; // Get config from fetched data
+            const officeStaffConfig = data.officeStaffConfig;
             const staffExpenses = {};
+            let overallTotalStaffSalary = 0;
 
-            // Initialize staff expenses with 0 hours and salary based on config
             for (const position in officeStaffConfig) {
                 staffExpenses[position] = {
                     hourlyRate: officeStaffConfig[position].rate,
                     totalHours: 0,
                     calculatedSalary: 0,
-                    programs: officeStaffConfig[position].programs, // Keep programs for filtering
-                    name: officeStaffConfig[position].name || position, // Get name from config
-                    id: officeStaffConfig[position].id // Get ID from config
+                    programs: officeStaffConfig[position].programs,
+                    name: officeStaffConfig[position].name || position,
+                    id: officeStaffConfig[position].id
                 };
             }
 
-            // Filter log data based on selected month
             let filteredLogEntries = [];
             if (selectedMonth === 'all') {
                 filteredLogEntries = detailedLogData;
@@ -846,48 +1039,79 @@
                 filteredLogEntries = detailedLogData.filter(entry => entry.month === selectedMonth);
             }
 
-            // Aggregate hours for each staff role based on programs
             filteredLogEntries.forEach(entry => {
-                const program = entry.program; // Use the 'program' field from logenterys
-
+                const program = entry.program;
                 for (const position in staffExpenses) {
                     const staffConfig = staffExpenses[position];
-                    // If programs array is empty, it means "all programs"
                     if (staffConfig.programs.length === 0 || staffConfig.programs.includes(program)) {
                         staffExpenses[position].totalHours += entry.classDurationHours;
                     }
                 }
             });
 
-            // Calculate salaries and populate table
+            let tableRowsHtml = '';
             let hasData = false;
             for (const position in staffExpenses) {
                 const info = staffExpenses[position];
                 info.calculatedSalary = info.totalHours * info.hourlyRate;
                 
-                const row = tableBody.insertRow();
-                row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add clickability
-                row.dataset.staffPosition = position; // Store position for modal
-                row.dataset.month = selectedMonth; // Store month for modal
-                row.innerHTML = `
-                    <td class="py-3 px-6 whitespace-nowrap">${position} (${info.name})</td>
-                    <td class="py-3 px-6 whitespace-nowrap">₹${info.hourlyRate.toFixed(2)}</td>
-                    <td class="py-3 px-6 whitespace-nowrap">${info.totalHours.toFixed(2)}</td>
-                    <td class="py-3 px-6 whitespace-nowrap">₹${info.calculatedSalary.toFixed(2)}</td>
+                tableRowsHtml += `
+                    <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-staff-position="${position}" data-month="${selectedMonth}">
+                        <td class="py-3 px-6 whitespace-nowrap">${position} (${info.name})</td>
+                        <td class="py-3 px-6 whitespace-nowrap">₹${info.hourlyRate.toFixed(2)}</td>
+                        <td class="py-3 px-6 whitespace-nowrap">${info.totalHours.toFixed(2)}</td>
+                        <td class="py-3 px-6 whitespace-nowrap">₹${info.calculatedSalary.toFixed(2)}</td>
+                    </tr>
                 `;
                 if (info.totalHours > 0) {
                     hasData = true;
+                    overallTotalStaffSalary += info.calculatedSalary;
                 }
             }
 
             if (!hasData) {
-                const row = tableBody.insertRow();
-                row.classList.add('border-b', 'border-gray-200');
-                row.innerHTML = `<td colspan="4" class="py-3 px-6 text-center text-gray-500">No office staff expense data for the selected month(s).</td>`;
+                tableRowsHtml = `<tr><td colspan="4" class="py-3 px-6 text-center text-gray-500">No office staff expense data for the selected month(s).</td></tr>`;
             }
 
+            const title = selectedMonth === 'all' ? 'Overall Office Staff Expenses Report' : `Office Staff Expenses Report for ${selectedMonth}`;
+
+            return `
+                <div class="overflow-x-auto">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">${title}</h3>
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Staff Role</th>
+                                <th class="py-3 px-6">Hourly Rate (₹)</th>
+                                <th class="py-3 px-6">Total Hours</th>
+                                <th class="py-3 px-6">Calculated Salary (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 text-sm font-light">
+                            ${tableRowsHtml}
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
+                                <td class="py-3 px-6" colspan="3">Overall Sum:</td>
+                                <td class="py-3 px-6">₹${overallTotalStaffSalary.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+        }
+
+        /**
+         * Populates the office staff expenses table.
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         */
+        function populateOfficeStaffTable(data, selectedMonth) {
+            const tableContainer = document.getElementById('officeStaffExpensesTable');
+            tableContainer.innerHTML = getOfficeStaffTableHtml(data, selectedMonth);
+
             // Add click event listeners to the new rows
-            tableBody.querySelectorAll('tr[data-staff-position]').forEach(row => {
+            tableContainer.querySelectorAll('tr[data-staff-position]').forEach(row => {
                 row.addEventListener('click', (event) => {
                     const staffPosition = event.currentTarget.dataset.staffPosition;
                     const month = event.currentTarget.dataset.month;
@@ -933,6 +1157,7 @@
                 if (tabId === 'overview') {
                     updateSummary(dashboardData, selectedMonth); // Update summary for selected month
                     renderCharts(dashboardData, selectedMonth);
+                    renderOverallCountsChart(dashboardData); // Render the new chart
                 } else if (tabId === 'teacher-salaries') {
                     populateTeacherSalariesTable(dashboardData, selectedMonth);
                 } else if (tabId === 'student-fees') {
@@ -1464,42 +1689,39 @@
 
 
         /**
-         * Downloads the content of the modal body as a PDF.
-         * @param {string} modalId The ID of the modal whose content needs to be downloaded.
+         * Downloads the content of a specified HTML element as a PDF.
+         * @param {string} elementId The ID of the HTML element to convert to PDF.
+         * @param {string} filenamePrefix A prefix for the downloaded PDF filename.
          */
-        async function downloadModalContentAsPdf(modalId) {
-            let element;
-            let modalTitleText;
-
-            if (modalId === 'detailsModal') {
-                element = document.getElementById('pdfContent');
-                modalTitleText = document.getElementById('modalTitle').textContent;
-            } else if (modalId === 'officeStaffDetailsModal') {
-                element = document.getElementById('pdfOfficeStaffContent'); // New ID for office staff PDF content
-                modalTitleText = document.getElementById('officeStaffModalTitle').textContent;
-            } else {
-                console.error("Invalid modal ID for PDF download:", modalId);
+        async function downloadElementAsPdf(elementId, filenamePrefix) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                console.error("Element not found for PDF download:", elementId);
                 showMessageBox("PDF Error", "Could not find content to download for PDF.");
                 return;
             }
 
-            const filename = `${modalTitleText.replace(/[^a-zA-Z0-9]/g, '_')}_Details.pdf`;
+            const filename = `${filenamePrefix.replace(/[^a-zA-Z0-9]/g, '_')}_Report.pdf`;
 
-            // Temporarily remove overflow-x-auto to ensure full table width is captured
-            const originalOverflow = element.style.overflowX;
+            // Declare originalStyles outside the try block
+            let originalStyles = {
+                overflowX: element.style.overflowX,
+                width: element.style.width,
+                padding: element.style.padding
+            };
+            
+            // Temporarily adjust styles for better PDF capture
             element.style.overflowX = 'visible';
-            element.style.width = 'fit-content'; // Ensure content is not truncated
+            element.style.width = 'fit-content'; 
+            element.style.padding = '20px'; // Add some padding for PDF margins
 
             try {
                 const canvas = await html2canvas(element, { 
                     scale: 2, // Increase scale for better resolution
                     logging: true, // Enable logging for debugging
-                    useCORS: true // Important for images, though not directly used here
+                    useCORS: true, // Important for images, though not directly used here
+                    allowTaint: true // Allow capturing content from different origins (e.g., charts)
                 });
-
-                // Revert styles after canvas creation
-                element.style.overflowX = originalOverflow;
-                element.style.width = '';
 
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
@@ -1528,9 +1750,63 @@
                 showMessageBox("PDF Generation Error", "Failed to generate PDF. Please try again. Error: " + error.message);
             } finally {
                 // Ensure styles are reverted even if an error occurs
-                element.style.overflowX = originalOverflow;
-                element.style.width = '';
+                element.style.overflowX = originalStyles.overflowX;
+                element.style.width = originalStyles.width;
+                element.style.padding = originalStyles.padding;
             }
+        }
+
+        /**
+         * Downloads the content of a modal body as a PDF.
+         * This function is specifically for modal content that has a designated 'pdfContent' ID.
+         * @param {string} modalId The ID of the modal whose content needs to be downloaded.
+         */
+        async function downloadModalContentAsPdf(modalId) {
+            let elementToCaptureId;
+            let filenamePrefix;
+
+            if (modalId === 'detailsModal') {
+                elementToCaptureId = 'pdfContent';
+                filenamePrefix = document.getElementById('modalTitle').textContent;
+            } else if (modalId === 'officeStaffDetailsModal') {
+                elementToCaptureId = 'pdfOfficeStaffContent';
+                filenamePrefix = document.getElementById('officeStaffModalTitle').textContent;
+            } else {
+                console.error("Invalid modal ID for PDF download:", modalId);
+                showMessageBox("PDF Error", "Could not find content to download for PDF.");
+                return;
+            }
+            await downloadElementAsPdf(elementToCaptureId, filenamePrefix);
+        }
+
+        /**
+         * Downloads the entire overview section as a PDF.
+         */
+        async function downloadOverallReportAsPdf() {
+            const selectedMonth = document.getElementById('monthSelect').value;
+            const monthText = selectedMonth === 'all' ? 'Overall' : selectedMonth;
+            await downloadElementAsPdf('overview', `School_Financial_Report_${monthText}`);
+        }
+
+        /**
+         * Generates and downloads a combined PDF for Teacher Salaries and Office Staff Expenses.
+         */
+        async function downloadCombinedSalariesExpensesReport() {
+            const selectedMonth = document.getElementById('monthSelect').value;
+            const monthText = selectedMonth === 'all' ? 'Overall' : selectedMonth;
+
+            const combinedPdfContentDiv = document.getElementById('combinedPdfContent');
+            combinedPdfContentDiv.innerHTML = ''; // Clear previous content
+
+            combinedPdfContentDiv.innerHTML += `<h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Combined Salaries & Expenses Report - ${monthText}</h1>`;
+
+            // Add Teacher Salaries section
+            combinedPdfContentDiv.innerHTML += `<div class="mb-8">${getTeacherSalariesTableHtml(dashboardData, selectedMonth)}</div>`;
+            
+            // Add Office Staff Expenses section
+            combinedPdfContentDiv.innerHTML += `<div>${getOfficeStaffTableHtml(dashboardData, selectedMonth)}</div>`;
+
+            await downloadElementAsPdf('combinedPdfContent', `Combined_Salaries_Expenses_Report_${monthText}`);
         }
 
 
@@ -1548,6 +1824,33 @@
                     const currentTab = document.querySelector('.tab-button.active').dataset.tab;
                     showTab(currentTab); // Re-render current tab with new month
                 });
+
+                // Add event listener for the new overall download button
+                document.getElementById('downloadOverallReportButton').addEventListener('click', downloadOverallReportAsPdf);
+
+                // Add event listener for the new combined salaries & expenses report button
+                document.getElementById('downloadCombinedSalariesExpensesButton').addEventListener('click', downloadCombinedSalariesExpensesReport);
+
+
+                // Add event listeners for the new monthly report download buttons
+                document.getElementById('downloadTeacherSalariesPdfButton').addEventListener('click', () => {
+                    const selectedMonth = document.getElementById('monthSelect').value;
+                    const monthText = selectedMonth === 'all' ? 'Overall' : selectedMonth;
+                    downloadElementAsPdf('teacherSalariesTable', `Teacher_Salaries_Report_${monthText}`);
+                });
+
+                document.getElementById('downloadStudentFeesPdfButton').addEventListener('click', () => {
+                    const selectedMonth = document.getElementById('monthSelect').value;
+                    const monthText = selectedMonth === 'all' ? 'Overall' : selectedMonth;
+                    downloadElementAsPdf('studentFeesTable', `Student_Fees_Report_${monthText}`);
+                });
+
+                document.getElementById('downloadOfficeStaffExpensesPdfButton').addEventListener('click', () => {
+                    const selectedMonth = document.getElementById('monthSelect').value;
+                    const monthText = selectedMonth === 'all' ? 'Overall' : selectedMonth;
+                    downloadElementAsPdf('officeStaffExpensesTable', `Office_Staff_Expenses_Report_${monthText}`);
+                });
+
 
                 // Show the default tab (Overview)
                 showTab('overview'); // This will call updateSummary and renderCharts with 'all' initially
