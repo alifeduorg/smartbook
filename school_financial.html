@@ -275,6 +275,7 @@
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
                                 <th class="py-3 px-6">Teacher ID (Name)</th>
+                                <th class="py-3 px-6">Overall Duration (Hours)</th> <!-- Changed header -->
                                 <th class="py-3 px-6">Salary</th>
                             </tr>
                         </thead>
@@ -304,6 +305,7 @@
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
                                 <th class="py-3 px-6">Student ID (Name)</th>
+                                <th class="py-3 px-6">Overall Duration (Hours)</th> <!-- Changed header -->
                                 <th class="py-3 px-6">Fee</th>
                             </tr>
                         </thead>
@@ -333,7 +335,7 @@
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Staff Role</th>
                                 <th class="py-3 px-6">Hourly Rate (₹)</th>
-                                <th class="py-3 px-6">Total Hours</th>
+                                <th class="py-3 px-6">Overall Duration (Hours)</th> <!-- Changed header -->
                                 <th class="py-3 px-6">Calculated Salary (₹)</th>
                             </tr>
                         </thead>
@@ -773,30 +775,27 @@
          * @returns {string} The HTML string for the teacher salaries table.
          */
         function getTeacherSalariesTableHtml(data, selectedMonth) {
-            const monthlyData = data.monthlyData;
             let tableRowsHtml = '';
             let hasData = false;
             let overallTotalSalary = 0;
+            let overallTotalHours = 0;
 
             if (selectedMonth === 'all') {
                 const yearlyTeacherTotals = {};
-                sortedMonths.forEach(month => {
-                    const teachersInMonth = monthlyData[month] ? monthlyData[month].teachers : {};
-                    for (const teacherId in teachersInMonth) {
+                data.detailedLogData.forEach(entry => {
+                    if (entry.staffId) {
+                        const teacherId = entry.staffId;
                         if (!yearlyTeacherTotals[teacherId]) {
                             yearlyTeacherTotals[teacherId] = {
-                                name: teachersInMonth[teacherId].name,
+                                name: entry.teacherName,
                                 totalSalary: 0,
                                 totalHours: 0,
-                                classDates: []
+                                classDates: new Set()
                             };
                         }
-                        yearlyTeacherTotals[teacherId].totalSalary += teachersInMonth[teacherId].totalSalary;
-                        yearlyTeacherTotals[teacherId].totalHours += teachersInMonth[teacherId].totalHours;
-                        yearlyTeacherTotals[teacherId].classDates = yearlyTeacherTotals[teacherId].classDates.concat(
-                            data.detailedLogData.filter(entry => entry.staffId === teacherId)
-                                .map(entry => new Date(entry.date).toLocaleDateString())
-                        );
+                        yearlyTeacherTotals[teacherId].totalSalary += parseFloat(entry.teacherSalary || 0);
+                        yearlyTeacherTotals[teacherId].totalHours += parseFloat(entry.classDurationHours || 0);
+                        yearlyTeacherTotals[teacherId].classDates.add(new Date(entry.date).toLocaleDateString());
                         hasData = true;
                     }
                 });
@@ -808,15 +807,17 @@
                         <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-teacher-id="${teacherId}" data-month="${selectedMonth}">
                             <td class="py-3 px-6 whitespace-nowrap">All Months</td>
                             <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${teacherInfo.totalHours.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
                         </tr>
                     `;
                     overallTotalSalary += teacherInfo.totalSalary;
+                    overallTotalHours += teacherInfo.totalHours;
                 });
 
             } else { // Specific month selected
                 const month = selectedMonth;
-                const teachers = monthlyData[month] ? monthlyData[month].teachers : {};
+                const teachers = data.monthlyData[month] ? data.monthlyData[month].teachers : {};
                 const sortedTeacherIds = Object.keys(teachers).sort();
 
                 if (sortedTeacherIds.length > 0) {
@@ -827,16 +828,18 @@
                             <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-teacher-id="${teacherId}" data-month="${selectedMonth}">
                                 <td class="py-3 px-6 whitespace-nowrap">${month}</td>
                                 <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
-                                <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.totalSalary.toFixed(2)}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">${parseFloat(teacherInfo.totalHours || 0).toFixed(2)}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">₹${parseFloat(teacherInfo.totalSalary || 0).toFixed(2)}</td>
                             </tr>
                         `;
-                        overallTotalSalary += teacherInfo.totalSalary;
+                        overallTotalSalary += parseFloat(teacherInfo.totalSalary || 0);
+                        overallTotalHours += parseFloat(teacherInfo.totalHours || 0);
                     });
                 }
             }
 
             if (!hasData) {
-                tableRowsHtml = `<tr><td colspan="3" class="py-3 px-6 text-center text-gray-500">No teacher salary data for the selected month(s).</td></tr>`;
+                tableRowsHtml = `<tr><td colspan="4" class="py-3 px-6 text-center text-gray-500">No teacher salary data for the selected month(s).</td></tr>`;
             }
 
             const title = selectedMonth === 'all' ? 'Overall Teacher Salaries Report' : `Teacher Salaries Report for ${selectedMonth}`;
@@ -849,6 +852,7 @@
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
                                 <th class="py-3 px-6">Teacher ID (Name)</th>
+                                <th class="py-3 px-6">Overall Duration (Hours)</th>
                                 <th class="py-3 px-6">Salary</th>
                             </tr>
                         </thead>
@@ -858,6 +862,7 @@
                         <tfoot>
                             <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
                                 <td class="py-3 px-6" colspan="2">Overall Sum:</td>
+                                <td class="py-3 px-6">${overallTotalHours.toFixed(2)}</td>
                                 <td class="py-3 px-6">₹${overallTotalSalary.toFixed(2)}</td>
                             </tr>
                         </tfoot>
@@ -895,30 +900,27 @@
          * @returns {string} The HTML string for the student fees table.
          */
         function getStudentFeesTableHtml(data, selectedMonth) {
-            const monthlyData = data.monthlyData;
             let tableRowsHtml = '';
             let hasData = false;
             let overallTotalFee = 0;
+            let overallTotalHours = 0;
 
             if (selectedMonth === 'all') {
                 const yearlyStudentTotals = {};
-                sortedMonths.forEach(month => {
-                    const studentsInMonth = monthlyData[month] ? monthlyData[month].students : {};
-                    for (const studentId in studentsInMonth) {
+                data.detailedLogData.forEach(entry => {
+                    if (entry.studentId) {
+                        const studentId = entry.studentId;
                         if (!yearlyStudentTotals[studentId]) {
                             yearlyStudentTotals[studentId] = {
-                                name: studentsInMonth[studentId].name,
+                                name: entry.studentName,
                                 totalFee: 0,
                                 totalHours: 0,
-                                classDates: []
+                                classDates: new Set()
                             };
                         }
-                        yearlyStudentTotals[studentId].totalFee += studentsInMonth[studentId].totalFee;
-                        yearlyStudentTotals[studentId].totalHours += studentsInMonth[studentId].totalHours;
-                        yearlyStudentTotals[studentId].classDates = yearlyStudentTotals[studentId].classDates.concat(
-                            data.detailedLogData.filter(entry => entry.studentId === studentId)
-                                .map(entry => new Date(entry.date).toLocaleDateString())
-                        );
+                        yearlyStudentTotals[studentId].totalFee += parseFloat(entry.studentFee || 0);
+                        yearlyStudentTotals[studentId].totalHours += parseFloat(entry.classDurationHours || 0);
+                        yearlyStudentTotals[studentId].classDates.add(new Date(entry.date).toLocaleDateString());
                         hasData = true;
                     }
                 });
@@ -930,15 +932,17 @@
                         <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-student-id="${studentId}" data-month="${selectedMonth}">
                             <td class="py-3 px-6 whitespace-nowrap">All Months</td>
                             <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${studentInfo.totalHours.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
                         </tr>
                     `;
                     overallTotalFee += studentInfo.totalFee;
+                    overallTotalHours += studentInfo.totalHours;
                 });
 
             } else { // Specific month selected
                 const month = selectedMonth;
-                const students = monthlyData[month] ? monthlyData[month].students : {};
+                const students = data.monthlyData[month] ? data.monthlyData[month].students : {};
                 const sortedStudentIds = Object.keys(students).sort();
 
                 if (sortedStudentIds.length > 0) {
@@ -949,16 +953,18 @@
                             <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" data-student-id="${studentId}" data-month="${selectedMonth}">
                                 <td class="py-3 px-6 whitespace-nowrap">${month}</td>
                                 <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
-                                <td class="py-3 px-6 whitespace-nowrap">₹${studentInfo.totalFee.toFixed(2)}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">${parseFloat(studentInfo.totalHours || 0).toFixed(2)}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">₹${parseFloat(studentInfo.totalFee || 0).toFixed(2)}</td>
                             </tr>
                         `;
-                        overallTotalFee += studentInfo.totalFee;
+                        overallTotalFee += parseFloat(studentInfo.totalFee || 0);
+                        overallTotalHours += parseFloat(studentInfo.totalHours || 0);
                     });
                 }
             }
 
             if (!hasData) {
-                tableRowsHtml = `<tr><td colspan="3" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td></tr>`;
+                tableRowsHtml = `<tr><td colspan="4" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td></tr>`;
             }
 
             const title = selectedMonth === 'all' ? 'Overall Student Fees Report' : `Student Fees Report for ${selectedMonth}`;
@@ -971,6 +977,7 @@
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Month</th>
                                 <th class="py-3 px-6">Student ID (Name)</th>
+                                <th class="py-3 px-6">Overall Duration (Hours)</th>
                                 <th class="py-3 px-6">Fee</th>
                             </tr>
                         </thead>
@@ -980,6 +987,7 @@
                         <tfoot>
                             <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
                                 <td class="py-3 px-6" colspan="2">Overall Sum:</td>
+                                <td class="py-3 px-6">${overallTotalHours.toFixed(2)}</td>
                                 <td class="py-3 px-6">₹${overallTotalFee.toFixed(2)}</td>
                             </tr>
                         </tfoot>
@@ -1020,10 +1028,11 @@
             const officeStaffConfig = data.officeStaffConfig;
             const staffExpenses = {};
             let overallTotalStaffSalary = 0;
+            let overallTotalStaffHours = 0; // New: Overall total hours for staff
 
             for (const position in officeStaffConfig) {
                 staffExpenses[position] = {
-                    hourlyRate: officeStaffConfig[position].rate,
+                    hourlyRate: parseFloat(officeStaffConfig[position].rate || 0),
                     totalHours: 0,
                     calculatedSalary: 0,
                     programs: officeStaffConfig[position].programs,
@@ -1044,7 +1053,7 @@
                 for (const position in staffExpenses) {
                     const staffConfig = staffExpenses[position];
                     if (staffConfig.programs.length === 0 || staffConfig.programs.includes(program)) {
-                        staffExpenses[position].totalHours += entry.classDurationHours;
+                        staffExpenses[position].totalHours += parseFloat(entry.classDurationHours || 0);
                     }
                 }
             });
@@ -1066,6 +1075,7 @@
                 if (info.totalHours > 0) {
                     hasData = true;
                     overallTotalStaffSalary += info.calculatedSalary;
+                    overallTotalStaffHours += info.totalHours; // Accumulate overall hours
                 }
             }
 
@@ -1083,7 +1093,7 @@
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                 <th class="py-3 px-6">Staff Role</th>
                                 <th class="py-3 px-6">Hourly Rate (₹)</th>
-                                <th class="py-3 px-6">Total Hours</th>
+                                <th class="py-3 px-6">Overall Duration (Hours)</th>
                                 <th class="py-3 px-6">Calculated Salary (₹)</th>
                             </tr>
                         </thead>
@@ -1092,7 +1102,8 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
-                                <td class="py-3 px-6" colspan="3">Overall Sum:</td>
+                                <td class="py-3 px-6" colspan="2">Overall Sum:</td>
+                                <td class="py-3 px-6">${overallTotalStaffHours.toFixed(2)}</td>
                                 <td class="py-3 px-6">₹${overallTotalStaffSalary.toFixed(2)}</td>
                             </tr>
                         </tfoot>
@@ -1226,15 +1237,21 @@
                 let totalSalaryForTeacher = 0;
                 let totalHoursForTeacher = 0;
                 const classDates = new Set(); // To store unique dates
-                const detailedClassesForEmail = []; // For detailed email content
                 const studentBreakdownForEmail = {}; // To group classes by student for email
 
                 // Sort filtered classes by date
                 filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
 
+                // Calculate totals for the modal header
+                filteredClasses.forEach(entry => {
+                    totalSalaryForTeacher += parseFloat(entry.teacherSalary || 0);
+                    totalHoursForTeacher += parseFloat(entry.classDurationHours || 0);
+                });
+
                 let tableHtml = `
                     <div id="pdfContent" class="overflow-x-auto"> <!-- Added ID for PDF export -->
                         <h4 class="text-lg font-semibold mb-2">Details for ${teacherId} (${teacherName}) - ${month === 'all' ? 'All Months' : month}</h4>
+                        <p class="text-md font-semibold mb-2">Overall Duration (Hours): ${totalHoursForTeacher.toFixed(2)}</p>
                         <table class="min-w-full bg-white rounded-lg shadow-md">
                             <thead>
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
@@ -1254,13 +1271,11 @@
                             <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.studentId} (${entry.studentName})</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.classroomName}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalaryPerHour.toFixed(2)}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalary.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${parseFloat(entry.classDurationHours || 0).toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${parseFloat(entry.teacherSalaryPerHour || 0).toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${parseFloat(entry.teacherSalary || 0).toFixed(2)}</td>
                         </tr>
                     `;
-                    totalSalaryForTeacher += entry.teacherSalary;
-                    totalHoursForTeacher += entry.classDurationHours;
                     classDates.add(new Date(entry.date).toLocaleDateString());
 
                     // Prepare data for email template: group by student
@@ -1269,12 +1284,12 @@
                             name: entry.studentName,
                             totalHours: 0,
                             totalAmount: 0,
-                            hourlyRate: entry.teacherSalaryPerHour, // Assuming hourly rate is consistent per teacher
+                            hourlyRate: parseFloat(entry.teacherSalaryPerHour || 0), // Assuming hourly rate is consistent per teacher
                             classes: []
                         };
                     }
-                    studentBreakdownForEmail[entry.studentId].totalHours += entry.classDurationHours;
-                    studentBreakdownForEmail[entry.studentId].totalAmount += entry.teacherSalary;
+                    studentBreakdownForEmail[entry.studentId].totalHours += parseFloat(entry.classDurationHours || 0);
+                    studentBreakdownForEmail[entry.studentId].totalAmount += parseFloat(entry.teacherSalary || 0);
                     studentBreakdownForEmail[entry.studentId].classes.push({
                         date: new Date(entry.date).toLocaleDateString(),
                         program: entry.program,
@@ -1348,9 +1363,16 @@
 
                 filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
 
+                // Calculate totals for the modal header
+                filteredClasses.forEach(entry => {
+                    totalFeeForStudent += parseFloat(entry.studentFee || 0);
+                    totalHoursForStudent += parseFloat(entry.classDurationHours || 0);
+                });
+
                 let tableHtml = `
                     <div id="pdfContent" class="overflow-x-auto"> <!-- Added ID for PDF export -->
                         <h4 class="text-lg font-semibold mb-2">Details for ${studentId} (${studentName}) - ${month === 'all' ? 'All Months' : month}</h4>
+                        <p class="text-md font-semibold mb-2">Overall Duration (Hours): ${totalHoursForStudent.toFixed(2)}</p>
                         <table class="min-w-full bg-white rounded-lg shadow-md">
                             <thead>
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
@@ -1370,13 +1392,11 @@
                             <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.staffId} (${entry.teacherName})</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.classroomName}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFeePerHour.toFixed(2)}</td>
-                            <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFee.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${parseFloat(entry.classDurationHours || 0).toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${parseFloat(entry.studentFeePerHour || 0).toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${parseFloat(entry.studentFee || 0).toFixed(2)}</td>
                         </tr>
                     `;
-                    totalFeeForStudent += entry.studentFee;
-                    totalHoursForStudent += entry.classDurationHours;
                     classDates.add(new Date(entry.date).toLocaleDateString());
 
                     // Prepare data for email template: group by teacher
@@ -1385,12 +1405,12 @@
                             name: entry.teacherName,
                             totalHours: 0,
                             totalAmount: 0,
-                            hourlyRate: entry.studentFeePerHour, // Student's fee rate for this teacher
+                            hourlyRate: parseFloat(entry.studentFeePerHour || 0), // Student's fee rate for this teacher
                             classes: []
                         };
                     }
-                    teacherBreakdownForEmail[entry.staffId].totalHours += entry.classDurationHours;
-                    teacherBreakdownForEmail[entry.staffId].totalAmount += entry.studentFee;
+                    teacherBreakdownForEmail[entry.staffId].totalHours += parseFloat(entry.classDurationHours || 0);
+                    teacherBreakdownForEmail[entry.staffId].totalAmount += parseFloat(entry.studentFee || 0);
                     teacherBreakdownForEmail[entry.staffId].classes.push({
                         date: new Date(entry.date).toLocaleDateString(),
                         program: entry.program,
@@ -1460,7 +1480,7 @@
             if (month === 'all') {
                 filteredLogEntries = dashboardData.detailedLogData;
             } else {
-                filteredLogEntries = dashboardData.detailedLogData.filter(entry => entry.month === month);
+                filteredLogEntries = dashboardData.detailedLogData.filter(entry => entry.month === selectedMonth);
             }
 
             const teacherContributions = {};
@@ -1474,7 +1494,7 @@
                 if (officeStaffConfig.programs.length === 0 || officeStaffConfig.programs.includes(program)) {
                     const teacherId = entry.staffId;
                     const teacherName = entry.teacherName;
-                    const classDurationHours = entry.classDurationHours;
+                    const classDurationHours = parseFloat(entry.classDurationHours || 0);
 
                     if (!teacherContributions[teacherId]) {
                         teacherContributions[teacherId] = {
@@ -1486,19 +1506,20 @@
                         };
                     }
                     teacherContributions[teacherId].hours += classDurationHours;
-                    teacherContributions[teacherId].salaryContribution += (classDurationHours * officeStaffConfig.rate);
+                    teacherContributions[teacherId].salaryContribution += (classDurationHours * parseFloat(officeStaffConfig.rate || 0));
                     teacherContributions[teacherId].classDates.add(new Date(entry.date).toLocaleDateString());
 
                     totalHoursForRole += classDurationHours;
                     classDatesForRole.add(new Date(entry.date).toLocaleDateString());
                 }
             });
-            totalSalaryForRole = totalHoursForRole * officeStaffConfig.rate;
+            totalSalaryForRole = totalHoursForRole * parseFloat(officeStaffConfig.rate || 0);
 
 
             let tableHtml = `
                 <div id="pdfOfficeStaffContent" class="overflow-x-auto">
                     <h4 class="text-lg font-semibold mb-2">Contribution Breakdown by Teacher for ${staffName} - ${month === 'all' ? 'All Months' : month}</h4>
+                    <p class="text-md font-semibold mb-2">Overall Duration (Hours): ${totalHoursForRole.toFixed(2)}</p>
                     <table class="min-w-full bg-white rounded-lg shadow-md">
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
@@ -1562,7 +1583,7 @@
                 totalHours: totalHoursForRole,
                 classDates: Array.from(classDatesForRole).join(', '),
                 teacherContributions: teacherContributionsForEmail,
-                officeStaffHourlyRate: officeStaffConfig.rate.toFixed(2) // Include office staff's own hourly rate
+                officeStaffHourlyRate: parseFloat(officeStaffConfig.rate || 0).toFixed(2) // Include office staff's own hourly rate
             };
             modal.classList.add('show');
         }
@@ -1590,9 +1611,9 @@
                         emailMessage += `  Hourly Rate for this Student: ₹${studentInfo.hourlyRate.toFixed(2)}\n`;
                         emailMessage += `  Total Amount for this Student: ₹${studentInfo.totalAmount.toFixed(2)}\n`;
                         if (studentInfo.classes.length > 0) {
-                            emailMessage += `  Classes Taught to this Student:\n`;
+                            emailMessage += `    Classes Taught to this Student:\n`;
                             studentInfo.classes.forEach(c => {
-                                emailMessage += `    - Date: ${c.date}, Program: ${c.program}, Classroom: ${c.classroom}, Subject: ${c.subject}, Duration: ${c.durationMinutes} minutes\n`;
+                                emailMessage += `      - Date: ${c.date}, Program: ${c.program}, Classroom: ${c.classroom}, Subject: ${c.subject}, Duration: ${c.durationMinutes} minutes\n`;
                             });
                         }
                         emailMessage += `\n`;
@@ -1618,9 +1639,9 @@
                         emailMessage += `  Hourly Rate for this Teacher: ₹${teacherInfo.hourlyRate.toFixed(2)}\n`;
                         emailMessage += `  Total Amount for this Teacher: ₹${teacherInfo.totalAmount.toFixed(2)}\n`;
                         if (teacherInfo.classes.length > 0) {
-                            emailMessage += `  Classes Attended with this Teacher:\n`;
+                            emailMessage += `    Classes Attended with this Teacher:\n`;
                             teacherInfo.classes.forEach(c => {
-                                emailMessage += `    - Date: ${c.date}, Program: ${c.program}, Classroom: ${c.classroom}, Subject: ${c.subject}, Duration: ${c.durationMinutes} minutes\n`;
+                                emailMessage += `      - Date: ${c.date}, Program: ${c.program}, Classroom: ${c.classroom}, Subject: ${c.subject}, Duration: ${c.durationMinutes} minutes\n`;
                             });
                         }
                         emailMessage += `\n`;
@@ -1789,6 +1810,162 @@
         }
 
         /**
+         * Generates the HTML table for combined staff (teachers and office staff).
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         * @returns {string} The HTML string for the combined staff table.
+         */
+        function getCombinedStaffTableHtml(data, selectedMonth) {
+            let combinedStaffData = [];
+            let overallGrandTotalHours = 0;
+            let overallGrandTotalAmount = 0;
+
+            // --- Process Teachers ---
+            if (selectedMonth === 'all') {
+                const yearlyTeacherTotals = {};
+                data.detailedLogData.forEach(entry => {
+                    if (entry.staffId) {
+                        const teacherId = entry.staffId;
+                        if (!yearlyTeacherTotals[teacherId]) {
+                            yearlyTeacherTotals[teacherId] = {
+                                name: entry.teacherName,
+                                totalSalary: 0,
+                                totalHours: 0
+                            };
+                        }
+                        yearlyTeacherTotals[teacherId].totalSalary += parseFloat(entry.teacherSalary || 0);
+                        yearlyTeacherTotals[teacherId].totalHours += parseFloat(entry.classDurationHours || 0);
+                    }
+                });
+                for (const teacherId in yearlyTeacherTotals) {
+                    const info = yearlyTeacherTotals[teacherId];
+                    combinedStaffData.push({
+                        type: 'Teacher',
+                        id: teacherId,
+                        name: info.name,
+                        duration: info.totalHours,
+                        amount: info.totalSalary
+                    });
+                }
+            } else { // Specific month selected
+                const teachers = data.monthlyData[selectedMonth] ? data.monthlyData[selectedMonth].teachers : {};
+                for (const teacherId in teachers) {
+                    const info = teachers[teacherId];
+                    combinedStaffData.push({
+                        type: 'Teacher',
+                        id: teacherId,
+                        name: info.name,
+                        duration: parseFloat(info.totalHours || 0),
+                        amount: parseFloat(info.totalSalary || 0)
+                    });
+                }
+            }
+
+            // --- Process Office Staff ---
+            const officeStaffConfig = data.officeStaffConfig;
+            const officeStaffExpenses = {}; // Declare officeStaffExpenses here
+
+            for (const position in officeStaffConfig) {
+                officeStaffExpenses[position] = {
+                    hourlyRate: parseFloat(officeStaffConfig[position].rate || 0),
+                    totalHours: 0,
+                    calculatedSalary: 0,
+                    programs: officeStaffConfig[position].programs,
+                    name: officeStaffConfig[position].name || position,
+                    id: officeStaffConfig[position].id || position // Use position as ID if not explicitly provided
+                };
+            }
+
+            let filteredLogEntries = [];
+            if (selectedMonth === 'all') {
+                filteredLogEntries = data.detailedLogData;
+            } else {
+                filteredLogEntries = data.detailedLogData.filter(entry => entry.month === selectedMonth);
+            }
+
+            filteredLogEntries.forEach(entry => {
+                const program = entry.program;
+                for (const position in officeStaffExpenses) {
+                    const staffConfig = officeStaffExpenses[position];
+                    if (staffConfig.programs.length === 0 || staffConfig.programs.includes(program)) {
+                        officeStaffExpenses[position].totalHours += parseFloat(entry.classDurationHours || 0); // Corrected variable name
+                    }
+                }
+            });
+
+            for (const position in officeStaffExpenses) {
+                const info = officeStaffExpenses[position];
+                info.calculatedSalary = info.totalHours * info.hourlyRate;
+                if (info.totalHours > 0 || info.calculatedSalary > 0) { // Only add if there's actual activity/cost
+                    combinedStaffData.push({
+                        type: 'Office Staff',
+                        id: info.id,
+                        name: info.name,
+                        duration: info.totalHours,
+                        amount: info.calculatedSalary
+                    });
+                }
+            }
+
+            // Sort combined data by type, then by name
+            combinedStaffData.sort((a, b) => {
+                if (a.type === b.type) {
+                    return a.name.localeCompare(b.name);
+                }
+                return a.type.localeCompare(b.type);
+            });
+
+            let tableRowsHtml = '';
+            let hasData = combinedStaffData.length > 0;
+
+            combinedStaffData.forEach(item => {
+                tableRowsHtml += `
+                    <tr class="border-b border-gray-200">
+                        <td class="py-3 px-6 whitespace-nowrap">${item.type}</td>
+                        <td class="py-3 px-6 whitespace-nowrap">${item.id} (${item.name})</td>
+                        <td class="py-3 px-6 whitespace-nowrap">${item.duration.toFixed(2)}</td>
+                        <td class="py-3 px-6 whitespace-nowrap">₹${item.amount.toFixed(2)}</td>
+                    </tr>
+                `;
+                overallGrandTotalHours += item.duration;
+                overallGrandTotalAmount += item.amount;
+            });
+
+            if (!hasData) {
+                tableRowsHtml = `<tr><td colspan="4" class="py-3 px-6 text-center text-gray-500">No combined staff data for the selected month(s).</td></tr>`;
+            }
+
+            const title = selectedMonth === 'all' ? 'Overall Combined Salaries & Expenses Report' : `Combined Salaries & Expenses Report for ${selectedMonth}`;
+
+            return `
+                <div class="overflow-x-auto">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">${title}</h3>
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Type</th>
+                                <th class="py-3 px-6">ID (Name/Role)</th>
+                                <th class="py-3 px-6">Overall Duration (Hours)</th>
+                                <th class="py-3 px-6">Total Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 text-sm font-light">
+                            ${tableRowsHtml}
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
+                                <td class="py-3 px-6" colspan="2">Overall Grand Total:</td>
+                                <td class="py-3 px-6">${overallGrandTotalHours.toFixed(2)}</td>
+                                <td class="py-3 px-6">₹${overallGrandTotalAmount.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+        }
+
+
+        /**
          * Generates and downloads a combined PDF for Teacher Salaries and Office Staff Expenses.
          */
         async function downloadCombinedSalariesExpensesReport() {
@@ -1796,15 +1973,7 @@
             const monthText = selectedMonth === 'all' ? 'Overall' : selectedMonth;
 
             const combinedPdfContentDiv = document.getElementById('combinedPdfContent');
-            combinedPdfContentDiv.innerHTML = ''; // Clear previous content
-
-            combinedPdfContentDiv.innerHTML += `<h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Combined Salaries & Expenses Report - ${monthText}</h1>`;
-
-            // Add Teacher Salaries section
-            combinedPdfContentDiv.innerHTML += `<div class="mb-8">${getTeacherSalariesTableHtml(dashboardData, selectedMonth)}</div>`;
-            
-            // Add Office Staff Expenses section
-            combinedPdfContentDiv.innerHTML += `<div>${getOfficeStaffTableHtml(dashboardData, selectedMonth)}</div>`;
+            combinedPdfContentDiv.innerHTML = getCombinedStaffTableHtml(dashboardData, selectedMonth);
 
             await downloadElementAsPdf('combinedPdfContent', `Combined_Salaries_Expenses_Report_${monthText}`);
         }
