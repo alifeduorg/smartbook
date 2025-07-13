@@ -29,12 +29,12 @@
 
         /* Styles for the black box code (for HTML preview) */
         .code-box {
-            background-color: black;
-            padding: 2px 8px;
-            border-radius: 0; /* Sharp edges */
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
+            background-color: transparent; /* No background */
+            padding: 0; /* No padding */
+            border-radius: 0; /* No border radius */
+            color: black; /* Black text */
+            font-weight: bold; /* Bold text */
+            font-size: 15px; /* Slightly smaller font size without the box */
             font-family: 'Roboto', sans-serif;
             display: inline-block; /* To make padding work */
             box-sizing: border-box;
@@ -258,6 +258,7 @@
                         <option value="Term 1">Term 1</option>
                         <option value="Term 2">Term 2</option>
                         <option value="Term 3">Term 3</option>
+                        <option value="Term 4">Term 4</option>
                         <option value="Half Yearly">Half Yearly</option>
                         <option value="Revision Test">Revision Test</option>
                         <option value="Admission Test">Admission Test</option>
@@ -322,7 +323,6 @@
             </div>
             <button id="addSectionBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out">
                 Add Section
-
             </button>
 
             <div class="flex justify-center space-x-4 mt-8">
@@ -489,7 +489,7 @@
         // Function to add a single sub-question input block
         function addSubQuestionInput(parentQuestionDiv) {
             // Generate a unique ID that is valid for CSS selectors (no decimals)
-            const subQuestionId = `${Date.now()}${Math.floor(Math.random() * 10000)}`; 
+            const subQuestionId = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
             const subQuestionDiv = document.createElement('div');
             subQuestionDiv.classList.add('sub-question-input-block', 'pl-4', 'border-l-2', 'border-gray-100', 'mb-2');
             subQuestionDiv.innerHTML = `
@@ -537,7 +537,7 @@
         // Function to add a single question input block within a section
         function addQuestionInput(sectionQuestionsContainer) {
             // Generate a unique ID that is valid for CSS selectors (no decimals)
-            const questionId = `${Date.now()}${Math.floor(Math.random() * 10000)}`; 
+            const questionId = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
             const questionDiv = document.createElement('div');
             questionDiv.classList.add('question-input-block', 'p-3', 'border', 'border-gray-200', 'rounded-md', 'bg-white', 'mb-4', 'shadow-sm');
             questionDiv.innerHTML = `
@@ -706,13 +706,15 @@
             // Generate Question Paper Code: [ExamCode][TestNumber if applicable][ClassCode][SubjectCode][SerialNumber]
             const subjectCode = subjectCodes[subject] || '';
             let examType = '';
-            let testNumber = '';
+            let testNumber = ''; // Initialize testNumber
+
             const examNameParts = examNameFull.split(' ');
             if (examNameParts.length > 1 && !isNaN(parseInt(examNameParts[examNameParts.length - 1]))) {
                 testNumber = examNameParts[examNameParts.length - 1];
                 examType = examNameParts.slice(0, -1).join(' ');
             } else {
                 examType = examNameFull;
+                testNumber = ''; // Explicitly ensure testNumber is empty if no number is found
             }
             const examCode = examTypeCodes[examType] || '';
             // Fix: Ensure 'C' is only added if className doesn't already start with it
@@ -821,13 +823,13 @@
                     }
                 });
 
-                sectionsData.push({ 
+                sectionsData.push({
                     sectionLetter,
-                    headingText, 
+                    headingText,
                     sectionQuestionsHtml: sectionQuestionsHtml.join(''),
                     sectionNumQuestions,
                     marksPerQuestion,
-                    sectionCalculatedMarks 
+                    sectionCalculatedMarks
                 });
             }
 
@@ -852,7 +854,7 @@
                                 </div>
                                 <div class="section-heading-description-line">
                                     <span class="section-heading-description">${section.headingText}</span>
-                                    ${section.sectionCalculatedMarks > 0 ? 
+                                    ${section.sectionCalculatedMarks > 0 ?
                                         `<span class="section-marks-text">(${section.sectionNumQuestions} x ${section.marksPerQuestion} = ${section.sectionCalculatedMarks})</span>` : ''
                                     }
                                 </div>
@@ -957,31 +959,25 @@
                     doc.addPage();
                     doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
 
-                    // Re-add header and footer code with black box and centered text on every new page
-                    doc.setFont('Roboto', '900'); // Use 900 for very thick
-                    doc.setFontSize(16); // Slightly larger font size for the code
-                    doc.setTextColor(255, 255, 255); // White color for text
-                    doc.setFillColor(0, 0, 0); // Black background for box
+                    // Re-add header and footer code on every new page (no black box)
+                    doc.setFont('Roboto', 'bold'); // Use bold for text
+                    doc.setFontSize(15); // Slightly smaller font size
+                    doc.setTextColor(0, 0, 0); // Black color for text
 
-                    // Header code box and text (centered)
+                    // Header code text
                     const headerCodeText = questionPaperCode;
                     const headerCodeTextWidth = doc.getTextWidth(headerCodeText);
-                    const headerBoxWidth = headerCodeTextWidth + 10; // Add padding
-                    const headerBoxHeight = 8; // Fixed height
-                    const headerBoxX = 210 - 20 - headerBoxWidth; // Right align, then subtract box width
-                    const headerBoxY = 17;
-                    doc.rect(headerBoxX, headerBoxY, headerBoxWidth, headerBoxHeight, 'F'); // Use rect for sharp corners
-                    doc.text(headerCodeText, headerBoxX + (headerBoxWidth / 2), headerBoxY + (headerBoxHeight / 2), { align: 'center', baseline: 'middle' });
+                    const headerTextX = 210 - 20 - headerCodeTextWidth; // Right align, 20mm from right edge
+                    const headerTextY = 18; // Moved up from previous 22mm
 
-                    // Footer code box and text (centered)
+                    doc.text(headerCodeText, headerTextX, headerTextY); // Place text
+
+                    // Footer code text
                     const footerCodeText = questionPaperCode;
-                    const footerCodeTextWidth = doc.getTextWidth(footerCodeText);
-                    const footerBoxWidth = footerCodeTextWidth + 10; // Add padding
-                    const footerBoxHeight = 8; // Fixed height
-                    const footerBoxX = 20; // Left align
-                    const footerBoxY = 284;
-                    doc.rect(footerBoxX, footerBoxY, footerBoxWidth, footerBoxHeight, 'F'); // Use rect for sharp corners
-                    doc.text(footerCodeText, footerBoxX + (footerBoxWidth / 2), footerBoxY + (footerBoxHeight / 2), { align: 'center', baseline: 'middle' });
+                    const footerTextX = 20; // Left align, 20mm from left edge
+                    const footerTextY = 281; // Moved up from previous 285mm
+
+                    doc.text(footerCodeText, footerTextX, footerTextY); // Place text
 
                     // PTO text - only if there's more content left for *another* page
                     if (heightLeft > pageHeight) {
