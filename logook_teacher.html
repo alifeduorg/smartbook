@@ -136,7 +136,13 @@
         #dashboardButton:hover:not(:disabled) {
             background-color: #27AE60; /* Darker green on hover */
         }
-
+        #logBookViewButton {
+            background-color: #FFC107; /* Amber for log book view button */
+            color: #333; /* Dark text for contrast */
+        }
+        #logBookViewButton:hover:not(:disabled) {
+            background-color: #FFA000; /* Darker amber on hover */
+        }
         .grid-cols-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -177,6 +183,7 @@
             display: none; /* Hidden by default */
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
+            text-align: center; /* Center text in message box */
         }
         .message-box.error {
             background-color: #f44336; /* Red for error */
@@ -188,9 +195,7 @@
     </style>
 </head>
 <body>
-
     <canvas id="three-canvas"></canvas>
-
     <div class="container">
         <h1 class="text-3xl text-center">Daily Class Log</h1>
         <form id="logForm">
@@ -217,7 +222,6 @@
                     </select>
                 </div>
             </div>
-
             <!-- Combined Teacher Name and ID dropdown -->
             <div>
                 <label for="teacherCombined">Teacher Name (ID):</label>
@@ -228,7 +232,6 @@
                     <input type="text" id="newTeacherCombined" name="newTeacherCombined" placeholder="e.g., New Teacher (NEWID001)" class="rounded-xl w-full">
                 </div>
             </div>
-
             <label for="program">Program:</label>
             <select id="program" name="program" required class="rounded-xl">
                 <option value="">Select Program</option>
@@ -249,7 +252,6 @@
                     <input type="text" id="newStudentCombined" name="newStudentCombined" placeholder="e.g., New Student (NEWSTU001)" class="rounded-xl w-full">
                 </div>
             </div>
-
             <label for="classroomName">Class Room Name:</label>
             <select id="classroomName" name="classroomName" required class="rounded-xl">
                 <option value="">Select Classroom</option>
@@ -257,7 +259,6 @@
             <div id="newClassroomInputContainer" style="display: none; margin-top: 0.5rem;">
                 <input type="text" id="newClassroomName" name="newClassroomName" placeholder="e.g., New Class 101" class="rounded-xl w-full">
             </div>
-
             <div class="grid grid-cols-2">
                 <div>
                     <label for="subject">Subject:</label>
@@ -268,31 +269,24 @@
                     <input type="time" id="classIn" name="classIn" required class="rounded-xl">
                 </div>
             </div>
-
             <label for="classDuration">Class Duration (minutes):</label>
             <input type="number" id="classDuration" name="classDuration" placeholder="e.g., 45" required class="rounded-xl">
-
             <label for="whatTeachToday">What Taught Today:</label>
             <textarea id="whatTeachToday" name="whatTeachToday" placeholder="Describe the topics covered and activities done..." required class="rounded-xl"></textarea>
-
             <label for="studentEngagement">Student Engagement:</label>
             <textarea id="studentEngagement" name="studentEngagement" placeholder="Observations on student participation and engagement..." class="rounded-xl"></textarea>
-
             <label for="anyWork">Any Work:</label>
             <textarea id="anyWork" name="anyWork" placeholder="Homework, assignments, or follow-up tasks..." class="rounded-xl"></textarea>
-
             <label for="anythingToShare">Anything you'd like to share?</label>
             <textarea id="anythingToShare" name="anythingToShare" placeholder="Any additional notes, concerns, or highlights..." class="rounded-xl"></textarea>
-
             <div class="button-group">
                 <button type="button" id="dashboardButton">Go to Dashboard</button>
+                <button type="button" id="logBookViewButton">Log Book View</button> <!-- New button added here -->
                 <button type="submit" id="submitButton">Submit Log</button>
             </div>
         </form>
     </div>
-
     <div id="messageBox" class="message-box"></div>
-
     <script>
         // Function to display messages
         function showMessage(message, type = 'success') {
@@ -304,14 +298,13 @@
             } else {
                 messageBox.classList.remove('error');
             }
-
+            // Message stays for 10 seconds
             setTimeout(() => {
                 messageBox.classList.remove('show');
                 // Optional: Hide completely after transition
                 setTimeout(() => { messageBox.style.display = 'none'; }, 300);
-            }, 3000); // Message disappears after 3 seconds
+            }, 10000); // Message disappears after 10 seconds
         }
-
         // --- Three.js Setup ---
         let scene, camera, renderer, particles = [], glowingSpheres = [], pointLight;
         const particleCount = 200; // More particles for a denser field
@@ -325,25 +318,20 @@
             0xEC4899, // Pink (retained for some contrast)
             0x8B5CF6  // Purple (retained for some contrast)
         ]; // Updated color palette for 3D animation
-
         function initThreeJS() {
             const canvas = document.getElementById('three-canvas');
             scene = new THREE.Scene();
-
             // Camera setup
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 15; // Move camera back to see more particles
-
             // Renderer setup
             renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true }); // Alpha true, antialias for smoother edges
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
-
             // Create particles (points)
             const positions = new Float32Array(particleCount * 3);
             const colorsArray = new Float32Array(particleCount * 3);
             const sizes = new Float32Array(particleCount);
-
             const particleGeometry = new THREE.BufferGeometry();
             const particleMaterial = new THREE.PointsMaterial({
                 size: 0.1,
@@ -353,30 +341,24 @@
                 blending: THREE.AdditiveBlending, // For a glowing effect
                 sizeAttenuation: true // Particles closer to camera appear larger
             });
-
             for (let i = 0; i < particleCount; i++) {
                 // Positions
                 positions[i * 3] = (Math.random() - 0.5) * 30; // x
                 positions[i * 3 + 1] = (Math.random() - 0.5) * 30; // y
                 positions[i * 3 + 2] = (Math.random() - 0.5) * 30; // z
-
                 // Colors
                 const color = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
                 colorsArray[i * 3] = color.r;
                 colorsArray[i * 3 + 1] = color.g;
                 colorsArray[i * 3 + 2] = color.b;
-
                 // Sizes
                 sizes[i] = 0.5 + Math.random() * 1.5; // Varying sizes
             }
-
             particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             particleGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
             particleGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1)); // Custom size attribute
-
             particles = new THREE.Points(particleGeometry, particleMaterial);
             scene.add(particles);
-
             // Create glowing spheres
             for (let i = 0; i < glowingSphereCount; i++) {
                 const geometry = new THREE.SphereGeometry(
@@ -393,82 +375,65 @@
                     metalness: 0.1
                 });
                 const sphere = new THREE.Mesh(geometry, material);
-
                 sphere.position.x = (Math.random() - 0.5) * 25;
                 sphere.position.y = (Math.random() - 0.5) * 25;
                 sphere.position.z = (Math.random() - 0.5) * 25;
-
                 sphere.rotationSpeedX = (Math.random() - 0.5) * 0.002;
                 sphere.rotationSpeedY = (Math.random() - 0.5) * 0.002;
                 sphere.rotationSpeedZ = (Math.random() - 0.5) * 0.002;
-
                 glowingSpheres.push(sphere);
                 scene.add(sphere);
             }
-
             // Add ambient light
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
             scene.add(ambientLight);
-
             // Add a dynamic point light for glowing effect
             pointLight = new THREE.PointLight(0xffffff, 1, 100);
             scene.add(pointLight);
-
             // Handle window resizing
             window.addEventListener('resize', onWindowResize, false);
         }
-
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
-
         function animate() {
             requestAnimationFrame(animate);
-
             const time = Date.now() * 0.0001;
-
             // Animate particles (subtle drift and rotation)
             particles.rotation.y += 0.0005;
             particles.rotation.x += 0.0002;
-
             // Animate glowing spheres
             glowingSpheres.forEach((sphere, index) => {
                 sphere.rotation.x += sphere.rotationSpeedX;
                 sphere.rotation.y += sphere.rotationSpeedY;
                 sphere.rotation.z += sphere.rotationSpeedZ;
-
                 // Subtle floating motion
                 sphere.position.y += Math.sin(time + index * 0.5) * 0.01;
                 sphere.position.x += Math.cos(time + index * 0.3) * 0.008;
             });
-
             // Animate point light
             pointLight.position.x = Math.sin(time * 0.7) * 10;
             pointLight.position.y = Math.cos(time * 0.5) * 10;
             pointLight.position.z = Math.sin(time * 0.3) * 10;
-
             renderer.render(scene, camera);
         }
-
         // --- Form Logic ---
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize Three.js
             initThreeJS();
             animate(); // Start the animation loop
-
             const dateInput = document.getElementById('date');
             const monthSelect = document.getElementById('month');
             const logForm = document.getElementById('logForm');
             const submitButton = document.getElementById('submitButton');
             const dashboardButton = document.getElementById('dashboardButton');
-
+            const logBookViewButton = document.getElementById('logBookViewButton'); // Get the new button
             // Combined dropdown elements
             const teacherCombinedSelect = document.getElementById('teacherCombined');
             const studentCombinedSelect = document.getElementById('studentCombined');
             const classroomNameSelect = document.getElementById('classroomName');
-
             // New input containers and fields
             const newTeacherInputContainer = document.getElementById('newTeacherInputContainer');
             const newTeacherCombinedInput = document.getElementById('newTeacherCombined');
@@ -476,10 +441,9 @@
             const newStudentCombinedInput = document.getElementById('newStudentCombined');
             const newClassroomInputContainer = document.getElementById('newClassroomInputContainer');
             const newClassroomNameInput = document.getElementById('newClassroomName');
-
-
             // Data provided by the user, parsed for dropdowns
             const teachers = [
+                { id: "ALF001", name: "AFLAH ZAMAN K" },
                 { id: "ALFTT25001", name: "Minha Anam V" },
                 { id: "ALFTT25002", name: "Akshai S" },
                 { id: "ALFTT25003", name: "Rahmath. M" },
@@ -498,30 +462,27 @@
                 { id: "ALFTT25016", name: "JAHANA SHERIN A" },
                 { id: "ALFTT25017", name: "SAFEERA THASNEEM K" },
                 { id: "ALFTT25018", name: "AKHILA CB" }
+                
             ];
-
             const students = [
-                { id: "ALF25001", name: "ADHIL RAHMAN.K", classroom: "C1-10" },
+                { id: "ALF25001", name: "ADHIL RAHMAN K", classroom: "C1-10" },
                 { id: "ALF25004", name: "LIYANA", classroom: "C2-8" },
-                { id: "ALF25005", name: "MUHAMMED SHIMIL", classroom: "C3-9" },
+                { id: "ALF25005", name: "SHIMIL", classroom: "C3-9" },
                 { id: "ALF25003", name: "AYISHA SAEEDA.K", classroom: "C4-3" },
                 { id: "ALF25006", name: "AYISHA MEHAVISH", classroom: "C5-3" },
                 { id: "ALF25011", name: "ANSILA", classroom: "C6-1" },
-                { id: "ALF25010", name: "MEHZA ABBAS", classroom: "C7-1" },
-                { id: "ALF25007", name: "Lamha fathima CK", classroom: "C8-7" }, // Using full name from previous data
+                { id: "ALF25010", name: "MEHZA ABBAS ", classroom: "C7-1" },
+                { id: "ALF25007", name: "Lamha ", classroom: "C8-7" }, // Using full name from previous data
                 { id: "ALF25009", name: "Faizan", classroom: "C9-3" },
-                { id: "ALF25008", name: "Ansha. K", classroom: "C10-6" }, // Using full name from previous data
+                { id: "ALF25008", name: "Ansha", classroom: "C10-6" }, // Using full name from previous data
                 // Students from previous list without new classroom mapping:
-                { id: "ALF25002", name: "SHAMAS HAMEED", classroom: "D1-1" }
+                { id: "ALF25002", name: "SHAMMAS", classroom: "D1-1" }
             ];
-
             // All classroom names, deduplicated and sorted
             const allClassrooms = [
                  "D1-1",
                 "C1-10", "C2-8", "C3-9", "C4-3", "C5-3", "C6-1", "C7-1", "C8-7", "C9-3", "C10-6"
             ].sort();
-
-
             /**
              * Populates a select element with options from a data array,
              * combining name and ID for display, and adds an "other_entry" option.
@@ -534,7 +495,6 @@
                 while (selectElement.options.length > 1) {
                     selectElement.remove(1);
                 }
-
                 dataArray.forEach(item => {
                     const option = document.createElement('option');
                     // Store the full item object as a JSON string in the value
@@ -547,7 +507,6 @@
                 otherOption.textContent = "Add New / Other...";
                 selectElement.appendChild(otherOption);
             }
-
             /**
              * Populates a select element with simple string options and adds an "other_entry" option.
              * @param {HTMLSelectElement} selectElement - The select element to populate.
@@ -568,16 +527,12 @@
                 otherOption.textContent = "Add New / Other...";
                 selectElement.appendChild(otherOption);
             }
-
             // Populate Teacher Name (ID) dropdown
             populateCombinedDropdown(teacherCombinedSelect, teachers);
-
             // Populate Student Name (ID) dropdown
             populateCombinedDropdown(studentCombinedSelect, students);
-
             // Populate Classroom Name dropdown
             populateSimpleDropdown(classroomNameSelect, allClassrooms);
-
             // Event listeners for "Add New / Other" functionality
             teacherCombinedSelect.addEventListener('change', () => {
                 if (teacherCombinedSelect.value === 'other_entry') {
@@ -589,7 +544,6 @@
                     newTeacherCombinedInput.required = false;
                 }
             });
-
             studentCombinedSelect.addEventListener('change', () => {
                 if (studentCombinedSelect.value === 'other_entry') {
                     newStudentInputContainer.style.display = 'block';
@@ -602,7 +556,6 @@
                     newStudentInputContainer.style.display = 'none';
                     newStudentCombinedInput.value = '';
                     newStudentCombinedInput.required = false;
-
                     try {
                         const selectedStudentData = JSON.parse(studentCombinedSelect.value);
                         if (selectedStudentData.classroom) {
@@ -620,7 +573,6 @@
                     }
                 }
             });
-
             classroomNameSelect.addEventListener('change', () => {
                 if (classroomNameSelect.value === 'other_entry') {
                     newClassroomInputContainer.style.display = 'block';
@@ -631,22 +583,17 @@
                     newClassroomNameInput.required = false;
                 }
             });
-
-
             // Ensure the submit button is enabled and ready for a new entry on page load
             submitButton.disabled = false;
             submitButton.textContent = 'Submit Log';
-
             // Set current date
             const today = new Date();
             const year = today.getFullYear();
             const month = (today.getMonth() + 1).toString().padStart(2, '0');
             const day = today.getDate().toString().padStart(2, '0');
             dateInput.value = `${year}-${month}-${day}`;
-
             // Set current month
             monthSelect.value = new Date().toLocaleString('default', { month: 'long' });
-
             // Dashboard button click handler (placeholder)
             dashboardButton.addEventListener('click', () => {
                 showMessage("Dashboard functionality not yet implemented.", "info");
@@ -654,18 +601,22 @@
                 // window.location.href = 'your-dashboard-url.html';
             });
 
+            // Log Book View button click handler
+            logBookViewButton.addEventListener('click', () => {
+                showMessage("To view the log book, please access the Google Sheet directly. This application does not currently support in-app viewing of the log data.", "info");
+                // If you have a public link to the Google Sheet, you could open it like this:
+                // window.open('YOUR_GOOGLE_SHEET_PUBLIC_VIEW_URL', '_blank');
+            });
+
             logForm.addEventListener('submit', async (event) => {
                 event.preventDefault(); // Prevent default form submission
-
                 submitButton.disabled = true; // Disable button immediately
                 submitButton.textContent = 'Submitting...'; // Change button text
-
                 const formData = new FormData(logForm);
                 const data = {};
                 for (let [key, value] of formData.entries()) {
                     data[key] = value;
                 }
-
                 // Handle "other_entry" for teacher
                 if (data['teacherCombined'] === 'other_entry') {
                     data['teacherCombined'] = data['newTeacherCombined'];
@@ -693,7 +644,6 @@
                 }
                 delete data['teacherCombined']; // Remove the combined field from the final data
                 delete data['newTeacherCombined']; // Remove the temporary new input field
-
                 // Handle "other_entry" for student
                 if (data['studentCombined'] === 'other_entry') {
                     data['studentCombined'] = data['newStudentCombined'];
@@ -722,20 +672,15 @@
                 }
                 delete data['studentCombined']; // Remove the combined field from the final data
                 delete data['newStudentCombined']; // Remove the temporary new input field
-
                 // Handle "other_entry" for classroom
                 if (data['classroomName'] === 'other_entry') {
                     data['classroomName'] = data['newClassroomName'];
                 }
                 delete data['newClassroomName']; // Remove the temporary new input field
-
-
                 console.log('Form Data:', data);
-
                 // --- Google Apps Script Integration ---
                 // The URL provided by the user is now used here.
                 const googleAppsScriptURL = 'https://script.google.com/macros/s/AKfycbzwvOCn_oiLOolWfT786giDoJTFQY34Vxso0qKwop_rHUw47AvFzmQbTO6WJ8UEF8bS/exec';
-
                 try {
                     const response = await fetch(googleAppsScriptURL, {
                         method: 'POST',
@@ -745,25 +690,22 @@
                         },
                         body: JSON.stringify(data),
                     });
-
                     // Note: With 'no-cors' mode, you cannot read the response body.
                     // The success/failure must be inferred from the network request itself,
                     // or by checking the Google Sheet after submission.
                     // For demonstration, we'll assume success if no fetch error.
-
                     console.log('Google Apps Script response (check network tab for actual status):', response);
-                    showMessage("Log submitted successfully! Refreshing for new entry...");
+                    showMessage("Log submitted successfully! Please check the Log View. If this was your first entry after a long break, it might have been a 'cold start' and you might need to check the Log View to confirm.");
                     logForm.reset(); // Clear the form after successful submission
                     
-                    // Refresh the page for a new entry
+                    // Refresh the page for a new entry after 10.5 seconds (allowing message to fade)
                     setTimeout(() => {
                         location.reload(); 
-                    }, 1000); // Give a short delay for the message to be seen
+                    }, 10500); 
                     
-
                 } catch (error) {
                     console.error('Error submitting log:', error);
-                    showMessage("Failed to submit log. Please try again.", "error");
+                    showMessage("Failed to submit log. Please try again. Check your browser's console for more details.", "error");
                     // Re-enable button on error so user can try again without refreshing
                     submitButton.disabled = false;
                     submitButton.textContent = 'Submit Log';
