@@ -282,14 +282,15 @@
     </div>
 
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby2i1vfoOPV8ey2p8hS1nXhPra0J27djweqbt-8G-uA1SfC9dkm9FZ4h_Q6k7u3wChf/exec';
+        // IMPORTANT: Ensure this URL is correct for your deployed Google Apps Script Web App
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwV4LmZMayHNWpmaRtxx5lF3-J0kXAVylCieGIMF4j0ZBlpbEVDJ0-_fef28NYF4M7r/exec';
 
         let monthlyProfitChart;
         let monthlyTeacherSalaryChart;
         let monthlyStudentFeeChart;
 
         let dashboardData = null; // Store fetched data globally
-        let sortedMonths = []; // To store sorted month names
+        let sortedMonths = []; // To store sorted month names (e.g., "January", "February")
 
         /**
          * Fetches data from the Google Apps Script web app.
@@ -320,8 +321,8 @@
 
         /**
          * Sorts months chronologically.
-         * @param {Array<string>} monthsArray The array of month names.
-         * @returns {Array<string>} The sorted array of month names.
+         * @param {Array<string>} monthsArray The array of month names (e.g., ["May", "April"]).
+         * @returns {Array<string>} The sorted array of month names (e.g., ["April", "May"]).
          */
         function sortMonthsChronologically(monthsArray) {
             const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -330,31 +331,32 @@
 
         /**
          * Populates the month selection dropdown.
-         * @param {Object} monthlyData The monthly aggregated data.
+         * @param {Object} monthlyData The monthly aggregated data (keyed by month name, e.g., "January").
          */
         function populateMonthSelect(monthlyData) {
             const monthSelect = document.getElementById('monthSelect');
             monthSelect.innerHTML = ''; // Clear existing options
 
-            sortedMonths = sortMonthsChronologically(Object.keys(monthlyData));
+            // Get unique month names from the data keys
+            const uniqueMonthNames = Object.keys(monthlyData);
+            sortedMonths = sortMonthsChronologically(uniqueMonthNames);
 
             // Add "All Months" option
             const allMonthsOption = document.createElement('option');
             allMonthsOption.value = 'all';
-            allMonthsOption.textContent = 'All Months';
+            allMonthsOption.textContent = 'All Months (Overall)';
             monthSelect.appendChild(allMonthsOption);
 
+            // Add options for each sorted month
             sortedMonths.forEach(month => {
                 const option = document.createElement('option');
-                option.value = month;
-                option.textContent = month;
+                option.value = month; // Value is the month name (e.g., "May")
+                option.textContent = month; // Display is the month name
                 monthSelect.appendChild(option);
             });
 
-            // Set default to "All Months" or the first month if no data
-            if (sortedMonths.length > 0) {
-                monthSelect.value = 'all'; // Default to 'All Months'
-            }
+            // Set default to "All Months"
+            monthSelect.value = 'all';
         }
 
         /**
@@ -367,12 +369,12 @@
             let labels, totalMonthlySalaries, totalMonthlyFees, monthlyProfits;
 
             if (selectedMonth === 'all') {
-                labels = sortedMonths;
-                totalMonthlySalaries = sortedMonths.map(month => monthlyData[month].totalTeacherSalary);
-                totalMonthlyFees = sortedMonths.map(month => monthlyData[month].totalStudentFee);
-                monthlyProfits = sortedMonths.map(month => monthlyData[month].monthlyProfit);
+                labels = sortedMonths; // Use the sorted list of unique month names
+                totalMonthlySalaries = labels.map(month => monthlyData[month] ? monthlyData[month].totalTeacherSalary : 0);
+                totalMonthlyFees = labels.map(month => monthlyData[month] ? monthlyData[month].totalStudentFee : 0);
+                monthlyProfits = labels.map(month => monthlyData[month] ? monthlyData[month].monthlyProfit : 0);
             } else {
-                labels = [selectedMonth];
+                labels = [selectedMonth]; // Only the selected month
                 totalMonthlySalaries = [monthlyData[selectedMonth] ? monthlyData[selectedMonth].totalTeacherSalary : 0];
                 totalMonthlyFees = [monthlyData[selectedMonth] ? monthlyData[selectedMonth].totalStudentFee : 0];
                 monthlyProfits = [monthlyData[selectedMonth] ? monthlyData[selectedMonth].monthlyProfit : 0];
@@ -386,7 +388,6 @@
                 studentFee: 'rgba(234, 179, 8, 0.7)',    // Amber
                 borderColor: (color) => color.replace('0.7', '1') // Solid border
             };
-
 
             // Destroy existing charts if they exist to prevent re-rendering issues
             if (monthlyProfitChart) monthlyProfitChart.destroy();
@@ -654,9 +655,9 @@
                 sortedStudentIds.forEach(studentId => {
                     const studentInfo = yearlyStudentTotals[studentId];
                     const row = tableBody.insertRow();
-                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
-                    row.dataset.studentId = studentId; // Store student ID
-                    row.dataset.month = selectedMonth; // Store 'all' for all months
+                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer');
+                    row.dataset.studentId = studentId;
+                    row.dataset.month = selectedMonth; // 'all'
                     row.innerHTML = `
                         <td class="py-3 px-6 whitespace-nowrap">All Months</td>
                         <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
@@ -674,9 +675,9 @@
                     sortedStudentIds.forEach(studentId => {
                         const studentInfo = students[studentId];
                         const row = tableBody.insertRow();
-                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
-                        row.dataset.studentId = studentId; // Store student ID
-                        row.dataset.month = selectedMonth; // Store specific month
+                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer');
+                        row.dataset.studentId = studentId;
+                        row.dataset.month = selectedMonth; // Specific month name
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
@@ -692,7 +693,6 @@
                 row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td>`;
             }
 
-            // Add click event listeners to the newly created rows
             tableBody.querySelectorAll('tr[data-student-id]').forEach(row => {
                 row.addEventListener('click', (event) => {
                     const studentId = event.currentTarget.dataset.studentId;
@@ -803,7 +803,7 @@
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6">Date</th>
                                     <th class="py-3 px-6">Student ID (Name)</th>
-                                    <th class="py-3 px-6">Subject</th>
+                                    <th class="py-3 px-6">Classroom Name</th> <!-- Changed from Subject -->
                                     <th class="py-3 px-6">Duration (Hours)</th>
                                     <th class="py-3 px-6">Salary/Hr (₹)</th>
                                     <th class="py-3 px-6">Total Salary (₹)</th>
@@ -813,12 +813,15 @@
                 `;
                 let totalSalaryForTeacher = 0;
 
+                // Sort filtered classes by date
+                filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 filteredClasses.forEach(entry => {
                     tableHtml += `
                         <tr class="border-b border-gray-200">
                             <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.studentId} (${entry.studentName})</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td> <!-- Data is still 'subject' from Apps Script -->
                             <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalaryPerHour.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalary.toFixed(2)}</td>
@@ -830,7 +833,7 @@
                             </tbody>
                             <tfoot>
                                 <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
-                                    <td class="py-3 px-6" colspan="5">Total Salary for ${teacherName} (${month === 'all' ? 'All Months' : month}):</td>
+                                    <td class="py-3 px-6" colspan="5">Total Salary for ${teacherName} (${month === 'all' ? 'Overall' : month}):</td>
                                     <td class="py-3 px-6">₹${totalSalaryForTeacher.toFixed(2)}</td>
                                 </tr>
                             </tfoot>
@@ -876,7 +879,7 @@
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6">Date</th>
                                     <th class="py-3 px-6">Teacher ID (Name)</th>
-                                    <th class="py-3 px-6">Subject</th>
+                                    <th class="py-3 px-6">Classroom Name</th> <!-- Changed from Subject -->
                                     <th class="py-3 px-6">Duration (Hours)</th>
                                     <th class="py-3 px-6">Fee/Hr (₹)</th>
                                     <th class="py-3 px-6">Total Fee (₹)</th>
@@ -891,7 +894,7 @@
                         <tr class="border-b border-gray-200">
                             <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.staffId} (${entry.teacherName})</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td> <!-- Data is still 'subject' from Apps Script -->
                             <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFeePerHour.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFee.toFixed(2)}</td>
@@ -903,7 +906,7 @@
                             </tbody>
                             <tfoot>
                                 <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
-                                    <td class="py-3 px-6" colspan="5">Total Fee for ${studentName} (${month === 'all' ? 'All Months' : month}):</td>
+                                    <td class="py-3 px-6" colspan="5">Total Fee for ${studentName} (${month === 'all' ? 'Overall' : month}):</td>
                                     <td class="py-3 px-6">₹${totalFeeForStudent.toFixed(2)}</td>
                                 </tr>
                             </tfoot>
