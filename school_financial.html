@@ -131,7 +131,7 @@
         .modal-close-button:hover {
             color: #1f2937;
         }
-        .download-button {
+        .action-button {
             background-color: #10b981; /* Emerald green */
             color: white;
             padding: 0.75rem 1.5rem;
@@ -143,10 +143,29 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            margin-right: 1rem; /* Space between buttons */
         }
-        .download-button:hover {
+        .action-button:hover {
             background-color: #059669; /* Darker green */
             transform: translateY(-1px);
+        }
+        .copy-button {
+            background-color: #3b82f6; /* Blue */
+        }
+        .copy-button:hover {
+            background-color: #2563eb; /* Darker Blue */
+        }
+        .email-preview {
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+            word-break: break-word; /* Break long words */
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
         }
     </style>
 </head>
@@ -165,6 +184,7 @@
             <button class="tab-button active" data-tab="overview">Overview</button>
             <button class="tab-button" data-tab="teacher-salaries">Teacher Monthly Salaries</button>
             <button class="tab-button" data-tab="student-fees">Student Monthly Fees</button>
+            <button class="tab-button" data-tab="office-staff-expenses">Office Staff Expenses</button> <!-- New Tab Button -->
         </div>
 
         <!-- Month Selection Dropdown -->
@@ -262,27 +282,101 @@
                 </div>
             </div>
         </div>
+
+        <!-- New: Office Staff Expenses Section -->
+        <div id="office-staff-expenses" class="tab-content hidden">
+            <div class="card p-6">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Office Staff Expenses</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Staff Role</th>
+                                <th class="py-3 px-6">Hourly Rate (₹)</th>
+                                <th class="py-3 px-6">Total Hours</th>
+                                <th class="py-3 px-6">Calculated Salary (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="officeStaffTableBody" class="text-gray-700 text-sm font-light">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Teacher/Student Details Modal -->
+    <!-- Teacher/Student Details Modal (Existing Modal, now with Email Button) -->
     <div id="detailsModal" class="modal-overlay">
         <div class="modal-content relative">
-            <button class="modal-close-button" onclick="closeModal()">&times;</button>
+            <button class="modal-close-button" onclick="closeModal('detailsModal')">&times;</button>
             <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mb-4">Details</h3>
             <div id="modalBody" class="text-gray-700">
                 <!-- Details will be loaded here -->
             </div>
-            <button id="downloadPdfButton" class="download-button hidden" onclick="downloadModalContentAsPdf()">
+            <div class="flex flex-wrap gap-4 mt-4">
+                <button id="downloadPdfButton" class="action-button" onclick="downloadModalContentAsPdf('detailsModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download as PDF
+                </button>
+                <button id="generateEmailButton" class="action-button copy-button" onclick="showEmailModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    Generate Official Email
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New: Office Staff Details Modal -->
+    <div id="officeStaffDetailsModal" class="modal-overlay">
+        <div class="modal-content relative">
+            <button class="modal-close-button" onclick="closeModal('officeStaffDetailsModal')">&times;</button>
+            <h3 id="officeStaffModalTitle" class="text-2xl font-bold text-gray-800 mb-4">Office Staff Details</h3>
+            <div id="officeStaffModalBody" class="text-gray-700">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="flex flex-wrap gap-4 mt-4">
+                <button id="downloadOfficeStaffPdfButton" class="action-button" onclick="downloadModalContentAsPdf('officeStaffDetailsModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download as PDF
+                </button>
+                <button id="generateOfficeStaffEmailButton" class="action-button copy-button" onclick="showEmailModal('officeStaff')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    Generate Official Email
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New: Email Preview Modal -->
+    <div id="emailModal" class="modal-overlay">
+        <div class="modal-content relative">
+            <button class="modal-close-button" onclick="closeModal('emailModal')">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Official Email Preview</h3>
+            <div id="emailContentPreview" class="email-preview">
+                <!-- Email content will be displayed here -->
+            </div>
+            <button class="action-button copy-button mt-4" onclick="copyEmailToClipboard()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
                 </svg>
-                Download as PDF
+                Copy to Clipboard
             </button>
         </div>
     </div>
 
     <script>
-        // IMPORTANT: Ensure this URL is correct for your deployed Google Apps Script Web App
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwV4LmZMayHNWpmaRtxx5lF3-J0kXAVylCieGIMF4j0ZBlpbEVDJ0-_fef28NYF4M7r/exec';
 
         let monthlyProfitChart;
@@ -291,6 +385,8 @@
 
         let dashboardData = null; // Store fetched data globally
         let sortedMonths = []; // To store sorted month names (e.g., "January", "February")
+
+        let currentEmailData = {}; // To store data for the email preview
 
         /**
          * Fetches data from the Google Apps Script web app.
@@ -562,10 +658,17 @@
                         if (!yearlyTeacherTotals[teacherId]) {
                             yearlyTeacherTotals[teacherId] = {
                                 name: teachersInMonth[teacherId].name,
-                                totalSalary: 0
+                                totalSalary: 0,
+                                totalHours: 0, // Initialize total hours
+                                classDates: [] // Initialize class dates for email
                             };
                         }
                         yearlyTeacherTotals[teacherId].totalSalary += teachersInMonth[teacherId].totalSalary;
+                        yearlyTeacherTotals[teacherId].totalHours += teachersInMonth[teacherId].totalHours; // Sum hours
+                        yearlyTeacherTotals[teacherId].classDates = yearlyTeacherTotals[teacherId].classDates.concat(
+                            data.detailedLogData.filter(entry => entry.staffId === teacherId)
+                                .map(entry => new Date(entry.date).toLocaleDateString())
+                        );
                         hasData = true;
                     }
                 });
@@ -643,10 +746,17 @@
                         if (!yearlyStudentTotals[studentId]) {
                             yearlyStudentTotals[studentId] = {
                                 name: studentsInMonth[studentId].name,
-                                totalFee: 0
+                                totalFee: 0,
+                                totalHours: 0, // Initialize total hours
+                                classDates: [] // Initialize class dates for email
                             };
                         }
                         yearlyStudentTotals[studentId].totalFee += studentsInMonth[studentId].totalFee;
+                        yearlyStudentTotals[studentId].totalHours += studentsInMonth[studentId].totalHours; // Sum hours
+                        yearlyStudentTotals[studentId].classDates = yearlyStudentTotals[studentId].classDates.concat(
+                            data.detailedLogData.filter(entry => entry.studentId === studentId)
+                                .map(entry => new Date(entry.date).toLocaleDateString())
+                        );
                         hasData = true;
                     }
                 });
@@ -693,6 +803,7 @@
                 row.innerHTML = `<td colspan="3" class="py-3 px-6 text-center text-gray-500">No student fee data for the selected month(s).</td>`;
             }
 
+            // Add click event listeners to the newly created rows
             tableBody.querySelectorAll('tr[data-student-id]').forEach(row => {
                 row.addEventListener('click', (event) => {
                     const studentId = event.currentTarget.dataset.studentId;
@@ -701,6 +812,89 @@
                 });
             });
         }
+
+        /**
+         * Populates the office staff expenses table.
+         * @param {Object} data The processed financial data.
+         * @param {string} selectedMonth The month to display, or 'all' for all months.
+         */
+        function populateOfficeStaffTable(data, selectedMonth) {
+            const tableBody = document.getElementById('officeStaffTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const detailedLogData = data.detailedLogData;
+            const officeStaffConfig = data.officeStaffConfig; // Get config from fetched data
+            const staffExpenses = {};
+
+            // Initialize staff expenses with 0 hours and salary based on config
+            for (const position in officeStaffConfig) {
+                staffExpenses[position] = {
+                    hourlyRate: officeStaffConfig[position].rate,
+                    totalHours: 0,
+                    calculatedSalary: 0,
+                    programs: officeStaffConfig[position].programs, // Keep programs for filtering
+                    name: officeStaffConfig[position].name || position // Get name from config
+                };
+            }
+
+            // Filter log data based on selected month
+            let filteredLogEntries = [];
+            if (selectedMonth === 'all') {
+                filteredLogEntries = detailedLogData;
+            } else {
+                filteredLogEntries = detailedLogData.filter(entry => entry.month === selectedMonth);
+            }
+
+            // Aggregate hours for each staff role based on programs
+            filteredLogEntries.forEach(entry => {
+                const program = entry.program; // Use the 'program' field from logenterys
+
+                for (const position in staffExpenses) {
+                    const staffConfig = staffExpenses[position];
+                    // If programs array is empty, it means "all programs"
+                    if (staffConfig.programs.length === 0 || staffConfig.programs.includes(program)) {
+                        staffExpenses[position].totalHours += entry.classDurationHours;
+                    }
+                }
+            });
+
+            // Calculate salaries and populate table
+            let hasData = false;
+            for (const position in staffExpenses) {
+                const info = staffExpenses[position];
+                info.calculatedSalary = info.totalHours * info.hourlyRate;
+                
+                const row = tableBody.insertRow();
+                row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add clickability
+                row.dataset.staffPosition = position; // Store position for modal
+                row.dataset.month = selectedMonth; // Store month for modal
+                row.innerHTML = `
+                    <td class="py-3 px-6 whitespace-nowrap">${position} (${info.name})</td>
+                    <td class="py-3 px-6 whitespace-nowrap">₹${info.hourlyRate.toFixed(2)}</td>
+                    <td class="py-3 px-6 whitespace-nowrap">${info.totalHours.toFixed(2)}</td>
+                    <td class="py-3 px-6 whitespace-nowrap">₹${info.calculatedSalary.toFixed(2)}</td>
+                `;
+                if (info.totalHours > 0) {
+                    hasData = true;
+                }
+            }
+
+            if (!hasData) {
+                const row = tableBody.insertRow();
+                row.classList.add('border-b', 'border-gray-200');
+                row.innerHTML = `<td colspan="4" class="py-3 px-6 text-center text-gray-500">No office staff expense data for the selected month(s).</td>`;
+            }
+
+            // Add click event listeners to the new rows
+            tableBody.querySelectorAll('tr[data-staff-position]').forEach(row => {
+                row.addEventListener('click', (event) => {
+                    const staffPosition = event.currentTarget.dataset.staffPosition;
+                    const month = event.currentTarget.dataset.month;
+                    showOfficeStaffDetailsModal(staffPosition, month);
+                });
+            });
+        }
+
 
         /**
          * Shows the selected tab content and hides others.
@@ -742,6 +936,8 @@
                     populateTeacherSalariesTable(dashboardData, selectedMonth);
                 } else if (tabId === 'student-fees') {
                     populateStudentFeesTable(dashboardData, selectedMonth);
+                } else if (tabId === 'office-staff-expenses') { // Handle new tab
+                    populateOfficeStaffTable(dashboardData, selectedMonth);
                 }
             }
         }
@@ -756,18 +952,21 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
             const downloadButton = document.getElementById('downloadPdfButton');
+            const emailButton = document.getElementById('generateEmailButton');
 
             modalTitle.textContent = title;
             modalBody.innerHTML = `<p>${message}</p>`;
-            downloadButton.classList.add('hidden'); // Hide download button for generic messages
+            downloadButton.classList.add('hidden');
+            emailButton.classList.add('hidden'); // Hide email button for generic messages
             modal.classList.add('show');
         }
 
         /**
-         * Closes the modal.
+         * Closes a specified modal.
+         * @param {string} modalId The ID of the modal to close.
          */
-        function closeModal() {
-            document.getElementById('detailsModal').classList.remove('show');
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
         }
 
         /**
@@ -779,6 +978,7 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
             const downloadButton = document.getElementById('downloadPdfButton');
+            const generateEmailButton = document.getElementById('generateEmailButton');
             
             let filteredClasses = [];
             if (month === 'all') {
@@ -791,9 +991,17 @@
                 modalTitle.textContent = `Classes Taught by ${teacherId}`;
                 modalBody.innerHTML = `<p>No detailed class data found for Teacher ID: ${teacherId} for ${month === 'all' ? 'all months' : month}.</p>`;
                 downloadButton.classList.add('hidden');
+                generateEmailButton.classList.add('hidden');
             } else {
-                const teacherName = filteredClasses[0].teacherName; // Get name from first entry
+                const teacherName = filteredClasses[0].teacherName;
                 modalTitle.textContent = `Classes Taught by ${teacherId} (${teacherName})`;
+
+                let totalSalaryForTeacher = 0;
+                let totalHoursForTeacher = 0;
+                const classDates = new Set(); // To store unique dates
+
+                // Sort filtered classes by date
+                filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let tableHtml = `
                     <div id="pdfContent" class="overflow-x-auto"> <!-- Added ID for PDF export -->
@@ -803,7 +1011,7 @@
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6">Date</th>
                                     <th class="py-3 px-6">Student ID (Name)</th>
-                                    <th class="py-3 px-6">Classroom Name</th> <!-- Changed from Subject -->
+                                    <th class="py-3 px-6">Classroom Name</th>
                                     <th class="py-3 px-6">Duration (Hours)</th>
                                     <th class="py-3 px-6">Salary/Hr (₹)</th>
                                     <th class="py-3 px-6">Total Salary (₹)</th>
@@ -811,37 +1019,46 @@
                             </thead>
                             <tbody class="text-gray-700 text-sm font-light">
                 `;
-                let totalSalaryForTeacher = 0;
-
-                // Sort filtered classes by date
-                filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
-
                 filteredClasses.forEach(entry => {
                     tableHtml += `
                         <tr class="border-b border-gray-200">
                             <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.studentId} (${entry.studentName})</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td> <!-- Data is still 'subject' from Apps Script -->
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.classroomName}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalaryPerHour.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.teacherSalary.toFixed(2)}</td>
                         </tr>
                     `;
                     totalSalaryForTeacher += entry.teacherSalary;
+                    totalHoursForTeacher += entry.classDurationHours;
+                    classDates.add(new Date(entry.date).toLocaleDateString());
                 });
                 tableHtml += `
                             </tbody>
                             <tfoot>
                                 <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
-                                    <td class="py-3 px-6" colspan="5">Total Salary for ${teacherName} (${month === 'all' ? 'Overall' : month}):</td>
-                                    <td class="py-3 px-6">₹${totalSalaryForTeacher.toFixed(2)}</td>
+                                    <td class="py-3 px-6" colspan="3">Totals for ${teacherName} (${month === 'all' ? 'Overall' : month}):</td>
+                                    <td class="py-3 px-6">Hours: ${totalHoursForTeacher.toFixed(2)}</td>
+                                    <td class="py-3 px-6" colspan="1"></td>
+                                    <td class="py-3 px-6">Salary: ₹${totalSalaryForTeacher.toFixed(2)}</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 `;
                 modalBody.innerHTML = tableHtml;
-                downloadButton.classList.remove('hidden'); // Show download button
+                downloadButton.classList.remove('hidden');
+                generateEmailButton.classList.remove('hidden');
+
+                currentEmailData = {
+                    type: 'teacher',
+                    name: teacherName,
+                    month: month,
+                    totalSalary: totalSalaryForTeacher,
+                    totalHours: totalHoursForTeacher,
+                    classDates: Array.from(classDates).join(', ')
+                };
             }
             document.getElementById('detailsModal').classList.add('show');
         }
@@ -855,6 +1072,7 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
             const downloadButton = document.getElementById('downloadPdfButton');
+            const generateEmailButton = document.getElementById('generateEmailButton');
             
             let filteredClasses = [];
             if (month === 'all') {
@@ -867,9 +1085,16 @@
                 modalTitle.textContent = `Classes Attended by ${studentId}`;
                 modalBody.innerHTML = `<p>No detailed class data found for Student ID: ${studentId} for ${month === 'all' ? 'all months' : month}.</p>`;
                 downloadButton.classList.add('hidden');
+                generateEmailButton.classList.add('hidden');
             } else {
-                const studentName = filteredClasses[0].studentName; // Get name from first entry
+                const studentName = filteredClasses[0].studentName;
                 modalTitle.textContent = `Classes Attended by ${studentId} (${studentName})`;
+
+                let totalFeeForStudent = 0;
+                let totalHoursForStudent = 0;
+                const classDates = new Set(); // To store unique dates
+
+                filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let tableHtml = `
                     <div id="pdfContent" class="overflow-x-auto"> <!-- Added ID for PDF export -->
@@ -879,7 +1104,7 @@
                                 <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6">Date</th>
                                     <th class="py-3 px-6">Teacher ID (Name)</th>
-                                    <th class="py-3 px-6">Classroom Name</th> <!-- Changed from Subject -->
+                                    <th class="py-3 px-6">Classroom Name</th>
                                     <th class="py-3 px-6">Duration (Hours)</th>
                                     <th class="py-3 px-6">Fee/Hr (₹)</th>
                                     <th class="py-3 px-6">Total Fee (₹)</th>
@@ -887,44 +1112,275 @@
                             </thead>
                             <tbody class="text-gray-700 text-sm font-light">
                 `;
-                let totalFeeForStudent = 0;
-
                 filteredClasses.forEach(entry => {
                     tableHtml += `
                         <tr class="border-b border-gray-200">
                             <td class="py-3 px-6 whitespace-nowrap">${new Date(entry.date).toLocaleDateString()}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.staffId} (${entry.teacherName})</td>
-                            <td class="py-3 px-6 whitespace-nowrap">${entry.subject}</td> <!-- Data is still 'subject' from Apps Script -->
+                            <td class="py-3 px-6 whitespace-nowrap">${entry.classroomName}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${entry.classDurationHours.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFeePerHour.toFixed(2)}</td>
                             <td class="py-3 px-6 whitespace-nowrap">₹${entry.studentFee.toFixed(2)}</td>
                         </tr>
                     `;
                     totalFeeForStudent += entry.studentFee;
+                    totalHoursForStudent += entry.classDurationHours;
+                    classDates.add(new Date(entry.date).toLocaleDateString());
                 });
                 tableHtml += `
                             </tbody>
                             <tfoot>
                                 <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
-                                    <td class="py-3 px-6" colspan="5">Total Fee for ${studentName} (${month === 'all' ? 'Overall' : month}):</td>
-                                    <td class="py-3 px-6">₹${totalFeeForStudent.toFixed(2)}</td>
+                                    <td class="py-3 px-6" colspan="3">Totals for ${studentName} (${month === 'all' ? 'Overall' : month}):</td>
+                                    <td class="py-3 px-6">Hours: ${totalHoursForStudent.toFixed(2)}</td>
+                                    <td class="py-3 px-6" colspan="1"></td>
+                                    <td class="py-3 px-6">Fee: ₹${totalFeeForStudent.toFixed(2)}</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 `;
                 modalBody.innerHTML = tableHtml;
-                downloadButton.classList.remove('hidden'); // Show download button
+                downloadButton.classList.remove('hidden');
+                generateEmailButton.classList.remove('hidden');
+
+                currentEmailData = {
+                    type: 'student',
+                    name: studentName,
+                    month: month,
+                    totalFee: totalFeeForStudent,
+                    totalHours: totalHoursForStudent,
+                    classDates: Array.from(classDates).join(', ')
+                };
             }
             document.getElementById('detailsModal').classList.add('show');
         }
 
         /**
-         * Downloads the content of the modal body as a PDF.
+         * Displays a modal with detailed breakdown for a specific office staff role.
+         * @param {string} staffPosition The position of the office staff (e.g., 'MD').
+         * @param {string} month The month (or 'all').
          */
-        async function downloadModalContentAsPdf() {
-            const element = document.getElementById('pdfContent'); // Element to convert to PDF
-            const modalTitleText = document.getElementById('modalTitle').textContent;
+        function showOfficeStaffDetailsModal(staffPosition, month) {
+            const modal = document.getElementById('officeStaffDetailsModal');
+            const modalTitle = document.getElementById('officeStaffModalTitle');
+            const modalBody = document.getElementById('officeStaffModalBody');
+            const downloadButton = document.getElementById('downloadOfficeStaffPdfButton');
+            const generateEmailButton = document.getElementById('generateOfficeStaffEmailButton');
+
+            const officeStaffConfig = dashboardData.officeStaffConfig[staffPosition];
+            if (!officeStaffConfig) {
+                modalTitle.textContent = `Details for ${staffPosition}`;
+                modalBody.innerHTML = `<p>Configuration for ${staffPosition} not found.</p>`;
+                downloadButton.classList.add('hidden');
+                generateEmailButton.classList.add('hidden');
+                modal.classList.add('show');
+                return;
+            }
+
+            const staffName = officeStaffConfig.name || staffPosition;
+            modalTitle.textContent = `Detailed Expenses for ${staffPosition} (${staffName})`;
+
+            let filteredLogEntries = [];
+            if (month === 'all') {
+                filteredLogEntries = dashboardData.detailedLogData;
+            } else {
+                filteredLogEntries = dashboardData.detailedLogData.filter(entry => entry.month === month);
+            }
+
+            const teacherContributions = {};
+            let totalHoursForRole = 0;
+            let totalSalaryForRole = 0;
+            const classDatesForRole = new Set();
+
+            filteredLogEntries.forEach(entry => {
+                const program = entry.program;
+                // Check if the class's program is relevant to this staff position
+                if (officeStaffConfig.programs.length === 0 || officeStaffConfig.programs.includes(program)) {
+                    const teacherId = entry.staffId;
+                    const teacherName = entry.teacherName;
+                    const classDurationHours = entry.classDurationHours;
+
+                    if (!teacherContributions[teacherId]) {
+                        teacherContributions[teacherId] = {
+                            name: teacherName,
+                            hours: 0,
+                            salaryContribution: 0,
+                            classDates: new Set()
+                        };
+                    }
+                    teacherContributions[teacherId].hours += classDurationHours;
+                    // Note: Office staff salary is based on total hours, not teacher's salary.
+                    // Here, we calculate the *contribution* to the office staff's hours/salary from this teacher's classes.
+                    teacherContributions[teacherId].salaryContribution += (classDurationHours * officeStaffConfig.rate);
+                    teacherContributions[teacherId].classDates.add(new Date(entry.date).toLocaleDateString());
+
+                    totalHoursForRole += classDurationHours;
+                    classDatesForRole.add(new Date(entry.date).toLocaleDateString());
+                }
+            });
+            totalSalaryForRole = totalHoursForRole * officeStaffConfig.rate;
+
+
+            let tableHtml = `
+                <div id="pdfOfficeStaffContent" class="overflow-x-auto">
+                    <h4 class="text-lg font-semibold mb-2">Contribution Breakdown by Teacher for ${staffName} - ${month === 'all' ? 'All Months' : month}</h4>
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6">Teacher ID (Name)</th>
+                                <th class="py-3 px-6">Hours Contributed</th>
+                                <th class="py-3 px-6">Calculated Salary (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 text-sm font-light">
+            `;
+            const sortedTeacherIds = Object.keys(teacherContributions).sort();
+            if (sortedTeacherIds.length > 0) {
+                sortedTeacherIds.forEach(teacherId => {
+                    const teacherInfo = teacherContributions[teacherId];
+                    tableHtml += `
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 px-6 whitespace-nowrap">${teacherId} (${teacherInfo.name})</td>
+                            <td class="py-3 px-6 whitespace-nowrap">${teacherInfo.hours.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.salaryContribution.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableHtml += `
+                    <tr>
+                        <td colspan="3" class="py-3 px-6 text-center text-gray-500">No teacher contributions found for this staff role and month.</td>
+                    </tr>
+                `;
+            }
+            tableHtml += `
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-100 text-left text-gray-700 uppercase text-sm leading-normal font-bold">
+                                <td class="py-3 px-6">Total for ${staffName} (${month === 'all' ? 'Overall' : month}):</td>
+                                <td class="py-3 px-6">Hours: ${totalHoursForRole.toFixed(2)}</td>
+                                <td class="py-3 px-6">Salary: ₹${totalSalaryForRole.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+            modalBody.innerHTML = tableHtml;
+            downloadButton.classList.remove('hidden');
+            generateEmailButton.classList.remove('hidden');
+
+            currentEmailData = {
+                type: 'officeStaff',
+                name: staffName,
+                position: staffPosition,
+                month: month,
+                totalSalary: totalSalaryForRole,
+                totalHours: totalHoursForRole,
+                classDates: Array.from(classDatesForRole).join(', ')
+            };
+            modal.classList.add('show');
+        }
+
+
+        /**
+         * Generates and displays the email content in the email preview modal.
+         */
+        function showEmailModal() {
+            const emailModal = document.getElementById('emailModal');
+            const emailContentPreview = document.getElementById('emailContentPreview');
+            let emailMessage = "";
+            const currentMonthYear = document.getElementById('monthSelect').value === 'all' ? 'Overall' : document.getElementById('monthSelect').value;
+
+            if (currentEmailData.type === 'teacher') {
+                emailMessage = `Subject: Your Monthly Salary Statement - ${currentEmailData.name} (${currentMonthYear})\n\n`;
+                emailMessage += `Dear ${currentEmailData.name},\n\n`;
+                emailMessage += `This email provides a summary of your teaching activities and salary for the period of ${currentMonthYear}.\n\n`;
+                emailMessage += `Total Classes Taught (Hours): ${currentEmailData.totalHours.toFixed(2)}\n`;
+                emailMessage += `Calculated Salary for the period: ₹${currentEmailData.totalSalary.toFixed(2)}\n`;
+                if (currentEmailData.classDates) {
+                    emailMessage += `Classes were taken on the following dates: ${currentEmailData.classDates}\n`;
+                }
+                emailMessage += `\nShould you have any questions, please feel free to contact the Alif Edu Accounts Team.\n\n`;
+                emailMessage += `Best regards,\nAlif Edu Accounts Team`;
+            } else if (currentEmailData.type === 'student') {
+                emailMessage = `Subject: Your Monthly Fee Statement - ${currentEmailData.name} (${currentMonthYear})\n\n`;
+                emailMessage += `Dear ${currentEmailData.name},\n\n`;
+                emailMessage += `This email provides a summary of your classes attended and fees for the period of ${currentMonthYear}.\n\n`;
+                emailMessage += `Total Classes Attended (Hours): ${currentEmailData.totalHours.toFixed(2)}\n`;
+                emailMessage += `Total Fee for the period: ₹${currentEmailData.totalFee.toFixed(2)}\n`;
+                if (currentEmailData.classDates) {
+                    emailMessage += `Classes were attended on the following dates: ${currentEmailData.classDates}\n`;
+                }
+                emailMessage += `\nFor any inquiries regarding your fees, please contact the Alif Edu Accounts Team.\n\n`;
+                emailMessage += `Best regards,\nAlif Edu Accounts Team`;
+            } else if (currentEmailData.type === 'officeStaff') {
+                emailMessage = `Subject: ${currentEmailData.position} Salary Statement - ${currentEmailData.name} (${currentMonthYear})\n\n`;
+                emailMessage += `Dear ${currentEmailData.name},\n\n`;
+                emailMessage += `This email summarizes the calculated salary for your role as ${currentEmailData.position} for the period of ${currentMonthYear}, based on program-related class hours.\n\n`;
+                emailMessage += `Total Program Hours Overseen: ${currentEmailData.totalHours.toFixed(2)}\n`;
+                emailMessage += `Calculated Salary for the period: ₹${currentEmailData.totalSalary.toFixed(2)}\n`;
+                if (currentEmailData.classDates) {
+                    emailMessage += `Relevant classes were conducted on the following dates: ${currentEmailData.classDates}\n`;
+                }
+                emailMessage += `\nShould you have any questions, please feel free to contact the Alif Edu Accounts Team.\n\n`;
+                emailMessage += `Best regards,\nAlif Edu Accounts Team`;
+            }
+
+            emailContentPreview.textContent = emailMessage;
+            emailModal.classList.add('show');
+        }
+
+        /**
+         * Copies the email content from the preview modal to the clipboard.
+         */
+        function copyEmailToClipboard() {
+            const emailContentPreview = document.getElementById('emailContentPreview');
+            const textToCopy = emailContentPreview.textContent;
+
+            // Use document.execCommand('copy') for better compatibility in iframes
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            textArea.style.position = 'fixed'; // Avoid scrolling to bottom
+            textArea.style.left = '-9999px'; // Hide element
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'Copied to clipboard!' : 'Failed to copy.';
+                showMessageBox('Copy Status', msg); // Use the existing message box for feedback
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                showMessageBox('Copy Error', 'Failed to copy email to clipboard. Please try manually.');
+            } finally {
+                document.body.removeChild(textArea);
+            }
+            closeModal('emailModal'); // Close email preview after copy attempt
+        }
+
+
+        /**
+         * Downloads the content of the modal body as a PDF.
+         * @param {string} modalId The ID of the modal whose content needs to be downloaded.
+         */
+        async function downloadModalContentAsPdf(modalId) {
+            let element;
+            let modalTitleText;
+
+            if (modalId === 'detailsModal') {
+                element = document.getElementById('pdfContent');
+                modalTitleText = document.getElementById('modalTitle').textContent;
+            } else if (modalId === 'officeStaffDetailsModal') {
+                element = document.getElementById('pdfOfficeStaffContent'); // New ID for office staff PDF content
+                modalTitleText = document.getElementById('officeStaffModalTitle').textContent;
+            } else {
+                console.error("Invalid modal ID for PDF download:", modalId);
+                showMessageBox("PDF Error", "Could not find content to download for PDF.");
+                return;
+            }
+
             const filename = `${modalTitleText.replace(/[^a-zA-Z0-9]/g, '_')}_Details.pdf`;
 
             // Temporarily remove overflow-x-auto to ensure full table width is captured
