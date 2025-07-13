@@ -765,9 +765,9 @@
                 sortedStudentIds.forEach(studentId => {
                     const studentInfo = yearlyStudentTotals[studentId];
                     const row = tableBody.insertRow();
-                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer');
-                    row.dataset.studentId = studentId;
-                    row.dataset.month = selectedMonth; // 'all'
+                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
+                    row.dataset.studentId = studentId; // Store student ID
+                    row.dataset.month = selectedMonth; // Store 'all' for all months
                     row.innerHTML = `
                         <td class="py-3 px-6 whitespace-nowrap">All Months</td>
                         <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
@@ -785,9 +785,9 @@
                     sortedStudentIds.forEach(studentId => {
                         const studentInfo = students[studentId];
                         const row = tableBody.insertRow();
-                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer');
-                        row.dataset.studentId = studentId;
-                        row.dataset.month = selectedMonth; // Specific month name
+                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer'); // Add cursor-pointer
+                        row.dataset.studentId = studentId; // Store student ID
+                        row.dataset.month = selectedMonth; // Store specific month
                         row.innerHTML = `
                             <td class="py-3 px-6 whitespace-nowrap">${month}</td>
                             <td class="py-3 px-6 whitespace-nowrap">${studentId} (${studentInfo.name})</td>
@@ -833,7 +833,8 @@
                     totalHours: 0,
                     calculatedSalary: 0,
                     programs: officeStaffConfig[position].programs, // Keep programs for filtering
-                    name: officeStaffConfig[position].name || position // Get name from config
+                    name: officeStaffConfig[position].name || position, // Get name from config
+                    id: officeStaffConfig[position].id // Get ID from config
                 };
             }
 
@@ -948,16 +949,17 @@
          * @param {string} message The message content.
          */
         function showMessageBox(title, message) {
+            // Using the existing detailsModal for generic messages
             const modal = document.getElementById('detailsModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
             const downloadButton = document.getElementById('downloadPdfButton');
-            const emailButton = document.getElementById('generateEmailButton');
+            const generateEmailButton = document.getElementById('generateEmailButton'); // Get the email button
 
             modalTitle.textContent = title;
             modalBody.innerHTML = `<p>${message}</p>`;
-            downloadButton.classList.add('hidden');
-            emailButton.classList.add('hidden'); // Hide email button for generic messages
+            downloadButton.classList.add('hidden'); // Hide download button for generic messages
+            generateEmailButton.classList.add('hidden'); // Hide email button for generic messages
             modal.classList.add('show');
         }
 
@@ -999,6 +1001,8 @@
                 let totalSalaryForTeacher = 0;
                 let totalHoursForTeacher = 0;
                 const classDates = new Set(); // To store unique dates
+                const detailedClassesForEmail = []; // For detailed email content
+                const studentBreakdownForEmail = {}; // To group classes by student for email
 
                 // Sort filtered classes by date
                 filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1033,6 +1037,26 @@
                     totalSalaryForTeacher += entry.teacherSalary;
                     totalHoursForTeacher += entry.classDurationHours;
                     classDates.add(new Date(entry.date).toLocaleDateString());
+
+                    // Prepare data for email template: group by student
+                    if (!studentBreakdownForEmail[entry.studentId]) {
+                        studentBreakdownForEmail[entry.studentId] = {
+                            name: entry.studentName,
+                            totalHours: 0,
+                            totalAmount: 0,
+                            hourlyRate: entry.teacherSalaryPerHour, // Assuming hourly rate is consistent per teacher
+                            classes: []
+                        };
+                    }
+                    studentBreakdownForEmail[entry.studentId].totalHours += entry.classDurationHours;
+                    studentBreakdownForEmail[entry.studentId].totalAmount += entry.teacherSalary;
+                    studentBreakdownForEmail[entry.studentId].classes.push({
+                        date: new Date(entry.date).toLocaleDateString(),
+                        program: entry.program,
+                        classroom: entry.classroomName,
+                        subject: entry.classroomName, // Using classroomName as subject for consistency
+                        durationMinutes: entry.classDurationMinutes
+                    });
                 });
                 tableHtml += `
                             </tbody>
@@ -1054,10 +1078,12 @@
                 currentEmailData = {
                     type: 'teacher',
                     name: teacherName,
+                    id: teacherId, // Add teacher ID
                     month: month,
                     totalSalary: totalSalaryForTeacher,
                     totalHours: totalHoursForTeacher,
-                    classDates: Array.from(classDates).join(', ')
+                    classDates: Array.from(classDates).join(', '),
+                    studentBreakdown: studentBreakdownForEmail // Pass the grouped data
                 };
             }
             document.getElementById('detailsModal').classList.add('show');
@@ -1093,6 +1119,7 @@
                 let totalFeeForStudent = 0;
                 let totalHoursForStudent = 0;
                 const classDates = new Set(); // To store unique dates
+                const teacherBreakdownForEmail = {}; // To group classes by teacher for email
 
                 filteredClasses.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -1126,6 +1153,26 @@
                     totalFeeForStudent += entry.studentFee;
                     totalHoursForStudent += entry.classDurationHours;
                     classDates.add(new Date(entry.date).toLocaleDateString());
+
+                    // Prepare data for email template: group by teacher
+                    if (!teacherBreakdownForEmail[entry.staffId]) {
+                        teacherBreakdownForEmail[entry.staffId] = {
+                            name: entry.teacherName,
+                            totalHours: 0,
+                            totalAmount: 0,
+                            hourlyRate: entry.studentFeePerHour, // Student's fee rate for this teacher
+                            classes: []
+                        };
+                    }
+                    teacherBreakdownForEmail[entry.staffId].totalHours += entry.classDurationHours;
+                    teacherBreakdownForEmail[entry.staffId].totalAmount += entry.studentFee;
+                    teacherBreakdownForEmail[entry.staffId].classes.push({
+                        date: new Date(entry.date).toLocaleDateString(),
+                        program: entry.program,
+                        classroom: entry.classroomName,
+                        subject: entry.classroomName, // Using classroomName as subject for consistency
+                        durationMinutes: entry.classDurationMinutes
+                    });
                 });
                 tableHtml += `
                             </tbody>
@@ -1147,10 +1194,12 @@
                 currentEmailData = {
                     type: 'student',
                     name: studentName,
+                    id: studentId, // Add student ID
                     month: month,
                     totalFee: totalFeeForStudent,
                     totalHours: totalHoursForStudent,
-                    classDates: Array.from(classDates).join(', ')
+                    classDates: Array.from(classDates).join(', '),
+                    teacherBreakdown: teacherBreakdownForEmail // Pass the grouped data
                 };
             }
             document.getElementById('detailsModal').classList.add('show');
@@ -1179,6 +1228,7 @@
             }
 
             const staffName = officeStaffConfig.name || staffPosition;
+            const staffId = officeStaffConfig.id || 'N/A'; // Get ID for office staff
             modalTitle.textContent = `Detailed Expenses for ${staffPosition} (${staffName})`;
 
             let filteredLogEntries = [];
@@ -1204,14 +1254,13 @@
                     if (!teacherContributions[teacherId]) {
                         teacherContributions[teacherId] = {
                             name: teacherName,
+                            id: teacherId, // Include teacher ID
                             hours: 0,
                             salaryContribution: 0,
                             classDates: new Set()
                         };
                     }
                     teacherContributions[teacherId].hours += classDurationHours;
-                    // Note: Office staff salary is based on total hours, not teacher's salary.
-                    // Here, we calculate the *contribution* to the office staff's hours/salary from this teacher's classes.
                     teacherContributions[teacherId].salaryContribution += (classDurationHours * officeStaffConfig.rate);
                     teacherContributions[teacherId].classDates.add(new Date(entry.date).toLocaleDateString());
 
@@ -1236,6 +1285,8 @@
                         <tbody class="text-gray-700 text-sm font-light">
             `;
             const sortedTeacherIds = Object.keys(teacherContributions).sort();
+            const teacherContributionsForEmail = []; // For detailed email content
+
             if (sortedTeacherIds.length > 0) {
                 sortedTeacherIds.forEach(teacherId => {
                     const teacherInfo = teacherContributions[teacherId];
@@ -1246,6 +1297,12 @@
                             <td class="py-3 px-6 whitespace-nowrap">₹${teacherInfo.salaryContribution.toFixed(2)}</td>
                         </tr>
                     `;
+                    teacherContributionsForEmail.push({
+                        teacherName: teacherInfo.name,
+                        teacherId: teacherInfo.id, // Add teacher ID
+                        hoursContributed: teacherInfo.hours.toFixed(2),
+                        salaryContribution: teacherInfo.salaryContribution.toFixed(2)
+                    });
                 });
             } else {
                 tableHtml += `
@@ -1273,11 +1330,14 @@
             currentEmailData = {
                 type: 'officeStaff',
                 name: staffName,
+                id: staffId, // Add office staff ID
                 position: staffPosition,
                 month: month,
                 totalSalary: totalSalaryForRole,
                 totalHours: totalHoursForRole,
-                classDates: Array.from(classDatesForRole).join(', ')
+                classDates: Array.from(classDatesForRole).join(', '),
+                teacherContributions: teacherContributionsForEmail,
+                officeStaffHourlyRate: officeStaffConfig.rate.toFixed(2) // Include office staff's own hourly rate
             };
             modal.classList.add('show');
         }
@@ -1293,37 +1353,79 @@
             const currentMonthYear = document.getElementById('monthSelect').value === 'all' ? 'Overall' : document.getElementById('monthSelect').value;
 
             if (currentEmailData.type === 'teacher') {
-                emailMessage = `Subject: Your Monthly Salary Statement - ${currentEmailData.name} (${currentMonthYear})\n\n`;
-                emailMessage += `Dear ${currentEmailData.name},\n\n`;
-                emailMessage += `This email provides a summary of your teaching activities and salary for the period of ${currentMonthYear}.\n\n`;
-                emailMessage += `Total Classes Taught (Hours): ${currentEmailData.totalHours.toFixed(2)}\n`;
-                emailMessage += `Calculated Salary for the period: ₹${currentEmailData.totalSalary.toFixed(2)}\n`;
-                if (currentEmailData.classDates) {
-                    emailMessage += `Classes were taken on the following dates: ${currentEmailData.classDates}\n`;
+                emailMessage = `Teacher Salary Details - ${currentEmailData.name} (ID: ${currentEmailData.id})\n`;
+                emailMessage += `Overall Total Hours for Teacher: ${currentEmailData.totalHours.toFixed(2)}\n\n`;
+                
+                if (Object.keys(currentEmailData.studentBreakdown).length > 0) {
+                    emailMessage += `Detailed Breakdown by Student:\n`;
+                    for (const studentId in currentEmailData.studentBreakdown) {
+                        const studentInfo = currentEmailData.studentBreakdown[studentId];
+                        emailMessage += `--- Student: ${studentInfo.name} (ID: ${studentId}) ---\n`;
+                        emailMessage += `  Total Hours for this Student: ${studentInfo.totalHours.toFixed(2)}\n`;
+                        emailMessage += `  Hourly Rate for this Student: ₹${studentInfo.hourlyRate.toFixed(2)}\n`;
+                        emailMessage += `  Total Amount for this Student: ₹${studentInfo.totalAmount.toFixed(2)}\n`;
+                        if (studentInfo.classes.length > 0) {
+                            emailMessage += `  Classes Taught to this Student:\n`;
+                            studentInfo.classes.forEach(c => {
+                                emailMessage += `    - Date: ${c.date}, Program: ${c.program}, Classroom: ${c.classroom}, Subject: ${c.subject}, Duration: ${c.durationMinutes} minutes\n`;
+                            });
+                        }
+                        emailMessage += `\n`;
+                    }
                 }
-                emailMessage += `\nShould you have any questions, please feel free to contact the Alif Edu Accounts Team.\n\n`;
+
+                emailMessage += `--------------------------------------\n`;
+                emailMessage += `Teacher's Grand Total Amount: ₹${currentEmailData.totalSalary.toFixed(2)}\n`;
+                emailMessage += `--------------------------------------\n\n`;
+                emailMessage += `Kindly confirm whether the salary details mentioned above are accurate.\n\n`;
                 emailMessage += `Best regards,\nAlif Edu Accounts Team`;
+
             } else if (currentEmailData.type === 'student') {
-                emailMessage = `Subject: Your Monthly Fee Statement - ${currentEmailData.name} (${currentMonthYear})\n\n`;
-                emailMessage += `Dear ${currentEmailData.name},\n\n`;
-                emailMessage += `This email provides a summary of your classes attended and fees for the period of ${currentMonthYear}.\n\n`;
-                emailMessage += `Total Classes Attended (Hours): ${currentEmailData.totalHours.toFixed(2)}\n`;
-                emailMessage += `Total Fee for the period: ₹${currentEmailData.totalFee.toFixed(2)}\n`;
-                if (currentEmailData.classDates) {
-                    emailMessage += `Classes were attended on the following dates: ${currentEmailData.classDates}\n`;
+                emailMessage = `Student Fee Details - ${currentEmailData.name} (ID: ${currentEmailData.id})\n`;
+                emailMessage += `Overall Total Hours for Student: ${currentEmailData.totalHours.toFixed(2)}\n\n`;
+
+                if (Object.keys(currentEmailData.teacherBreakdown).length > 0) {
+                    emailMessage += `Detailed Breakdown by Teacher:\n`;
+                    for (const teacherId in currentEmailData.teacherBreakdown) {
+                        const teacherInfo = currentEmailData.teacherBreakdown[teacherId];
+                        emailMessage += `--- Teacher: ${teacherInfo.name} (ID: ${teacherId}) ---\n`;
+                        emailMessage += `  Total Hours with this Teacher: ${teacherInfo.totalHours.toFixed(2)}\n`;
+                        emailMessage += `  Hourly Rate for this Teacher: ₹${teacherInfo.hourlyRate.toFixed(2)}\n`;
+                        emailMessage += `  Total Amount for this Teacher: ₹${teacherInfo.totalAmount.toFixed(2)}\n`;
+                        if (teacherInfo.classes.length > 0) {
+                            emailMessage += `  Classes Attended with this Teacher:\n`;
+                            teacherInfo.classes.forEach(c => {
+                                emailMessage += `    - Date: ${c.date}, Program: ${c.program}, Classroom: ${c.classroom}, Subject: ${c.subject}, Duration: ${c.durationMinutes} minutes\n`;
+                            });
+                        }
+                        emailMessage += `\n`;
+                    }
                 }
-                emailMessage += `\nFor any inquiries regarding your fees, please contact the Alif Edu Accounts Team.\n\n`;
+
+                emailMessage += `--------------------------------------\n`;
+                emailMessage += `Student's Grand Total Amount: ₹${currentEmailData.totalFee.toFixed(2)}\n`;
+                emailMessage += `--------------------------------------\n\n`;
+                emailMessage += `Kindly confirm whether the fee details mentioned above are accurate.\n\n`;
                 emailMessage += `Best regards,\nAlif Edu Accounts Team`;
+
             } else if (currentEmailData.type === 'officeStaff') {
-                emailMessage = `Subject: ${currentEmailData.position} Salary Statement - ${currentEmailData.name} (${currentMonthYear})\n\n`;
-                emailMessage += `Dear ${currentEmailData.name},\n\n`;
-                emailMessage += `This email summarizes the calculated salary for your role as ${currentEmailData.position} for the period of ${currentMonthYear}, based on program-related class hours.\n\n`;
-                emailMessage += `Total Program Hours Overseen: ${currentEmailData.totalHours.toFixed(2)}\n`;
-                emailMessage += `Calculated Salary for the period: ₹${currentEmailData.totalSalary.toFixed(2)}\n`;
-                if (currentEmailData.classDates) {
-                    emailMessage += `Relevant classes were conducted on the following dates: ${currentEmailData.classDates}\n`;
+                emailMessage = `Teacher Salary Details - ${currentEmailData.name} (ID: ${currentEmailData.id})\n`; // Using "Teacher Salary Details" as per template
+                emailMessage += `Overall Total Hours for ${currentEmailData.position}: ${currentEmailData.totalHours.toFixed(2)}\n\n`;
+
+                if (currentEmailData.teacherContributions && currentEmailData.teacherContributions.length > 0) {
+                    emailMessage += `Detailed Breakdown of Other Teachers:\n`;
+                    currentEmailData.teacherContributions.forEach(tc => {
+                        emailMessage += `--- Role: Teacher, Name: ${tc.teacherName} (ID: ${tc.teacherId}) ---\n`;
+                        emailMessage += `  Total Hours: ${tc.hoursContributed}\n`;
+                        emailMessage += `  Hourly Rate: ₹${currentEmailData.officeStaffHourlyRate}\n`; // Office staff's rate
+                        emailMessage += `  Total Amount: ₹${tc.salaryContribution}\n\n`;
+                    });
                 }
-                emailMessage += `\nShould you have any questions, please feel free to contact the Alif Edu Accounts Team.\n\n`;
+
+                emailMessage += `--------------------------------------\n`;
+                emailMessage += `Teacher's Grand Total Amount: ₹${currentEmailData.totalSalary.toFixed(2)}\n`; // Office staff's total salary
+                emailMessage += `--------------------------------------\n\n`;
+                emailMessage += `Kindly confirm whether the salary details mentioned above are accurate.\n\n`;
                 emailMessage += `Best regards,\nAlif Edu Accounts Team`;
             }
 
