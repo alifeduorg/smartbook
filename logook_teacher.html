@@ -289,7 +289,7 @@
     <div id="messageBox" class="message-box"></div>
     <script>
         // Function to display messages
-        function showMessage(message, type = 'success') {
+        function showMessage(message, type = 'success', duration = 10000) { // Added duration parameter, default 10 seconds
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
             messageBox.className = 'message-box show'; // Reset classes and show
@@ -298,12 +298,12 @@
             } else {
                 messageBox.classList.remove('error');
             }
-            // Message stays for 10 seconds
+            // Message stays for the specified duration
             setTimeout(() => {
                 messageBox.classList.remove('show');
                 // Optional: Hide completely after transition
                 setTimeout(() => { messageBox.style.display = 'none'; }, 300);
-            }, 10000); // Message disappears after 10 seconds
+            }, duration);
         }
         // --- Three.js Setup ---
         let scene, camera, renderer, particles = [], glowingSpheres = [], pointLight;
@@ -690,12 +690,12 @@
                         },
                         body: JSON.stringify(data),
                     });
-                    // Note: With 'no-cors' mode, you cannot read the response body.
-                    // The success/failure must be inferred from the network request itself,
-                    // or by checking the Google Sheet after submission.
-                    // For demonstration, we'll assume success if no fetch error.
-                    console.log('Google Apps Script response (check network tab for actual status):', response);
-                    showMessage("Log submitted successfully! Please check the Log View. If this was your first entry after a long break, it might have been a 'cold start' and you might need to check the Log View to confirm.");
+                    // Note: With 'no-cors' mode, you cannot read the response body directly.
+                    // The success/failure of the Google Apps Script execution itself
+                    // must be verified by checking the Google Sheet or the Apps Script logs.
+                    console.log('Google Apps Script fetch initiated. Response (check network tab for actual status):', response);
+                    console.warn('Due to "no-cors" mode, direct response from Google Apps Script is not accessible by client-side JavaScript. Please verify submission directly in your Google Sheet and check Google Apps Script execution logs for errors.');
+                    showMessage("Log submission attempt sent. Please check your Google Sheet to confirm if the entry was stored successfully. If this was your first entry after a long break, it might have been a 'cold start'.", "success", 15000); // Increased duration for success message
                     logForm.reset(); // Clear the form after successful submission
                     
                     // Refresh the page for a new entry after 10.5 seconds (allowing message to fade)
@@ -704,8 +704,8 @@
                     }, 10500); 
                     
                 } catch (error) {
-                    console.error('Error submitting log:', error);
-                    showMessage("Failed to submit log. Please try again. Check your browser's console for more details.", "error");
+                    console.error('Error submitting log (network or client-side issue):', error);
+                    showMessage("Failed to submit log. This might be a network issue. Please check your internet connection and your browser's developer console (Network tab) for more details, then try again.", "error", 20000); // Increased duration for error message
                     // Re-enable button on error so user can try again without refreshing
                     submitButton.disabled = false;
                     submitButton.textContent = 'Submit Log';
