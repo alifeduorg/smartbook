@@ -4,8 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Timetable Viewer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Define CSS Variables for a consistent and friendly color palette */
         :root {
@@ -14,6 +17,10 @@
             --primary-light-blue: #3E6A8A; /* Slightly lighter shade for more dynamic gradients */
             --secondary-accent-yellow: #FFC107; /* Bright, inviting yellow */
             --secondary-light-yellow: #FFD54F; /* Lighter yellow for hover states */
+            --tertiary-green: #4CAF50; /* Green for JPEG download */
+            --tertiary-light-green: #66BB6A; /* Lighter green for hover */
+            --quaternary-purple: #8A2BE2; /* New color for "Download All" */
+            --quaternary-light-purple: #9932CC; /* Lighter purple for hover */
             --light-bg-color: #F8F9FA; /* Very light, almost white for primary backgrounds */
             --mid-bg-color: #E2EBF1; /* A subtle cool grey/blue for background transitions */
             --text-dark: #2C3E50; /* Darker text for better contrast */
@@ -168,7 +175,7 @@
         header h1 {
             font-size: 2rem; /* Larger title */
             margin: 0;
-            font-weight: 700;
+            font-weight: 800; /* Bolder title */
             letter-spacing: 0.5px; /* Slight letter spacing */
             text-shadow: var(--shadow-subtle); /* Subtle text shadow */
         }
@@ -186,6 +193,9 @@
             box-shadow: var(--shadow-subtle);
             animation: bounceIn 0.8s ease-out;
             min-width: 120px; /* Ensure a decent size */
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .dashboard-button:hover {
@@ -214,15 +224,24 @@
             backdrop-filter: blur(10px); /* Increased blur for glassmorphism */
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5); /* Stronger light border */
+            animation: fadeInScale 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.95) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         /* Form Elements (Select, Input) */
+        .form-group {
+            margin-bottom: 1.8rem; /* Space between form groups */
+        }
+
         select, input[type="date"] {
             padding: 1rem 1.4rem; /* More padding */
             border-radius: var(--border-radius-md);
             border: 1px solid var(--border-color-medium); /* More visible border */
             font-size: 1.05rem; /* Slightly larger font */
-            margin: 0.8rem 0 1.8rem 0; /* More margin below */
             width: calc(100% - 2.8rem); /* Adjust width for padding */
             max-width: 450px; /* Increased max width */
             display: block;
@@ -245,6 +264,39 @@
             font-weight: 600;
             color: var(--text-dark); /* Ensure labels are dark */
             font-size: 0.95rem; /* Slightly smaller for labels */
+        }
+
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Space between date input and buttons */
+            max-width: 450px;
+        }
+
+        .date-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .date-buttons button {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border-color-medium);
+            border-radius: var(--border-radius-md);
+            background-color: var(--mid-bg-color);
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .date-buttons button:hover {
+            background-color: var(--border-color-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-default);
         }
 
         /* Action Buttons Styling (Run, Download) */
@@ -312,6 +364,16 @@
             background-color: var(--primary-light-blue);
         }
 
+        /* New style for JPEG download button */
+        .download-jpeg-btn {
+            background-color: var(--tertiary-green); /* A nice green color */
+            color: var(--text-light);
+        }
+
+        .download-jpeg-btn:hover {
+            background-color: var(--tertiary-light-green); /* Lighter green on hover */
+        }
+
         /* Spinner for Buttons */
         .action-button-group button .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
@@ -348,6 +410,29 @@
             }
         }
 
+        /* Timetable Display Section */
+        .timetable-display-section {
+            margin-top: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        .timetable-display-section.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timetable-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-dark-blue);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+            text-shadow: var(--shadow-subtle);
+        }
+
         /* Table Styles (for the single table) */
         #timetable {
             width: 100%;
@@ -357,7 +442,6 @@
             border-radius: var(--border-radius-md);
             overflow: hidden; /* Ensures rounded corners */
             background: white;
-            margin-top: 3rem;
             border: 1px solid var(--border-color-light);
             display: table; /* Ensure it's displayed now */
         }
@@ -387,12 +471,6 @@
             background-color: #E6F3FF;
             cursor: pointer;
         }
-
-        /* Hide the daily timetables container as we're not using separate tables anymore */
-        #dailyTimetablesContainer {
-            display: none;
-        }
-
 
         /* Custom Modal for Alerts */
         .modal {
@@ -528,6 +606,7 @@
             select, input[type="date"] {
                 padding: 0.8rem 1.2rem;
                 font-size: 0.95rem;
+                width: calc(100% - 2.4rem); /* Adjust for smaller padding */
             }
             .action-button-group button {
                 padding: 1rem 1.8rem;
@@ -560,6 +639,12 @@
                 padding: 12px 25px;
                 font-size: 1.05rem;
             }
+            .timetable-title {
+                font-size: 1.5rem;
+            }
+            .date-buttons {
+                flex-direction: column; /* Stack date buttons on small screens */
+            }
         }
 
         @media (max-width: 480px) {
@@ -583,6 +668,7 @@
             select, input[type="date"] {
                 padding: 0.7rem 1rem;
                 font-size: 0.9rem;
+                width: calc(100% - 2rem); /* Adjust for smaller padding */
             }
             .action-button-group {
                 gap: 15px;
@@ -607,6 +693,9 @@
             .modal-content {
                 padding: 20px;
             }
+            .timetable-title {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
@@ -621,48 +710,75 @@
 
     <header>
         <h1>Student Timetable</h1>
-        <button class="dashboard-button" onclick="goToDashboard()">Back to Dashboard</button>
+        <button class="dashboard-button" onclick="goToDashboard()">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
     </header>
 
     <div class="container">
-        <label for="studentSelect">Select Student</label>
-        <select id="studentSelect">
-            <option value="">Select Student</option>
-        </select>
+        <div class="form-group">
+            <label for="studentSelect">Select Student</label>
+            <select id="studentSelect">
+                <option value="">Select Student</option>
+            </select>
+        </div>
 
-        <label for="startDate">Start Date</label>
-        <input type="date" id="startDate" />
+        <div class="form-group">
+            <label for="startDate">Start Date (for weekly range)</label>
+            <div class="date-input-group">
+                <input type="date" id="startDate" />
+                <div class="date-buttons">
+                    <button id="setTodayStartDateBtn">Today</button>
+                    <button id="clearStartDateBtn">Clear</button>
+                </div>
+            </div>
+        </div>
 
-        <label for="endDate">End Date</label>
-        <input type="date" id="endDate" />
+        <div class="form-group">
+            <label for="endDate">End Date (for weekly range)</label>
+            <div class="date-input-group">
+                <input type="date" id="endDate" />
+                <div class="date-buttons">
+                    <button id="setTodayEndDateBtn">Today</button>
+                    <button id="clearEndDateBtn">Clear</button>
+                </div>
+            </div>
+        </div>
 
         <div class="action-button-group">
             <button class="show-timetable-btn" id="showTimetableBtn">
                 <span class="spinner"></span>
-                <span>Show Timetable</span>
+                <span><i class="fas fa-calendar-alt"></i> Show Timetable</span>
             </button>
-            <button class="download-btn" id="downloadBtn">
+            <button class="download-btn" id="downloadPdfBtn">
                 <span class="spinner"></span>
-                <span>Download Timetable as PDF</span>
+                <span><i class="fas fa-file-pdf"></i> Download as PDF</span>
+            </button>
+            <button class="download-jpeg-btn" id="downloadJpegBtn">
+                <span class="spinner"></span>
+                <span><i class="fas fa-file-image"></i> Download as JPEG</span>
             </button>
         </div>
 
-        <table id="timetable">
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Subject</th>
-                    <th>Teacher</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Timetable data will be inserted here -->
-            </tbody>
-        </table>
-
-
+        <div class="timetable-display-section" id="timetableDisplaySection">
+            <h2 class="timetable-title" id="currentTimetableTitle"></h2>
+            <div style="overflow-x: auto;">
+                <table id="timetable">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Timetable data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div id="messageModal" class="modal">
@@ -680,6 +796,21 @@
         // Google Sheet URL for timetable data
         const sheetURL = 'https://script.google.com/macros/s/AKfycbzARIynxtCX1rbMPIfY0Uwnwfk2ozLYmifGK5pA49J1a8G8ad1Z_DIYvoYXYE1dlJjNNA/exec';
         let timetableData = []; // Array to store fetched timetable data
+        let currentDisplayedTimetableData = []; // To store the data currently shown in the table
+
+        // DOM elements
+        const studentSelect = document.getElementById('studentSelect');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const showTimetableBtn = document.getElementById('showTimetableBtn');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const downloadJpegBtn = document.getElementById('downloadJpegBtn');
+        const timetableTbody = document.querySelector('#timetable tbody');
+        const timetableDisplaySection = document.getElementById('timetableDisplaySection');
+        const currentTimetableTitle = document.getElementById('currentTimetableTitle');
+        const messageModal = document.getElementById('messageModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
 
         // Function to add ripple effect to buttons
         function addRippleEffect(event) {
@@ -701,7 +832,12 @@
             button.appendChild(circle);
         }
 
-        // Helper to get the date for a specific day of the week within a week starting on a given date
+        /**
+         * Helper to get the date for a specific day of the week within a week starting on a given date.
+         * @param {string} weekStartDateISO - The ISO string of the week's start date (e.g., "2023-01-01").
+         * @param {string} dayOfWeekString - The name of the day (e.g., "Monday", "Sunday").
+         * @returns {Date | null} The Date object for that specific day, or null if invalid input.
+         */
         function getDateForDayInWeek(weekStartDateISO, dayOfWeekString) {
             if (!weekStartDateISO || !dayOfWeekString) return null;
 
@@ -709,7 +845,6 @@
             if (isNaN(startDate.getTime())) return null;
 
             // Ensure startDate is correctly interpreted as local date to avoid timezone issues
-            // when calculating day of week and setting date.
             const startDateLocal = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 
             const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -725,12 +860,32 @@
             return actualDate;
         }
 
+        /**
+         * Calculates the start (Sunday) and end (Saturday) dates of the week for a given date.
+         * Dates are normalized to midnight for accurate comparison.
+         * @param {Date} date - The date within the week.
+         * @returns {{weekStart: Date, weekEnd: Date}} An object containing the start and end dates of the week.
+         */
+        function getWeekRange(date) {
+            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Normalize to start of day
+            const dayOfWeek = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+            const weekStart = new Date(d);
+            weekStart.setDate(d.getDate() - dayOfWeek); // Go back to Sunday
+
+            const weekEnd = new Date(d);
+            weekEnd.setDate(d.getDate() + (6 - dayOfWeek)); // Go forward to Saturday
+            weekEnd.setHours(23, 59, 59, 999); // Set to end of Saturday for inclusive range
+
+            return { weekStart, weekEnd };
+        }
+
 
         // Fetch data from Google Sheet on page load
         fetch(sheetURL)
             .then(res => res.json())
             .then(data => {
-                // Sort data by "Week Start" in descending order
+                // Sort data by "Week Start" in ascending order to ensure chronological display
                 timetableData = data.sort((a, b) => {
                     const dateA = getDateForDayInWeek(a["Week Start"], a["Day"]);
                     const dateB = getDateForDayInWeek(b["Week Start"], b["Day"]);
@@ -782,7 +937,6 @@
          * @param {Array<Object>} data - The timetable data.
          */
         function populateStudents(data) {
-            const dropdown = document.getElementById('studentSelect');
             const studentMap = new Map(); // Use a Map to store unique student IDs and names
 
             data.forEach(row => {
@@ -795,72 +949,155 @@
                     const option = document.createElement('option');
                     option.value = id;
                     option.textContent = `${name} (ID: ${id})`; // Display name and ID in dropdown
-                    dropdown.appendChild(option);
+                    studentSelect.appendChild(option);
                 }
             });
         }
 
         /**
          * Renders the timetable based on the selected student and date range into a single table.
+         * Filters by full weeks if start and end dates are provided.
          */
         function renderTimetable() {
-            const selectedOption = document.getElementById('studentSelect').selectedOptions[0];
+            const selectedOption = studentSelect.selectedOptions[0];
             const selectedID = selectedOption ? selectedOption.value : '';
-            const startDateInput = document.getElementById('startDate').value;
-            const endDateInput = document.getElementById('endDate').value;
-            const tbody = document.querySelector('#timetable tbody');
-            tbody.innerHTML = ''; // Clear existing table rows
+            const selectedStudentName = selectedOption && selectedOption.value ? selectedOption.textContent.split('(')[0].trim() : '';
+            const startDateValue = startDateInput.value;
+            const endDateValue = endDateInput.value;
+            timetableTbody.innerHTML = ''; // Clear existing table rows
+            timetableDisplaySection.classList.remove('show'); // Hide section initially
+            currentDisplayedTimetableData = []; // Clear previously displayed data
 
             if (!selectedID) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td colspan="5" style="text-align: center; padding: 20px;">Please select a student to view their timetable.</td>`;
-                tbody.appendChild(tr);
+                timetableTbody.appendChild(tr);
+                currentTimetableTitle.textContent = "Student Timetable";
                 return;
             }
 
-            let currentFilteredData = timetableData.filter(entry => entry["Student ID"] === selectedID);
+            let studentSpecificData = timetableData.filter(entry => String(entry["Student ID"]) === selectedID);
 
-            // Apply date filtering if both start and end dates are provided
-            if (startDateInput && endDateInput) {
-                const startDate = new Date(startDateInput);
-                const endDate = new Date(new Date(endDateInput).setHours(23, 59, 59, 999));
+            let dataToDisplay = [];
+            let displayStartDate = null;
+            let displayEndDate = null;
+            let titleSuffix = "";
 
-                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            // Logic for filtering based on date inputs
+            if (startDateValue && endDateValue) {
+                const inputStartDate = new Date(startDateValue);
+                const inputEndDate = new Date(endDateValue);
+
+                if (isNaN(inputStartDate.getTime()) || isNaN(inputEndDate.getTime())) {
                     showModal("Invalid Dates", "Please enter valid start and end dates.");
                     return;
                 }
 
-                if (startDate > endDate) {
+                if (inputStartDate > inputEndDate) {
                     showModal("Invalid Date Range", "Start date cannot be after end date.");
                     return;
                 }
 
-                currentFilteredData = currentFilteredData.filter(entry => {
+                const { weekStart: filterStartWeek } = getWeekRange(inputStartDate);
+                const { weekEnd: finalEndOfWeek } = getWeekRange(inputEndDate);
+
+                dataToDisplay = studentSpecificData.filter(entry => {
                     const entryDate = getDateForDayInWeek(entry["Week Start"], entry["Day"]);
                     if (!entryDate) return false;
-
                     const normalizedEntryDate = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
-                    const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-                    const normalizedEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-
-                    return normalizedEntryDate >= normalizedStartDate && normalizedEntryDate <= normalizedEndDate;
+                    return normalizedEntryDate >= filterStartWeek && normalizedEntryDate <= finalEndOfWeek;
                 });
-            } else if (startDateInput || endDateInput) {
-                showModal("Missing Date", "Please select both start and end dates to filter by date range, or leave both empty to see all timetable data for the selected student.");
-                document.getElementById('startDate').value = '';
-                document.getElementById('endDate').value = '';
-                return;
+
+                displayStartDate = filterStartWeek;
+                displayEndDate = finalEndOfWeek;
+                titleSuffix = ` (${formatDate(displayStartDate)} - ${formatDate(displayEndDate)})`;
+
+            } else if (startDateValue && !endDateValue) {
+                // If only start date is provided, automatically set end date to end of that week
+                const inputStartDate = new Date(startDateValue);
+                if (isNaN(inputStartDate.getTime())) {
+                    showModal("Invalid Start Date", "Please enter a valid start date.");
+                    return;
+                }
+                const { weekStart: autoWeekStart, weekEnd: autoWeekEnd } = getWeekRange(inputStartDate);
+                endDateInput.value = autoWeekEnd.toISOString().split('T')[0]; // Set the end date input field
+
+                dataToDisplay = studentSpecificData.filter(entry => {
+                    const entryDate = getDateForDayInWeek(entry["Week Start"], entry["Day"]);
+                    if (!entryDate) return false;
+                    const normalizedEntryDate = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
+                    return normalizedEntryDate >= autoWeekStart && normalizedEntryDate <= autoWeekEnd;
+                });
+
+                displayStartDate = autoWeekStart;
+                displayEndDate = autoWeekEnd;
+                titleSuffix = ` (${formatDate(displayStartDate)} - ${formatDate(displayEndDate)})`;
+
+            } else if (!startDateValue && endDateValue) {
+                // If only end date is provided, clear both and prompt
+                showModal("Missing Start Date", "Please select a start date to define a weekly range, or clear both dates to view the full timetable.");
+                endDateInput.value = ''; // Clear end date
+                dataToDisplay = studentSpecificData; // Show full timetable
+                // Determine full range for title
+                if (studentSpecificData.length > 0) {
+                    const allDates = studentSpecificData.map(entry => getDateForDayInWeek(entry["Week Start"], entry["Day"]))
+                                                        .filter(date => date !== null)
+                                                        .sort((a, b) => a.getTime() - b.getTime());
+                    if (allDates.length > 0) {
+                        displayStartDate = allDates[0];
+                        displayEndDate = allDates[allDates.length - 1];
+                        titleSuffix = ` (Full Timetable: ${formatDate(displayStartDate)} - ${formatDate(displayEndDate)})`;
+                    }
+                }
+                
+            } else {
+                // No dates selected, show full timetable for the student
+                dataToDisplay = studentSpecificData;
+                // Determine full range for title
+                if (studentSpecificData.length > 0) {
+                    const allDates = studentSpecificData.map(entry => getDateForDayInWeek(entry["Week Start"], entry["Day"]))
+                                                        .filter(date => date !== null)
+                                                        .sort((a, b) => a.getTime() - b.getTime());
+                    if (allDates.length > 0) {
+                        displayStartDate = allDates[0];
+                        displayEndDate = allDates[allDates.length - 1];
+                        titleSuffix = ` (Full Timetable: ${formatDate(displayStartDate)} - ${formatDate(displayEndDate)})`;
+                    }
+                }
             }
 
-            if (currentFilteredData.length === 0) {
+            // If no data found after filtering
+            if (dataToDisplay.length === 0) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td colspan="5" style="text-align: center; padding: 20px;">No timetable data found for the selected student and date range.</td>`;
-                tbody.appendChild(tr);
+                timetableTbody.appendChild(tr);
+                currentTimetableTitle.textContent = `Timetable for ${selectedStudentName}`;
                 return;
             }
 
-            // Populate the single table with filtered data
-            currentFilteredData.forEach(row => {
+            // Sort the data to display by date and then time
+            dataToDisplay.sort((a, b) => {
+                const dateA = getDateForDayInWeek(a["Week Start"], a["Day"]);
+                const dateB = getDateForDayInWeek(b["Week Start"], b["Day"]);
+                if (dateA && dateB) {
+                    const dateComparison = dateA.getTime() - dateB.getTime();
+                    if (dateComparison !== 0) return dateComparison;
+
+                    const timeA = new Date(`1970/01/01 ${a["Time"]}`);
+                    const timeB = new Date(`1970/01/01 ${b["Time"]}`);
+                    return timeA.getTime() - timeB.getTime();
+                }
+                return 0;
+            });
+
+            // Update global variable for currently displayed data
+            currentDisplayedTimetableData = dataToDisplay;
+
+            // Update timetable title
+            currentTimetableTitle.textContent = `Timetable for ${selectedStudentName}${titleSuffix}`;
+
+            // Populate the table with the sorted data
+            currentDisplayedTimetableData.forEach(row => {
                 const tr = document.createElement('tr');
                 const actualDate = getDateForDayInWeek(row["Week Start"], row["Day"]);
                 tr.innerHTML = `
@@ -870,98 +1107,33 @@
                     <td>${row["Subject"] || ''}</td>
                     <td>${row["Teacher"] || ''}</td>
                 `;
-                tbody.appendChild(tr);
+                timetableTbody.appendChild(tr);
             });
+
+            timetableDisplaySection.classList.add('show'); // Show timetable section with animation
         }
 
-        // Event listener for student selection change
-        document.getElementById('studentSelect').addEventListener('change', renderTimetable);
-
-        // Event listener for the new 'Show Timetable' button click
-        document.getElementById('showTimetableBtn').addEventListener('click', (event) => {
-            addRippleEffect(event); // Add ripple effect
-            renderTimetable();
-        });
-
-        // Event listener for download button click
-        document.getElementById('downloadBtn').addEventListener('click', async (event) => {
-            addRippleEffect(event); // Add ripple effect
-            const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.classList.add('loading'); // Add loading class
-            downloadBtn.disabled = true; // Disable button during download
+        /**
+         * Generic function to handle PDF download.
+         * @param {Array<Object>} dataToDownload - The filtered data to include in the PDF.
+         * @param {string} studentName - The name of the selected student.
+         * @param {string} downloadFileName - The desired file name for the download.
+         * @param {string} titleForPdf - The title to be used inside the PDF.
+         * @param {HTMLElement} buttonElement - The button element that triggered the download.
+         */
+        async function downloadTimetableAsPdf(dataToDownload, studentName, downloadFileName, titleForPdf, buttonElement) {
+            buttonElement.classList.add('loading');
+            buttonElement.disabled = true;
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            const selectedOption = document.getElementById('studentSelect').selectedOptions[0];
-            const selectedID = selectedOption ? selectedOption.value : '';
-            const selectedStudentText = selectedOption ? selectedOption.textContent : '';
-
-
-            const startDateInput = document.getElementById('startDate').value;
-            const endDateInput = document.getElementById('endDate').value;
-
-            // Validate inputs
-            if (!selectedID) {
-                showModal("Missing Selection", "Please select a student.");
-                downloadBtn.classList.remove('loading');
-                downloadBtn.disabled = false;
-                return;
-            }
-            if (!startDateInput || !endDateInput) {
-                showModal("Missing Dates", "Please select both start and end dates to download PDF.");
-                downloadBtn.classList.remove('loading');
-                downloadBtn.disabled = false;
-                return;
-            }
-
-            const startDate = new Date(startDateInput);
-            const endDate = new Date(new Date(endDateInput).setHours(23, 59, 59, 999));
-
-            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                showModal("Invalid Dates", "Please enter valid start and end dates.");
-                downloadBtn.classList.remove('loading');
-                downloadBtn.disabled = false;
-                return;
-            }
-
-            if (startDate > endDate) {
-                showModal("Invalid Date Range", "Start date cannot be after end date.");
-                downloadBtn.classList.remove('loading');
-                downloadBtn.disabled = false;
-                return;
-            }
-
-            // Filter data based on selected student and date range for PDF
-            const filteredForPdf = timetableData.filter(entry => {
-                const entryDate = getDateForDayInWeek(entry["Week Start"], entry["Day"]);
-                if (!entryDate) return false;
-
-                const normalizedEntryDate = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
-                const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-                const normalizedEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-                return entry["Student ID"] === selectedID && normalizedEntryDate >= normalizedStartDate && normalizedEntryDate <= normalizedEndDate;
-            });
-
-            if (filteredForPdf.length === 0) {
-                showModal("No Data", "No timetable data found for the selected student and date range to generate PDF.");
-                downloadBtn.classList.remove('loading');
-                downloadBtn.disabled = false;
-                return;
-            }
-
             try {
-                // Generate PDF content
                 let y = 20;
                 doc.setFontSize(14);
-                // PDF title to include student name
-                doc.text(`Student Timetable for: ${selectedStudentText}`, 10, y);
+                doc.text(titleForPdf, 10, y);
                 y += 10;
-                doc.setFontSize(10);
-                doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
-                y += 15;
 
-                // PDF Table headers
                 doc.setFontSize(10);
                 doc.text("Day", 10, y);
                 doc.text("Date", 40, y);
@@ -969,21 +1141,18 @@
                 doc.text("Subject", 105, y);
                 doc.text("Teacher", 155, y);
                 y += 5;
-                doc.line(10, y, 200, y); // Draw a line under headers
+                doc.line(10, y, 200, y);
                 y += 5;
 
-                // Add timetable entries to PDF
-                filteredForPdf.forEach(row => {
+                dataToDownload.forEach(row => {
                     const actualDate = getDateForDayInWeek(row["Week Start"], row["Day"]);
-                    if (y > 270) { // Check if new page is needed
+                    if (y > 270) {
                         doc.addPage();
                         y = 20;
                         doc.setFontSize(14);
-                        doc.text(`Student Timetable for: ${selectedStudentText} (Cont.)`, 10, y);
+                        doc.text(`${titleForPdf} (Cont.)`, 10, y);
                         y += 10;
                         doc.setFontSize(10);
-                        doc.text(`From: ${formatDate(startDateInput)} To: ${formatDate(endDateInput)}`, 10, y);
-                        y += 15;
                         doc.text("Day", 10, y);
                         doc.text("Date", 40, y);
                         doc.text("Time", 75, y);
@@ -1001,16 +1170,192 @@
                     y += 8;
                 });
 
-                // Save the PDF
-                doc.save(`Timetable_${selectedID}_${formatDate(startDateInput).replace(/\//g, '-')}_to_${formatDate(endDateInput).replace(/\//g, '-')}.pdf`);
+                doc.save(downloadFileName);
                 showModal("Success!", "Timetable PDF downloaded successfully.");
             } catch (error) {
                 console.error("Error generating PDF:", error);
                 showModal("Error", "Failed to generate PDF. Please try again.");
             } finally {
-                downloadBtn.classList.remove('loading'); // Remove loading class
-                downloadBtn.disabled = false; // Re-enable button
+                buttonElement.classList.remove('loading');
+                buttonElement.disabled = false;
             }
+        }
+
+        /**
+         * Generic function to handle JPEG download.
+         * @param {Array<Object>} dataToDownload - The filtered data to include in the JPEG (used for rendering before capture).
+         * @param {string} studentName - The name of the selected student.
+         * @param {string} downloadFileName - The desired file name for the download.
+         * @param {string} titleForJpeg - The title to be used inside the captured image.
+         * @param {HTMLElement} buttonElement - The button element that triggered the download.
+         */
+        async function downloadTimetableAsJpeg(dataToDownload, studentName, downloadFileName, titleForJpeg, buttonElement) {
+            buttonElement.classList.add('loading');
+            buttonElement.disabled = true;
+
+            // Temporarily update the displayed timetable to match the data being downloaded
+            const originalTimetableContent = timetableTbody.innerHTML;
+            const originalTitle = currentTimetableTitle.textContent;
+
+            timetableTbody.innerHTML = '';
+            dataToDownload.forEach(row => {
+                const tr = document.createElement('tr');
+                const actualDate = getDateForDayInWeek(row["Week Start"], row["Day"]);
+                tr.innerHTML = `
+                    <td>${row["Day"] || ''}</td>
+                    <td>${formatDate(actualDate || '')}</td>
+                    <td>${formatTime(row["Time"] || '')}</td>
+                    <td>${row["Subject"] || ''}</td>
+                    <td>${row["Teacher"] || ''}</td>
+                `;
+                timetableTbody.appendChild(tr);
+            });
+
+            currentTimetableTitle.textContent = titleForJpeg;
+            timetableDisplaySection.classList.add('show'); // Ensure it's visible
+
+            const timetableTable = document.getElementById('timetable');
+
+            if (!timetableTable || timetableTable.offsetHeight === 0 || timetableTable.offsetWidth === 0) {
+                showModal("Error", "Timetable table is not visible or rendered correctly for JPEG generation.");
+                buttonElement.classList.remove('loading');
+                buttonElement.disabled = false;
+                // Restore original content if capture fails
+                timetableTbody.innerHTML = originalTimetableContent;
+                currentTimetableTitle.textContent = originalTitle;
+                return;
+            }
+
+            try {
+                const canvas = await html2canvas(timetableTable, {
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+
+                const imageData = canvas.toDataURL('image/jpeg', 0.9);
+
+                const link = document.createElement('a');
+                link.href = imageData;
+                link.download = downloadFileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showModal("Success!", "Timetable JPEG downloaded successfully.");
+
+            } catch (error) {
+                console.error("Error generating JPEG:", error);
+                showModal("Error", "Failed to generate JPEG. Please ensure the timetable is visible and try again.");
+            } finally {
+                buttonElement.classList.remove('loading');
+                buttonElement.disabled = false;
+                // Restore original content after capture
+                timetableTbody.innerHTML = originalTimetableContent;
+                currentTimetableTitle.textContent = originalTitle;
+                renderTimetable(); // Re-render the timetable based on current selections
+            }
+        }
+
+
+        // Event listeners
+        studentSelect.addEventListener('change', renderTimetable);
+
+        // Modified startDateInput event listener
+        startDateInput.addEventListener('change', () => {
+            const startDateValue = startDateInput.value;
+            if (startDateValue) {
+                const inputStartDate = new Date(startDateValue);
+                if (!isNaN(inputStartDate.getTime())) {
+                    const { weekEnd: autoWeekEnd } = getWeekRange(inputStartDate);
+                    endDateInput.value = autoWeekEnd.toISOString().split('T')[0];
+                }
+            }
+            renderTimetable(); // Always re-render after start date changes
+        });
+
+        endDateInput.addEventListener('change', renderTimetable); // Auto-update on end date change
+
+        showTimetableBtn.addEventListener('click', (event) => {
+            addRippleEffect(event);
+            renderTimetable(); // Explicitly re-render if needed
+        });
+
+        // Set Today buttons
+        document.getElementById('setTodayStartDateBtn').addEventListener('click', (event) => {
+            addRippleEffect(event);
+            const today = new Date();
+            startDateInput.value = today.toISOString().split('T')[0];
+            // Trigger change event to auto-update end date and re-render
+            startDateInput.dispatchEvent(new Event('change'));
+        });
+
+        document.getElementById('setTodayEndDateBtn').addEventListener('click', (event) => {
+            addRippleEffect(event);
+            const today = new Date();
+            endDateInput.value = today.toISOString().split('T')[0];
+            renderTimetable(); // Re-render after setting date
+        });
+
+        // Clear Date buttons
+        document.getElementById('clearStartDateBtn').addEventListener('click', (event) => {
+            addRippleEffect(event);
+            startDateInput.value = '';
+            renderTimetable(); // Re-render after clearing date
+        });
+
+        document.getElementById('clearEndDateBtn').addEventListener('click', (event) => {
+            addRippleEffect(event);
+            endDateInput.value = '';
+            renderTimetable(); // Re-render after clearing date
+        });
+
+
+        // Event listener for PDF download button click
+        downloadPdfBtn.addEventListener('click', async (event) => {
+            addRippleEffect(event);
+
+            const selectedOption = studentSelect.selectedOptions[0];
+            const selectedID = selectedOption ? selectedOption.value : '';
+            const selectedStudentName = selectedOption ? selectedOption.textContent.split('(')[0].trim() : '';
+
+            if (!selectedID) {
+                showModal("Missing Selection", "Please select a student.");
+                return;
+            }
+            if (currentDisplayedTimetableData.length === 0) {
+                showModal("No Data", "No timetable data is currently displayed for download.");
+                return;
+            }
+
+            const downloadFileName = `Timetable_${selectedID}_${currentTimetableTitle.textContent.replace(/[^a-zA-Z0-9_ -]/g, '').replace(/\s/g, '_')}.pdf`;
+            const titleForPdf = currentTimetableTitle.textContent; // Use the displayed title
+
+            await downloadTimetableAsPdf(currentDisplayedTimetableData, selectedStudentName, downloadFileName, titleForPdf, downloadPdfBtn);
+        });
+
+        // Event listener for JPEG download button click
+        downloadJpegBtn.addEventListener('click', async (event) => {
+            addRippleEffect(event);
+
+            const selectedOption = studentSelect.selectedOptions[0];
+            const selectedID = selectedOption ? selectedOption.value : '';
+            const selectedStudentName = selectedOption ? selectedOption.textContent.split('(')[0].trim() : '';
+
+            if (!selectedID) {
+                showModal("Missing Selection", "Please select a student.");
+                return;
+            }
+            if (currentDisplayedTimetableData.length === 0) {
+                showModal("No Data", "No timetable data is currently displayed for download.");
+                return;
+            }
+
+            const downloadFileName = `Timetable_${selectedID}_${currentTimetableTitle.textContent.replace(/[^a-zA-Z0-9_ -]/g, '').replace(/\s/g, '_')}.jpeg`;
+            const titleForJpeg = currentTimetableTitle.textContent; // Use the displayed title
+
+            await downloadTimetableAsJpeg(currentDisplayedTimetableData, selectedStudentName, downloadFileName, titleForJpeg, downloadJpegBtn);
         });
 
         // Add ripple effect to the Dashboard button
@@ -1025,10 +1370,6 @@
         }
 
         /* Custom Modal Functions */
-        const messageModal = document.getElementById('messageModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalMessage = document.getElementById('modalMessage');
-
         /**
          * Displays the custom message modal.
          * @param {string} title - The title of the message.
@@ -1044,6 +1385,8 @@
          * Hides the custom message modal.
          */
         function hideModal() {
+            modalTitle.textContent = '';
+            modalMessage.textContent = '';
             messageModal.classList.remove('show'); // Remove 'show' class to hide and trigger animation
         }
 
