@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Timetable Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Define CSS Variables for consistent theming */
         :root {
@@ -365,14 +366,16 @@
         <label for="weekStart">📅 Week Start Date</label>
         <input type="date" id="weekStart">
 
-        <label for="studentName">👤 Student Name</label>
-        <input type="text" id="studentName" placeholder="e.g., John Doe">
+        <label for="studentSelect">👤 Student Name</label>
+        <select id="studentSelect">
+            <option value="">Select Student</option>
+        </select>
 
         <label for="studentId">🆔 Student ID</label>
-        <input type="text" id="studentId" placeholder="e.g., S12345">
+        <input type="text" id="studentId" placeholder="Auto-filled / Enter Student ID" readonly>
 
         <label for="classroomName">🏫 Classroom Name</label>
-        <input type="text" id="classroomName" placeholder="e.g., Room 101">
+        <input type="text" id="classroomName" placeholder="Auto-filled / Enter Classroom Name" readonly>
 
         <div id="slots"></div>
 
@@ -402,6 +405,48 @@
         const modalIcon = document.getElementById("modalIcon");
         const modalMessage = document.getElementById("modalMessage");
 
+        // References to the main input fields
+        const studentSelect = document.getElementById("studentSelect");
+        const studentIdInput = document.getElementById("studentId");
+        const classroomNameInput = document.getElementById("classroomName");
+
+        // Predefined data for dropdowns
+        const teachers = [
+            { id: "ALF001", name: "AFLAH ZAMAN K" },
+            { id: "ALFTT25001", name: "Minha Anam V" },
+            { id: "ALFTT25002", name: "Akshai S" },
+            { id: "ALFTT25003", name: "Rahmath. M" },
+            { id: "ALFTT25004", name: "JANNATH N" },
+            { id: "ALFTT25005", name: "Hasna Sherin P" },
+            { id: "ALFTT25006", name: "Fathima Nifna m" },
+            { id: "ALFTT25007", name: "Ummu habeeba pk" },
+            { id: "ALFTT25008", name: "Juvairiyya" },
+            { id: "ALFTT25009", name: "Rihila -k" },
+            { id: "ALFTT25010", name: "Shifa.k" },
+            { id: "ALFTT25011", name: "SHIFNA. M" },
+            { id: "ALFTT25012", name: "Zeenath. K" },
+            { id: "ALFTT25013", name: "Amna pv" },
+            { id: "ALFTT25014", name: "Avandika T" },
+            { id: "ALFTT25015", name: "Shamila pk" },
+            { id: "ALFTT25016", name: "JAHANA SHERIN A" },
+            { id: "ALFTT25017", name: "SAFEERA THASNEEM K" },
+            { id: "ALFTT25018", name: "AKHILA CB" }
+        ];
+
+        const students = [
+            { id: "ALF25001", name: "ADHIL RAHMAN K", classroom: "C1-10" },
+            { id: "ALF25004", name: "LIYANA", classroom: "C2-8" },
+            { id: "ALF25005", name: "SHIMIL", classroom: "C3-9" },
+            { id: "ALF25003", name: "AYISHA SAEEDA.K", classroom: "C4-3" },
+            { id: "ALF25006", name: "AYISHA MEHAVISH", classroom: "C5-3" },
+            { id: "ALF25011", name: "ANSILA", classroom: "C6-1" },
+            { id: "ALF25010", name: "MEHZA ABBAS ", classroom: "C7-1" },
+            { id: "ALF25007", name: "Lamha ", classroom: "C8-7" },
+            { id: "ALF25009", name: "Faizan", classroom: "C9-3" },
+            { id: "ALF25008", name: "Ansha", classroom: "C10-6" },
+            { id: "ALF25002", name: "SHAMMAS", classroom: "D1-1" }
+        ];
+
         // Function to show custom modal
         function showModal(message, type = 'info') {
             modalMessage.textContent = message;
@@ -426,6 +471,68 @@
             customModal.classList.remove('visible');
         }
 
+        // Function to populate student dropdown
+        function populateStudentDropdown() {
+            studentSelect.innerHTML = '<option value="">Select Student</option>'; // Clear existing options
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.name} (ID: ${student.id})`;
+                studentSelect.appendChild(option);
+            });
+            // Add the "Other" option
+            const otherOption = document.createElement('option');
+            otherOption.value = 'other';
+            otherOption.textContent = 'Other Student (Manual Entry)';
+            studentSelect.appendChild(otherOption);
+        }
+
+        // Function to populate teacher dropdown for a given select element
+        function populateTeacherDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">Select Teacher</option>'; // Clear existing options
+            teachers.forEach(teacher => {
+                const option = document.createElement('option');
+                option.value = teacher.id;
+                option.textContent = `${teacher.name} (ID: ${teacher.id})`;
+                selectElement.appendChild(option);
+            });
+            // Add the "Other" option
+            const otherOption = document.createElement('option');
+            otherOption.value = 'other';
+            otherOption.textContent = 'Other Teacher (Manual Entry)';
+            selectElement.appendChild(otherOption);
+        }
+
+        // Event listener for student selection change
+        studentSelect.addEventListener('change', () => {
+            const selectedStudentId = studentSelect.value;
+            if (selectedStudentId === 'other') {
+                studentIdInput.value = '';
+                classroomNameInput.value = '';
+                studentIdInput.readOnly = false;
+                classroomNameInput.readOnly = false;
+                studentIdInput.placeholder = "Enter Student ID";
+                classroomNameInput.placeholder = "Enter Classroom Name";
+            } else {
+                const selectedStudent = students.find(s => s.id === selectedStudentId);
+                if (selectedStudent) {
+                    studentIdInput.value = selectedStudent.id;
+                    classroomNameInput.value = selectedStudent.classroom;
+                    studentIdInput.readOnly = true;
+                    classroomNameInput.readOnly = true;
+                    studentIdInput.placeholder = "Auto-filled Student ID";
+                    classroomNameInput.placeholder = "Auto-filled Classroom Name";
+                } else {
+                    studentIdInput.value = '';
+                    classroomNameInput.value = '';
+                    studentIdInput.readOnly = true; // Keep readonly if no student selected
+                    classroomNameInput.readOnly = true;
+                    studentIdInput.placeholder = "Auto-filled / Enter Student ID";
+                    classroomNameInput.placeholder = "Auto-filled / Enter Classroom Name";
+                }
+            }
+        });
+
         function addSlot() {
             const div = document.createElement("div");
             div.className = "slot";
@@ -444,11 +551,43 @@
                     <input type="text" placeholder="e.g., Mathematics">
                 </label>
                 <label>👨‍🏫 Teacher
-                    <input type="text" placeholder="e.g., Ms. Smith">
+                    <select class="teacher-select">
+                        <!-- Teachers will be populated here by JS -->
+                    </select>
                 </label>
+                <div class="other-teacher-inputs" style="display: none;">
+                    <label>Other Teacher Name
+                        <input type="text" class="other-teacher-name-input" placeholder="Enter Teacher Name">
+                    </label>
+                    <label>Other Teacher ID
+                        <input type="text" class="other-teacher-id-input" placeholder="Enter Teacher ID">
+                    </label>
+                </div>
                 <button class="remove-slot-button" onclick="removeSlot(this)">🗑 Remove</button>
             `;
             slotsContainer.appendChild(div);
+
+            // Populate the newly added teacher dropdown
+            const newTeacherSelect = div.querySelector('.teacher-select');
+            populateTeacherDropdown(newTeacherSelect);
+
+            // Add event listener for the new teacher select
+            newTeacherSelect.addEventListener('change', (event) => {
+                const otherTeacherInputsDiv = event.target.closest('.slot').querySelector('.other-teacher-inputs');
+                if (event.target.value === 'other') {
+                    otherTeacherInputsDiv.style.display = 'block';
+                    otherTeacherInputsDiv.querySelectorAll('input').forEach(input => {
+                        input.value = ''; // Clear previous values
+                        input.required = true; // Make them required when visible
+                    });
+                } else {
+                    otherTeacherInputsDiv.style.display = 'none';
+                    otherTeacherInputsDiv.querySelectorAll('input').forEach(input => {
+                        input.value = ''; // Clear values when hidden
+                        input.required = false; // Not required when hidden
+                    });
+                }
+            });
         }
 
         function removeSlot(btn) {
@@ -457,12 +596,34 @@
 
         async function submitData() {
             const weekStart = document.getElementById("weekStart").value;
-            const studentName = document.getElementById("studentName").value;
-            const studentId = document.getElementById("studentId").value;
-            const classroomName = document.getElementById("classroomName").value; // Added classroom name
 
-            if (!weekStart || !studentName || !studentId || !classroomName) {
-                showModal("⚠️ Please fill all required fields.", 'warning');
+            let studentActualName;
+            let studentId;
+            let classroomName;
+
+            if (studentSelect.value === 'other') {
+                studentActualName = studentSelect.value; // This will be 'other'
+                studentId = studentIdInput.value.trim();
+                classroomName = classroomNameInput.value.trim();
+                if (!studentId || !classroomName) {
+                    showModal("⚠️ Please fill in Student ID and Classroom Name for 'Other Student'.", 'warning');
+                    return;
+                }
+            } else {
+                const selectedStudent = students.find(s => s.id === studentSelect.value);
+                if (selectedStudent) {
+                    studentActualName = selectedStudent.name;
+                    studentId = selectedStudent.id;
+                    classroomName = selectedStudent.classroom;
+                } else {
+                    showModal("⚠️ Please select a student or choose 'Other Student'.", 'warning');
+                    return;
+                }
+            }
+
+
+            if (!weekStart) {
+                showModal("⚠️ Please fill the Week Start date.", 'warning');
                 return;
             }
 
@@ -476,37 +637,66 @@
             let hasEmptySlotField = false;
 
             slots.forEach(slot => {
-                const inputs = slot.querySelectorAll("select, input");
-                const day = inputs[0].value;
-                const time = inputs[1].value;
-                const subject = inputs[2].value;
-                const teacher = inputs[3].value;
+                const day = slot.querySelector('select:nth-of-type(1)').value; // Day select
+                const time = slot.querySelector('input[type="time"]').value;
+                const subject = slot.querySelector('input[type="text"]').value.trim();
+                const teacherSelect = slot.querySelector('.teacher-select');
 
-                // Check if any slot field is empty
-                if (!day || !time || !subject || !teacher) {
+                let teacherActualName;
+                let teacherId;
+
+                if (teacherSelect.value === 'other') {
+                    teacherActualName = slot.querySelector('.other-teacher-name-input').value.trim();
+                    teacherId = slot.querySelector('.other-teacher-id-input').value.trim();
+                    if (!teacherActualName || !teacherId) {
+                        hasEmptySlotField = true; // Mark as empty if 'other' is selected but fields are blank
+                    }
+                } else {
+                    const selectedTeacher = teachers.find(t => t.id === teacherSelect.value);
+                    if (selectedTeacher) {
+                        teacherActualName = selectedTeacher.name;
+                        teacherId = selectedTeacher.id;
+                    } else {
+                        hasEmptySlotField = true; // Mark as empty if no teacher selected from list and not 'other'
+                    }
+                }
+
+                // Check if any slot field is empty (including dynamically revealed 'other' fields)
+                if (!day || !time || !subject || !teacherActualName || !teacherId) {
                     hasEmptySlotField = true;
                 }
 
+                // Combine Student Name and Classroom
+                const studentNameClass = `${studentActualName} (${classroomName})`;
+                // Combine Teacher Name and Teacher ID
+                const teacherNameId = `${teacherActualName} (ID: ${teacherId})`;
+
                 data.push({
                     weekStart,
-                    studentName,
-                    studentId,
-                    classroomName, // Include classroom name in data
+                    studentNameClass,    // Combined field
+                    studentId,           // Separate Student ID
+                    studentActualName,   // Raw Student Name
+                    classroomName,       // Raw Classroom Name
                     day,
                     time,
                     subject,
-                    teacher
+                    teacherNameId,       // Combined field
+                    teacherActualName,   // Raw Teacher Name
+                    teacherId            // Raw Teacher ID
                 });
             });
 
             if (hasEmptySlotField) {
-                showModal("⚠️ Please ensure all fields in each slot are filled.", 'warning');
+                showModal("⚠️ Please ensure all fields in each slot are filled (Day, Time, Subject, Teacher Name, Teacher ID).", 'warning');
                 return;
             }
 
             // Show loading spinner
             submitBtn.classList.add('loading');
             submitBtn.disabled = true; // Disable button during submission
+
+            // Log the data being sent for debugging purposes
+            console.log("Data being sent to Google Apps Script:", data);
 
             try {
                 const response = await fetch(WEB_APP_URL, {
@@ -528,14 +718,19 @@
                     slotsContainer.innerHTML = ""; // Clear slots on success
                     // Optionally clear other form fields
                     document.getElementById("weekStart").value = '';
-                    document.getElementById("studentName").value = '';
-                    document.getElementById("studentId").value = '';
-                    document.getElementById("classroomName").value = '';
+                    studentSelect.value = ''; // Reset student dropdown
+                    studentIdInput.value = ''; // Clear auto-filled student ID
+                    classroomNameInput.value = ''; // Clear auto-filled classroom
+                    studentIdInput.readOnly = true; // Make them readonly again
+                    classroomNameInput.readOnly = true;
+                    studentIdInput.placeholder = "Auto-filled / Enter Student ID";
+                    classroomNameInput.placeholder = "Auto-filled / Enter Classroom Name";
                     addSlot(); // Add a new empty slot for convenience
                 } else {
                     showModal(`❌ Submission failed: ${responseText}`, 'error');
                 }
-            } catch (err) {
+            }
+            catch (err) {
                 console.error("Fetch error:", err);
                 showModal(`❌ Error submitting data: ${err.message}`, 'error');
             } finally {
@@ -552,8 +747,11 @@
             //   window.history.back();
         }
 
-        // Auto add 1 slot on page load
-        window.onload = () => addSlot();
+        // Auto add 1 slot and populate dropdowns on page load
+        window.onload = () => {
+            populateStudentDropdown();
+            addSlot();
+        };
     </script>
 </body>
 </html>
