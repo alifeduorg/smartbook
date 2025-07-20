@@ -409,6 +409,13 @@
 <body>
 
     <div class="main-container">
+        <!-- Logo at the top center -->
+        <img src="https://placehold.co/820x312/cccccc/000000?text=YOUR+ALIF+EDU+LOGO"
+             alt="Alif Edu Logo"
+             class="block mx-auto mb-6 max-w-full h-auto"
+             onerror="this.onerror=null;this.src='https://placehold.co/820x312/cccccc/000000?text=Alif+Edu+Logo+Not+Found';"
+             style="max-width: 820px; height: auto;">
+
         <h1><span class="icon">📊</span> Student Performance Dashboard</h1>
 
         <div class="mb-6 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-2">
@@ -467,25 +474,36 @@
             <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 download-hide-box">
                 <div>
                     <label for="examTypeFilter" class="block text-gray-700 font-medium mb-1">Filter by Exam Type:</label>
-                    <select id="examTypeFilter" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" style="width: 100%;">
+                    <select id="examTypeFilter" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" style="width: 100%;" onchange="updatePerformanceView()">
                         <option value="all">All Exam Types</option>
                     </select>
                 </div>
                 <div>
                     <label for="subjectFilter" class="block text-gray-700 font-medium mb-1">Filter by Subject:</label>
-                    <select id="subjectFilter" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" style="width: 100%;">
+                    <select id="subjectFilter" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" style="width: 100%;" onchange="updatePerformanceView()">
                         <option value="all">All Subjects</option>
                     </select>
                 </div>
             </div>
 
-            <div class="mb-6 download-hide-box">
-                <label for="chartDataType" class="block text-gray-700 font-medium mb-1">Chart Data Type:</label>
-                <select id="chartDataType" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" onchange="updatePerformanceView()" style="width: 100%;">
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="marks">Marks (Score)</option>
-                </select>
+            <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 download-hide-box">
+                <div>
+                    <label for="chartDataType" class="block text-gray-700 font-medium mb-1">Chart Data Type:</label>
+                    <select id="chartDataType" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" onchange="updatePerformanceView()" style="width: 100%;">
+                        <option value="percentage">Percentage (%)</option>
+                        <option value="marks">Marks (Score)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="graphGrouping" class="block text-gray-700 font-medium mb-1">Group Graph By:</label>
+                    <select id="graphGrouping" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" onchange="updatePerformanceView()" style="width: 100%;">
+                        <option value="individual">Individual Exam Results</option>
+                        <option value="subject_average">Average by Subject</option>
+                        <option value="exam_type_average">Average by Exam Type</option>
+                    </select>
+                </div>
             </div>
+
 
             <h3 class="text-xl font-bold text-indigo-700 mb-3 mt-6">Detailed Exam Results</h3>
             <div class="overflow-x-auto rounded-xl shadow-md mb-6">
@@ -620,6 +638,8 @@
                 allStudentData = data.map(record => ({
                     ...record,
                     StudentName: cleanText(record.StudentName),
+                    Examtype: cleanText(record.Examtype), // Clean Examtype
+                    Subject: cleanText(record.Subject),   // Clean Subject
                     Mark: parseFloat(record.Mark),
                     OutOf: parseFloat(record.OutOf),
                     Percentage: parseFloat(record.Percentage)
@@ -738,6 +758,7 @@
             const examTypeFilter = document.getElementById('examTypeFilter');
             const subjectFilter = document.getElementById('subjectFilter');
             const chartDataTypeFilter = document.getElementById('chartDataType');
+            const graphGroupingFilter = document.getElementById('graphGrouping'); // New filter
             const overallAveragePercentage = document.getElementById('overallAveragePercentage');
             const teacherRemarks = document.getElementById('teacherRemarks'); // Get the textarea
 
@@ -771,6 +792,7 @@
             examTypeFilter.value = 'all';
             subjectFilter.value = 'all';
             chartDataTypeFilter.value = 'percentage';
+            graphGroupingFilter.value = 'individual'; // Set default grouping
             teacherRemarks.value = ''; // Clear remarks when opening modal for a new student
 
             modalStudentName.textContent = `Performance for: ${cleanText(currentStudentRecords[0].StudentName)}`;
@@ -784,8 +806,9 @@
 
             updatePerformanceView();
 
-            examTypeFilter.onchange = updatePerformanceView;
-            subjectFilter.onchange = updatePerformanceView;
+            // Event listeners are now set directly in HTML for simplicity (onchange)
+            // examTypeFilter.onchange = updatePerformanceView;
+            // subjectFilter.onchange = updatePerformanceView;
 
             modal.classList.add('visible'); // Use the new modal visibility class
             setTimeout(() => {
@@ -822,6 +845,7 @@
             const examTypeFilter = document.getElementById('examTypeFilter');
             const subjectFilter = document.getElementById('subjectFilter');
             const chartDataType = document.getElementById('chartDataType').value; // Get selected chart data type
+            const graphGrouping = document.getElementById('graphGrouping').value; // Get selected graph grouping
 
             examDetailsTableBody.innerHTML = '';
 
@@ -836,6 +860,7 @@
                 filteredRecords = filteredRecords.filter(record => cleanText(record.Subject) === selectedSubject);
             }
 
+            // Always sort by timestamp for the detailed table, regardless of graph grouping
             filteredRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
             // --- Render Detailed Exam Table ---
@@ -881,31 +906,8 @@
             }
 
 
-            // --- Prepare Chart Data ---
+            // --- Prepare Chart Data based on Grouping ---
             let labels = [];
-            if (selectedSubject !== 'all') {
-                labels = filteredRecords.map(record => {
-                    let examType = cleanText(record.Examtype);
-                    // Shorten "Academic Test AT1" to "AT1" etc.
-                    if (examType.startsWith("Academic Test ")) {
-                        examType = examType.replace("Academic Test ", "");
-                    }
-                    return `${examType} (${new Date(record.Timestamp).toLocaleDateString()})`;
-                });
-            } else {
-                labels = filteredRecords.map(record => {
-                    let examType = cleanText(record.Examtype);
-                    let subject = cleanText(record.Subject);
-                    // Shorten "Academic Test AT1" to "AT1" etc.
-                    if (examType.startsWith("Academic Test ")) {
-                        examType = examType.replace("Academic Test ", "");
-                    }
-                    // Shorten subject to first 3 letters
-                    subject = subject.substring(0, 3);
-                    return `${examType} (${new Date(record.Timestamp).toLocaleDateString()}) - ${subject}`;
-                });
-            }
-
             let chartData = [];
             let yAxisLabel = '';
             let yAxisMax = 100;
@@ -913,20 +915,72 @@
             let tooltipCallback = function(context) { return `${context.dataset.label}: ${context.raw}%`; };
 
             if (chartDataType === 'percentage') {
-                chartData = filteredRecords.map(record => record.Percentage);
                 yAxisLabel = 'Percentage (%)';
                 yAxisMax = 100;
                 yAxisCallback = function(value) { return value + '%'; };
                 tooltipCallback = function(context) { return `${context.dataset.label}: ${context.raw}%`; };
             } else if (chartDataType === 'marks') {
-                chartData = filteredRecords.map(record => record.Mark);
                 yAxisLabel = 'Marks (Score)';
-                // Determine max mark dynamically for marks chart
-                yAxisMax = Math.max(...filteredRecords.map(record => record.OutOf), 100); // Ensure at least 100 for visual consistency
-                yAxisCallback = function(value) { return value; }; // No '%' for marks
+                yAxisMax = Math.max(...filteredRecords.map(record => record.OutOf), 100);
+                yAxisCallback = function(value) { return value; };
                 tooltipCallback = function(context) {
                     const record = filteredRecords[context.dataIndex];
-                    return `${context.dataset.label}: ${record.Mark} out of ${record.OutOf}`; // Updated tooltip for marks
+                    return `${context.dataset.label}: ${record.Mark} out of ${record.OutOf}`;
+                };
+            }
+
+            if (graphGrouping === 'individual') {
+                // Sort by timestamp for individual results
+                filteredRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+                labels = filteredRecords.map(record => {
+                    const examType = getShortExamName(cleanText(record.Examtype));
+                    const subject = cleanText(record.Subject);
+                    const date = new Date(record.Timestamp).toLocaleDateString();
+                    return `${examType} (${date}) - ${subject}`;
+                });
+                chartData = filteredRecords.map(record => chartDataType === 'percentage' ? record.Percentage : record.Mark);
+            } else if (graphGrouping === 'subject_average') {
+                const groupedBySubject = {};
+                filteredRecords.forEach(record => {
+                    const subject = cleanText(record.Subject);
+                    if (!groupedBySubject[subject]) {
+                        groupedBySubject[subject] = [];
+                    }
+                    groupedBySubject[subject].push(chartDataType === 'percentage' ? record.Percentage : record.Mark);
+                });
+
+                labels = Object.keys(groupedBySubject).sort();
+                chartData = labels.map(subject => {
+                    const sum = groupedBySubject[subject].reduce((acc, val) => acc + val, 0);
+                    return sum / groupedBySubject[subject].length;
+                });
+                yAxisLabel = chartDataType === 'percentage' ? 'Average Percentage (%)' : 'Average Marks (Score)';
+                tooltipCallback = function(context) {
+                    const groupLabel = context.label;
+                    const value = context.raw.toFixed(2); // Format average
+                    return `Average for ${groupLabel}: ${value}${chartDataType === 'percentage' ? '%' : ''}`;
+                };
+
+            } else if (graphGrouping === 'exam_type_average') {
+                const groupedByExamType = {};
+                filteredRecords.forEach(record => {
+                    const examType = cleanText(record.Examtype);
+                    if (!groupedByExamType[examType]) {
+                        groupedByExamType[examType] = [];
+                    }
+                    groupedByExamType[examType].push(chartDataType === 'percentage' ? record.Percentage : record.Mark);
+                });
+
+                labels = Object.keys(groupedByExamType).sort();
+                chartData = labels.map(examType => {
+                    const sum = groupedByExamType[examType].reduce((acc, val) => acc + val, 0);
+                    return sum / groupedByExamType[examType].length;
+                });
+                yAxisLabel = chartDataType === 'percentage' ? 'Average Percentage (%)' : 'Average Marks (Score)';
+                tooltipCallback = function(context) {
+                    const groupLabel = context.label;
+                    const value = context.raw.toFixed(2); // Format average
+                    return `Average for ${groupLabel}: ${value}${chartDataType === 'percentage' ? '%' : ''}`;
                 };
             }
 
@@ -985,7 +1039,7 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Exam Instances',
+                                text: graphGrouping === 'individual' ? 'Exam Instances' : (graphGrouping === 'subject_average' ? 'Subjects' : 'Exam Types'),
                                 color: '#2d3748',
                                 font: {
                                     size: 16,
@@ -1056,7 +1110,7 @@
             // Create a new container for downloadable content
             const downloadableContent = document.createElement('div');
             downloadableContent.id = 'downloadableContent';
-            downloadableContent.style.width = '100%';
+            downloadableContent.style.width = '1200px'; // Set a fixed width for high-res capture
             downloadableContent.style.padding = '20px';
             downloadableContent.style.boxSizing = 'border-box';
             downloadableContent.style.fontFamily = 'Poppins, sans-serif';
@@ -1064,18 +1118,17 @@
             downloadableContent.style.backgroundColor = '#fff'; // Ensure white background for PDF/JPEG
             downloadableContent.style.position = 'relative'; // For absolute positioning of logo
 
-            // Add background logo (watermark)
+            // ADDED: Logo at the top center
             const logoImg = document.createElement('img');
             // IMPORTANT: Replace this URL with your actual public logo URL
-            logoImg.src = 'alif edu (600 x 300 px) (820 x 312 px).png'; // Using a generic placeholder logo
-            logoImg.style.position = 'absolute';
-            logoImg.style.top = '50%';
-            logoImg.style.left = '50%';
-            logoImg.style.transform = 'translate(-50%, -50%)';
-            logoImg.style.width = '200px'; // Adjust size as needed
+            // This placeholder is 820x312 pixels as requested.
+            logoImg.src = 'https://placehold.co/820x312/cccccc/000000?text=YOUR+ALIF+EDU+LOGO';
+            logoImg.alt = 'Alif Edu Logo';
+            logoImg.style.display = 'block'; // Make it a block element
+            logoImg.style.margin = '0 auto 20px auto'; // Center it and add margin below
+            logoImg.style.maxWidth = '80%'; // Ensure it's responsive within the content
             logoImg.style.height = 'auto'; // Maintain aspect ratio
-            logoImg.style.opacity = '0.1'; // Watermark effect
-            logoImg.style.zIndex = '0'; // Behind content
+            logoImg.style.zIndex = '1'; // Ensure it's above other elements if needed
             downloadableContent.appendChild(logoImg);
 
 
@@ -1154,6 +1207,8 @@
             const modalContent = document.getElementById('modalContent');
             const downloadableContent = document.getElementById('downloadableContent');
             if (downloadableContent) {
+                // Remove the temporary fixed width
+                downloadableContent.style.width = '';
                 modalContent.removeChild(downloadableContent);
             }
 
