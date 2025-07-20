@@ -331,16 +331,61 @@
             width: 20px;
             height: 20px;
             animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
+            display: inline-block; /* Changed to inline-block */
+            vertical-align: middle; /* Align with text */
+            margin-right: 8px; /* Space between spinner and text */
         }
 
-        .loading-indicator .spinner {
-            display: block;
+        .loading-indicator {
+            display: flex; /* Use flexbox for centering */
+            align-items: center; /* Vertically center */
+            justify-content: center; /* Horizontally center */
+            padding: 10px 0;
+            color: #666;
+            font-weight: 500;
+        }
+        .loading-indicator.hidden {
+            display: none;
         }
 
-        .loading-indicator span {
-            margin-left: 10px;
+        /* Download Message Box */
+        #downloadMessage {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            z-index: 1002;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            border: 1px solid var(--primary-blue);
         }
+        #downloadMessage.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #downloadMessage button {
+            background-color: var(--primary-blue);
+            color: var(--light-text);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        #downloadMessage button:hover {
+            background-color: var(--secondary-darkblue);
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -507,7 +552,7 @@
                 </div>
                 <div>
                     <label for="graphGrouping" class="block text-gray-700 font-medium mb-1">Group Graph By:</label>
-                    <select id="graphGrouping" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" onchange="updatePerformanceView()" style="width: 100%;">
+                    <select id="graphGrouping" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" style="width: 100%;">
                         <option value="individual">Individual Exam Results</option>
                         <option value="subject_average">Average by Subject</option>
                         <option value="exam_type_average">Average by Exam Type</option>
@@ -580,6 +625,16 @@
     <!-- Toast message for copy to clipboard -->
     <div id="copyToast">
         Summary Copied to Clipboard!
+    </div>
+
+    <!-- Download Message Box -->
+    <div id="downloadMessage" class="hidden">
+        <p class="text-lg font-semibold mb-4">Download Issue</p>
+        <p class="text-sm text-gray-700 mb-4">
+            If the download did not start automatically, your browser might have blocked it.
+            Please ensure pop-ups are allowed for this site, or try saving the image manually if it opened in a new tab.
+        </p>
+        <button onclick="hideDownloadMessage()">OK</button>
     </div>
 
     <script>
@@ -1115,6 +1170,9 @@
             const studentClass = document.getElementById('modalStudentId').textContent.split('|')[1].replace('Class:', '').trim();
             const teacherRemarks = document.getElementById('teacherRemarks').value.trim();
 
+            // Show loading indicator
+            showLoadingIndicator('Preparing for download...');
+
             // Store original display styles of main modal elements to revert later
             const elementsToHide = modalContent.children;
             originalElementsState = [];
@@ -1135,7 +1193,8 @@
             if (performanceChartContainer) {
                 originalElementsState.push({ element: performanceChartContainer, originalStyle: performanceChartContainer.style.cssText });
                 performanceChartContainer.style.maxHeight = 'none';
-                performanceChartContainer.style.height = '600px'; // Give it a generous height for capture
+                // Adjusted height for better fit in downloaded reports
+                performanceChartContainer.style.height = '450px'; // Reduced from 600px
             }
 
 
@@ -1219,17 +1278,18 @@
             downloadableContent.innerHTML += `
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; position: relative; z-index: 1;">
                     <div style="text-align: center; width: 48%; padding-right: 10px;">
-                        <div style="height: 60px; border-bottom: 1px solid #444; margin-bottom: 10px;"></div>
+                        <div style="height: 60px; border-b border-gray-400 mb-2"></div>
                         <p style="font-size: 0.9em; font-weight: 600; color: #555;">Principal's Signature</p>
                     </div>
                     <div style="text-align: center; width: 48%; padding-left: 10px;">
-                        <div style="height: 60px; border-bottom: 1px solid #444; margin-bottom: 10px;"></div>
+                        <div style="height: 60px; border-b border-gray-400 mb-2"></div>
                         <p style="font-size: 0.9em; font-weight: 600; color: #555;">Official Seal</p>
                     </div>
                 </div>
             `;
 
             modalContent.appendChild(downloadableContent);
+            hideLoadingIndicator(); // Hide loading indicator after content is prepared
         }
 
         /**
@@ -1264,6 +1324,7 @@
             const studentName = cleanText(document.getElementById('modalStudentName').textContent.replace('Performance for: ', ''));
             const studentId = document.getElementById('modalStudentId').textContent.split('|')[0].replace('Student ID: ', '').trim();
 
+            showLoadingIndicator('Generating PDF...');
             await prepareModalForDownload(); // Await this as it involves image loading
             const downloadableContent = document.getElementById('downloadableContent');
 
@@ -1279,6 +1340,7 @@
             });
 
             revertModalFromDownload();
+            hideLoadingIndicator(); // Hide loading indicator after download is complete
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
@@ -1310,6 +1372,7 @@
             const studentName = cleanText(document.getElementById('modalStudentName').textContent.replace('Performance for: ', ''));
             const studentId = document.getElementById('modalStudentId').textContent.split('|')[0].replace('Student ID: ', '').trim();
 
+            showLoadingIndicator('Generating JPEG...');
             await prepareModalForDownload(); // Await this as it involves image loading
             const downloadableContent = document.getElementById('downloadableContent');
 
@@ -1325,17 +1388,62 @@
             });
 
             revertModalFromDownload();
+            hideLoadingIndicator(); // Hide loading indicator after download is complete
 
             const imgData = canvas.toDataURL('image/jpeg', 0.95); // 0.95 is JPEG quality for higher clarity
             
-            // Open in a new window/tab for better mobile compatibility
-            const newWindow = window.open(imgData, '_blank');
-            if (newWindow) {
-                newWindow.focus();
-            } else {
-                // Fallback for pop-up blockers
-                alert('Please allow pop-ups for this site to download the image.');
-            }
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = `Student_Performance_${studentName.replace(/[^a-zA-Z0-9]/g, '_')}_${studentId}.jpeg`;
+            document.body.appendChild(link); // Append to body to ensure it's in the DOM
+            link.click(); // Programmatically click the link to trigger download
+            document.body.removeChild(link); // Clean up the temporary link
+
+            // Show a message if the download didn't start (might still be pop-up blocker or other issue)
+            // This is a fallback and might not always catch all scenarios.
+            setTimeout(() => {
+                if (!link.download) { // Simple check if download attribute was honored
+                     showDownloadMessage();
+                }
+            }, 500); // Give it a short moment to try downloading
+        }
+
+        /**
+         * Shows the custom download message box.
+         */
+        function showDownloadMessage() {
+            const messageBox = document.getElementById('downloadMessage');
+            messageBox.classList.remove('hidden');
+            messageBox.classList.add('show');
+        }
+
+        /**
+         * Hides the custom download message box.
+         */
+        function hideDownloadMessage() {
+            const messageBox = document.getElementById('downloadMessage');
+            messageBox.classList.remove('show');
+            messageBox.classList.add('hidden');
+        }
+
+        /**
+         * Shows the loading indicator with a given message.
+         * @param {string} message - The message to display.
+         */
+        function showLoadingIndicator(message) {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const loadingSpan = loadingIndicator.querySelector('span');
+            loadingSpan.textContent = message;
+            loadingIndicator.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the loading indicator.
+         */
+        function hideLoadingIndicator() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.classList.add('hidden');
         }
 
         /**
