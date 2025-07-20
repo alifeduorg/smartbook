@@ -4,132 +4,402 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alif Edu - Billing Panel</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Define CSS Variables for consistent theming */
+        :root {
+            --primary-blue: #4A90E2; /* A friendly, accessible blue */
+            --secondary-darkblue: #2F6F9D; /* A darker shade for accents */
+            --accent-orange: #FF7043; /* A vibrant orange for highlights/buttons */
+            --light-gray: #F0F2F5; /* A very light background gray */
+            --mid-gray: #E0E5EC; /* Slightly darker background shade */
+            --dark-text: #333; /* Standard dark text color */
+            --light-text: #fff; /* White text for dark backgrounds */
+            --border-radius: 12px; /* Consistent rounded corners */
+            --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+            --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
+            --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow */
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
+            font-family: 'Poppins', sans-serif; /* Modern, friendly font */
+            background: linear-gradient(135deg, var(--light-gray), var(--mid-gray)); /* Soft gradient background */
+            color: var(--dark-text);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            align-items: flex-start; /* Align content to the top */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            position: relative; /* For background animations */
         }
-        .container {
-            background-color: #fff;
+
+        /* Background Animation - Subtle, floating shapes */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3); /* Translucent white for a dreamy effect */
+            border-radius: 50%; /* Circular shapes */
+            opacity: 0.6;
+            filter: blur(80px); /* Soft blur */
+            z-index: -1; /* Behind content */
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            left: -50px;
+            animation: moveShape 15s infinite alternate ease-in-out; /* Slower animation */
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            bottom: -80px;
+            right: -80px;
+            animation: moveShape 20s infinite alternate-reverse ease-in-out; /* Different timing for variety */
+        }
+
+        @keyframes moveShape {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.05);
+            }
+            50% {
+                transform: translate(0, 50px) scale(0.95);
+            }
+            75% {
+                transform: translate(-40px, -20px) scale(1.1);
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        /* Main form container styling */
+        .form-container {
+            background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for glassmorphism */
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 700px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            max-width: 600px; /* Max width for readability on large screens */
+            width: 100%; /* Full width on smaller screens */
+            margin-top: 40px; /* Space from top */
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+            transform: translateY(0); /* Initial state for hover effect */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
-        h2 {
+
+        .form-container:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: var(--box-shadow-hover);
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 2.2em;
             text-align: center;
-            color: #333;
             margin-bottom: 30px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between icon and text */
         }
-        .form-group {
-            margin-bottom: 15px;
+
+        h1 .icon {
+            font-size: 1.2em; /* Larger icon */
+            color: var(--accent-orange); /* Accent color for icon */
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: bold;
+            margin: 15px 0 8px;
+            font-weight: 600;
+            color: var(--dark-text);
+            font-size: 0.95em;
         }
+
         input[type="text"],
         input[type="number"],
-        input[type="date"], /* Added for date input */
+        input[type="date"],
         select,
         textarea {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd; /* Light border */
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05); /* Inner shadow for depth */
+            font-size: 1em;
+            margin-bottom: 15px;
+            width: calc(100% - 30px); /* Adjust for padding */
+            max-width: 100%; /* Ensure it doesn't exceed parent width */
+            transition: all 0.3s ease; /* Smooth transitions */
+            background-color: #fcfcfc; /* Slightly off-white background */
         }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue); /* Highlight on focus */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Glow effect */
+        }
+
+        input[readonly] {
+            background-color: #e9e9e9; /* Style for read-only fields */
+            cursor: not-allowed;
+        }
+
         .hidden {
-            display: none;
+            display: none !important; /* Use !important to ensure override */
         }
+
         .fee-calculation-section {
             background-color: #e9f7ef;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
             margin-top: 15px;
             border: 1px dashed #a8e6cf;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03); /* Subtle inner shadow */
         }
         .fee-calculation-section label {
-            font-weight: normal;
+            font-weight: 500; /* Slightly lighter for sub-labels */
+            margin-top: 5px;
+            margin-bottom: 2px;
         }
+
         .total-fee {
-            font-size: 20px;
-            font-weight: bold;
-            color: #28a745;
+            font-size: 1.5em; /* Larger font size */
+            font-weight: 700; /* Bolder */
+            color: #28a745; /* Green for total */
             text-align: right;
-            margin-top: 20px;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--mid-gray); /* Separator line */
         }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 20px;
+
+        /* Custom button 3D effect */
+        .button-3d {
+            position: relative;
+            background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%); /* Indigo gradient */
+            box-shadow: 0px 5px 0px 0px #4338ca; /* Darker shadow for 3D effect */
+            transition: all 0.1s ease-in-out;
+            transform: translateY(0);
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
             border: none;
-            border-radius: 4px;
+            color: var(--light-text);
+            font-weight: 600;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%; /* Ensure it takes full width */
+            margin-top: 30px; /* Space above button */
+        }
+
+        .button-3d:hover:not(:disabled) {
+            background: linear-gradient(180deg, #4f46e5 0%, #6366f1 100%); /* Reverse gradient on hover */
+            box-shadow: 0px 2px 0px 0px #4338ca; /* Smaller shadow on hover */
+            transform: translateY(3px); /* Move down slightly on hover */
+        }
+
+        .button-3d:active:not(:disabled) {
+            box-shadow: 0px 0px 0px 0px #4338ca;
+            transform: translateY(5px); /* Simulate press */
+        }
+
+        .button-3d:disabled {
+            background: #a78bfa; /* Lighter purple for disabled */
+            box-shadow: 0px 3px 0px 0px #8b5cf6;
+            transform: translateY(0);
+            cursor: not-allowed;
+            opacity: 0.7; /* Slightly dim disabled button */
+        }
+
+        /* Custom Modal for Alerts */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* On top of everything */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
         }
-        .response-message {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
+
+        .modal-content {
+            background: var(--light-text);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
             text-align: center;
-            font-weight: bold;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
         }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
         }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .modal-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .modal-icon.success { color: #28a745; }
+        .modal-icon.error { color: #dc3545; }
+        .modal-icon.warning { color: #FF7043; }
+        .modal-icon.info { color: var(--primary-blue); } /* Added info color */
+
+        .modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .modal-button {
+            background: var(--primary-blue);
+            color: var(--light-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .modal-button:hover {
+            background: var(--secondary-darkblue);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none; /* Hidden by default */
+        }
+        .submit-button.loading .spinner {
+            display: block;
+        }
+        .submit-button.loading #buttonText {
+            display: none; /* Hide text when loading */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                align-items: center; /* Center content vertically on smaller screens */
+            }
+
+            .form-container {
+                margin-top: 20px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            input[type="date"],
+            textarea,
+            select {
+                font-size: 0.95em;
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .form-container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Alif Edu - Billing Panel</h2>
+    <!-- Custom Modal for Alerts -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalIcon" class="modal-icon"></div>
+            <p id="modalMessage" class="modal-message"></p>
+            <button class="modal-button" onclick="hideModal()">OK</button>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h1>
+            <span class="icon">💰</span> Alif Edu - Billing Panel
+        </h1>
+
         <form id="billingForm" method="POST" action="https://script.google.com/macros/s/AKfycbyo0QABFkMjTb_hKysA80IiV2GPZjTjHL3UCmjU0NVCDBMuFAqcM83bthaasd3iYiLB/exec">
-            <div class="form-group">
+            <div>
                 <label for="studentName">Student Name:</label>
-                <input type="text" id="studentName" name="StudentName" required>
+                <select id="studentName" name="StudentName" required
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    <option value="">--Select Student--</option>
+                    <!-- Student names will be populated here by JavaScript -->
+                </select>
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="date">Date:</label>
-                <input type="date" id="date" name="Date" required>
+                <input type="date" id="date" name="Date" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="studentId">Student ID:</label>
-                <input type="text" id="studentId" name="StudentID" required>
+                <input type="text" id="studentId" name="StudentID" required readonly
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="class">Class:</label>
-                <input type="text" id="class" name="Class" required>
+                <input type="text" id="class" name="Class" required readonly
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="feeType">Type of Fee:</label>
-                <select id="feeType" name="FeeType" required>
+                <select id="feeType" name="FeeType" required
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
                     <option value="">--Select Fee Type--</option>
                     <option value="Admission Fee">Admission Fee</option>
                     <option value="Tuition Fee">Tuition Fee</option>
@@ -140,19 +410,22 @@
             </div>
 
             <div id="tuitionFeeSection" class="fee-calculation-section hidden">
-                <div class="form-group">
+                <div>
                     <label for="tuitionHours">Tuition Hours:</label>
-                    <input type="number" id="tuitionHours" name="TuitionHours" min="0" step="any">
+                    <input type="number" id="tuitionHours" name="TuitionHours" min="0" step="any"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
                 </div>
-                <div class="form-group">
+                <div>
                     <label for="ratePerHour">Rate Per Hour (INR):</label>
-                    <input type="number" id="ratePerHour" name="RatePerHour" min="0" step="0.01">
+                    <input type="number" id="ratePerHour" name="RatePerHour" min="0" step="0.01"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
                 </div>
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="otherFeeAmount" id="otherFeeAmountLabel" class="hidden">Other Fee Amount (INR):</label>
-                <input type="number" id="otherFeeAmount" name="OtherFeeAmount" min="0" step="0.01" class="hidden">
+                <input type="number" id="otherFeeAmount" name="OtherFeeAmount" min="0" step="0.01" class="hidden
+                       mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
             </div>
 
             <div class="total-fee">
@@ -160,9 +433,10 @@
                 <input type="hidden" id="totalFee" name="TotalFee">
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="paymentMode">Payment Mode:</label>
-                <select id="paymentMode" name="PaymentMode" required>
+                <select id="paymentMode" name="PaymentMode" required
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
                     <option value="">--Select Payment Mode--</option>
                     <option value="UPI">UPI</option>
                     <option value="Cash">Cash</option>
@@ -172,19 +446,45 @@
                 </select>
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="remark">Remark:</label>
-                <textarea id="remark" name="Remark" rows="3"></textarea>
+                <textarea id="remark" name="Remark" rows="3"
+                          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
             </div>
 
-            <button type="submit">Generate Bill & Submit</button>
+            <button type="submit" id="submitButton" class="button-3d">
+                <span id="buttonText">Generate Bill & Submit</span>
+                <span id="spinner" class="spinner">
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </span>
+            </button>
         </form>
-        <div id="responseMessage" class="response-message hidden"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Student data provided by the user
+            const studentsData = [
+                { id: "ALF25001", name: "ADHIL RAHMAN K", classroom: "C1-10" },
+                { id: "ALF25004", name: "LIYANA", classroom: "C2-8" },
+                { id: "ALF25005", name: "SHIMIL", classroom: "C3-9" },
+                { id: "ALF25003", name: "AYISHA SAEEDA.K", classroom: "C4-3" },
+                { id: "ALF25006", name: "AYISHA MEHAVISH", classroom: "C5-3" },
+                { id: "ALF25011", name: "ANSILA", classroom: "C6-1" },
+                { id: "ALF25010", name: "MEHZA ABBAS", classroom: "C7-1" },
+                { id: "ALF25007", name: "Lamha", classroom: "C8-7" },
+                { id: "ALF25009", name: "Faizan", classroom: "C9-3" },
+                { id: "ALF25008", name: "Ansha", classroom: "C10-6" },
+                { id: "ALF25002", name: "SHAMMAS", classroom: "D1-1" }
+            ];
+
             const dateInput = document.getElementById('date');
+            const studentNameSelect = document.getElementById('studentName');
+            const studentIdInput = document.getElementById('studentId');
+            const classInput = document.getElementById('class');
             const feeTypeSelect = document.getElementById('feeType');
             const tuitionFeeSection = document.getElementById('tuitionFeeSection');
             const tuitionHoursInput = document.getElementById('tuitionHours');
@@ -194,11 +494,37 @@
             const displayTotalFeeSpan = document.getElementById('displayTotalFee');
             const totalFeeHiddenInput = document.getElementById('totalFee');
             const billingForm = document.getElementById('billingForm');
-            const responseMessageDiv = document.getElementById('responseMessage');
+            const submitButton = document.getElementById('submitButton');
+            const spinner = document.getElementById('spinner');
+            const buttonText = document.getElementById('buttonText');
 
             // Set current date as default, but allow changing
             const today = new Date();
             dateInput.value = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+            // Populate the student name dropdown
+            function populateStudentNames() {
+                studentsData.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id; // Use ID as value for easy lookup
+                    option.textContent = student.name;
+                    studentNameSelect.appendChild(option);
+                });
+            }
+
+            // Function to update Student ID and Class based on selected student name
+            function updateStudentDetails() {
+                const selectedStudentId = studentNameSelect.value;
+                const selectedStudent = studentsData.find(student => student.id === selectedStudentId);
+
+                if (selectedStudent) {
+                    studentIdInput.value = selectedStudent.id;
+                    classInput.value = selectedStudent.classroom;
+                } else {
+                    studentIdInput.value = '';
+                    classInput.value = '';
+                }
+            }
 
             function calculateTotalFee() {
                 let total = 0;
@@ -214,6 +540,40 @@
                 displayTotalFeeSpan.textContent = total.toFixed(2);
                 totalFeeHiddenInput.value = total.toFixed(2);
             }
+
+            // Custom Modal Functions
+            function showModal(type, message) {
+                const customModal = document.getElementById('customModal');
+                const modalIcon = document.getElementById('modalIcon');
+                const modalMessage = document.getElementById('modalMessage');
+
+                modalIcon.className = 'modal-icon'; // Reset classes
+                modalMessage.textContent = message;
+
+                if (type === 'success') {
+                    modalIcon.classList.add('success');
+                    modalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                } else if (type === 'error') {
+                    modalIcon.classList.add('error');
+                    modalIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                } else if (type === 'warning') {
+                    modalIcon.classList.add('warning');
+                    modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                } else if (type === 'info') {
+                    modalIcon.classList.add('info');
+                    modalIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                }
+
+                customModal.classList.add('visible');
+            }
+
+            window.hideModal = function() { // Make it globally accessible for onclick
+                const customModal = document.getElementById('customModal');
+                customModal.classList.remove('visible');
+            }
+
+            // Event listener for student name selection
+            studentNameSelect.addEventListener('change', updateStudentDetails);
 
             feeTypeSelect.addEventListener('change', function() {
                 // Hide all conditional sections first
@@ -259,6 +619,10 @@
             billingForm.addEventListener('submit', function(e) {
                 e.preventDefault(); // Prevent default form submission
 
+                // Disable button and show spinner to prevent multiple clicks
+                submitButton.disabled = true;
+                submitButton.classList.add('submit-button', 'loading'); // Add classes for styling spinner
+
                 const formData = new FormData(billingForm);
                 const url = billingForm.action; // Your Google Apps Script Web App URL
 
@@ -273,9 +637,7 @@
                     throw new Error('Network response was not ok.');
                 })
                 .then(data => {
-                    responseMessageDiv.classList.remove('hidden', 'error');
-                    responseMessageDiv.classList.add('success');
-                    responseMessageDiv.textContent = 'Bill generated and data submitted successfully!';
+                    showModal('success', 'Bill generated and data submitted successfully!');
                     billingForm.reset(); // Clear the form
                     dateInput.value = new Date().toISOString().split('T')[0]; // Reset date to today's date
                     calculateTotalFee(); // Reset total fee display
@@ -283,16 +645,24 @@
                     tuitionFeeSection.classList.add('hidden');
                     otherFeeAmountInput.classList.add('hidden');
                     otherFeeAmountLabel.classList.add('hidden');
+                    // Reset student details
+                    studentNameSelect.value = '';
+                    studentIdInput.value = '';
+                    classInput.value = '';
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    responseMessageDiv.classList.remove('hidden', 'success');
-                    responseMessageDiv.classList.add('error');
-                    responseMessageDiv.textContent = 'Error submitting data. Please try again.';
+                    showModal('error', 'Error submitting data. Please try again.');
+                })
+                .finally(() => {
+                    // Re-enable button and hide spinner regardless of success or failure
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('submit-button', 'loading');
                 });
             });
 
-            // Initial calculation on page load
+            // Initial calls on page load
+            populateStudentNames();
             calculateTotalFee();
         });
     </script>
