@@ -421,7 +421,7 @@
             URL has not been replaced with a valid, accessible image URL.
             ***************************************************************************************************
         -->
-        <img src="alif edu (600 x 300 px) (820 x 312 px).png"
+        <img src="YOUR_ALIF_EDU_LOGO_PUBLIC_URL_HERE"
              alt="alif edu (600 x 300 px) (820 x 312 px).png"
              class="block mx-auto mb-6 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto"
              onerror="this.onerror=null;this.src='https://placehold.co/300x150/cccccc/000000?text=Alif+Edu+Logo+Not+Found';"
@@ -536,7 +536,8 @@
             </div>
 
             <h3 class="text-xl font-bold text-indigo-700 mb-3 mt-6">Performance Graph</h3>
-            <div class="relative h-auto w-full mb-6 max-h-96"> <!-- Added max-h-96 for graph container -->
+            <!-- Removed max-h-96 from here to allow it to expand for download capture -->
+            <div class="relative h-auto w-full mb-6">
                 <canvas id="performanceChart"></canvas>
             </div>
 
@@ -1064,8 +1065,8 @@
                                     size: 9, // Reduced from 10 to 9 for labels to prevent overlap
                                     family: 'Poppins' /* Changed to Poppins */
                                 },
-                                minRotation: 45, // Rotate labels for better fit
-                                maxRotation: 45
+                                minRotation: 60, // Increased rotation for better fit
+                                maxRotation: 60
                             },
                             grid: {
                                 display: false
@@ -1130,7 +1131,7 @@
             modalContent.style.overflowY = 'visible'; // Allow content to expand
 
             // Also ensure the chart container itself doesn't have max-height for capture
-            const performanceChartContainer = document.querySelector('#performanceModal .relative.h-auto.w-full.mb-6');
+            const performanceChartContainer = document.querySelector('#performanceModal .relative.h-auto.w-full'); // Removed max-h-96
             if (performanceChartContainer) {
                 originalElementsState.push({ element: performanceChartContainer, originalStyle: performanceChartContainer.style.cssText });
                 performanceChartContainer.style.maxHeight = 'none';
@@ -1153,7 +1154,7 @@
             const logoImg = document.createElement('img');
             // IMPORTANT: Replace this URL with your actual public logo URL
             // This placeholder is 820x312 pixels as requested.
-            logoImg.src = 'alif edu (600 x 300 px) (820 x 312 px).png';
+            logoImg.src = 'YOUR_ALIF_EDU_LOGO_PUBLIC_URL_HERE';
             logoImg.alt = 'alif edu (600 x 300 px) (820 x 312 px).png'; // Using the exact file name here
             logoImg.style.display = 'block'; // Make it a block element
             logoImg.style.margin = '0 auto 20px auto'; // Center it and add margin below
@@ -1247,7 +1248,7 @@
             originalElementsState.forEach(item => {
                 if (item.element === modalContent) {
                     item.element.style.cssText = item.originalStyle; // Restore original inline style
-                } else if (item.element === document.querySelector('#performanceModal .relative.h-auto.w-full.mb-6')) {
+                } else if (item.element === document.querySelector('#performanceModal .relative.h-auto.w-full')) { // Updated selector
                     item.element.style.cssText = item.originalStyle; // Restore original inline style for chart container
                 } else {
                     item.element.style.display = item.originalDisplay;
@@ -1326,12 +1327,15 @@
             revertModalFromDownload();
 
             const imgData = canvas.toDataURL('image/jpeg', 0.95); // 0.95 is JPEG quality for higher clarity
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = `Student_Performance_${studentName.replace(/[^a-zA-Z0-9]/g, '_')}_${studentId}.jpeg`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            
+            // Open in a new window/tab for better mobile compatibility
+            const newWindow = window.open(imgData, '_blank');
+            if (newWindow) {
+                newWindow.focus();
+            } else {
+                // Fallback for pop-up blockers
+                alert('Please allow pop-ups for this site to download the image.');
+            }
         }
 
         /**
