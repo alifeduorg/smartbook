@@ -528,6 +528,24 @@
             border: 1px solid #eee;
         }
 
+        /* New styles for consolidated modal sections */
+        .detail-sub-section {
+            background-color: #fcfcfc; /* Lighter background for individual log details within the modal */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px; /* Space between individual log entries */
+        }
+
+        .detail-sub-section h5 {
+            color: var(--primary-blue); /* Make sub-section titles prominent */
+            font-size: 1.15em;
+            margin-bottom: 10px;
+            display: block; /* Ensure it takes full width */
+            border-bottom: 1px solid var(--accent-orange); /* Small underline */
+            padding-bottom: 5px;
+        }
+
 
         /* Responsive adjustments for detail modal */
         @media (max-width: 768px) {
@@ -697,6 +715,7 @@
     <datalist id="classesList"></datalist> <!-- This will now contain "RoomNo-ClassName" -->
     <datalist id="studentIdsList"></datalist>
     <datalist id="roomNosList"></datalist>
+    <datalist id="roomClassNamesList"></datalist> <!-- New datalist for "RoomNo ClassName" -->
 
     <script>
         // Store all student data for auto-filling
@@ -773,21 +792,18 @@
             document.getElementById('customModal').classList.remove('visible');
         }
 
-        // Function to show log detail modal
-        function showLogDetailModal(logData) {
+        // Function to show log detail modal (consolidated view)
+        function showLogDetailModal(clickedDate) {
             detailSectionsContainer.innerHTML = ''; // Clear previous details
 
-            // Main info
-            const mainInfo = document.createElement('div');
-            mainInfo.className = 'detail-section';
-            mainInfo.innerHTML = `
-                <strong><i class="fas fa-calendar-alt"></i> Date:</strong> <p class="free-text">${formatDate(logData['Date'])}</p>
-                <strong><i class="fas fa-user-check"></i> Submitted By:</strong> <p class="free-text">${logData['Submitted By'] || 'N/A'}</p>
-            `;
-            detailSectionsContainer.appendChild(mainInfo);
+            // Filter all logs for the same date
+            const dailyLogs = allHandoverLogs.filter(log => log['Date'] === clickedDate);
 
-            // Add other sections dynamically
-            const sections = {
+            // Set title for the modal
+            document.getElementById('detailModalTitle').textContent = `Handover Details for ${formatDate(clickedDate)}`;
+
+            // Sections configuration
+            const sectionsConfig = {
                 'App Access': { icon: '📱', field: 'App Access', keys: ['CLASS', 'STUDENT', 'ID', 'TEACHER', 'ROOM'] },
                 'Leave/Substitute': { icon: '✈️', field: 'Leave/Substitute', keys: ['TEACHER', 'SUBSTITUTE', 'CLASS'] },
                 'Class Problems': { icon: '⚠️', field: 'Class Problems', keys: ['CONTEXT', 'PROBLEM', 'SOLUTION'] },
@@ -796,32 +812,39 @@
                 'Notes': { icon: '📝', field: 'Notes', isFreeText: true }
             };
 
-            for (const key in sections) {
-                const { icon, field, keys, isFreeText } = sections[key];
-                if (logData[field] && logData[field].trim() !== '') {
+            for (const key in sectionsConfig) {
+                const { icon, field, keys, isFreeText } = sectionsConfig[key];
+                let combinedSectionEntries = [];
+
+                // Collect all entries for this field from all logs for the clicked date
+                dailyLogs.forEach(log => {
+                    if (log[field] && log[field].trim() !== '') {
+                        if (!isFreeText) {
+                            // For structured text, split by newline and add each item
+                            log[field].split('\n').filter(item => item.trim() !== '').forEach(item => combinedSectionEntries.push(item));
+                        } else {
+                            // For free text, add the entire block
+                            combinedSectionEntries.push(log[field]);
+                        }
+                    }
+                });
+
+                if (combinedSectionEntries.length > 0) {
                     const sectionDiv = document.createElement('div');
                     sectionDiv.className = 'detail-section';
                     sectionDiv.innerHTML = `<strong><span class="section-icon">${icon}</span> ${key}:</strong>`;
 
                     if (isFreeText) {
-                        // For free text fields, just display as a paragraph with pre-wrap
                         const pElement = document.createElement('p');
                         pElement.className = 'free-text';
-                        pElement.textContent = logData[field];
+                        pElement.textContent = combinedSectionEntries.join('\n\n'); // Join multiple notes/tasks with double newline
                         sectionDiv.appendChild(pElement);
                     } else {
-                        // For structured list items
                         const itemsContainer = document.createElement('div');
                         itemsContainer.className = 'item-list';
-
-                        const rawItems = logData[field].split('\n').filter(item => item.trim() !== '');
-
-                        rawItems.forEach(rawItem => {
+                        combinedSectionEntries.forEach(rawItem => {
                             const itemEntryDiv = document.createElement('div');
                             itemEntryDiv.className = 'item-entry';
-
-                            // Parse key-value pairs from the raw item string
-                            // Example: "CLASS: C1-X, STUDENT: ADHIL RAHMAN K"
                             const pairs = rawItem.split(',').map(pair => pair.trim());
                             let parsedItem = {};
                             pairs.forEach(pair => {
@@ -833,16 +856,13 @@
                                 }
                             });
 
-                            // Display based on expected keys for this section
                             keys.forEach(expectedKey => {
                                 const labelSpan = document.createElement('span');
                                 labelSpan.className = 'label';
                                 labelSpan.textContent = `${expectedKey}:`;
-
                                 const valueSpan = document.createElement('span');
                                 valueSpan.className = 'value';
-                                valueSpan.textContent = parsedItem[expectedKey] || 'N/A'; // Use 'N/A' if value is missing
-
+                                valueSpan.textContent = parsedItem[expectedKey] || 'N/A';
                                 itemEntryDiv.appendChild(labelSpan);
                                 itemEntryDiv.appendChild(valueSpan);
                             });
@@ -1052,38 +1072,89 @@
                 }
 
                 const logs = result.data;
-                allHandoverLogs = logs; // Store fetched logs for detail view
+                // Sort logs by Date in descending order (newest first)
+                // Secondary sort by Timestamp (ascending) to ensure consistent order within a day for processing
+                logs.sort((a, b) => {
+                    const dateA = new Date(a.Date);
+                    const dateB = new Date(b.Date);
+
+                    // Primary sort by Date (descending)
+                    if (dateA.getTime() !== dateB.getTime()) {
+                        return dateB.getTime() - dateA.getTime();
+                    }
+
+                    // Secondary sort by Timestamp (ascending) for consistent grouping order
+                    const timestampA = new Date(a.Timestamp);
+                    const timestampB = new Date(b.Timestamp);
+                    if (!isNaN(timestampA) && !isNaN(timestampB)) {
+                        return timestampA.getTime() - timestampB.getTime(); // Ascending timestamp
+                    }
+                    return 0;
+                });
+                allHandoverLogs = logs; // Store sorted data
 
                 if (logs.length === 0) {
                     noLogsFound.style.display = 'block';
                     return;
                 }
 
-                logs.forEach((log, index) => {
-                    const logCard = document.createElement('div');
-                    logCard.className = 'log-card';
-                    logCard.dataset.logIndex = index; // Store index to retrieve full data later
+                // Group logs by date and then by submittedBy
+                const groupedByDateAndSubmitter = new Map(); // Map<Date, { MD: [], Principal: [] }>
 
-                    // Display only Date and Submitted By
-                    let cardContent = `
-                        <p class="text-lg font-semibold text-gray-800 mb-2">
-                            <i class="fas fa-calendar-alt mr-2 text-primary-blue"></i>
-                            Date: <span class="font-normal">${formatDate(log['Date'])}</span>
-                        </p>
-                        <p class="text-base font-medium text-gray-700 mb-4">
-                            <i class="fas fa-user-check mr-2 text-primary-blue"></i>
-                            Submitted By: <span class="font-normal">${log['Submitted By'] || 'N/A'}</span>
-                        </p>
-                    `;
-
-                    logCard.innerHTML = cardContent;
-                    logsContainer.appendChild(logCard);
-
-                    // Add click listener to open detail modal
-                    logCard.addEventListener('click', () => {
-                        showLogDetailModal(allHandoverLogs[index]);
-                    });
+                logs.forEach(log => {
+                    const date = log.Date;
+                    if (!groupedByDateAndSubmitter.has(date)) {
+                        groupedByDateAndSubmitter.set(date, { MD: [], Principal: [] });
+                    }
+                    const submitterType = log['Submitted By'];
+                    if (submitterType === 'MD' || submitterType === 'Principal') {
+                        groupedByDateAndSubmitter.get(date)[submitterType].push(log);
+                    }
                 });
+
+                // Display grouped logs
+                // Iterate through the map in the order of keys (which are dates, already sorted descending)
+                for (const [date, submissions] of groupedByDateAndSubmitter.entries()) {
+                    // Create a container for each date's boxes if needed, or just directly add cards
+
+                    if (submissions.MD.length > 0) {
+                        const mdCard = document.createElement('div');
+                        mdCard.className = 'log-card';
+                        mdCard.innerHTML = `
+                            <p class="text-lg font-semibold text-gray-800 mb-2">
+                                <i class="fas fa-calendar-alt mr-2 text-primary-blue"></i>
+                                Date: <span class="font-normal">${formatDate(date)}</span>
+                            </p>
+                            <p class="text-base font-medium text-gray-700 mb-4">
+                                <i class="fas fa-user-check mr-2 text-primary-blue"></i>
+                                Submitted By: <span class="font-normal">MD</span>
+                            </p>
+                        `;
+                        mdCard.addEventListener('click', () => {
+                            showLogDetailModal(date); // Pass the date to the modal
+                        });
+                        logsContainer.appendChild(mdCard);
+                    }
+
+                    if (submissions.Principal.length > 0) {
+                        const principalCard = document.createElement('div');
+                        principalCard.className = 'log-card';
+                        principalCard.innerHTML = `
+                            <p class="text-lg font-semibold text-gray-800 mb-2">
+                                <i class="fas fa-calendar-alt mr-2 text-primary-blue"></i>
+                                Date: <span class="font-normal">${formatDate(date)}</span>
+                            </p>
+                            <p class="text-base font-medium text-gray-700 mb-4">
+                                <i class="fas fa-user-check mr-2 text-primary-blue"></i>
+                                Submitted By: <span class="font-normal">Principal</span>
+                            </p>
+                        `;
+                        principalCard.addEventListener('click', () => {
+                            showLogDetailModal(date); // Pass the date to the modal
+                        });
+                        logsContainer.appendChild(principalCard);
+                    }
+                }
 
             } catch (error) {
                 console.error('Network or parsing error:', error);
@@ -1196,7 +1267,7 @@
             const newRow = document.createElement('div');
             newRow.className = 'grid grid-cols-1 sm:grid-cols-4 gap-3 dynamic-row';
             newRow.innerHTML = `
-                <input type="text" placeholder="CLASSROOM : TEACHER (PERIOD)" class="class-problem-context px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="roomNosList">
+                <input type="text" placeholder="CLASSROOM : TEACHER (PERIOD)" class="class-problem-context px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="roomClassNamesList"> <!-- Changed list to roomClassNamesList -->
                 <input type="text" placeholder="PROBLEM" class="class-problem-description px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 <input type="text" placeholder="SOLUTION (IF TAKEN/PENDING)" class="class-problem-solution px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             `;
@@ -1274,6 +1345,7 @@ D1 I ALF25002 SHAMMAS`;
             const classesList = document.getElementById('classesList');
             const studentIdsList = document.getElementById('studentIdsList');
             const roomNosList = document.getElementById('roomNosList');
+            const roomClassNamesList = document.getElementById('roomClassNamesList'); // Get the new datalist
 
             // Populate teachersList with NAME (ID: ID_NUMBER) format
             const uniqueTeachers = new Set();
@@ -1295,6 +1367,7 @@ D1 I ALF25002 SHAMMAS`;
             const uniqueClassesCombined = new Set(); // To store "RoomNo-ClassName"
             const uniqueStudentIds = new Set();
             const uniqueRoomNos = new Set();
+            const uniqueRoomClassNames = new Set(); // New set for "RoomNo ClassName"
 
             studentsRawData.split('\n').forEach(line => {
                 const parts = line.trim().split(/\s+/);
@@ -1309,6 +1382,7 @@ D1 I ALF25002 SHAMMAS`;
                     uniqueClassesCombined.add(`${roomNo}-${className}`); // Add combined string "RoomNo-ClassName"
                     uniqueStudentIds.add(studentId);
                     uniqueStudentNames.add(studentName);
+                    uniqueRoomClassNames.add(`${roomNo} ${className}`); // Add "RoomNo ClassName"
                 }
             });
 
@@ -1334,6 +1408,12 @@ D1 I ALF25002 SHAMMAS`;
                 const option = document.createElement('option');
                 option.value = roomNo;
                 roomNosList.appendChild(option);
+            });
+
+            uniqueRoomClassNames.forEach(roomClassName => { // Populate the new datalist
+                const option = document.createElement('option');
+                option.value = roomClassName;
+                roomClassNamesList.appendChild(option);
             });
         }
     </script>
