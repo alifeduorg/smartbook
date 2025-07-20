@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institutional Communication Form</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Define CSS Variables for consistent theming */
+        :root {
+            --primary-blue: #4A90E2; /* A friendly, accessible blue */
+            --secondary-darkblue: #2F6F9D; /* A darker shade for accents */
+            --accent-orange: #FF7043; /* A vibrant orange for highlights/buttons */
+            --light-gray: #F0F2F5; /* A very light background gray */
+            --mid-gray: #E0E5EC; /* Slightly darker background shade */
+            --dark-text: #333; /* Standard dark text color */
+            --light-text: #fff; /* White text for dark backgrounds */
+            --border-radius: 12px; /* Consistent rounded corners */
+            --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+            --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
+            --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow */
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Poppins', sans-serif; /* Modern, friendly font */
+            background: linear-gradient(135deg, var(--light-gray), var(--mid-gray)); /* Soft gradient background */
+            color: var(--dark-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align content to the top */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            position: relative; /* For background animations */
+        }
+
+        /* Background Animation - Subtle, floating shapes */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3); /* Translucent white for a dreamy effect */
+            border-radius: 50%; /* Circular shapes */
+            opacity: 0.6;
+            filter: blur(80px); /* Soft blur */
+            z-index: -1; /* Behind content */
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            left: -50px;
+            animation: moveShape 15s infinite alternate ease-in-out; /* Slower animation */
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            bottom: -80px;
+            right: -80px;
+            animation: moveShape 20s infinite alternate-reverse ease-in-out; /* Different timing for variety */
+        }
+
+        @keyframes moveShape {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.05);
+            }
+            50% {
+                transform: translate(0, 50px) scale(0.95);
+            }
+            75% {
+                transform: translate(-40px, -20px) scale(1.1);
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        /* Main form container styling */
+        .form-container {
+            background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for glassmorphism */
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            max-width: 600px; /* Max width for readability on large screens */
+            width: 100%; /* Full width on smaller screens */
+            margin-top: 40px; /* Space from top */
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+            transform: translateY(0); /* Initial state for hover effect */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: var(--box-shadow-hover);
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between icon and text */
+        }
+
+        h1 .icon {
+            font-size: 1.2em; /* Larger icon */
+            color: var(--accent-orange); /* Accent color for icon */
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: 600;
+            color: var(--dark-text);
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        textarea,
+        select {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd; /* Light border */
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05); /* Inner shadow for depth */
+            font-size: 1em;
+            margin-bottom: 15px;
+            width: calc(100% - 30px); /* Adjust for padding */
+            max-width: 100%; /* Ensure it doesn't exceed parent width */
+            transition: all 0.3s ease; /* Smooth transitions */
+            background-color: #fcfcfc; /* Slightly off-white background */
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-blue); /* Highlight on focus */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Glow effect */
+        }
+
+        /* Custom button 3D effect */
+        .button-3d {
+            position: relative;
+            background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%); /* Indigo gradient */
+            box-shadow: 0px 5px 0px 0px #4338ca; /* Darker shadow for 3D effect */
+            transition: all 0.1s ease-in-out;
+            transform: translateY(0);
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            border: none;
+            color: var(--light-text);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%; /* Ensure it takes full width */
+        }
+
+        .button-3d:hover {
+            background: linear-gradient(180deg, #4f46e5 0%, #6366f1 100%); /* Reverse gradient on hover */
+            box-shadow: 0px 2px 0px 0px #4338ca; /* Smaller shadow on hover */
+            transform: translateY(3px); /* Move down slightly on hover */
+        }
+
+        .button-3d:active {
+            box-shadow: 0px 0px 0px 0px #4338ca;
+            transform: translateY(5px); /* Simulate press */
+        }
+
+        .button-3d:disabled {
+            background: #a78bfa; /* Lighter purple for disabled */
+            box-shadow: 0px 3px 0px 0px #8b5cf6;
+            transform: translateY(0);
+            cursor: not-allowed;
+            opacity: 0.7; /* Slightly dim disabled button */
+        }
+
+        /* Custom Modal for Alerts */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* On top of everything */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--light-text);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .modal-icon.success { color: #28a745; }
+        .modal-icon.error { color: #dc3545; }
+        .modal-icon.warning { color: #FF7043; }
+        .modal-icon.info { color: var(--primary-blue); } /* Added info color */
+
+        .modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .modal-button {
+            background: var(--primary-blue);
+            color: var(--light-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .modal-button:hover {
+            background: var(--secondary-darkblue);
+        }
+
+        /* Loading Spinner */
+        .submit-button.loading .spinner {
+            display: block;
+        }
+
+        .submit-button.loading #buttonText {
+            display: none; /* Hide text when loading */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                align-items: center; /* Center content vertically on smaller screens */
+            }
+
+            .form-container {
+                margin-top: 20px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="date"],
+            textarea,
+            select {
+                font-size: 0.95em;
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .form-container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Modal for Alerts -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalIcon" class="modal-icon"></div>
+            <p id="modalMessage" class="modal-message"></p>
+            <button class="modal-button" onclick="hideModal()">OK</button>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+            <span class="icon">📧</span> Institutional Communication Form
+        </h1>
+
+        <form id="communicationForm" class="space-y-6">
+            <!-- Sender Name -->
+            <div>
+                <label for="senderName" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                <input type="text" id="senderName" name="senderName" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+            </div>
+
+            <!-- Sender ID (e.g., Employee ID, Teacher ID) -->
+            <div>
+                <label for="senderId" class="block text-sm font-medium text-gray-700 mb-1">Your ID</label>
+                <input type="text" id="senderId" name="senderId" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+            </div>
+
+            <!-- Sender Email -->
+            <div>
+                <label for="senderEmail" class="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+                <input type="email" id="senderEmail" name="senderEmail" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+            </div>
+
+            <!-- Sender Role -->
+            <div>
+                <label for="senderRole" class="block text-sm font-medium text-gray-700 mb-1">Your Role</label>
+                <select id="senderRole" name="senderRole" required
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    <option value="">Select Your Role</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Principal">Principal</option>
+                    <option value="CEO">CEO</option>
+                    <option value="MD">MD</option>
+                    <option value="Mentor">Mentor</option>
+                    <option value="Clerk">Clerk</option>
+                    <option value="Coordinator">Coordinator</option>
+                    <option value="Other">Other (Specify below)</option>
+                </select>
+            </div>
+            <div id="otherRoleSection" class="hidden">
+                <label for="otherRole" class="block text-sm font-medium text-gray-700 mb-1">Specify Other Role</label>
+                <input type="text" id="otherRole" name="otherRole"
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+            </div>
+
+
+            <!-- Type of Request -->
+            <div>
+                <label for="requestType" class="block text-sm font-medium text-gray-700 mb-1">Type of Communication</label>
+                <select id="requestType" name="requestType" required
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    <option value="">Select Type</option>
+                    <option value="Leave Letter">Leave Letter</option>
+                    <option value="Weekly Report">Weekly Report</option>
+                    <option value="General Message">General Message</option>
+                    <option value="Event Announcement">Event Announcement</option>
+                    <option value="Resource Request">Resource Request</option>
+                    <option value="IT Support Request">IT Support Request</option>
+                    <option value="Feedback/Suggestion">Feedback/Suggestion</option>
+                    <option value="Other">Other (Specify in Subject)</option>
+                </select>
+            </div>
+
+            <!-- Subject of Request (Always visible) -->
+            <div>
+                <label for="requestSubject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <input type="text" id="requestSubject" name="requestSubject" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+            </div>
+
+            <!-- Conditional Sections -->
+
+            <!-- Leave Letter Section -->
+            <div id="leaveLetterSection" class="space-y-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Leave Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="leaveStartDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" id="leaveStartDate" name="leaveStartDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    </div>
+                    <div>
+                        <label for="leaveEndDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" id="leaveEndDate" name="leaveEndDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="emergencyLeave" name="emergencyLeave"
+                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="emergencyLeave" class="ml-2 block text-sm text-gray-900">
+                        Mark as Emergency Leave (Bypasses 2-day consecutive limit)
+                    </label>
+                </div>
+                <div>
+                    <label for="leaveReason" class="block text-sm font-medium text-gray-700 mb-1">Reason for Leave</label>
+                    <textarea id="leaveReason" name="leaveReason" rows="4"
+                              placeholder="Briefly explain the reason for your leave."
+                              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                </div>
+            </div>
+
+            <!-- Weekly Report Section (Parent Container) -->
+            <div id="weeklyReportSection" class="space-y-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Weekly Report Details</h2>
+
+                <!-- Teacher Report Fields -->
+                <div id="teacherReportFields" class="space-y-6 hidden">
+                    <div>
+                        <label for="teacherReportWeekStartDate" class="block text-sm font-medium text-gray-700 mb-1">📅 Week Start Date</label>
+                        <input type="date" id="teacherReportWeekStartDate" name="teacherReportWeekStartDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    </div>
+                    <div>
+                        <label for="teacherClassesTaught" class="block text-sm font-medium text-gray-700 mb-1">📚 Classes Taught This Week</label>
+                        <textarea id="teacherClassesTaught" name="teacherClassesTaught" rows="4"
+                                  placeholder="e.g., Grade 5 Math, Grade 7 Science, Grade 9 English"
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="teacherTopicsCovered" class="block text-sm font-medium text-gray-700 mb-1">📖 Topics Covered</label>
+                        <textarea id="teacherTopicsCovered" name="teacherTopicsCovered" rows="4"
+                                  placeholder="e.g., Algebra basics, Photosynthesis, Shakespearean sonnets"
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="teacherStudentProgress" class="block text-sm font-medium text-gray-700 mb-1">📈 Student Progress / Challenges</label>
+                        <textarea id="teacherStudentProgress" name="teacherStudentProgress" rows="4"
+                                  placeholder="e.g., Most students grasp concept X, struggling with Y. Need to review Z."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="teacherUpcomingActivities" class="block text-sm font-medium text-gray-700 mb-1">🗓️ Upcoming Activities / Plans</label>
+                        <textarea id="teacherUpcomingActivities" name="teacherUpcomingActivities" rows="4"
+                                  placeholder="e.g., Next week: Chapter 3 test, field trip planning, parent-teacher meetings."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="teacherIssuesFeedback" class="block text-sm font-medium text-gray-700 mb-1">💬 Any Issues / Feedback (Optional)</label>
+                        <textarea id="teacherIssuesFeedback" name="teacherIssuesFeedback" rows="3"
+                                  placeholder="e.g., Classroom projector not working. Need more art supplies."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                </div>
+
+                <!-- Principal Report Fields -->
+                <div id="principalReportFields" class="space-y-6 hidden">
+                    <div>
+                        <label for="principalReportWeekStartDate" class="block text-sm font-medium text-gray-700 mb-1">📅 Week Start Date</label>
+                        <input type="date" id="principalReportWeekStartDate" name="principalReportWeekStartDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    </div>
+                    <div>
+                        <label for="principalKeyAchievements" class="block text-sm font-medium text-gray-700 mb-1">🌟 Key Achievements This Week</label>
+                        <textarea id="principalKeyAchievements" name="principalKeyAchievements" rows="4"
+                                  placeholder="e.g., Successful Parent-Teacher Conference, New curriculum implemented in Grade X."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="principalOperationalChallenges" class="block text-sm font-medium text-gray-700 mb-1">🚧 Operational Challenges</label>
+                        <textarea id="principalOperationalChallenges" name="principalOperationalChallenges" rows="4"
+                                  placeholder="e.g., Maintenance issues with building Y, Staffing shortage in department Z."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="principalStaffingUpdates" class="block text-sm font-medium text-gray-700 mb-1">👥 Staffing Updates</label>
+                        <textarea id="principalStaffingUpdates" name="principalStaffingUpdates" rows="3"
+                                  placeholder="e.g., New teacher hired for Math, Substitute needed for X."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="principalStudentWelfare" class="block text-sm font-medium text-gray-700 mb-1">🧑‍🎓 Student Welfare / Discipline Notes</label>
+                        <textarea id="principalStudentWelfare" name="principalStudentWelfare" rows="3"
+                                  placeholder="e.g., Resolved bullying incident, Noted improvement in student attendance."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="principalUpcomingEvents" class="block text-sm font-medium text-gray-700 mb-1">🗓️ Upcoming School Events / Initiatives</label>
+                        <textarea id="principalUpcomingEvents" name="principalUpcomingEvents" rows="3"
+                                  placeholder="e.g., Annual Sports Day planning, Inter-school debate competition."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="principalBudgetNeeds" class="block text-sm font-medium text-gray-700 mb-1">💰 Budget / Resource Needs</label>
+                        <textarea id="principalBudgetNeeds" name="principalBudgetNeeds" rows="3"
+                                  placeholder="e.g., Need funds for library books, Request for new classroom technology."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="principalGeneralRemarks" class="block text-sm font-medium text-gray-700 mb-1">📝 General Remarks (Optional)</label>
+                        <textarea id="principalGeneralRemarks" name="principalGeneralRemarks" rows="3"
+                                  placeholder="Any other relevant information."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                </div>
+
+                <!-- CEO/MD Report Fields -->
+                <div id="ceoMdReportFields" class="space-y-6 hidden">
+                    <div>
+                        <label for="ceoMdReportWeekStartDate" class="block text-sm font-medium text-gray-700 mb-1">📅 Week Start Date</label>
+                        <input type="date" id="ceoMdReportWeekStartDate" name="ceoMdReportWeekStartDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    </div>
+                    <div>
+                        <label for="ceoMdStrategicProgress" class="block text-sm font-medium text-gray-700 mb-1">🚀 Strategic Progress</label>
+                        <textarea id="ceoMdStrategicProgress" name="ceoMdStrategicProgress" rows="4"
+                                  placeholder="e.g., Progress on new campus acquisition, Partnership discussions advanced."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="ceoMdFinancialOverview" class="block text-sm font-medium text-gray-700 mb-1">📈 Financial Overview (High-level)</label>
+                        <textarea id="ceoMdFinancialOverview" name="ceoMdFinancialOverview" rows="4"
+                                  placeholder="e.g., Revenue up by X%, Expenses within budget, Fundraising efforts."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="ceoMdKeyDecisions" class="block text-sm font-medium text-gray-700 mb-1">✅ Key Decisions Made</label>
+                        <textarea id="ceoMdKeyDecisions" name="ceoMdKeyDecisions" rows="3"
+                                  placeholder="e.g., Approved marketing campaign, Decision on new vendor."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="ceoMdMarketInsights" class="block text-sm font-medium text-gray-700 mb-1">🌐 Market / Industry Insights</label>
+                        <textarea id="ceoMdMarketInsights" name="ceoMdMarketInsights" rows="3"
+                                  placeholder="e.g., Competitor X launched new program, Noted trend in education sector."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="ceoMdChallengesRisks" class="block text-sm font-medium text-gray-700 mb-1">⚠️ Challenges / Risks</label>
+                        <textarea id="ceoMdChallengesRisks" name="ceoMdChallengesRisks" rows="3"
+                                  placeholder="e.g., Regulatory changes, Potential supply chain disruption."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="ceoMdNextSteps" class="block text-sm font-medium text-gray-700 mb-1">➡️ Next Steps / Priorities</label>
+                        <textarea id="ceoMdNextSteps" name="ceoMdNextSteps" rows="3"
+                                  placeholder="e.g., Follow up on X, Prepare for board meeting."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="ceoMdGeneralComments" class="block text-sm font-medium text-gray-700 mb-1">📝 General Comments (Optional)</label>
+                        <textarea id="ceoMdGeneralComments" name="ceoMdGeneralComments" rows="3"
+                                  placeholder="Any other relevant information."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                </div>
+
+                <!-- Clerk/Office Staff Report Fields -->
+                <div id="clerkReportFields" class="space-y-6 hidden">
+                    <div>
+                        <label for="clerkReportWeekStartDate" class="block text-sm font-medium text-gray-700 mb-1">📅 Week Start Date</label>
+                        <input type="date" id="clerkReportWeekStartDate" name="clerkReportWeekStartDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+                    </div>
+                    <div>
+                        <label for="clerkAdminTasks" class="block text-sm font-medium text-gray-700 mb-1">📋 Administrative Tasks Completed</label>
+                        <textarea id="clerkAdminTasks" name="clerkAdminTasks" rows="4"
+                                  placeholder="e.g., Processed invoices, Organized student files, Scheduled meetings."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="clerkStudentRecords" class="block text-sm font-medium text-gray-700 mb-1">🧑‍💻 Student Records Updates</label>
+                        <textarea id="clerkStudentRecords" name="clerkStudentRecords" rows="3"
+                                  placeholder="e.g., Updated attendance records, Processed new student registrations."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="clerkCorrespondence" class="block text-sm font-medium text-gray-700 mb-1">✉️ Correspondence Handled</label>
+                        <textarea id="clerkCorrespondence" name="clerkCorrespondence" rows="3"
+                                  placeholder="e.g., Responded to parent emails, Sent out school newsletters."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="clerkInventoryStatus" class="block text-sm font-medium text-gray-700 mb-1">📦 Supply / Inventory Status</label>
+                        <textarea id="clerkInventoryStatus" name="clerkInventoryStatus" rows="3"
+                                  placeholder="e.g., Ordered office supplies, Noted low stock of printer ink."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="clerkOfficeIssues" class="block text-sm font-medium text-gray-700 mb-1">🚨 Office Issues / Needs</label>
+                        <textarea id="clerkOfficeIssues" name="clerkOfficeIssues" rows="3"
+                                  placeholder="e.g., Internet connection intermittent, Need new office chair."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label for="clerkGeneralNotes" class="block text-sm font-medium text-gray-700 mb-1">📝 General Notes (Optional)</label>
+                        <textarea id="clerkGeneralNotes" name="clerkGeneralNotes" rows="3"
+                                  placeholder="Any other relevant information."
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Message Section -->
+            <div id="generalMessageSection" class="space-y-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Message Details</h2>
+                <div>
+                    <label for="generalMessageDetails" class="block text-sm font-medium text-gray-700 mb-1">Your Message</label>
+                    <textarea id="generalMessageDetails" name="generalMessageDetails" rows="6"
+                              placeholder="Type your message here..."
+                              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200"></textarea>
+                </div>
+            </div>
+
+            <!-- Contact Information (Always visible, but optional) -->
+            <div>
+                <label for="contactPhone" class="block text-sm font-medium text-gray-700 mb-1">📞 Your Contact Phone (Optional)</label>
+                <input type="text" id="contactPhone" name="contactPhone"
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:shadow-md transition-shadow duration-200">
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" id="submitButton"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md text-lg font-medium text-white button-3d submit-button">
+                    <span id="buttonText">Send Communication</span>
+                    <span id="loadingSpinner" class="spinner hidden"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Function to show custom modal
+        const customModal = document.getElementById("customModal");
+        const modalIcon = document.getElementById("modalIcon");
+        const modalMessage = document.getElementById("modalMessage");
+
+        function showModal(message, type = 'info') {
+            modalMessage.textContent = message;
+            modalIcon.className = 'modal-icon'; // Reset classes
+            if (type === 'success') {
+                modalIcon.textContent = '🎉';
+                modalIcon.classList.add('success');
+            } else if (type === 'error') {
+                modalIcon.textContent = '❌';
+                modalIcon.classList.add('error');
+            } else if (type === 'warning') {
+                modalIcon.textContent = '⚠️';
+                modalIcon.classList.add('warning');
+            } else { // Default info
+                modalIcon.textContent = 'ℹ️';
+                modalIcon.classList.add('info');
+            }
+            customModal.classList.add('visible');
+        }
+
+        // Function to hide custom modal
+        function hideModal() {
+            customModal.classList.remove('visible');
+        }
+
+        // Helper function to format date to YYYY-MM-DD
+        function formatDate(date) {
+            const d = new Date(date);
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            const year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        // Get elements
+        const communicationForm = document.getElementById('communicationForm');
+        const senderRoleSelect = document.getElementById('senderRole');
+        const otherRoleSection = document.getElementById('otherRoleSection');
+        const otherRoleInput = document.getElementById('otherRole');
+
+        const requestTypeSelect = document.getElementById('requestType');
+        const leaveLetterSection = document.getElementById('leaveLetterSection');
+        const weeklyReportSection = document.getElementById('weeklyReportSection');
+        const generalMessageSection = document.getElementById('generalMessageSection');
+
+        // Leave-specific fields
+        const leaveStartDateInput = document.getElementById('leaveStartDate');
+        const leaveEndDateInput = document.getElementById('leaveEndDate');
+        const emergencyLeaveCheckbox = document.getElementById('emergencyLeave');
+        const leaveReasonTextarea = document.getElementById('leaveReason');
+
+        // Weekly Report-specific fields (Parent container for all role-based reports)
+        const teacherReportFields = document.getElementById('teacherReportFields');
+        const principalReportFields = document.getElementById('principalReportFields');
+        const ceoMdReportFields = document.getElementById('ceoMdReportFields');
+        const clerkReportFields = document.getElementById('clerkReportFields');
+
+        // Teacher Report fields
+        const teacherReportWeekStartDateInput = document.getElementById('teacherReportWeekStartDate');
+        const teacherClassesTaughtTextarea = document.getElementById('teacherClassesTaught');
+        const teacherTopicsCoveredTextarea = document.getElementById('teacherTopicsCovered');
+        const teacherStudentProgressTextarea = document.getElementById('teacherStudentProgress');
+        const teacherUpcomingActivitiesTextarea = document.getElementById('teacherUpcomingActivities');
+        const teacherIssuesFeedbackTextarea = document.getElementById('teacherIssuesFeedback');
+
+        // Principal Report fields
+        const principalReportWeekStartDateInput = document.getElementById('principalReportWeekStartDate');
+        const principalKeyAchievementsTextarea = document.getElementById('principalKeyAchievements');
+        const principalOperationalChallengesTextarea = document.getElementById('principalOperationalChallenges');
+        const principalStaffingUpdatesTextarea = document.getElementById('principalStaffingUpdates');
+        const principalStudentWelfareTextarea = document.getElementById('principalStudentWelfare');
+        const principalUpcomingEventsTextarea = document.getElementById('principalUpcomingEvents');
+        const principalBudgetNeedsTextarea = document.getElementById('principalBudgetNeeds');
+        const principalGeneralRemarksTextarea = document.getElementById('principalGeneralRemarks');
+
+        // CEO/MD Report fields
+        const ceoMdReportWeekStartDateInput = document.getElementById('ceoMdReportWeekStartDate');
+        const ceoMdStrategicProgressTextarea = document.getElementById('ceoMdStrategicProgress');
+        const ceoMdFinancialOverviewTextarea = document.getElementById('ceoMdFinancialOverview');
+        const ceoMdKeyDecisionsTextarea = document.getElementById('ceoMdKeyDecisions');
+        const ceoMdMarketInsightsTextarea = document.getElementById('ceoMdMarketInsights');
+        const ceoMdChallengesRisksTextarea = document.getElementById('ceoMdChallengesRisks');
+        const ceoMdNextStepsTextarea = document.getElementById('ceoMdNextSteps');
+        const ceoMdGeneralCommentsTextarea = document.getElementById('ceoMdGeneralComments');
+
+        // Clerk Report fields
+        const clerkReportWeekStartDateInput = document.getElementById('clerkReportWeekStartDate');
+        const clerkAdminTasksTextarea = document.getElementById('clerkAdminTasks');
+        const clerkStudentRecordsTextarea = document.getElementById('clerkStudentRecords');
+        const clerkCorrespondenceTextarea = document.getElementById('clerkCorrespondence');
+        const clerkInventoryStatusTextarea = document.getElementById('clerkInventoryStatus');
+        const clerkOfficeIssuesTextarea = document.getElementById('clerkOfficeIssues');
+        const clerkGeneralNotesTextarea = document.getElementById('clerkGeneralNotes');
+
+
+        // General Message-specific field
+        const generalMessageDetailsTextarea = document.getElementById('generalMessageDetails');
+
+        const submitButton = document.getElementById('submitButton');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // Function to manage visibility and required status of conditional sections
+        function updateFormSections() {
+            // Hide all conditional sections and remove required attributes
+            leaveLetterSection.classList.add('hidden');
+            weeklyReportSection.classList.add('hidden');
+            generalMessageSection.classList.add('hidden');
+
+            // Hide all role-specific report fields and remove required attributes
+            [teacherReportFields, principalReportFields, ceoMdReportFields, clerkReportFields].forEach(section => {
+                section.classList.add('hidden');
+                section.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
+            });
+
+
+            [leaveStartDateInput, leaveEndDateInput, leaveReasonTextarea,
+             teacherReportWeekStartDateInput, teacherClassesTaughtTextarea, teacherTopicsCoveredTextarea,
+             teacherStudentProgressTextarea, teacherUpcomingActivitiesTextarea, teacherIssuesFeedbackTextarea,
+             principalReportWeekStartDateInput, principalKeyAchievementsTextarea, principalOperationalChallengesTextarea,
+             principalStaffingUpdatesTextarea, principalStudentWelfareTextarea, principalUpcomingEventsTextarea,
+             principalBudgetNeedsTextarea, principalGeneralRemarksTextarea,
+             ceoMdReportWeekStartDateInput, ceoMdStrategicProgressTextarea, ceoMdFinancialOverviewTextarea,
+             ceoMdKeyDecisionsTextarea, ceoMdMarketInsightsTextarea, ceoMdChallengesRisksTextarea,
+             ceoMdNextStepsTextarea, ceoMdGeneralCommentsTextarea,
+             clerkReportWeekStartDateInput, clerkAdminTasksTextarea, clerkStudentRecordsTextarea,
+             clerkCorrespondenceTextarea, clerkInventoryStatusTextarea, clerkOfficeIssuesTextarea,
+             clerkGeneralNotesTextarea,
+             generalMessageDetailsTextarea
+            ].forEach(input => input.removeAttribute('required'));
+
+            // Show and set required attributes for the selected section
+            const selectedRequestType = requestTypeSelect.value;
+            const selectedRole = senderRoleSelect.value;
+
+            if (selectedRequestType === 'Leave Letter') {
+                leaveLetterSection.classList.remove('hidden');
+                leaveStartDateInput.setAttribute('required', 'required');
+                leaveEndDateInput.setAttribute('required', 'required');
+                leaveReasonTextarea.setAttribute('required', 'required');
+                // Set min date for leaveStartDate to today
+                leaveStartDateInput.min = formatDate(new Date());
+                updateLeaveDatesConstraints(); // Call to set initial end date constraint
+            } else if (selectedRequestType === 'Weekly Report') {
+                weeklyReportSection.classList.remove('hidden');
+                // Determine which role's report fields to show
+                if (selectedRole === 'Teacher') {
+                    teacherReportFields.classList.remove('hidden');
+                    teacherReportWeekStartDateInput.setAttribute('required', 'required');
+                    teacherClassesTaughtTextarea.setAttribute('required', 'required');
+                    teacherTopicsCoveredTextarea.setAttribute('required', 'required');
+                    teacherStudentProgressTextarea.setAttribute('required', 'required');
+                    teacherUpcomingActivitiesTextarea.setAttribute('required', 'required');
+                    teacherReportWeekStartDateInput.min = formatDate(new Date());
+                } else if (selectedRole === 'Principal') {
+                    principalReportFields.classList.remove('hidden');
+                    principalReportWeekStartDateInput.setAttribute('required', 'required');
+                    principalKeyAchievementsTextarea.setAttribute('required', 'required');
+                    principalOperationalChallengesTextarea.setAttribute('required', 'required');
+                    principalStaffingUpdatesTextarea.setAttribute('required', 'required');
+                    principalStudentWelfareTextarea.setAttribute('required', 'required');
+                    principalUpcomingEventsTextarea.setAttribute('required', 'required');
+                    principalBudgetNeedsTextarea.setAttribute('required', 'required');
+                    principalReportWeekStartDateInput.min = formatDate(new Date());
+                } else if (selectedRole === 'CEO' || selectedRole === 'MD') {
+                    ceoMdReportFields.classList.remove('hidden');
+                    ceoMdReportWeekStartDateInput.setAttribute('required', 'required');
+                    ceoMdStrategicProgressTextarea.setAttribute('required', 'required');
+                    ceoMdFinancialOverviewTextarea.setAttribute('required', 'required');
+                    ceoMdKeyDecisionsTextarea.setAttribute('required', 'required');
+                    ceoMdMarketInsightsTextarea.setAttribute('required', 'required');
+                    ceoMdChallengesRisksTextarea.setAttribute('required', 'required');
+                    ceoMdNextStepsTextarea.setAttribute('required', 'required');
+                    ceoMdReportWeekStartDateInput.min = formatDate(new Date());
+                } else if (selectedRole === 'Clerk' || selectedRole === 'Coordinator') { // Assuming 'Office Staff' falls under Clerk
+                    clerkReportFields.classList.remove('hidden');
+                    clerkReportWeekStartDateInput.setAttribute('required', 'required');
+                    clerkAdminTasksTextarea.setAttribute('required', 'required');
+                    clerkStudentRecordsTextarea.setAttribute('required', 'required');
+                    clerkCorrespondenceTextarea.setAttribute('required', 'required');
+                    clerkInventoryStatusTextarea.setAttribute('required', 'required');
+                    clerkOfficeIssuesTextarea.setAttribute('required', 'required');
+                    clerkReportWeekStartDateInput.min = formatDate(new Date());
+                } else {
+                    // If Weekly Report is selected but role doesn't have a specific format
+                    // or if 'Other' role is selected for Weekly Report
+                    showModal('Please select a specific role (Teacher, Principal, CEO, MD, Clerk, Coordinator) for Weekly Report, or choose "General Message".', 'warning');
+                }
+            } else if (selectedRequestType === 'General Message' || selectedRequestType === 'Event Announcement' ||
+                       selectedRequestType === 'Resource Request' || selectedRequestType === 'IT Support Request' ||
+                       selectedRequestType === 'Feedback/Suggestion' || selectedRequestType === 'Other') {
+                generalMessageSection.classList.remove('hidden');
+                generalMessageDetailsTextarea.setAttribute('required', 'required');
+            }
+        }
+
+        // Function to update end date and its max attribute based on start date and emergency status (for Leave Letter)
+        function updateLeaveDatesConstraints() {
+            if (requestTypeSelect.value === 'Leave Letter' && leaveStartDateInput.value) {
+                const startDate = new Date(leaveStartDateInput.value);
+                const isEmergency = emergencyLeaveCheckbox.checked;
+
+                const defaultEndDate = new Date(startDate);
+                defaultEndDate.setDate(startDate.getDate() + 1); // Default to 2-day leave
+
+                leaveEndDateInput.min = leaveStartDateInput.value;
+
+                if (!isEmergency) {
+                    leaveEndDateInput.max = formatDate(defaultEndDate);
+                    if (new Date(leaveEndDateInput.value) > defaultEndDate || !leaveEndDateInput.value) {
+                         leaveEndDateInput.value = formatDate(defaultEndDate);
+                    }
+                } else {
+                    leaveEndDateInput.removeAttribute('max');
+                    if (!leaveEndDateInput.value || new Date(leaveEndDateInput.value) < startDate) {
+                        leaveEndDateInput.value = formatDate(startDate);
+                    }
+                }
+            } else {
+                leaveEndDateInput.removeAttribute('min');
+                leaveEndDateInput.removeAttribute('max');
+                leaveEndDateInput.value = '';
+            }
+        }
+
+        // Event listeners
+        senderRoleSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherRoleSection.classList.remove('hidden');
+                otherRoleInput.setAttribute('required', 'required');
+            } else {
+                otherRoleSection.classList.add('hidden');
+                otherRoleInput.removeAttribute('required');
+                otherRoleInput.value = ''; // Clear value when hidden
+            }
+            // Re-evaluate form sections when role changes, especially if 'Weekly Report' is selected
+            updateFormSections();
+        });
+
+        requestTypeSelect.addEventListener('change', updateFormSections);
+        leaveStartDateInput.addEventListener('change', updateLeaveDatesConstraints);
+        emergencyLeaveCheckbox.addEventListener('change', updateLeaveDatesConstraints);
+
+
+        communicationForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            // Disable button and show loading spinner
+            submitButton.disabled = true;
+            submitButton.classList.add('loading');
+
+            // Validate sender role
+            if (senderRoleSelect.value === 'Other' && !otherRoleInput.value.trim()) {
+                showModal('Please specify your role for "Other" selection.', 'warning');
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                return;
+            }
+
+            // Collect common form data
+            const formData = {
+                senderName: document.getElementById('senderName').value,
+                senderId: document.getElementById('senderId').value,
+                senderEmail: document.getElementById('senderEmail').value,
+                senderRole: senderRoleSelect.value === 'Other' ? otherRoleInput.value.trim() : senderRoleSelect.value,
+                requestType: requestTypeSelect.value,
+                requestSubject: document.getElementById('requestSubject').value,
+                contactPhone: document.getElementById('contactPhone').value
+            };
+
+            // Add conditional data based on request type and role
+            const selectedRequestType = requestTypeSelect.value;
+            const selectedRole = senderRoleSelect.value;
+
+            if (selectedRequestType === 'Leave Letter') {
+                const startDate = new Date(leaveStartDateInput.value);
+                const endDate = new Date(leaveEndDateInput.value);
+                const isEmergency = emergencyLeaveCheckbox.checked;
+
+                if (!leaveStartDateInput.value || !leaveEndDateInput.value || !leaveReasonTextarea.value) {
+                    showModal('Please provide all required details for Leave Letter.', 'warning');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    return;
+                }
+                if (startDate > endDate) {
+                    showModal('End Date cannot be before Start Date.', 'error');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    return;
+                }
+
+                const oneDay = 24 * 60 * 60 * 1000;
+                const diffDays = Math.round(Math.abs((startDate - endDate) / oneDay)) + 1;
+
+                if (!isEmergency && diffDays > 2) {
+                    showModal('Non-emergency leave cannot exceed 2 consecutive days.', 'error');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    return;
+                }
+
+                if (!isEmergency) {
+                    showModal('Please note: The rule "only 2 leaves can be taken in a month" requires a backend system to track past leave requests. This client-side form cannot enforce that rule.', 'info');
+                }
+
+                formData.leaveStartDate = leaveStartDateInput.value;
+                formData.leaveEndDate = leaveEndDateInput.value;
+                formData.emergencyLeave = emergencyLeaveCheckbox.checked ? 'on' : '';
+                formData.leaveReason = leaveReasonTextarea.value;
+
+            } else if (selectedRequestType === 'Weekly Report') {
+                // Collect data based on selected role's report fields
+                if (selectedRole === 'Teacher') {
+                    if (!teacherReportWeekStartDateInput.value || !teacherClassesTaughtTextarea.value || !teacherTopicsCoveredTextarea.value ||
+                        !teacherStudentProgressTextarea.value || !teacherUpcomingActivitiesTextarea.value) {
+                        showModal('Please provide all required details for Teacher Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = teacherReportWeekStartDateInput.value;
+                    formData.teacherClassesTaught = teacherClassesTaughtTextarea.value;
+                    formData.teacherTopicsCovered = teacherTopicsCoveredTextarea.value;
+                    formData.teacherStudentProgress = teacherStudentProgressTextarea.value;
+                    formData.teacherUpcomingActivities = teacherUpcomingActivitiesTextarea.value;
+                    formData.teacherIssuesFeedback = teacherIssuesFeedbackTextarea.value;
+                } else if (selectedRole === 'Principal') {
+                    if (!principalReportWeekStartDateInput.value || !principalKeyAchievementsTextarea.value || !principalOperationalChallengesTextarea.value ||
+                        !principalStaffingUpdatesTextarea.value || !principalStudentWelfareTextarea.value || !principalUpcomingEventsTextarea.value ||
+                        !principalBudgetNeedsTextarea.value) {
+                        showModal('Please provide all required details for Principal Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = principalReportWeekStartDateInput.value;
+                    formData.principalKeyAchievements = principalKeyAchievementsTextarea.value;
+                    formData.principalOperationalChallenges = principalOperationalChallengesTextarea.value;
+                    formData.principalStaffingUpdates = principalStaffingUpdatesTextarea.value;
+                    formData.principalStudentWelfare = principalStudentWelfareTextarea.value;
+                    formData.principalUpcomingEvents = principalUpcomingEventsTextarea.value;
+                    formData.principalBudgetNeeds = principalBudgetNeedsTextarea.value;
+                    formData.principalGeneralRemarks = principalGeneralRemarksTextarea.value;
+                } else if (selectedRole === 'CEO' || selectedRole === 'MD') {
+                    if (!ceoMdReportWeekStartDateInput.value || !ceoMdStrategicProgressTextarea.value || !ceoMdFinancialOverviewTextarea.value ||
+                        !ceoMdKeyDecisionsTextarea.value || !ceoMdMarketInsightsTextarea.value || !ceoMdChallengesRisksTextarea.value ||
+                        !ceoMdNextStepsTextarea.value) {
+                        showModal('Please provide all required details for CEO/MD Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = ceoMdReportWeekStartDateInput.value;
+                    formData.ceoMdStrategicProgress = ceoMdStrategicProgressTextarea.value;
+                    formData.ceoMdFinancialOverview = ceoMdFinancialOverviewTextarea.value;
+                    formData.ceoMdKeyDecisions = ceoMdKeyDecisionsTextarea.value;
+                    formData.ceoMdMarketInsights = ceoMdMarketInsightsTextarea.value;
+                    formData.ceoMdChallengesRisks = ceoMdChallengesRisksTextarea.value;
+                    formData.ceoMdNextSteps = ceoMdNextStepsTextarea.value;
+                    formData.ceoMdGeneralComments = ceoMdGeneralCommentsTextarea.value;
+                } else if (selectedRole === 'Clerk' || selectedRole === 'Coordinator') { // Assuming Coordinator also uses Clerk report
+                     if (!clerkReportWeekStartDateInput.value || !clerkAdminTasksTextarea.value || !clerkStudentRecordsTextarea.value ||
+                        !clerkCorrespondenceTextarea.value || !clerkInventoryStatusTextarea.value || !clerkOfficeIssuesTextarea.value) {
+                        showModal('Please provide all required details for Clerk/Coordinator Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = clerkReportWeekStartDateInput.value;
+                    formData.clerkAdminTasks = clerkAdminTasksTextarea.value;
+                    formData.clerkStudentRecords = clerkStudentRecordsTextarea.value;
+                    formData.clerkCorrespondence = clerkCorrespondenceTextarea.value;
+                    formData.clerkInventoryStatus = clerkInventoryStatusTextarea.value;
+                    formData.clerkOfficeIssues = clerkOfficeIssuesTextarea.value;
+                    formData.clerkGeneralNotes = clerkGeneralNotesTextarea.value;
+                } else {
+                    showModal('Please select a specific role (Teacher, Principal, CEO, MD, Clerk, Coordinator) for Weekly Report, or choose "General Message".', 'warning');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    return;
+                }
+            } else if (selectedRequestType === 'General Message' || selectedRequestType === 'Event Announcement' ||
+                       selectedRequestType === 'Resource Request' || selectedRequestType === 'IT Support Request' ||
+                       selectedRequestType === 'Feedback/Suggestion' || selectedRequestType === 'Other') {
+                if (!generalMessageDetailsTextarea.value) {
+                    showModal('Please provide your message details.', 'warning');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    return;
+                }
+                formData.generalMessageDetails = generalMessageDetailsTextarea.value;
+            }
+
+            // IMPORTANT: This URL must be your deployed Google Apps Script Web App URL
+            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqIUE173Vpl-2_doPSivUNqFDN1ElTiVO6iSk5QOYjIRc9k1kmUD6jF5mcUu6tEQIflA/exec';
+
+            if (GOOGLE_APPS_SCRIPT_URL.includes('YOUR_DEPLOYED_WEB_APP_URL_HERE')) {
+                showModal('Error: Google Apps Script URL is not set. Please update the HTML file with your deployed script URL.', 'error');
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                return;
+            }
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData).toString(),
+                });
+
+                showModal('Communication sent successfully!', 'success');
+
+                // Clear the form and reset sections after successful submission
+                this.reset();
+                updateFormSections(); // Reset visibility and required attributes
+                otherRoleSection.classList.add('hidden'); // Ensure other role is hidden
+                otherRoleInput.value = ''; // Clear other role input
+                otherRoleInput.removeAttribute('required'); // Remove required
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showModal('Failed to send communication. Please try again later. Check console for details.', 'error');
+            } finally {
+                // Re-enable button and hide loading spinner regardless of success or failure
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+            }
+        });
+
+        // Initialize form sections on page load
+        window.onload = () => {
+            updateFormSections(); // Set initial state
+        };
+    </script>
+</body>
+</html>
