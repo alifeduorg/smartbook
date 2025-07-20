@@ -410,8 +410,17 @@
 
     <div class="main-container">
         <!-- Logo at the top center -->
-        <!-- IMPORTANT: Replace "YOUR_ALIF_EDU_LOGO_PUBLIC_URL_HERE" with the actual public URL of your logo image. -->
-        <!-- Example: If your image is hosted on Imgur, it might look like "https://i.imgur.com/yourlogo.png" -->
+        <!--
+            ***************************************************************************************************
+            IMPORTANT: To display your logo, you MUST replace "YOUR_ALIF_EDU_LOGO_PUBLIC_URL_HERE"
+            with the actual public URL of your "alif edu (600 x 300 px) (820 x 312 px).png" image.
+            This image needs to be hosted online (e.g., Google Drive, Imgur, your own web server)
+            and accessible publicly via a direct URL.
+            Example: If your image is hosted on Imgur, it might look like "https://i.imgur.com/yourlogo.png"
+            The current error "Error loading image YOUR_ALIF_EDU_LOGO_PUBLIC_URL_HERE" means this placeholder
+            URL has not been replaced with a valid, accessible image URL.
+            ***************************************************************************************************
+        -->
         <img src="alif edu (600 x 300 px) (820 x 312 px).png"
              alt="alif edu (600 x 300 px) (820 x 312 px).png"
              class="block mx-auto mb-6 max-w-full h-auto"
@@ -527,7 +536,7 @@
             </div>
 
             <h3 class="text-xl font-bold text-indigo-700 mb-3 mt-6">Performance Graph</h3>
-            <div class="relative h-auto w-full mb-6">
+            <div class="relative h-auto w-full mb-6 max-h-96"> <!-- Added max-h-96 for graph container -->
                 <canvas id="performanceChart"></canvas>
             </div>
 
@@ -1044,7 +1053,7 @@
                                 text: graphGrouping === 'individual' ? 'Exam Instances' : (graphGrouping === 'subject_average' ? 'Subjects' : 'Exam Types'),
                                 color: '#2d3748',
                                 font: {
-                                    size: 16,
+                                    size: 14, // Changed from 16 to 14
                                     weight: 'bold',
                                     family: 'Poppins' /* Changed to Poppins */
                                 }
@@ -1109,6 +1118,22 @@
                 el.style.display = 'none'; // Hide all original content
             });
 
+            // Temporarily move modalContent off-screen and remove height constraints for capture
+            originalElementsState.push({ element: modalContent, originalStyle: modalContent.style.cssText });
+            modalContent.style.position = 'absolute';
+            modalContent.style.left = '-9999px';
+            modalContent.style.maxHeight = 'none'; // Remove max-height for capture
+            modalContent.style.overflowY = 'visible'; // Allow content to expand
+
+            // Also ensure the chart container itself doesn't have max-height for capture
+            const performanceChartContainer = document.querySelector('#performanceModal .relative.h-auto.w-full.mb-6');
+            if (performanceChartContainer) {
+                originalElementsState.push({ element: performanceChartContainer, originalStyle: performanceChartContainer.style.cssText });
+                performanceChartContainer.style.maxHeight = 'none';
+                performanceChartContainer.style.height = '600px'; // Give it a generous height for capture
+            }
+
+
             // Create a new container for downloadable content
             const downloadableContent = document.createElement('div');
             downloadableContent.id = 'downloadableContent';
@@ -1124,7 +1149,7 @@
             const logoImg = document.createElement('img');
             // IMPORTANT: Replace this URL with your actual public logo URL
             // This placeholder is 820x312 pixels as requested.
-            logoImg.src = 'YOUR_ALIF_EDU_LOGO_PUBLIC_URL_HERE';
+            logoImg.src = 'alif edu (600 x 300 px) (820 x 312 px).png';
             logoImg.alt = 'alif edu (600 x 300 px) (820 x 312 px).png'; // Using the exact file name here
             logoImg.style.display = 'block'; // Make it a block element
             logoImg.style.margin = '0 auto 20px auto'; // Center it and add margin below
@@ -1214,9 +1239,15 @@
                 modalContent.removeChild(downloadableContent);
             }
 
-            // Restore original display styles
+            // Revert modalContent styles
             originalElementsState.forEach(item => {
-                item.element.style.display = item.originalDisplay;
+                if (item.element === modalContent) {
+                    item.element.style.cssText = item.originalStyle; // Restore original inline style
+                } else if (item.element === document.querySelector('#performanceModal .relative.h-auto.w-full.mb-6')) {
+                    item.element.style.cssText = item.originalStyle; // Restore original inline style for chart container
+                } else {
+                    item.element.style.display = item.originalDisplay;
+                }
             });
             originalElementsState = []; // Clear the array
         }
