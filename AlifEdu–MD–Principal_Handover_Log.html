@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alif Edu – MD–Principal Handover Log</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Define CSS Variables for consistent theming */
+        :root {
+            --primary-blue: #4A90E2; /* A friendly, accessible blue */
+            --secondary-darkblue: #2F6F9D; /* A darker shade for accents */
+            --accent-orange: #FF7043; /* A vibrant orange for highlights/buttons */
+            --light-gray: #F0F2F5; /* A very light background gray */
+            --mid-gray: #E0E5EC; /* Slightly darker background shade */
+            --dark-text: #333; /* Standard dark text color */
+            --light-text: #fff; /* White text for dark backgrounds */
+            --border-radius: 12px; /* Consistent rounded corners */
+            --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+            --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
+            --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow */
+        }
+
+        body {
+            margin: 0;
+            padding: 20px; /* Reduced padding for better mobile fit */
+            font-family: 'Poppins', sans-serif; /* Modern, friendly font */
+            background: linear-gradient(135deg, var(--light-gray), var(--mid-gray)); /* Soft gradient background */
+            color: var(--dark-text);
+            min-height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: flex-start; /* Align content to the top */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            position: relative; /* For background animations */
+        }
+
+        /* Background Animation - Subtle, floating shapes */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3); /* Translucent white for a dreamy effect */
+            border-radius: 50%; /* Circular shapes */
+            opacity: 0.6;
+            filter: blur(80px); /* Soft blur */
+            z-index: -1; /* Behind content */
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            left: -50px;
+            animation: moveShape 15s infinite alternate ease-in-out; /* Slower animation */
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            bottom: -80px;
+            right: -80px;
+            animation: moveShape 20s infinite alternate-reverse ease-in-out; /* Different timing for variety */
+        }
+
+        @keyframes moveShape {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.05);
+            }
+            50% {
+                transform: translate(0, 50px) scale(0.95);
+            }
+            75% {
+                transform: translate(-40px, -20px) scale(1.1);
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        /* Custom font for a clean look */
+        /* body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+        /* } */
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #e2e8f0; /* Lighter gray track */
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* Medium gray thumb */
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Darker gray on hover */
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for glassmorphism */
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            max-width: 600px; /* Max width for readability on large screens */
+            width: 100%; /* Full width on smaller screens */
+            margin-top: 40px; /* Space from top */
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between icon and text */
+        }
+
+        h1 .icon {
+            font-size: 1.2em; /* Larger icon */
+            color: var(--accent-orange); /* Accent color for icon */
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: 600;
+            color: var(--dark-text);
+            font-size: 0.95em;
+        }
+
+        input,
+        select,
+        textarea { /* Added textarea to this rule */
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd; /* Light border */
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05); /* Inner shadow for depth */
+            font-size: 1em;
+            margin-bottom: 15px;
+            width: calc(100% - 30px); /* Adjust for padding */
+            max-width: 100%; /* Ensure it doesn't exceed parent width */
+            transition: all 0.3s ease; /* Smooth transitions */
+            background-color: #fcfcfc; /* Slightly off-white background */
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus { /* Added textarea to this rule */
+            outline: none;
+            border-color: var(--primary-blue); /* Highlight on focus */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Glow effect */
+        }
+
+        button {
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            border: none;
+            color: var(--light-text);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transitions for all properties */
+            font-size: 1em;
+            box-shadow: var(--box-shadow-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Space between icon and text */
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 120px; /* Minimum width for buttons */
+        }
+
+        button:hover {
+            transform: translateY(-3px); /* Lift effect on hover */
+            box-shadow: var(--box-shadow-medium);
+        }
+
+        button:active {
+            transform: translateY(0); /* Press effect */
+            box-shadow: var(--box-shadow-light);
+        }
+
+        /* Specific button styles */
+        .add-slot-button { /* Renamed from .add-slot-button to .add-option-button for general use */
+            background: linear-gradient(145deg, var(--primary-blue), var(--secondary-darkblue));
+        }
+
+        .submit-button {
+            background: linear-gradient(145deg, #28a745, #218838); /* Green for submit */
+        }
+
+        .dashboard-button { /* Renamed from .dashboard-button to .view-logs-button */
+            background: linear-gradient(145deg, var(--accent-orange), #E65100); /* Orange for dashboard */
+        }
+
+        .remove-slot-button { /* Renamed from .remove-slot-button to .remove-option-button for general use */
+            background: linear-gradient(145deg, #dc3545, #c82333); /* Red for remove */
+            margin-top: 15px;
+            width: auto; /* Allow remove button to size based on content */
+            align-self: flex-end; /* Align to the right within the slot */
+        }
+
+        #appAccessContainer > div.dynamic-row,
+        #leaveSubstitutesContainer > div.dynamic-row,
+        #classProblemsContainer > div.dynamic-row,
+        #parentConcernsContainer > div.dynamic-row {
+            background: var(--light-text); /* White background for slots */
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-light);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            position: relative; /* For potential absolute positioning of elements */
+        }
+
+        #appAccessContainer > div.dynamic-row:hover,
+        #leaveSubstitutesContainer > div.dynamic-row:hover,
+        #classProblemsContainer > div.dynamic-row:hover,
+        #parentConcernsContainer > div.dynamic-row:hover {
+            transform: translateY(-5px); /* More pronounced lift on slot hover */
+            box-shadow: var(--box-shadow-hover);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px; /* Space between buttons */
+            flex-wrap: wrap; /* Wrap buttons on smaller screens */
+            margin-top: 30px;
+            justify-content: center; /* Center buttons */
+        }
+
+        /* Custom Modal for Alerts */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* On top of everything */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--light-text);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .modal-icon.success { color: #28a745; }
+        .modal-icon.error { color: #dc3545; }
+        .modal-icon.warning { color: #FF7043; }
+
+        .modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .modal-button {
+            background: var(--primary-blue);
+            color: var(--light-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .modal-button:hover {
+            background: var(--secondary-darkblue);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--light-text);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        .submit-button.loading .spinner {
+            display: block;
+        }
+
+        .submit-button.loading span {
+            display: none; /* Hide text when loading */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                align-items: center; /* Center content vertically on smaller screens */
+            }
+
+            .container {
+                margin-top: 20px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            input, select, button {
+                font-size: 0.95em;
+                padding: 10px 12px;
+            }
+
+            .buttons {
+                flex-direction: column; /* Stack buttons vertically */
+                gap: 10px;
+            }
+
+            button {
+                width: 100%; /* Full width buttons */
+            }
+
+            #appAccessContainer > div.dynamic-row,
+            #leaveSubstitutesContainer > div.dynamic-row,
+            #classProblemsContainer > div.dynamic-row,
+            #parentConcernsContainer > div.dynamic-row {
+                padding: 15px;
+                margin: 15px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="container">
+        <h1><span class="icon">📘</span> Alif Edu – MD–Principal Handover Log</h1>
+
+        <form id="handoverForm" class="space-y-6">
+            <!-- Date Field -->
+            <div>
+                <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input type="date" id="date" name="Date" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-100 cursor-not-allowed" readonly>
+            </div>
+
+            <!-- Submitted By Dropdown -->
+            <div>
+                <label for="submittedBy" class="block text-sm font-medium text-gray-700 mb-1">Submitted by</label>
+                <select id="submittedBy" name="Submitted By" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white" required>
+                    <option value="" disabled selected>Select who is submitting</option>
+                    <option value="MD">MD</option>
+                    <option value="Principal">Principal</option>
+                </select>
+            </div>
+
+            <!-- App Access Given - Dynamic Fields -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">App Access Given</label>
+                <div id="appAccessContainer" class="space-y-3 p-3 border border-gray-300 rounded-md bg-gray-50">
+                    <!-- Initial row added by JavaScript -->
+                </div>
+                <button type="button" id="addAppAccessRow" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 shadow-sm add-slot-button">➕ Add Option</button>
+            </div>
+
+            <!-- Leave & Substitutes - Dynamic Fields -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Leave & Substitutes</label>
+                <div id="leaveSubstitutesContainer" class="space-y-3 p-3 border border-gray-300 rounded-md bg-gray-50">
+                    <!-- Initial row added by JavaScript -->
+                </div>
+                <button type="button" id="addLeaveSubstituteRow" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 shadow-sm add-slot-button">➕ Add Option</button>
+            </div>
+
+            <!-- Class Problems - Dynamic Fields -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Class Problems</label>
+                <div id="classProblemsContainer" class="space-y-3 p-3 border border-gray-300 rounded-md bg-gray-50">
+                    <!-- Initial row added by JavaScript -->
+                </div>
+                <button type="button" id="addClassProblemRow" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 shadow-sm add-slot-button">➕ Add Option</button>
+            </div>
+
+            <!-- Parent Concerns - Dynamic Fields -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Parent Concerns</label>
+                <div id="parentConcernsContainer" class="space-y-3 p-3 border border-gray-300 rounded-md bg-gray-50">
+                    <!-- Initial row added by JavaScript -->
+                </div>
+                <button type="button" id="addParentConcernRow" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 shadow-sm add-slot-button">➕ Add Option</button>
+            </div>
+
+            <!-- Tasks for Follow-up (remains textarea) -->
+            <div>
+                <label for="followUpTasks" class="block text-sm font-medium text-gray-700 mb-1">Tasks for Follow-up</label>
+                <textarea id="followUpTasks" name="Follow-Up Tasks" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-y"></textarea>
+            </div>
+
+            <!-- General Notes (remains textarea) -->
+            <div>
+                <label for="generalNotes" class="block text-sm font-medium text-gray-700 mb-1">General Notes</label>
+                <textarea id="generalNotes" name="Notes" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-y"></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 pt-4">
+                <button type="submit" id="submitBtn" class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150 submit-button">
+                    <span class="spinner"></span>
+                    <span>✅ Submit</span>
+                </button>
+                <button type="button" id="viewLogsBtn" class="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition ease-in-out duration-150 dashboard-button">
+                    🏠 View Past Logs
+                </button>
+            </div>
+        </form>
+
+        <!-- Message Box for feedback -->
+        <div id="messageBox" class="hidden mt-6 p-4 rounded-md text-sm text-center" role="alert"></div>
+    </div>
+
+    <!-- Custom Modal for Alerts -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalIcon" class="modal-icon"></div>
+            <p id="modalMessage" class="modal-message"></p>
+            <button class="modal-button" onclick="hideModal()">OK</button>
+        </div>
+    </div>
+
+    <!-- Datalist for auto-completion -->
+    <datalist id="teachersList"></datalist>
+    <datalist id="studentNamesList"></datalist>
+    <datalist id="classesList"></datalist> <!-- This will now contain "RoomNo-ClassName" -->
+    <datalist id="studentIdsList"></datalist>
+    <datalist id="roomNosList"></datalist>
+
+    <script>
+        // Store all student data for auto-filling
+        let allStudents = [];
+
+        // Set today's date
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+            // Populate datalists and allStudents array
+            populateDatalists();
+
+            // Add initial rows for dynamic fields
+            addAppAccessRow();
+            addLeaveSubstituteRow();
+            addClassProblemRow();
+            addParentConcernRow();
+        });
+
+        const form = document.getElementById('handoverForm');
+        const messageBox = document.getElementById('messageBox');
+        const viewLogsBtn = document.getElementById('viewLogsBtn');
+
+        // Custom Modal elements
+        const customModal = document.getElementById("customModal");
+        const modalIcon = document.getElementById("modalIcon");
+        const modalMessage = document.getElementById("modalMessage");
+        const submitBtn = document.getElementById("submitBtn"); // Get submit button reference
+
+
+        // IMPORTANT: Replace with your Google Apps Script Web App URL
+        // After deploying your Google Apps Script as a web app, copy its URL here.
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwATpmBcYV4twlfEVUQyJsixyprDdm0psjtZMQpmY1B3mQXoJnTgqprjNqX_fff6qV_/exec';
+
+        // Function to show custom modal
+        function showModal(message, type = 'info') {
+            modalMessage.textContent = message;
+            modalIcon.className = 'modal-icon'; // Reset classes
+            if (type === 'success') {
+                modalIcon.textContent = '🎉';
+                modalIcon.classList.add('success');
+            } else if (type === 'error') {
+                modalIcon.textContent = '❌';
+                modalIcon.classList.add('error');
+            } else if (type === 'warning') {
+                modalIcon.textContent = '⚠️';
+                modalIcon.classList.add('warning');
+            } else { // Default info
+                modalIcon.textContent = 'ℹ️';
+            }
+            customModal.classList.add('visible');
+        }
+
+        // Function to hide custom modal
+        function hideModal() {
+            customModal.classList.remove('visible');
+        }
+
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            // --- ERROR FIX: Check if WEB_APP_URL is configured ---
+            if (!WEB_APP_URL || WEB_APP_URL === '') {
+                showModal('Error: Please configure your Google Apps Script Web App URL in the script (WEB_APP_URL constant).', 'error');
+                return; // Stop form submission
+            }
+            // --- END ERROR FIX ---
+
+            // Show loading message and spinner
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            showMessage('Submitting data...', 'bg-blue-100 text-blue-800');
+
+
+            const data = {};
+
+            // Collect static fields
+            data['Date'] = document.getElementById('date').value;
+            data['Submitted By'] = document.getElementById('submittedBy').value;
+            data['Follow-Up Tasks'] = document.getElementById('followUpTasks').value;
+            data['Notes'] = document.getElementById('generalNotes').value;
+
+            // Collect dynamic App Access data
+            const appAccessRows = document.querySelectorAll('#appAccessContainer > div.dynamic-row');
+            let appAccessData = [];
+            appAccessRows.forEach(row => {
+                const classVal = row.querySelector('.app-access-class').value.trim();
+                const studentVal = row.querySelector('.app-access-student').value.trim();
+                const studentIdVal = row.querySelector('.app-access-student-id').value.trim();
+                const teacherVal = row.querySelector('.app-access-teacher').value.trim();
+                const roomNoVal = row.querySelector('.app-access-room-no').value.trim(); // Get room number (hidden)
+
+                if (classVal || studentVal || studentIdVal || teacherVal || roomNoVal) {
+                    appAccessData.push(`CLASS: ${classVal || 'N/A'}, STUDENT: ${studentVal || 'N/A'}, ID: ${studentIdVal || 'N/A'}, TEACHER: ${teacherVal || 'N/A'}, ROOM: ${roomNoVal || 'N/A'}`);
+                }
+            });
+            data['App Access'] = appAccessData.join('\n');
+
+            // Collect dynamic Leave & Substitutes data
+            const leaveSubstitutesRows = document.querySelectorAll('#leaveSubstitutesContainer > div.dynamic-row');
+            let leaveSubstitutesData = [];
+            leaveSubstitutesRows.forEach(row => {
+                const teacherName = row.querySelector('.leave-teacher-name').value.trim();
+                const substitute = row.querySelector('.leave-substitute').value.trim();
+                const classVal = row.querySelector('.leave-class').value.trim();
+                if (teacherName || substitute || classVal) {
+                    leaveSubstitutesData.push(`TEACHER: ${teacherName || 'N/A'}, SUBSTITUTE: ${substitute || 'N/A'}, CLASS: ${classVal || 'N/A'}`);
+                }
+            });
+            data['Leave/Substitute'] = leaveSubstitutesData.join('\n');
+
+            // Collect dynamic Class Problems data
+            const classProblemsRows = document.querySelectorAll('#classProblemsContainer > div.dynamic-row');
+            let classProblemsData = [];
+            classProblemsRows.forEach(row => {
+                const context = row.querySelector('.class-problem-context').value.trim();
+                const problem = row.querySelector('.class-problem-description').value.trim();
+                const solution = row.querySelector('.class-problem-solution').value.trim();
+                if (context || problem || solution) {
+                    classProblemsData.push(`CONTEXT: ${context || 'N/A'}, PROBLEM: ${problem || 'N/A'}, SOLUTION: ${solution || 'N/A'}`);
+                }
+            });
+            data['Class Problems'] = classProblemsData.join('\n');
+
+            // Collect dynamic Parent Concerns data
+            const parentConcernsRows = document.querySelectorAll('#parentConcernsContainer > div.dynamic-row');
+            let parentConcernsData = [];
+            parentConcernsRows.forEach(row => {
+                const parentName = row.querySelector('.parent-concern-parent-name').value.trim();
+                const classVal = row.querySelector('.parent-concern-class').value.trim();
+                const studentName = row.querySelector('.parent-concern-student-name').value.trim();
+                const concern = row.querySelector('.parent-concern-concern').value.trim();
+                const action = row.querySelector('.parent-concern-action').value.trim();
+                if (parentName || classVal || studentName || concern || action) {
+                    parentConcernsData.push(`PARENT: ${parentName || 'N/A'}, CLASS: ${classVal || 'N/A'}, STUDENT: ${studentName || 'N/A'}, CONCERN: ${concern || 'N/A'}, ACTION: ${action || 'N/A'}`);
+                }
+            });
+            data['Parent Concern'] = parentConcernsData.join('\n');
+
+            // Ensure the order matches the Google Apps Script expected order
+            const orderedData = {
+                'Date': data['Date'],
+                'Submitted By': data['Submitted By'],
+                'App Access': data['App Access'],
+                'Leave/Substitute': data['Leave/Substitute'],
+                'Class Problems': data['Class Problems'],
+                'Parent Concern': data['Parent Concern'],
+                'Follow-Up Tasks': data['Follow-Up Tasks'],
+                'Notes': data['Notes']
+            };
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Required for Google Apps Script as a simple POST
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(orderedData).toString()
+                });
+
+                // Since mode is 'no-cors', we can't directly read response.ok or response.json()
+                // We assume success if no network error occurred.
+                showModal('Timetable submitted successfully!', 'success');
+                form.reset(); // Clear the form
+                // Re-set the date and dynamic fields after reset
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+                resetDynamicFields();
+
+            } catch (error) {
+                console.error('Error submitting data:', error);
+                showModal('Error submitting data. Please try again.', 'error');
+            } finally {
+                // Hide loading spinner and re-enable button
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Function to display messages (now using custom modal)
+        function showMessage(message, classes) {
+            // This function is now redundant for user-facing messages,
+            // as showModal is used directly. Keeping for consistency with previous
+            // implementation or if other non-modal messages are needed.
+            // For now, it will just log to console or you can remove it.
+            console.log(`Message: ${message} (Classes: ${classes})`);
+        }
+
+
+        // View Past Logs button functionality
+        viewLogsBtn.addEventListener('click', () => {
+            // IMPORTANT: Replace with your Google Sheet URL
+            // You can get this from your Google Sheet by clicking 'Share' or just copying the URL from your browser.
+            const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1t6OndQutjlVSBvL_ORXZMDw8TIDYh6bYtEQOeRb31_A/edit?gid=0#gid=0';
+
+            // --- ERROR FIX: Check if GOOGLE_SHEET_URL is configured ---
+            if (!GOOGLE_SHEET_URL || GOOGLE_SHEET_URL === '') {
+                showModal('Error: Please configure your Google Sheet URL in the script (GOOGLE_SHEET_URL constant).', 'error');
+                return; // Stop opening the tab
+            }
+            // --- END ERROR FIX ---
+
+            window.open(GOOGLE_SHEET_URL, '_blank');
+        });
+
+        // Function to create a remove button
+        function createRemoveButton(row) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'col-span-1 sm:col-span-1 px-3 py-1 bg-red-500 text-white rounded-md text-xs hover:bg-red-600 shadow-sm self-end remove-slot-button';
+            removeBtn.textContent = '🗑 Remove';
+            removeBtn.onclick = () => row.remove();
+            return removeBtn;
+        }
+
+        // Auto-fill logic for App Access and Parent Concern fields
+        function autoFillStudentDetails(inputElement, fieldType, rowElement) {
+            const value = inputElement.value.trim();
+            // Clear all related fields in the row if the input is cleared
+            if (!value) {
+                rowElement.querySelector('.app-access-class, .parent-concern-class').value = '';
+                rowElement.querySelector('.app-access-student, .parent-concern-student-name').value = '';
+                if (rowElement.querySelector('.app-access-student-id')) { // Only exists in app access rows
+                    rowElement.querySelector('.app-access-student-id').value = '';
+                }
+                if (rowElement.querySelector('.app-access-room-no')) { // Only exists in app access rows
+                    rowElement.querySelector('.app-access-room-no').value = '';
+                }
+                return;
+            }
+
+            let foundStudent = null;
+            if (fieldType === 'className') {
+                // When class input is changed, value is "RoomNo-ClassName"
+                // Find student matching the full "RoomNo-ClassName" combination
+                const parts = value.split('-');
+                if (parts.length >= 2) {
+                    const roomNoPart = parts[0];
+                    const classNamePart = parts.slice(1).join('-'); // Handle cases like 'C1-X' or 'C1-10'
+                    foundStudent = allStudents.find(student =>
+                        student.roomNo.toLowerCase() === roomNoPart.toLowerCase() &&
+                        student.className.toLowerCase() === classNamePart.toLowerCase()
+                    );
+                }
+            } else if (fieldType === 'studentName') {
+                foundStudent = allStudents.find(student => student.studentName.toLowerCase() === value.toLowerCase());
+            } else if (fieldType === 'studentId') {
+                foundStudent = allStudents.find(student => student.studentId.toLowerCase() === value.toLowerCase());
+            }
+
+            if (foundStudent) {
+                // For App Access rows
+                if (rowElement.querySelector('.app-access-class')) {
+                    rowElement.querySelector('.app-access-class').value = `${foundStudent.roomNo}-${foundStudent.className}`;
+                    rowElement.querySelector('.app-access-student').value = foundStudent.studentName;
+                    rowElement.querySelector('.app-access-student-id').value = foundStudent.studentId;
+                    rowElement.querySelector('.app-access-room-no').value = foundStudent.roomNo; // Populate hidden room number
+                }
+                // For Parent Concern rows
+                if (rowElement.querySelector('.parent-concern-class')) {
+                    rowElement.querySelector('.parent-concern-class').value = `${foundStudent.roomNo}-${foundStudent.className}`;
+                    rowElement.querySelector('.parent-concern-student-name').value = foundStudent.studentName;
+                    // Parent concern doesn't have student ID or room number fields in the UI, so no need to set them.
+                }
+            }
+        }
+
+        // Functions to add rows for dynamic fields
+        function addAppAccessRow() {
+            const container = document.getElementById('appAccessContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'grid grid-cols-1 sm:grid-cols-5 gap-3 dynamic-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="ROOM-CLASS" class="app-access-class px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="classesList">
+                <input type="text" placeholder="STUDENT NAME" class="app-access-student px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="studentNamesList">
+                <input type="text" placeholder="STUDENT ID" class="app-access-student-id px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="studentIdsList">
+                <input type="text" placeholder="TEACHER" class="app-access-teacher px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="teachersList">
+                <input type="hidden" class="app-access-room-no"> <!-- Hidden field for room number -->
+            `;
+            newRow.appendChild(createRemoveButton(newRow));
+            container.appendChild(newRow);
+
+            // Add event listeners for auto-fill to the newly created inputs
+            newRow.querySelector('.app-access-class').addEventListener('input', (event) => autoFillStudentDetails(event.target, 'className', newRow));
+            newRow.querySelector('.app-access-student').addEventListener('input', (event) => autoFillStudentDetails(event.target, 'studentName', newRow));
+            newRow.querySelector('.app-access-student-id').addEventListener('input', (event) => autoFillStudentDetails(event.target, 'studentId', newRow));
+        }
+
+        function addLeaveSubstituteRow() {
+            const container = document.getElementById('leaveSubstitutesContainer');
+            const newRow = document.createElement('div');
+            // Adjusted grid-cols to 4 since Staff ID is removed
+            newRow.className = 'grid grid-cols-1 sm:grid-cols-4 gap-3 dynamic-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="TEACHER NAME" class="leave-teacher-name px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="teachersList">
+                <input type="text" placeholder="SUBSTITUTE (NAME ID)" class="leave-substitute px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="teachersList">
+                <input type="text" placeholder="ROOM-CLASS" class="leave-class px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="classesList">
+            `;
+            newRow.appendChild(createRemoveButton(newRow));
+            container.appendChild(newRow);
+        }
+
+        function addClassProblemRow() {
+            const container = document.getElementById('classProblemsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'grid grid-cols-1 sm:grid-cols-4 gap-3 dynamic-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="CLASSROOM : TEACHER (PERIOD)" class="class-problem-context px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="roomNosList">
+                <input type="text" placeholder="PROBLEM" class="class-problem-description px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="text" placeholder="SOLUTION (IF TAKEN/PENDING)" class="class-problem-solution px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            `;
+            newRow.appendChild(createRemoveButton(newRow));
+            container.appendChild(newRow);
+        }
+
+        function addParentConcernRow() {
+            const container = document.getElementById('parentConcernsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'grid grid-cols-1 sm:grid-cols-6 gap-3 dynamic-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="PARENT NAME" class="parent-concern-parent-name px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="text" placeholder="ROOM-CLASS" class="parent-concern-class px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="classesList">
+                <input type="text" placeholder="STUDENT NAME" class="parent-concern-student-name px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" list="studentNamesList">
+                <input type="text" placeholder="CONCERN" class="parent-concern-concern px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="text" placeholder="ACTION" class="parent-concern-action px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            `;
+            newRow.appendChild(createRemoveButton(newRow));
+            container.appendChild(newRow);
+
+            // Add event listeners for auto-fill to the newly created inputs
+            newRow.querySelector('.parent-concern-class').addEventListener('input', (event) => autoFillStudentDetails(event.target, 'className', newRow));
+            newRow.querySelector('.parent-concern-student-name').addEventListener('input', (event) => autoFillStudentDetails(event.target, 'studentName', newRow));
+        }
+
+        // Event listeners for add buttons
+        document.getElementById('addAppAccessRow').addEventListener('click', addAppAccessRow);
+        document.getElementById('addLeaveSubstituteRow').addEventListener('click', addLeaveSubstituteRow);
+        document.getElementById('addClassProblemRow').addEventListener('click', addClassProblemRow);
+        document.getElementById('addParentConcernRow').addEventListener('click', addParentConcernRow);
+
+        // Function to reset dynamic fields after form submission
+        function resetDynamicFields() {
+            document.getElementById('appAccessContainer').innerHTML = '';
+            document.getElementById('leaveSubstitutesContainer').innerHTML = '';
+            document.getElementById('classProblemsContainer').innerHTML = '';
+            document.getElementById('parentConcernsContainer').innerHTML = '';
+            addAppAccessRow();
+            addLeaveSubstituteRow();
+            addClassProblemRow();
+            addParentConcernRow();
+        }
+
+        // Function to populate datalists with provided data
+        function populateDatalists() {
+            const teachersData = `ALFTT25001Minha Anam
+ALFTT25002Akshai S
+ALFTT25004JANNATH N
+ALFTT25005Hasna Sherin P
+ALFTT25006Fathima Nifna m
+ALFTT25007Ummu habeeba pk
+ALFTT25009Rihila -k
+ALFTT25011SHIFNA. M
+ALFTT25013Amna pv
+ALFTT25014Avandika T
+ALFTT25015Shamila pk
+ALFTT25017SAFEERA THASNEEM K
+ALFTT25018AKHILA CB`;
+
+            const studentsRawData = `C1 X ALF25001 ADHIL RAHMAN K
+C2 VIII ALF25004 LIYANA
+C3 IX ALF25005 SHIMIL
+C4 III ALF25003 AYISHA SAEEDA.K
+C5 III ALF25006 AYISHA MEHAVISH
+C6 I ALF25011 ANSILA
+C7 1 ALF25010 MEHZA ABBAS
+C8 VII ALF25007 Lamha
+C9 III ALF25009 Faizan
+C10 VI ALF25008 Ansha
+D1 I ALF25002 SHAMMAS`;
+
+            const teachersList = document.getElementById('teachersList');
+            const studentNamesList = document.getElementById('studentNamesList');
+            const classesList = document.getElementById('classesList');
+            const studentIdsList = document.getElementById('studentIdsList');
+            const roomNosList = document.getElementById('roomNosList');
+
+            // Populate teachersList with NAME (ID: ID_NUMBER) format
+            const uniqueTeachers = new Set();
+            teachersData.split('\n').forEach(line => {
+                const match = line.match(/^(ALFTT\d{5})(.*)/); // Capture ID and Name
+                if (match && match[1] && match[2]) {
+                    const teacherId = match[1].trim().toUpperCase();
+                    const teacherName = match[2].trim().toUpperCase();
+                    uniqueTeachers.add(`${teacherName} (ID: ${teacherId})`);
+                }
+            });
+            uniqueTeachers.forEach(formattedTeacher => {
+                const option = document.createElement('option');
+                option.value = formattedTeacher;
+                teachersList.appendChild(option);
+            });
+
+            const uniqueStudentNames = new Set();
+            const uniqueClassesCombined = new Set(); // To store "RoomNo-ClassName"
+            const uniqueStudentIds = new Set();
+            const uniqueRoomNos = new Set();
+
+            studentsRawData.split('\n').forEach(line => {
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 4) {
+                    const roomNo = parts[0].toUpperCase(); // Convert roomNo to uppercase
+                    const className = parts[1].toUpperCase(); // Convert className to uppercase
+                    const studentId = parts[2].toUpperCase(); // Convert studentId to uppercase
+                    const studentName = parts.slice(3).join(' ').toUpperCase(); // Convert studentName to uppercase
+                    allStudents.push({ roomNo, className, studentId, studentName }); // Store in global allStudents array
+
+                    uniqueRoomNos.add(roomNo);
+                    uniqueClassesCombined.add(`${roomNo}-${className}`); // Add combined string "RoomNo-ClassName"
+                    uniqueStudentIds.add(studentId);
+                    uniqueStudentNames.add(studentName);
+                }
+            });
+
+            uniqueStudentNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                studentNamesList.appendChild(option);
+            });
+
+            uniqueClassesCombined.forEach(combinedClass => { // Use the combined set for classesList
+                const option = document.createElement('option');
+                option.value = combinedClass;
+                classesList.appendChild(option);
+            });
+
+            uniqueStudentIds.forEach(id => {
+                const option = document.createElement('option');
+                option.value = id;
+                studentIdsList.appendChild(option);
+            });
+
+            uniqueRoomNos.forEach(roomNo => {
+                const option = document.createElement('option');
+                option.value = roomNo;
+                roomNosList.appendChild(option);
+            });
+        }
+    </script>
+</body>
+</html>
