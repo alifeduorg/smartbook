@@ -4,84 +4,440 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Performance Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for Inter font and general body */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Light gray background */
-            color: #374151; /* Dark gray text */
-        }
-        /* Style for the modal backdrop */
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        /* Hide scrollbar for elements if needed, but allow content to scroll */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        /* Loading spinner animation */
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #4f46e5; /* Indigo-600 */
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Define CSS Variables for consistent theming */
+        :root {
+            --primary-blue: #4A90E2; /* A friendly, accessible blue */
+            --secondary-darkblue: #2F6F9D; /* A darker shade for accents */
+            --accent-orange: #FF7043; /* A vibrant orange for highlights/buttons */
+            --light-gray: #F0F2F5; /* A very light background gray */
+            --mid-gray: #E0E5EC; /* Slightly darker background shade */
+            --dark-text: #333; /* Standard dark text color */
+            --light-text: #fff; /* White text for dark backgrounds */
+            --border-radius: 12px; /* Consistent rounded corners */
+            --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+            --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
+            --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow */
         }
 
-        /* Added styles for modal content overflow */
-        #modalContent {
+        body {
+            margin: 0;
+            padding: 20px; /* Reduced padding for better mobile fit */
+            font-family: 'Poppins', sans-serif; /* Modern, friendly font */
+            background: linear-gradient(135deg, var(--light-gray), var(--mid-gray)); /* Soft gradient background */
+            color: var(--dark-text);
+            min-height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: flex-start; /* Align content to the top */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            position: relative; /* For background animations */
+        }
+
+        /* Background Animation - Subtle, floating shapes */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3); /* Translucent white for a dreamy effect */
+            border-radius: 50%; /* Circular shapes */
+            opacity: 0.6;
+            filter: blur(80px); /* Soft blur */
+            z-index: -1; /* Behind content */
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            left: -50px;
+            animation: moveShape 15s infinite alternate ease-in-out; /* Slower animation */
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            bottom: -80px;
+            right: -80px;
+            animation: moveShape 20s infinite alternate-reverse ease-in-out; /* Different timing for variety */
+        }
+
+        @keyframes moveShape {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.05);
+            }
+            50% {
+                transform: translate(0, 50px) scale(0.95);
+            }
+            75% {
+                transform: translate(-40px, -20px) scale(1.1);
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for glassmorphism */
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            max-width: 1000px; /* Increased max-width for the main container */
+            width: 100%; /* Full width on smaller screens */
+            margin-top: 40px; /* Space from top */
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between icon and text */
+        }
+
+        h1 .icon {
+            font-size: 1.2em; /* Larger icon */
+            color: var(--accent-orange); /* Accent color for icon */
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: 600;
+            color: var(--dark-text);
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd; /* Light border */
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05); /* Inner shadow for depth */
+            font-size: 1em;
+            margin-bottom: 15px;
+            width: calc(100% - 30px); /* Adjust for padding */
+            max-width: 100%; /* Ensure it doesn't exceed parent width */
+            transition: all 0.3s ease; /* Smooth transitions */
+            background-color: #fcfcfc; /* Slightly off-white background */
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue); /* Highlight on focus */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Glow effect */
+        }
+
+        /* Specific styles for the dropdowns to ensure text visibility */
+        .modal-filter-select {
+            min-height: 48px; /* Ensure sufficient height for text */
+            font-size: 1rem; /* Base font size */
+            line-height: 1.5; /* Ensure text sits well */
+            padding: 0.75rem 1rem; /* Adjust padding as needed */
+            width: 100%; /* Ensure they take full width in their column */
+        }
+
+
+        .custom-button {
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            border: none;
+            color: var(--light-text);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transitions for all properties */
+            font-size: 1em;
+            box-shadow: var(--box-shadow-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Space between icon and text */
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 120px; /* Minimum width for buttons */
+        }
+
+        .custom-button:hover {
+            transform: translateY(-3px); /* Lift effect on hover */
+            box-shadow: var(--box-shadow-medium);
+        }
+
+        .custom-button:active {
+            transform: translateY(0); /* Press effect */
+            box-shadow: var(--box-shadow-light);
+        }
+
+        /* Specific button styles */
+        .search-button {
+            background: linear-gradient(145deg, var(--primary-blue), var(--secondary-darkblue));
+        }
+
+        .reset-button {
+            background: linear-gradient(145deg, #6c757d, #5a6268); /* Gray for reset */
+        }
+
+        .download-pdf-button {
+            background: linear-gradient(145deg, #28a745, #218838); /* Green for PDF */
+        }
+
+        .download-jpeg-button {
+            background: linear-gradient(145deg, #007bff, #0056b3); /* Blue for JPEG */
+        }
+
+        .copy-email-button {
+            background: linear-gradient(145deg, var(--accent-orange), #E65100); /* Orange for copy */
+        }
+
+        .view-performance-button {
+            background: linear-gradient(145deg, #6366f1, #4f46e5); /* Indigo for view */
+        }
+
+        /* Table styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-light);
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--light-text);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        thead th {
+            background-color: var(--primary-blue);
+            color: var(--light-text);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f0f8ff; /* Light blue on hover */
+            transition: background-color 0.2s ease;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content-inner {
+            background: rgba(255, 255, 255, 0.98); /* Near opaque white for modal */
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-medium);
+            max-width: 90%; /* Adjust modal width */
+            width: 100%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
             max-height: 90vh; /* Limit modal height to 90% of viewport height */
             overflow-y: auto; /* Enable vertical scrolling if content overflows */
+        }
+
+        .modal-overlay.visible .modal-content-inner {
+            transform: scale(1);
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 2em;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close-button:hover {
+            color: #333;
+        }
+
+        /* Toast message for copy to clipboard */
+        #copyToast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary-darkblue); /* Use theme color */
+            color: var(--light-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow-medium);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 1001; /* Above modal */
+        }
+        #copyToast.show {
+            opacity: 1;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--light-text);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        .loading-indicator .spinner {
+            display: block;
+        }
+
+        .loading-indicator span {
+            margin-left: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                align-items: center; /* Center content vertically on smaller screens */
+            }
+
+            .main-container {
+                margin-top: 20px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            input[type="text"],
+            input[type="date"],
+            select,
+            textarea {
+                font-size: 0.95em;
+                padding: 10px 12px;
+            }
+
+            .button-group {
+                flex-direction: column; /* Stack buttons vertically */
+                gap: 10px;
+            }
+
+            .custom-button {
+                width: 100%; /* Full width buttons */
+            }
+
+            .modal-content-inner {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .modal-filter-select {
+                font-size: 0.9rem; /* Slightly smaller font on mobile */
+                padding: 0.6rem 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-<body class="p-4 sm:p-6 md:p-8">
+<body>
 
-    <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-xl">
-        <h1 class="text-3xl font-bold text-center mb-8 text-indigo-700">Student Performance Overview</h1>
+    <div class="main-container">
+        <h1><span class="icon">📊</span> Student Performance Dashboard</h1>
 
-        <div class="mb-6 flex items-center space-x-2">
+        <div class="mb-6 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-2">
             <input type="text" id="studentSearch" placeholder="Search by Student Name or ID..."
-                   class="flex-grow px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                   onkeyup="filterStudentTable()"> 
-            <button onclick="filterStudentTable()"
-                    class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md shadow-sm transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">
-                Search
+                   class="flex-grow w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base">
+            <button onclick="filterStudentTable()" class="custom-button search-button w-full sm:w-auto">
+                <i class="fas fa-search"></i> Search
             </button>
-            <button onclick="resetSearch()"
-                    class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-75">
-                Reset
+            <button onclick="resetSearch()" class="custom-button reset-button w-full sm:w-auto">
+                <i class="fas fa-redo"></i> Reset
             </button>
         </div>
 
-        <div id="loadingIndicator" class="flex items-center justify-center py-10 text-gray-600 hidden">
+        <div id="loadingIndicator" class="loading-indicator flex items-center justify-center py-10 text-gray-600 hidden">
             <div class="spinner mr-3"></div>
-            <span>Loading student data from Google Sheet...</span>
+            <span>Loading student data...</span>
         </div>
 
-        <div id="studentTableContainer" class="overflow-x-auto rounded-lg shadow-md hidden">
-            <table class="min-w-full bg-white border-collapse">
-                <thead class="bg-indigo-600 text-white">
+        <div id="studentTableContainer" class="table-container hidden">
+            <table class="min-w-full bg-white">
+                <thead>
                     <tr>
-                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-lg">Student Name</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Student ID</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Class</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold uppercase tracking-wider rounded-tr-lg">Action</th>
+                        <th class="py-3 px-4 rounded-tl-xl">Student Name</th>
+                        <th class="py-3 px-4">Student ID</th>
+                        <th class="py-3 px-4">Class</th>
+                        <th class="py-3 px-4 text-center rounded-tr-xl">Action</th>
                     </tr>
                 </thead>
-                <tbody id="studentTableBody" class="divide-y divide-gray-200">
+                <tbody id="studentTableBody">
                 </tbody>
             </table>
         </div>
@@ -93,68 +449,76 @@
         </div>
     </div>
 
-    <div id="performanceModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl p-6 relative transform transition-all scale-95 opacity-0 duration-300 ease-out" id="modalContent">
-            <button onclick="closeModal()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-semibold">
+    <div id="performanceModal" class="modal-overlay">
+        <div class="modal-content-inner" id="modalContent">
+            <button onclick="closeModal()" class="modal-close-button">
                 &times;
             </button>
 
-            <h2 id="modalStudentName" class="text-2xl font-bold text-indigo-700 mb-4"></h2>
-            <p id="modalStudentId" class="text-gray-600 mb-4"></p>
+            <h2 id="modalStudentName" class="text-2xl font-bold text-indigo-700 mb-2"></h2>
+            <p id="modalStudentId" class="text-gray-600 mb-6 text-lg"></p>
 
-            <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Overall Performance Summary Card -->
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg shadow-sm mb-6">
+                <h3 class="text-xl font-bold text-blue-800 mb-2">Overall Performance Summary</h3>
+                <p id="overallAveragePercentage" class="text-blue-700 text-lg font-semibold">Average Percentage: --</p>
+            </div>
+
+            <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 download-hide-box">
                 <div>
                     <label for="examTypeFilter" class="block text-gray-700 font-medium mb-1">Filter by Exam Type:</label>
-                    <select id="examTypeFilter" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                    <select id="examTypeFilter" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" style="width: 100%;">
                         <option value="all">All Exam Types</option>
                     </select>
                 </div>
                 <div>
                     <label for="subjectFilter" class="block text-gray-700 font-medium mb-1">Filter by Subject:</label>
-                    <select id="subjectFilter" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                    <select id="subjectFilter" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" style="width: 100%;">
                         <option value="all">All Subjects</option>
                     </select>
                 </div>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-6 download-hide-box">
                 <label for="chartDataType" class="block text-gray-700 font-medium mb-1">Chart Data Type:</label>
-                <select id="chartDataType" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white" onchange="updatePerformanceView()">
+                <select id="chartDataType" class="block modal-filter-select border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" onchange="updatePerformanceView()" style="width: 100%;">
                     <option value="percentage">Percentage (%)</option>
                     <option value="marks">Marks (Score)</option>
                 </select>
             </div>
 
             <h3 class="text-xl font-bold text-indigo-700 mb-3 mt-6">Detailed Exam Results</h3>
-            <div class="overflow-x-auto rounded-lg shadow-md mb-6">
-                <table class="min-w-full bg-white border-collapse">
-                    <thead class="bg-gray-200 text-gray-700">
+            <div class="overflow-x-auto rounded-xl shadow-md mb-6">
+                <table class="min-w-full bg-white">
+                    <thead>
                         <tr>
-                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-lg">Timestamp</th>
-                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Exam Type</th>
-                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Subject</th>
-                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Mark</th>
-                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Out Of</th>
-                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider">Percentage</th>
-                            <th class="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-lg">Grade</th>
+                            <th class="py-2 px-3 rounded-tl-xl">Timestamp</th>
+                            <th class="py-2 px-3">Exam Type</th>
+                            <th class="py-2 px-3">Subject</th>
+                            <th class="py-2 px-3">Mark</th>
+                            <th class="py-2 px-3">Out Of</th>
+                            <th class="py-2 px-3">Percentage</th>
+                            <th class="py-2 px-3 rounded-tr-xl">Grade</th>
                         </tr>
                     </thead>
-                    <tbody id="examDetailsTableBody" class="divide-y divide-gray-100">
+                    <tbody id="examDetailsTableBody">
                     </tbody>
                 </table>
             </div>
 
             <h3 class="text-xl font-bold text-indigo-700 mb-3 mt-6">Performance Graph</h3>
-            <div class="relative h-48 md:h-64 lg:h-72 mb-6"> <canvas id="performanceChart"></canvas>
+            <div class="relative h-auto w-full mb-6">
+                <canvas id="performanceChart"></canvas>
             </div>
 
+            <!-- Class Teacher's Remarks/Suggestions -->
             <div class="mb-8 p-4 border border-gray-300 rounded-lg bg-gray-50">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Class Teacher's Remarks:</h3>
-                <div class="h-24 border border-gray-200 bg-white rounded-md p-3 text-sm text-gray-700"
-                     style="min-height: 50px;">
-                    </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Class Teacher's Remarks/Suggestions:</h3>
+                <textarea id="teacherRemarks"
+                          class="w-full h-24 border border-gray-200 bg-white rounded-md p-3 text-sm text-gray-700 resize-y focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="Enter remarks or suggestions here..."></textarea>
                 <p class="text-xs text-gray-500 mt-2">
-                    (This section is for manual entry/signature by the class teacher after printing)
+                    (This section can be manually filled by the class teacher)
                 </p>
             </div>
 
@@ -169,12 +533,23 @@
                 </div>
             </div>
 
-            <div class="flex justify-center mt-6">
-                <button onclick="downloadPdf()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75">
-                    Download Performance as PDF
+            <div class="button-group flex flex-col sm:flex-row justify-center gap-4 mt-6">
+                <button onclick="downloadPdf()" class="custom-button download-pdf-button w-full sm:w-auto">
+                    <i class="fas fa-file-pdf"></i> Download as PDF
+                </button>
+                <button onclick="downloadJpeg()" class="custom-button download-jpeg-button w-full sm:w-auto">
+                    <i class="fas fa-image"></i> Download as JPEG
+                </button>
+                <button onclick="copyPerformanceSummary()" class="custom-button copy-email-button w-full sm:w-auto">
+                    <i class="fas fa-copy"></i> Copy Summary for Email
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Toast message for copy to clipboard -->
+    <div id="copyToast">
+        Summary Copied to Clipboard!
     </div>
 
     <script>
@@ -185,6 +560,40 @@
         let allStudentData = []; // This will be populated from the Google Sheet
         let currentChart = null; // To store the Chart.js instance
         let currentStudentRecords = []; // To store records of the currently viewed student
+
+        /**
+         * Cleans a string by replacing '+' with spaces and trimming.
+         * @param {string} text - The input string.
+         * @returns {string} The cleaned string.
+         */
+        function cleanText(text) {
+            return text ? String(text).replace(/\+/g, ' ').trim() : '';
+        }
+
+        /**
+         * Returns a shortened version of the exam name.
+         * @param {string} examName - The full exam name.
+         * @returns {string} The shortened exam name.
+         */
+        function getShortExamName(examName) {
+            const mapping = {
+                "Academic Test 1": "AT1",
+                "Academic Test 2": "AT2",
+                "Academic Test 3": "AT3",
+                "Academic Test 4": "AT4",
+                "Periodic Test 1": "PT1",
+                "Periodic Test 2": "PT2",
+                "Periodic Test 3": "PT3",
+                "Periodic Test 4": "PT4",
+                "Term 1": "T1",
+                "Term 2": "T2",
+                "Model Exam": "ME",
+                "Admission Test": "Ad. Test",
+                "Revision Test Series": "RTS"
+            };
+            return mapping[examName] || examName; // Return short form or original if not found
+        }
+
 
         /**
          * Fetches student data from the Google Apps Script web app.
@@ -207,8 +616,10 @@
                 const data = await response.json();
 
                 // Ensure data types are consistent for calculations (Mark, OutOf, Percentage)
+                // Clean names here as well
                 allStudentData = data.map(record => ({
                     ...record,
+                    StudentName: cleanText(record.StudentName),
                     Mark: parseFloat(record.Mark),
                     OutOf: parseFloat(record.OutOf),
                     Percentage: parseFloat(record.Percentage)
@@ -249,10 +660,10 @@
                 const row = tableBody.insertRow();
                 row.className = 'hover:bg-gray-50 transition-colors duration-200';
 
-                // Student Name Cell
+                // Student Name Cell - Cleaned
                 let cell = row.insertCell();
                 cell.className = 'py-3 px-4 whitespace-nowrap text-sm font-medium text-gray-900';
-                cell.textContent = student.StudentName;
+                cell.textContent = cleanText(student.StudentName);
 
                 // Student ID Cell
                 cell = row.insertCell();
@@ -266,10 +677,10 @@
 
                 // Action (View) Button Cell
                 cell = row.insertCell();
-                cell.className = 'py-3 px-4 whitespace-nowrap text-center text-sm font-medium';
+                cell.className = 'py-3 px-4 whitespace-nowrap text-center';
                 const viewButton = document.createElement('button');
                 viewButton.textContent = 'View Performance';
-                viewButton.className = 'bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75';
+                viewButton.className = 'custom-button view-performance-button'; // Using the new custom button class
                 viewButton.onclick = () => showStudentPerformance(student.StudentID);
                 cell.appendChild(viewButton);
             });
@@ -285,7 +696,7 @@
                 if (!uniqueStudentsMap.has(record.StudentID)) {
                     uniqueStudentsMap.set(record.StudentID, {
                         StudentID: record.StudentID,
-                        StudentName: record.StudentName,
+                        StudentName: cleanText(record.StudentName), // Ensure name is cleaned here too
                         Class: record.Class
                     });
                 }
@@ -301,7 +712,7 @@
             const searchValue = document.getElementById('studentSearch').value.toLowerCase();
             const uniqueStudents = getUniqueStudents();
             const filteredStudents = uniqueStudents.filter(student =>
-                student.StudentName.toLowerCase().includes(searchValue) ||
+                cleanText(student.StudentName).toLowerCase().includes(searchValue) || // Clean name for search
                 student.StudentID.toLowerCase().includes(searchValue)
             );
             renderStudentTable(filteredStudents);
@@ -327,7 +738,8 @@
             const examTypeFilter = document.getElementById('examTypeFilter');
             const subjectFilter = document.getElementById('subjectFilter');
             const chartDataTypeFilter = document.getElementById('chartDataType');
-
+            const overallAveragePercentage = document.getElementById('overallAveragePercentage');
+            const teacherRemarks = document.getElementById('teacherRemarks'); // Get the textarea
 
             currentStudentRecords = allStudentData.filter(record => record.StudentID === studentId);
 
@@ -336,14 +748,14 @@
                 return;
             }
 
-            const uniqueExamTypes = [...new Set(currentStudentRecords.map(record => record.Examtype))].sort();
-            const uniqueSubjects = [...new Set(currentStudentRecords.map(record => record.Subject))].sort();
+            const uniqueExamTypes = [...new Set(currentStudentRecords.map(record => cleanText(record.Examtype)))].sort();
+            const uniqueSubjects = [...new Set(currentStudentRecords.map(record => cleanText(record.Subject)))].sort();
 
             examTypeFilter.innerHTML = '<option value="all">All Exam Types</option>';
             uniqueExamTypes.forEach(type => {
                 const option = document.createElement('option');
                 option.value = type;
-                option.textContent = type;
+                option.textContent = type; // Use cleaned text
                 examTypeFilter.appendChild(option);
             });
 
@@ -351,7 +763,7 @@
             uniqueSubjects.forEach(subject => {
                 const option = document.createElement('option');
                 option.value = subject;
-                option.textContent = subject;
+                option.textContent = subject; // Use cleaned text
                 subjectFilter.appendChild(option);
             });
 
@@ -359,20 +771,26 @@
             examTypeFilter.value = 'all';
             subjectFilter.value = 'all';
             chartDataTypeFilter.value = 'percentage';
+            teacherRemarks.value = ''; // Clear remarks when opening modal for a new student
 
-
-            modalStudentName.textContent = `Performance for: ${currentStudentRecords[0].StudentName}`;
+            modalStudentName.textContent = `Performance for: ${cleanText(currentStudentRecords[0].StudentName)}`;
             modalStudentId.textContent = `Student ID: ${currentStudentRecords[0].StudentID} | Class: ${currentStudentRecords[0].Class}`;
+
+            // Calculate and display overall average percentage
+            const totalPercentage = currentStudentRecords.reduce((sum, record) => sum + record.Percentage, 0);
+            const averagePercentage = currentStudentRecords.length > 0 ? (totalPercentage / currentStudentRecords.length).toFixed(2) : 'N/A';
+            overallAveragePercentage.textContent = `Average Percentage: ${averagePercentage}%`;
+
 
             updatePerformanceView();
 
             examTypeFilter.onchange = updatePerformanceView;
             subjectFilter.onchange = updatePerformanceView;
 
-            modal.classList.remove('hidden');
+            modal.classList.add('visible'); // Use the new modal visibility class
             setTimeout(() => {
                 modalContent.classList.remove('scale-95', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-100');
             }, 50);
         }
 
@@ -383,10 +801,10 @@
             const modal = document.getElementById('performanceModal');
             const modalContent = document.getElementById('modalContent');
 
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-95', 'opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
             setTimeout(() => {
-                modal.classList.add('hidden');
+                modal.classList.remove('visible'); // Use the new modal visibility class
                 if (currentChart) {
                     currentChart.destroy();
                     currentChart = null;
@@ -401,28 +819,26 @@
         function updatePerformanceView() {
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const examDetailsTableBody = document.getElementById('examDetailsTableBody');
-            // Removed subjectSummaryTableBody as it's no longer needed
             const examTypeFilter = document.getElementById('examTypeFilter');
             const subjectFilter = document.getElementById('subjectFilter');
             const chartDataType = document.getElementById('chartDataType').value; // Get selected chart data type
 
             examDetailsTableBody.innerHTML = '';
-            // Removed clearing of subjectSummaryTableBody
 
             const selectedExamType = examTypeFilter.value;
             const selectedSubject = subjectFilter.value;
 
             let filteredRecords = currentStudentRecords;
             if (selectedExamType !== 'all') {
-                filteredRecords = filteredRecords.filter(record => record.Examtype === selectedExamType);
+                filteredRecords = filteredRecords.filter(record => cleanText(record.Examtype) === selectedExamType);
             }
             if (selectedSubject !== 'all') {
-                filteredRecords = filteredRecords.filter(record => record.Subject === selectedSubject);
+                filteredRecords = filteredRecords.filter(record => cleanText(record.Subject) === selectedSubject);
             }
 
             filteredRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-            // --- Render Detailed Exam Table (Moved to the top of this function) ---
+            // --- Render Detailed Exam Table ---
             if (filteredRecords.length === 0) {
                 const row = examDetailsTableBody.insertRow();
                 const cell = row.insertCell();
@@ -440,11 +856,11 @@
 
                     cell = row.insertCell();
                     cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
-                    cell.textContent = record.Examtype;
+                    cell.textContent = cleanText(record.Examtype);
 
                     cell = row.insertCell();
                     cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
-                    cell.textContent = record.Subject;
+                    cell.textContent = cleanText(record.Subject);
 
                     cell = row.insertCell();
                     cell.className = 'py-2 px-3 whitespace-nowrap text-sm text-gray-700';
@@ -465,12 +881,29 @@
             }
 
 
-            // --- Prepare Chart Data (unchanged, now processes filteredRecords) ---
+            // --- Prepare Chart Data ---
             let labels = [];
             if (selectedSubject !== 'all') {
-                labels = filteredRecords.map(record => `${record.Examtype} (${new Date(record.Timestamp).toLocaleDateString()})`);
+                labels = filteredRecords.map(record => {
+                    let examType = cleanText(record.Examtype);
+                    // Shorten "Academic Test AT1" to "AT1" etc.
+                    if (examType.startsWith("Academic Test ")) {
+                        examType = examType.replace("Academic Test ", "");
+                    }
+                    return `${examType} (${new Date(record.Timestamp).toLocaleDateString()})`;
+                });
             } else {
-                labels = filteredRecords.map(record => `${record.Examtype} (${new Date(record.Timestamp).toLocaleDateString()}) - ${record.Subject}`);
+                labels = filteredRecords.map(record => {
+                    let examType = cleanText(record.Examtype);
+                    let subject = cleanText(record.Subject);
+                    // Shorten "Academic Test AT1" to "AT1" etc.
+                    if (examType.startsWith("Academic Test ")) {
+                        examType = examType.replace("Academic Test ", "");
+                    }
+                    // Shorten subject to first 3 letters
+                    subject = subject.substring(0, 3);
+                    return `${examType} (${new Date(record.Timestamp).toLocaleDateString()}) - ${subject}`;
+                });
             }
 
             let chartData = [];
@@ -509,13 +942,13 @@
                     datasets: [{
                         label: chartDataType === 'percentage' ? 'Performance Percentage' : 'Student Marks',
                         data: chartData,
-                        borderColor: '#4f46e5',
-                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: '#6366f1', /* Indigo-500 */
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)', /* Light indigo with transparency */
                         tension: 0.3,
-                        pointBackgroundColor: '#4f46e5',
+                        pointBackgroundColor: '#6366f1',
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#4f46e5',
+                        pointHoverBorderColor: '#6366f1',
                         pointRadius: 5,
                         pointHoverRadius: 7,
                         fill: true,
@@ -531,9 +964,9 @@
                             labels: {
                                 font: {
                                     size: 14,
-                                    family: 'Inter'
+                                    family: 'Poppins' /* Changed to Poppins */
                                 },
-                                color: '#374151'
+                                color: '#2d3748'
                             }
                         },
                         tooltip: {
@@ -541,10 +974,10 @@
                                 label: tooltipCallback
                             },
                             titleFont: {
-                                family: 'Inter'
+                                family: 'Poppins' /* Changed to Poppins */
                             },
                             bodyFont: {
-                                family: 'Inter'
+                                family: 'Poppins' /* Changed to Poppins */
                             }
                         }
                     },
@@ -553,17 +986,17 @@
                             title: {
                                 display: true,
                                 text: 'Exam Instances',
-                                color: '#374151',
+                                color: '#2d3748',
                                 font: {
                                     size: 16,
                                     weight: 'bold',
-                                    family: 'Inter'
+                                    family: 'Poppins' /* Changed to Poppins */
                                 }
                             },
                             ticks: {
-                                color: '#4b5563',
+                                color: '#4a5568',
                                 font: {
-                                    family: 'Inter'
+                                    family: 'Poppins' /* Changed to Poppins */
                                 }
                             },
                             grid: {
@@ -574,24 +1007,24 @@
                             title: {
                                 display: true,
                                 text: yAxisLabel,
-                                color: '#374151',
+                                color: '#2d3748',
                                 font: {
                                     size: 16,
                                     weight: 'bold',
-                                    family: 'Inter'
+                                    family: 'Poppins' /* Changed to Poppins */
                                 }
                             },
                             min: 0,
                             max: yAxisMax, // Dynamic max for Y-axis
                             ticks: {
                                 callback: yAxisCallback,
-                                color: '#4b5563',
+                                color: '#4a5568',
                                 font: {
-                                    family: 'Inter'
+                                    family: 'Poppins' /* Changed to Poppins */
                                 }
                             },
                             grid: {
-                                color: '#e5e7eb'
+                                color: '#e2e8f0' /* Lighter gray for grid lines */
                             }
                         }
                     }
@@ -599,54 +1032,160 @@
             });
         }
 
+        // Array to store original elements and their replacements/styles for download preparation
+        let originalElementsState = [];
+
+        /**
+         * Prepares the modal content for download by modifying elements for better rendering.
+         */
+        async function prepareModalForDownload() {
+            const modalContent = document.getElementById('modalContent');
+            const studentName = cleanText(document.getElementById('modalStudentName').textContent.replace('Performance for: ', ''));
+            const studentId = document.getElementById('modalStudentId').textContent.split('|')[0].replace('Student ID: ', '').trim();
+            const studentClass = document.getElementById('modalStudentId').textContent.split('|')[1].replace('Class:', '').trim();
+            const teacherRemarks = document.getElementById('teacherRemarks').value.trim();
+
+            // Store original display styles of main modal elements to revert later
+            const elementsToHide = modalContent.children;
+            originalElementsState = [];
+            Array.from(elementsToHide).forEach(el => {
+                originalElementsState.push({ element: el, originalDisplay: el.style.display });
+                el.style.display = 'none'; // Hide all original content
+            });
+
+            // Create a new container for downloadable content
+            const downloadableContent = document.createElement('div');
+            downloadableContent.id = 'downloadableContent';
+            downloadableContent.style.width = '100%';
+            downloadableContent.style.padding = '20px';
+            downloadableContent.style.boxSizing = 'border-box';
+            downloadableContent.style.fontFamily = 'Poppins, sans-serif';
+            downloadableContent.style.color = '#333';
+            downloadableContent.style.backgroundColor = '#fff'; // Ensure white background for PDF/JPEG
+            downloadableContent.style.position = 'relative'; // For absolute positioning of logo
+
+            // Add background logo (watermark)
+            const logoImg = document.createElement('img');
+            // IMPORTANT: Replace this URL with your actual public logo URL
+            logoImg.src = 'https://placehold.co/200x200/cccccc/000000?text=Your+Logo'; // Using a generic placeholder logo
+            logoImg.style.position = 'absolute';
+            logoImg.style.top = '50%';
+            logoImg.style.left = '50%';
+            logoImg.style.transform = 'translate(-50%, -50%)';
+            logoImg.style.width = '200px'; // Adjust size as needed
+            logoImg.style.height = 'auto'; // Maintain aspect ratio
+            logoImg.style.opacity = '0.1'; // Watermark effect
+            logoImg.style.zIndex = '0'; // Behind content
+            downloadableContent.appendChild(logoImg);
+
+
+            // 1. Progress Card (centered)
+            downloadableContent.innerHTML += `<h2 style="text-align: center; font-size: 2em; font-weight: 700; color: var(--primary-blue); margin-bottom: 20px; position: relative; z-index: 1;">Progress Card</h2>`;
+
+            // 2. Student Name, ID, Class (on one line)
+            downloadableContent.innerHTML += `
+                <p style="font-size: 1.1em; margin-bottom: 20px; position: relative; z-index: 1;">
+                    <strong>Student Name:</strong> ${studentName} &nbsp;&nbsp;&nbsp;
+                    <strong>ID:</strong> ${studentId} &nbsp;&nbsp;&nbsp;
+                    <strong>Class:</strong> ${studentClass}
+                </p>
+            `;
+
+            // 3. Exam Name (explicitly stated, smaller font, using short form)
+            const selectedExamType = document.getElementById('examTypeFilter').value;
+            downloadableContent.innerHTML += `
+                <p style="font-size: 0.9em; margin-bottom: 20px; position: relative; z-index: 1;">
+                    <strong>Exam Name:</strong> ${getShortExamName(selectedExamType === 'all' ? 'All Exam Types' : selectedExamType)}
+                </p>
+            `;
+
+            // 4. The mark list of the exam (Detailed Exam Results Table)
+            const examTable = document.getElementById('examDetailsTableBody').parentNode.cloneNode(true); // Clone the whole table
+            examTable.style.marginBottom = '30px';
+            examTable.style.border = '1px solid #eee'; // Add a border for clarity in PDF
+            examTable.style.borderRadius = '8px';
+            examTable.style.overflow = 'hidden'; // Ensure rounded corners apply
+            examTable.style.position = 'relative'; // For z-index
+            examTable.style.zIndex = '1'; // Ensure it's above the logo
+            downloadableContent.appendChild(examTable);
+
+            // 5. Graph
+            const chartCanvas = document.getElementById('performanceChart');
+            const chartImg = document.createElement('img');
+            chartImg.src = chartCanvas.toDataURL('image/png');
+            chartImg.style.width = '100%';
+            chartImg.style.height = 'auto';
+            chartImg.style.marginBottom = '30px';
+            chartImg.style.border = '1px solid #eee'; // Add border for clarity
+            chartImg.style.borderRadius = '8px';
+            chartImg.style.position = 'relative'; // For z-index
+            chartImg.style.zIndex = '1'; // Ensure it's above the logo
+            downloadableContent.appendChild(chartImg);
+
+            // 6. Class Teacher's Remarks/Suggestions:
+            downloadableContent.innerHTML += `
+                <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; position: relative; z-index: 1;">
+                    <h3 style="font-size: 1.1em; font-weight: 600; color: var(--dark-text); margin-bottom: 10px;">Class Teacher's Remarks/Suggestions:</h3>
+                    <p style="font-size: 1em; line-height: 1.6; color: #555;">${teacherRemarks || 'No remarks/suggestions provided.'}</p>
+                </div>
+            `;
+
+            // 7. Principal Sign (Principal's Signature & Official Seal)
+            downloadableContent.innerHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; position: relative; z-index: 1;">
+                    <div style="text-align: center; width: 48%; padding-right: 10px;">
+                        <div style="height: 60px; border-bottom: 1px solid #444; margin-bottom: 10px;"></div>
+                        <p style="font-size: 0.9em; font-weight: 600; color: #555;">Principal's Signature</p>
+                    </div>
+                    <div style="text-align: center; width: 48%; padding-left: 10px;">
+                        <div style="height: 60px; border-bottom: 1px solid #444; margin-bottom: 10px;"></div>
+                        <p style="font-size: 0.9em; font-weight: 600; color: #555;">Official Seal</p>
+                    </div>
+                </div>
+            `;
+
+            modalContent.appendChild(downloadableContent);
+        }
+
+        /**
+         * Reverts the modal content back to its interactive state after download.
+         */
+        function revertModalFromDownload() {
+            const modalContent = document.getElementById('modalContent');
+            const downloadableContent = document.getElementById('downloadableContent');
+            if (downloadableContent) {
+                modalContent.removeChild(downloadableContent);
+            }
+
+            // Restore original display styles
+            originalElementsState.forEach(item => {
+                item.element.style.display = item.originalDisplay;
+            });
+            originalElementsState = []; // Clear the array
+        }
+
         /**
          * Downloads the content of the performance modal as a PDF.
          */
         async function downloadPdf() {
-            const modalContent = document.getElementById('modalContent');
-            const studentName = document.getElementById('modalStudentName').textContent.replace('Performance for: ', '');
+            const studentName = cleanText(document.getElementById('modalStudentName').textContent.replace('Performance for: ', ''));
             const studentId = document.getElementById('modalStudentId').textContent.split('|')[0].replace('Student ID: ', '').trim();
 
-            // Store original styles
-            const originalMaxHeight = modalContent.style.maxHeight;
-            const originalOverflowY = modalContent.style.overflowY;
-            const originalPaddingBottom = modalContent.style.paddingBottom;
+            await prepareModalForDownload(); // Await this as it involves image loading
+            const downloadableContent = document.getElementById('downloadableContent');
 
-            // Temporarily remove max-height and overflow-y to capture full content
-            modalContent.style.maxHeight = 'none';
-            modalContent.style.overflowY = 'visible';
-            modalContent.style.paddingBottom = '20mm'; // Add some padding for the footer content
+            const scaleFactor = 4; // Higher scale for better clarity
 
-            // Temporarily hide the close button and download button for PDF generation
-            const closeButton = modalContent.querySelector('button.absolute');
-            const downloadButton = modalContent.querySelector('button[onclick="downloadPdf()"]');
-            if (closeButton) closeButton.style.display = 'none';
-            if (downloadButton) downloadButton.style.display = 'none';
-
-            // Get the current width and height of the modal content
-            const originalWidth = modalContent.offsetWidth;
-            const originalHeight = modalContent.offsetHeight;
-
-            // Set a fixed width for canvas rendering to ensure consistent PDF output
-            const renderWidth = 800; // A good width for PDF rendering
-            const scale = renderWidth / originalWidth;
-
-            // Use html2canvas to render the modal content
-            const canvas = await html2canvas(modalContent, {
-                scale: scale,
+            const canvas = await html2canvas(downloadableContent, {
+                scale: scaleFactor,
                 useCORS: true,
-                windowWidth: renderWidth,
-                windowHeight: originalHeight * scale,
+                windowWidth: downloadableContent.scrollWidth,
+                windowHeight: downloadableContent.scrollHeight,
                 scrollY: -window.scrollY,
                 scrollX: -window.scrollX
             });
 
-            // Revert styles and show hidden elements
-            modalContent.style.maxHeight = originalMaxHeight;
-            modalContent.style.overflowY = originalOverflowY;
-            modalContent.style.paddingBottom = originalPaddingBottom;
-            if (closeButton) closeButton.style.display = 'block';
-            if (downloadButton) downloadButton.style.display = 'block';
+            revertModalFromDownload();
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
@@ -669,6 +1208,98 @@
             }
 
             pdf.save(`Student_Performance_${studentName.replace(/[^a-zA-Z0-9]/g, '_')}_${studentId}.pdf`);
+        }
+
+        /**
+         * Downloads the content of the performance modal as a JPEG image.
+         */
+        async function downloadJpeg() {
+            const studentName = cleanText(document.getElementById('modalStudentName').textContent.replace('Performance for: ', ''));
+            const studentId = document.getElementById('modalStudentId').textContent.split('|')[0].replace('Student ID: ', '').trim();
+
+            await prepareModalForDownload(); // Await this as it involves image loading
+            const downloadableContent = document.getElementById('downloadableContent');
+
+            const scaleFactor = 4; // Higher scale for better clarity
+
+            const canvas = await html2canvas(downloadableContent, {
+                scale: scaleFactor,
+                useCORS: true,
+                windowWidth: downloadableContent.scrollWidth,
+                windowHeight: downloadableContent.scrollHeight,
+                scrollY: -window.scrollY,
+                scrollX: -window.scrollX
+            });
+
+            revertModalFromDownload();
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.95); // 0.95 is JPEG quality for higher clarity
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = `Student_Performance_${studentName.replace(/[^a-zA-Z0-9]/g, '_')}_${studentId}.jpeg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /**
+         * Copies a summary of the student's performance to the clipboard.
+         */
+        function copyPerformanceSummary() {
+            const studentName = cleanText(document.getElementById('modalStudentName').textContent.replace('Performance for: ', ''));
+            const studentId = document.getElementById('modalStudentId').textContent.split('|')[0].replace('Student ID: ', '').trim();
+            const studentClass = document.getElementById('modalStudentId').textContent.split('|')[1].replace('Class:', '').trim();
+            const averagePercentage = document.getElementById('overallAveragePercentage').textContent.replace('Average Percentage: ', '');
+            const teacherRemarks = document.getElementById('teacherRemarks').value.trim();
+
+            let examDetails = '';
+            // Sort records by subject and then by exam type for consistent output
+            const sortedRecords = [...currentStudentRecords].sort((a, b) => {
+                const subjectComparison = a.Subject.localeCompare(b.Subject);
+                if (subjectComparison !== 0) return subjectComparison;
+                return a.Examtype.localeCompare(b.Examtype);
+            });
+
+            sortedRecords.forEach(record => {
+                examDetails += `  - ${cleanText(record.Subject)} (${cleanText(record.Examtype)}): Mark ${record.Mark}/${record.OutOf}, Percentage ${record.Percentage}%, Grade ${record.Grade}\n`;
+            });
+
+            const summaryText = `
+Student Performance Summary:
+
+Student Name: ${studentName}
+Student ID: ${studentId}
+Class: ${studentClass}
+Overall Average Percentage: ${averagePercentage}
+
+Detailed Exam Results:
+${examDetails || '  No detailed exam results available for current filters.'}
+Class Teacher's Remarks/Suggestions:
+${teacherRemarks || '  No remarks/suggestions provided.'}
+
+For a detailed performance report, please refer to the attached PDF/JPEG or log in to the student portal.
+            `.trim();
+
+            // Create a temporary textarea element to hold the text
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = summaryText;
+            document.body.appendChild(tempTextArea);
+
+            // Select the text and copy it
+            tempTextArea.select();
+            document.execCommand('copy');
+
+            // Remove the temporary textarea
+            document.body.removeChild(tempTextArea);
+
+            // Show toast notification
+            const copyToast = document.getElementById('copyToast');
+            copyToast.classList.remove('hidden');
+            copyToast.classList.add('show');
+            setTimeout(() => {
+                copyToast.classList.remove('show');
+                copyToast.classList.add('hidden');
+            }, 3000); // Hide after 3 seconds
         }
 
         // Initial data fetch when the DOM is fully loaded
