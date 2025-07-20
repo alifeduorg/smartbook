@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Institutional Communication Form</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS CDN for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Poppins for a modern, friendly look -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Define CSS Variables for consistent theming */
@@ -18,27 +20,28 @@
             --mid-gray: #E0E5EC; /* Slightly darker background shade */
             --dark-text: #333; /* Standard dark text color */
             --light-text: #fff; /* White text for dark backgrounds */
-            --border-radius: 12px; /* Consistent rounded corners */
+            --border-radius: 12px; /* Consistent rounded corners for all elements */
             --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
             --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
-            --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow */
+            --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow for interactive elements */
         }
 
+        /* Body styling for overall page appearance */
         body {
             margin: 0;
             padding: 20px;
-            font-family: 'Poppins', sans-serif; /* Modern, friendly font */
+            font-family: 'Poppins', sans-serif; /* Apply Poppins font */
             background: linear-gradient(135deg, var(--light-gray), var(--mid-gray)); /* Soft gradient background */
-            color: var(--dark-text);
-            min-height: 100vh;
+            color: var(--dark-text); /* Default text color */
+            min-height: 100vh; /* Full viewport height */
             display: flex;
-            justify-content: center;
+            justify-content: center; /* Center content horizontally */
             align-items: flex-start; /* Align content to the top */
             overflow-x: hidden; /* Prevent horizontal scroll */
             position: relative; /* For background animations */
         }
 
-        /* Background Animation - Subtle, floating shapes */
+        /* Subtle background animation for visual interest */
         body::before,
         body::after {
             content: '';
@@ -46,8 +49,8 @@
             background: rgba(255, 255, 255, 0.3); /* Translucent white for a dreamy effect */
             border-radius: 50%; /* Circular shapes */
             opacity: 0.6;
-            filter: blur(80px); /* Soft blur */
-            z-index: -1; /* Behind content */
+            filter: blur(80px); /* Soft blur effect */
+            z-index: -1; /* Place behind content */
         }
 
         body::before {
@@ -84,7 +87,7 @@
             }
         }
 
-        /* Main form container styling */
+        /* Main form container styling for a modern card-like appearance */
         .form-container {
             background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for glassmorphism */
             padding: 30px;
@@ -94,17 +97,18 @@
             width: 100%; /* Full width on smaller screens */
             margin-top: 40px; /* Space from top */
             backdrop-filter: blur(10px); /* Glassmorphism effect */
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            -webkit-backdrop-filter: blur(10px); /* For Safari compatibility */
             border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
             transform: translateY(0); /* Initial state for hover effect */
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transitions */
         }
 
         .form-container:hover {
             transform: translateY(-5px); /* Lift effect on hover */
-            box-shadow: var(--box-shadow-hover);
+            box-shadow: var(--box-shadow-hover); /* Enhanced shadow on hover */
         }
 
+        /* Heading styling */
         h1 {
             color: var(--primary-blue);
             font-size: 2.2em;
@@ -122,6 +126,7 @@
             color: var(--accent-orange); /* Accent color for icon */
         }
 
+        /* Label styling for form fields */
         label {
             display: block;
             margin: 15px 0 8px;
@@ -130,6 +135,7 @@
             font-size: 0.95em;
         }
 
+        /* Input and textarea styling */
         input[type="text"],
         input[type="email"],
         input[type="date"],
@@ -147,6 +153,7 @@
             background-color: #fcfcfc; /* Slightly off-white background */
         }
 
+        /* Focus styles for input and textarea */
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="date"]:focus,
@@ -157,7 +164,7 @@
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Glow effect */
         }
 
-        /* Custom button 3D effect */
+        /* Custom 3D button effect */
         .button-3d {
             position: relative;
             background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%); /* Indigo gradient */
@@ -197,7 +204,7 @@
             opacity: 0.7; /* Slightly dim disabled button */
         }
 
-        /* Custom Modal for Alerts */
+        /* Custom Modal for Alerts and Messages */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -265,7 +272,7 @@
             background: var(--secondary-darkblue);
         }
 
-        /* Loading Spinner */
+        /* Loading Spinner for submit button */
         .spinner {
             display: none; /* Hidden by default */
         }
@@ -278,7 +285,7 @@
             display: none; /* Hide text when loading */
         }
 
-        /* Responsive adjustments */
+        /* Responsive adjustments for various screen sizes */
         @media (max-width: 768px) {
             body {
                 padding: 15px;
@@ -668,12 +675,13 @@
     </div>
 
     <script>
-        // Function to show custom modal
+        // Function to show custom modal messages (success, error, warning, info)
         const customModal = document.getElementById("customModal");
         const modalIcon = document.getElementById("modalIcon");
         const modalMessage = document.getElementById("modalMessage");
+        let modalCallback = null; // To store the callback function for the modal's OK button
 
-        function showModal(message, type = 'info') {
+        function showModal(message, type = 'info', onOkCallback = null) {
             modalMessage.textContent = message;
             modalIcon.className = 'modal-icon'; // Reset classes
             if (type === 'success') {
@@ -690,11 +698,16 @@
                 modalIcon.classList.add('info');
             }
             customModal.classList.add('visible');
+            modalCallback = onOkCallback; // Store the callback
         }
 
-        // Function to hide custom modal
+        // Function to hide the custom modal
         function hideModal() {
             customModal.classList.remove('visible');
+            if (modalCallback) {
+                modalCallback(); // Execute the stored callback
+                modalCallback = null; // Clear the callback
+            }
         }
 
         // Helper function to format date to YYYY-MM-DD (for input element values)
@@ -723,7 +736,7 @@
             return `${day}. ${month}. ${year}`;
         }
 
-        // Get elements
+        // Get all relevant DOM elements
         const communicationForm = document.getElementById('communicationForm');
         const senderRoleSelect = document.getElementById('senderRole');
         const otherRoleSection = document.getElementById('otherRoleSection');
@@ -738,7 +751,7 @@
         const leaveStartDateInput = document.getElementById('leaveStartDate');
         const leaveEndDateInput = document.getElementById('leaveEndDate');
         const emergencyLeaveCheckbox = document.getElementById('emergencyLeave');
-        const emergencyLeaveWarning = document.getElementById('emergencyLeaveWarning'); // New element
+        const emergencyLeaveWarning = document.getElementById('emergencyLeaveWarning');
         const leaveReasonTextarea = document.getElementById('leaveReason');
 
         // Weekly Report-specific fields (Parent container for all role-based reports)
@@ -781,9 +794,8 @@
         const clerkStudentRecordsTextarea = document.getElementById('clerkStudentRecords');
         const clerkCorrespondenceTextarea = document.getElementById('clerkCorrespondence');
         const clerkInventoryStatusTextarea = document.getElementById('clerkInventoryStatus');
-        const clerkOfficeIssuesTextarea = document = document.getElementById('clerkOfficeIssues');
+        const clerkOfficeIssuesTextarea = document.getElementById('clerkOfficeIssues');
         const clerkGeneralNotesTextarea = document.getElementById('clerkGeneralNotes');
-
 
         // General Message-specific field
         const generalMessageDetailsTextarea = document.getElementById('generalMessageDetails');
@@ -792,7 +804,7 @@
         const buttonText = document.getElementById('buttonText');
         const loadingSpinner = document.getElementById('loadingSpinner');
 
-        // Function to manage visibility and required status of conditional sections
+        // Function to manage visibility and required status of conditional sections based on request type and role
         function updateFormSections() {
             // Hide all conditional sections and remove required attributes
             leaveLetterSection.classList.add('hidden');
@@ -806,7 +818,7 @@
                 section.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
             });
 
-
+            // Remove required attributes from all conditional inputs to prevent validation issues when hidden
             [leaveStartDateInput, leaveEndDateInput, leaveReasonTextarea,
              teacherReportWeekStartDateInput, teacherClassesTaughtTextarea, teacherTopicsCoveredTextarea,
              teacherStudentProgressTextarea, teacherUpcomingActivitiesTextarea, teacherIssuesFeedbackTextarea,
@@ -865,7 +877,7 @@
                     ceoMdChallengesRisksTextarea.setAttribute('required', 'required');
                     ceoMdNextStepsTextarea.setAttribute('required', 'required');
                     ceoMdReportWeekStartDateInput.min = formatDate(new Date());
-                } else if (selectedRole === 'Clerk' || selectedRole === 'Coordinator') { // Assuming 'Office Staff' falls under Clerk
+                } else if (selectedRole === 'Clerk' || selectedRole === 'Coordinator') {
                     clerkReportFields.classList.remove('hidden');
                     clerkReportWeekStartDateInput.setAttribute('required', 'required');
                     clerkAdminTasksTextarea.setAttribute('required', 'required');
@@ -876,7 +888,6 @@
                     clerkReportWeekStartDateInput.min = formatDate(new Date());
                 } else {
                     // If Weekly Report is selected but role doesn't have a specific format
-                    // or if 'Other' role is selected for Weekly Report
                     showModal('Please select a specific role (Teacher, Principal, CEO, MD, Clerk, Coordinator) for Weekly Report, or choose "General Message".', 'warning');
                 }
             } else if (selectedRequestType === 'General Message' || selectedRequestType === 'Event Announcement' ||
@@ -887,7 +898,7 @@
             }
         }
 
-        // Function to update end date and its max attribute based on start date and emergency status (for Leave Letter)
+        // Function to update end date constraints based on start date and emergency status (for Leave Letter)
         function updateLeaveDatesConstraints() {
             if (requestTypeSelect.value === 'Leave Letter' && leaveStartDateInput.value) {
                 const startDate = new Date(leaveStartDateInput.value);
@@ -897,26 +908,26 @@
 
                 if (!isEmergency) {
                     // For non-emergency, default end date to start date (1-day leave)
+                    // and allow modification up to 2 consecutive days.
                     leaveEndDateInput.value = leaveStartDateInput.value;
-                    // Allow up to 2 consecutive days (start date + 1 day)
                     const maxAllowedEndDate = new Date(startDate);
-                    maxAllowedEndDate.setDate(startDate.getDate() + 1);
+                    maxAllowedEndDate.setDate(startDate.getDate() + 1); // Allows start day + next day (2 days total)
                     leaveEndDateInput.max = formatDate(maxAllowedEndDate);
-                    leaveEndDateInput.readOnly = false; // Make end date editable
+                    leaveEndDateInput.readOnly = false; // Make end date editable for 1 or 2 days
                     emergencyLeaveWarning.classList.add('hidden'); // Hide warning
                 } else {
                     // For emergency, remove max constraint and make fully editable
                     leaveEndDateInput.removeAttribute('max');
-                    leaveEndDateInput.readOnly = false; // Make end date editable
+                    leaveEndDateInput.readOnly = false; // Make end date fully editable
                     emergencyLeaveWarning.classList.remove('hidden'); // Show warning
                     showModal('Proof of emergency leave must be submitted via email to admin@mgmt.alifedu.org.', 'warning');
-                    // If end date is not set or before start date, default to start date
+                    // If end date is not set or before start date, default to start date for emergency
                     if (!leaveEndDateInput.value || new Date(leaveEndDateInput.value) < startDate) {
                         leaveEndDateInput.value = formatDate(startDate);
                     }
                 }
             } else {
-                // Reset when not in Leave Letter section
+                // Reset when not in Leave Letter section or start date is cleared
                 leaveEndDateInput.removeAttribute('min');
                 leaveEndDateInput.removeAttribute('max');
                 leaveEndDateInput.readOnly = false; // Ensure it's not stuck read-only
@@ -925,7 +936,51 @@
             }
         }
 
-        // Event listeners
+        // Function to handle the actual form submission (after validations/warnings)
+        async function proceedSubmission(formData) {
+            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqIUE173Vpl-2_doPSivUNqFDN1ElTiVO6iSk5QOYjIRc9k1kmUD6jF5mcUu6tEQIflA/exec';
+
+            // Check if the placeholder URL is still present
+            if (GOOGLE_APPS_SCRIPT_URL.includes('YOUR_DEPLOYED_WEB_APP_URL_HERE')) {
+                showModal('Error: Google Apps Script URL is not set. Please update the HTML file with your deployed script URL.', 'error');
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                return;
+            }
+
+            try {
+                // Send form data to Google Apps Script
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Required for cross-origin requests to Apps Script
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData).toString(), // Serialize form data
+                });
+
+                showModal('Communication sent successfully!', 'success');
+
+                // Clear the form and reset sections after successful submission
+                communicationForm.reset();
+                updateFormSections(); // Reset visibility and required attributes
+                otherRoleSection.classList.add('hidden'); // Ensure other role is hidden
+                otherRoleInput.value = ''; // Clear other role input
+                otherRoleInput.removeAttribute('required'); // Remove required
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showModal('Failed to send communication. Please try again later. Check console for details.', 'error');
+            } finally {
+                // Re-enable button and hide loading spinner regardless of success or failure
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+            }
+        }
+
+
+        // Event listeners for dynamic form behavior
         senderRoleSelect.addEventListener('change', function() {
             if (this.value === 'Other') {
                 otherRoleSection.classList.remove('hidden');
@@ -945,13 +1000,13 @@
 
 
         communicationForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent default form submission
 
-            // Disable button and show loading spinner
+            // Disable button and show loading spinner immediately
             submitButton.disabled = true;
             submitButton.classList.add('loading');
 
-            // Validate sender role
+            // Validate sender role if 'Other' is selected
             if (senderRoleSelect.value === 'Other' && !otherRoleInput.value.trim()) {
                 showModal('Please specify your role for "Other" selection.', 'warning');
                 submitButton.disabled = false;
@@ -979,12 +1034,14 @@
                 const endDate = new Date(leaveEndDateInput.value);
                 const isEmergency = emergencyLeaveCheckbox.checked;
 
+                // Client-side validation for required fields in Leave Letter
                 if (!leaveStartDateInput.value || !leaveEndDateInput.value || !leaveReasonTextarea.value) {
                     showModal('Please provide all required details for Leave Letter.', 'warning');
                     submitButton.disabled = false;
                     submitButton.classList.remove('loading');
                     return;
                 }
+                // Client-side validation: End Date cannot be before Start Date
                 if (startDate > endDate) {
                     showModal('End Date (' + formatDateForDisplay(leaveEndDateInput.value) + ') cannot be before Start Date (' + formatDateForDisplay(leaveStartDateInput.value) + ').', 'error');
                     submitButton.disabled = false;
@@ -996,6 +1053,7 @@
                 const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
                 const diffDays = Math.ceil(diffTime / oneDay) + 1; // +1 to include both start and end day
 
+                // Client-side validation for non-emergency leave duration
                 if (!isEmergency && diffDays > 2) {
                     showModal('Regular leave cannot exceed 2 consecutive days. For longer leaves, please mark as Emergency Leave.', 'error');
                     submitButton.disabled = false;
@@ -1003,142 +1061,41 @@
                     return;
                 }
 
-                // This message is for a backend rule, keeping it as is.
-                if (!isEmergency) {
-                    showModal('Please note: The rule "only 2 leaves can be taken in a month" requires a backend system to track past leave requests. This client-side form cannot enforce that rule.', 'info');
-                }
+                // Check submission time for leave letters
+                const now = new Date();
+                const submissionTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes from midnight
+                const cutoffTime = 8 * 60 + 30; // 8:30 AM in minutes from midnight
 
-                formData.leaveStartDate = leaveStartDateInput.value;
-                formData.leaveEndDate = leaveEndDateInput.value;
-                formData.emergencyLeave = emergencyLeaveCheckbox.checked ? 'on' : '';
-                formData.leaveReason = leaveReasonTextarea.value;
-
-            } else if (selectedRequestType === 'Weekly Report') {
-                // Collect data based on selected role's report fields
-                if (selectedRole === 'Teacher') {
-                    if (!teacherReportWeekStartDateInput.value || !teacherClassesTaughtTextarea.value || !teacherTopicsCoveredTextarea.value ||
-                        !teacherStudentProgressTextarea.value || !teacherUpcomingActivitiesTextarea.value) {
-                        showModal('Please provide all required details for Teacher Weekly Report.', 'warning');
-                        submitButton.disabled = false;
-                        submitButton.classList.remove('loading');
-                        return;
-                    }
-                    formData.reportWeekStartDate = teacherReportWeekStartDateInput.value;
-                    formData.teacherClassesTaught = teacherClassesTaughtTextarea.value;
-                    formData.teacherTopicsCovered = teacherTopicsCoveredTextarea.value;
-                    formData.teacherStudentProgress = teacherStudentProgressTextarea.value;
-                    formData.teacherUpcomingActivities = teacherUpcomingActivitiesTextarea.value;
-                    formData.teacherIssuesFeedback = teacherIssuesFeedbackTextarea.value;
-                } else if (selectedRole === 'Principal') {
-                    if (!principalReportWeekStartDateInput.value || !principalKeyAchievementsTextarea.value || !principalOperationalChallengesTextarea.value ||
-                        !principalStaffingUpdatesTextarea.value || !principalStudentWelfareTextarea.value || !principalUpcomingEventsTextarea.value ||
-                        !principalBudgetNeedsTextarea.value) {
-                        showModal('Please provide all required details for Principal Weekly Report.', 'warning');
-                        submitButton.disabled = false;
-                        submitButton.classList.remove('loading');
-                        return;
-                    }
-                    formData.reportWeekStartDate = principalReportWeekStartDateInput.value;
-                    formData.principalKeyAchievements = principalKeyAchievementsTextarea.value;
-                    formData.principalOperationalChallenges = principalOperationalChallengesTextarea.value;
-                    formData.principalStaffingUpdates = principalStaffingUpdatesTextarea.value;
-                    formData.principalStudentWelfare = principalStudentWelfareTextarea.value;
-                    formData.principalUpcomingEvents = principalUpcomingEventsTextarea.value;
-                    formData.principalBudgetNeeds = principalBudgetNeedsTextarea.value;
-                    formData.principalGeneralRemarks = principalGeneralRemarksTextarea.value;
-                } else if (selectedRole === 'CEO' || selectedRole === 'MD') {
-                    if (!ceoMdReportWeekStartDateInput.value || !ceoMdStrategicProgressTextarea.value || !ceoMdFinancialOverviewTextarea.value ||
-                        !ceoMdKeyDecisionsTextarea.value || !ceoMdMarketInsightsTextarea.value || !ceoMdChallengesRisksTextarea.value ||
-                        !ceoMdNextStepsTextarea.value) {
-                        showModal('Please provide all required details for CEO/MD Weekly Report.', 'warning');
-                        submitButton.disabled = false;
-                        submitButton.classList.remove('loading');
-                        return;
-                    }
-                    formData.reportWeekStartDate = ceoMdReportWeekStartDateInput.value;
-                    formData.ceoMdStrategicProgress = ceoMdStrategicProgressTextarea.value;
-                    formData.ceoMdFinancialOverview = ceoMdFinancialOverviewTextarea.value;
-                    formData.ceoMdKeyDecisions = ceoMdKeyDecisionsTextarea.value;
-                    formData.ceoMdMarketInsights = ceoMdMarketInsightsTextarea.value;
-                    formData.ceoMdChallengesRisks = ceoMdChallengesRisksTextarea.value;
-                    formData.ceoMdNextSteps = ceoMdNextStepsTextarea.value;
-                    formData.ceoMdGeneralComments = ceoMdGeneralCommentsTextarea.value;
-                } else if (selectedRole === 'Clerk' || selectedRole === 'Coordinator') { // Assuming Coordinator also uses Clerk report
-                     if (!clerkReportWeekStartDateInput.value || !clerkAdminTasksTextarea.value || !clerkStudentRecordsTextarea.value ||
-                        !clerkCorrespondenceTextarea.value || !clerkInventoryStatusTextarea.value || !clerkOfficeIssuesTextarea.value) {
-                        showModal('Please provide all required details for Clerk/Coordinator Weekly Report.', 'warning');
-                        submitButton.disabled = false;
-                        submitButton.classList.remove('loading');
-                        return;
-                    }
-                    formData.reportWeekStartDate = clerkReportWeekStartDateInput.value;
-                    formData.clerkAdminTasks = clerkAdminTasksTextarea.value;
-                    formData.clerkStudentRecords = clerkStudentRecordsTextarea.value;
-                    formData.clerkCorrespondence = clerkCorrespondenceTextarea.value;
-                    formData.clerkInventoryStatus = clerkInventoryStatusTextarea.value;
-                    formData.clerkOfficeIssues = clerkOfficeIssuesTextarea.value;
-                    formData.clerkGeneralNotes = clerkGeneralNotesTextarea.value;
+                if (submissionTime > cutoffTime) {
+                    // Show warning and defer submission until OK is clicked
+                    showModal(
+                        'Warning: This leave request is being submitted after 8:30 AM. It may be rejected or only considered after approval. Otherwise, you should take your class.',
+                        'warning',
+                        async () => { // This callback will be executed when the user clicks OK
+                            await proceedSubmission(formData);
+                        }
+                    );
+                    // Do NOT proceed with submission here; it will be handled by the modal's callback
+                    return;
                 } else {
-                    showModal('Please select a specific role (Teacher, Principal, CEO, MD, Clerk, Coordinator) for Weekly Report, or choose "General Message".', 'warning');
-                    submitButton.disabled = false;
-                    submitButton.classList.remove('loading');
-                    return;
+                    // If no time warning, proceed with submission immediately
+                    if (!isEmergency) {
+                        showModal('Please note: The rule "only 2 leaves can be taken in a month" requires a backend system to track past leave requests. This client-side form cannot enforce that rule.', 'info');
+                    }
+                    await proceedSubmission(formData); // Proceed immediately
                 }
-            } else if (selectedRequestType === 'General Message' || selectedRequestType === 'Event Announcement' ||
-                       selectedRequestType === 'Resource Request' || selectedRequestType === 'IT Support Request' ||
-                       selectedRequestType === 'Feedback/Suggestion' || selectedRequestType === 'Other') {
-                if (!generalMessageDetailsTextarea.value) {
-                    showModal('Please provide your message details.', 'warning');
-                    submitButton.disabled = false;
-                    submitButton.classList.remove('loading');
-                    return;
-                }
-                formData.generalMessageDetails = generalMessageDetailsTextarea.value;
-            }
 
-            // IMPORTANT: This URL must be your deployed Google Apps Script Web App URL
-            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqIUE173Vpl-2_doPSivUNqFDN1ElTiVO6iSk5QOYjIRc9k1kmUD6jF5mcUu6tEQIflA/exec';
-
-            if (GOOGLE_APPS_SCRIPT_URL.includes('YOUR_DEPLOYED_WEB_APP_URL_HERE')) {
-                showModal('Error: Google Apps Script URL is not set. Please update the HTML file with your deployed script URL.', 'error');
-                submitButton.disabled = false;
-                submitButton.classList.remove('loading');
-                return;
-            }
-
-            try {
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams(formData).toString(),
-                });
-
-                showModal('Communication sent successfully!', 'success');
-
-                // Clear the form and reset sections after successful submission
-                this.reset();
-                updateFormSections(); // Reset visibility and required attributes
-                otherRoleSection.classList.add('hidden'); // Ensure other role is hidden
-                otherRoleInput.value = ''; // Clear other role input
-                otherRoleInput.removeAttribute('required'); // Remove required
-
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                showModal('Failed to send communication. Please try again later. Check console for details.', 'error');
-            } finally {
-                // Re-enable button and hide loading spinner regardless of success or failure
-                submitButton.disabled = false;
-                submitButton.classList.remove('loading');
+            } else {
+                // For other request types, proceed directly without time check
+                await proceedSubmission(formData);
             }
         });
 
-        // Initialize form sections on page load
+        // Initialize form sections on page load to set initial state
         window.onload = () => {
-            updateFormSections(); // Set initial state
+            updateFormSections(); // Set initial state of sections
+            // Attach event listener to the modal's OK button
+            document.querySelector('#customModal .modal-button').addEventListener('click', hideModal);
         };
     </script>
 </body>
