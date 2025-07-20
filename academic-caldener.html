@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf.js CDN for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- html2canvas.js CDN for JPEG generation (explicitly added for direct access) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Define CSS Variables for consistent theming (from handover page) */
         :root {
@@ -24,6 +26,7 @@
             --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
             --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
             --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow */
+            --holiday-red: #DC2626; /* Specific red for holidays and accents */
         }
 
         /* Base styles for body and container (from handover page) */
@@ -170,6 +173,9 @@
             border: none;
             box-shadow: var(--box-shadow-light);
         }
+        .controls button.jpeg-button { /* Specific style for JPEG button */
+            background: linear-gradient(145deg, #4CAF50, #388E3C); /* Green for JPEG */
+        }
         .controls button:hover {
             transform: translateY(-3px);
             box-shadow: var(--box-shadow-medium);
@@ -205,7 +211,7 @@
             color: var(--primary-blue); /* Primary blue for month name */
             margin-bottom: 20px;
             text-align: center;
-            border-bottom: 3px solid var(--accent-orange); /* Accent orange border */
+            border-bottom: 3px solid var(--holiday-red); /* Changed to red underline */
             padding-bottom: 15px;
         }
 
@@ -271,21 +277,21 @@
         }
 
         .day-cell.has-event {
-            background-color: #D9EDFF; /* Light blue for days with events */
+            background-color: var(--primary-blue); /* Changed to primary blue */
             font-weight: 700;
-            color: var(--primary-blue); /* Primary blue text for event days */
-            box-shadow: inset 0 0 0 2px var(--secondary-darkblue); /* Darker blue border highlight */
+            color: var(--light-text); /* Changed to white text */
+            box-shadow: inset 0 0 0 2px var(--primary-blue); /* Consistent blue border */
         }
         /* New style for holidays */
         .day-cell.is-holiday {
-            background-color: #EF4444; /* Red for holidays */
+            background-color: var(--holiday-red); /* Red for holidays */
             color: var(--light-text); /* White text for holidays */
             font-weight: 700;
             box-shadow: inset 0 0 0 2px #B91C1C; /* Darker red border */
         }
         /* If a day is both an event and a holiday, holiday styling takes precedence */
         .day-cell.has-event.is-holiday {
-            background-color: #DC2626; /* Slightly darker red for combined */
+            background-color: var(--holiday-red); /* Slightly darker red for combined */
             color: var(--light-text);
             box-shadow: inset 0 0 0 2px #991B1B;
         }
@@ -310,7 +316,7 @@
             font-weight: 700;
             color: var(--primary-blue); /* Primary blue for event list title */
             margin-bottom: 15px;
-            border-bottom: 1px solid var(--accent-orange); /* Accent orange border */
+            border-bottom: 1px solid var(--holiday-red); /* Changed to red underline */
             padding-bottom: 10px;
         }
         .event-list ul {
@@ -340,7 +346,7 @@
         }
         /* Specific bullet color for holidays in the list */
         .event-list li.is-holiday-event::before {
-            color: #DC2626; /* Red bullet */
+            color: var(--holiday-red); /* Red bullet */
         }
 
         .loading-message, .error-message {
@@ -574,6 +580,7 @@
                 <!-- Month options will be populated here by JavaScript -->
             </select>
             <button id="download-pdf-btn" class="rounded-lg shadow-md hover:shadow-lg">Download Selected Month as PDF</button>
+            <button id="download-jpeg-btn" class="rounded-lg shadow-md hover:shadow-lg jpeg-button">Download Selected Month as JPEG</button>
         </div>
 
         <div id="calendar-container" class="month-grid-container">
@@ -1004,12 +1011,38 @@
         }
 
         /**
-         * Downloads the currently displayed month card as a PDF.
+         * Gets the element to be printed based on the selected month.
+         * @returns {HTMLElement|null} The element to print.
          */
-        function downloadPdf() {
+        function getElementToPrint() {
             const selectedMonth = document.getElementById('month-selector').value;
             let elementToPrint;
+
+            if (selectedMonth === 'all') {
+                elementToPrint = document.getElementById('calendar-container');
+            } else {
+                elementToPrint = document.getElementById(`month-${selectedMonth}`);
+            }
+
+            if (!elementToPrint) {
+                displayMessageBox('Error', 'No calendar content found for download. Please select a month or "Show All Months".');
+                return null;
+            }
+            return elementToPrint;
+        }
+
+        /**
+         * Downloads the currently displayed calendar content as a PDF.
+         */
+        async function downloadPdf() {
+            const elementToPrint = getElementToPrint();
+            if (!elementToPrint) return;
+
+            const selectedMonth = document.getElementById('month-selector').value;
             let filename = 'Academic_Calendar_2025-2026.pdf';
+            if (selectedMonth !== 'all') {
+                filename = `Academic_Calendar_${selectedMonth}_2025-26.pdf`;
+            }
 
             // Hide pop-up and clear auto-popup cycle before generating PDF
             hideEventPopup();
@@ -1021,31 +1054,12 @@
                 activeDayCell = null;
             }
 
-            if (selectedMonth === 'all') {
-                // If "Show All Months" is selected, print the entire calendar container.
-                elementToPrint = document.getElementById('calendar-container');
-                filename = 'Academic_Calendar_2025-2026_Full.pdf';
-            } else {
-                // Print only the selected month card.
-                elementToPrint = document.getElementById(`month-${selectedMonth}`);
-                if (!elementToPrint) {
-                    // Using a custom message box instead of alert()
-                    displayMessageBox('Error', 'No month card found to download. Please select a month.');
-                    return;
-                }
-                filename = `Academic_Calendar_${selectedMonth}_2025-2026.pdf`;
-            }
-
             // Create a temporary element to hold the content for PDF generation
             const tempDiv = document.createElement('div');
-            tempDiv.style.width = '210mm'; // A4 width
-            tempDiv.style.padding = '10mm'; // Some padding for the PDF content
             tempDiv.style.boxSizing = 'border-box';
 
-            // Clone the content to be printed to avoid modifying the live DOM
             const contentClone = elementToPrint.cloneNode(true);
             
-            // If printing the whole container, add a main title for the PDF
             if (selectedMonth === 'all') {
                 const titleForPdf = document.createElement('h1');
                 titleForPdf.textContent = 'Academic Calendar 2025-2026';
@@ -1059,21 +1073,75 @@
 
             tempDiv.appendChild(contentClone);
 
-            // Options for html2pdf
+            // Options for html2pdf - increased scale and dpi for 4K clarity
             const opt = {
                 margin: 10,
                 filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { scale: 3, logging: true, dpi: 300, letterRendering: true }, // Increased scale and dpi
+                jsPDF: { unit: 'mm' } // Removed format and orientation to allow dynamic sizing
             };
 
             // Generate the PDF
-            html2pdf().set(opt).from(tempDiv).save();
+            await html2pdf().set(opt).from(tempDiv).save();
 
             // After PDF generation, restart the auto-popup cycle
             startAutoPopupCycle();
         }
+
+        /**
+         * Downloads the currently displayed calendar content as a JPEG image.
+         */
+        async function downloadJpeg() {
+            const elementToPrint = getElementToPrint();
+            if (!elementToPrint) return;
+
+            const selectedMonth = document.getElementById('month-selector').value;
+            let filename = 'Academic_Calendar_2025-2026.jpeg';
+            if (selectedMonth !== 'all') {
+                filename = `Academic_Calendar_${selectedMonth}_2025-26.jpeg`;
+            }
+
+            // Hide pop-up and clear auto-popup cycle before generating JPEG
+            hideEventPopup();
+            clearInterval(autoPopupIntervalId);
+            clearTimeout(autoPopupHideTimeoutId);
+
+            if (activeDayCell) {
+                activeDayCell.classList.remove('clicked-3d');
+                activeDayCell = null;
+            }
+
+            try {
+                // Use html2canvas to render the element to a canvas
+                const canvas = await html2canvas(elementToPrint, {
+                    scale: 3, // Increased scale for 4K clarity
+                    dpi: 300, // Increased dpi for 4K clarity
+                    logging: true,
+                    letterRendering: true,
+                    useCORS: true // Important if you have external images/fonts
+                });
+
+                // Get the image data as JPEG
+                const imageData = canvas.toDataURL('image/jpeg', 0.98); // 0.98 for high quality
+
+                // Create a temporary link element to trigger the download
+                const link = document.createElement('a');
+                link.href = imageData;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (error) {
+                console.error("Error generating JPEG:", error);
+                displayMessageBox('Error', 'Failed to generate JPEG image. Please try again.');
+            } finally {
+                // After JPEG generation, restart the auto-popup cycle
+                startAutoPopupCycle();
+            }
+        }
+
 
         // Custom message box function (replaces alert())
         function displayMessageBox(title, message) {
@@ -1100,7 +1168,7 @@
             
             // Check if the click was outside the popup and outside any day cell
             // Also ensure the click wasn't on the month selector or download button
-            const isClickOnControls = clickedElement.closest('.controls') || clickedElement.id === 'month-selector' || clickedElement.id === 'download-pdf-btn';
+            const isClickOnControls = clickedElement.closest('.controls') || clickedElement.id === 'month-selector' || clickedElement.id === 'download-pdf-btn' || clickedElement.id === 'download-jpeg-btn';
             const isClickOnPopupCloseButton = clickedElement.id === 'popup-close-button';
 
             // If a day cell was active and the click was outside it, the popup, and controls, and not the close button
@@ -1122,6 +1190,8 @@
                 document.getElementById('month-selector').addEventListener('change', filterMonths);
                 // Add event listener for PDF download button
                 document.getElementById('download-pdf-btn').addEventListener('click', downloadPdf);
+                // Add event listener for JPEG download button
+                document.getElementById('download-jpeg-btn').addEventListener('click', downloadJpeg);
                 // Add event listener for the popup close button
                 document.getElementById('popup-close-button').addEventListener('click', () => {
                     hideEventPopup();
