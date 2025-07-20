@@ -4,39 +4,131 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monthly Lesson Plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    /* Define CSS Variables for consistent theming */
+    :root {
+      --primary-blue: #4A90E2; /* A friendly, accessible blue */
+      --secondary-darkblue: #2F6F9D; /* A darker shade for accents */
+      --accent-orange: #FF7043; /* A vibrant orange for highlights/buttons */
+      --light-gray: #F0F2F5; /* A very light background gray */
+      --mid-gray: #E0E5EC; /* Slightly darker background shade */
+      --dark-text: #333; /* Standard dark text color */
+      --light-text: #fff; /* White text for dark backgrounds */
+      --border-radius: 12px; /* Consistent rounded corners */
+      --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+      --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
+      --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15); /* Hover shadow */
+    }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f8fafc;
+      padding: 20px;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--light-gray), var(--mid-gray));
+      color: var(--dark-text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+      position: relative;
     }
+
+    /* Background Animation - Subtle, floating shapes */
+    body::before,
+    body::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      opacity: 0.6;
+      filter: blur(80px);
+      z-index: -1;
+    }
+
+    body::before {
+      width: 300px;
+      height: 300px;
+      top: -50px;
+      left: -50px;
+      animation: moveShape 15s infinite alternate ease-in-out;
+    }
+
+    body::after {
+      width: 400px;
+      height: 400px;
+      bottom: -80px;
+      right: -80px;
+      animation: moveShape 20s infinite alternate-reverse ease-in-out;
+    }
+
+    @keyframes moveShape {
+      0% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(50px, -30px) scale(1.05); }
+      50% { transform: translate(0, 50px) scale(0.95); }
+      75% { transform: translate(-40px, -20px) scale(1.1); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
     .header {
-      background: navy;
-      color: white;
-      padding: 1rem;
+      background: var(--primary-blue);
+      color: var(--light-text);
+      padding: 1rem 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      border-bottom-left-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
     }
+    .header h2 {
+      margin: 0;
+      font-size: 1.8em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header h2 .icon {
+      font-size: 1.2em;
+      color: var(--accent-orange);
+    }
+
     .dashboard-btn {
-      background: goldenrod;
+      background: var(--accent-orange);
       border: none;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
+      color: var(--light-text);
+      padding: 0.7rem 1.5rem;
+      border-radius: var(--border-radius);
       cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      font-weight: 600;
+      box-shadow: var(--box-shadow-light);
+      transition: all 0.3s ease;
     }
+    .dashboard-btn:hover {
+      background: #E65100;
+      transform: translateY(-2px);
+      box-shadow: var(--box-shadow-medium);
+    }
+
     .card {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
       max-width: 600px;
-      margin: 2rem auto;
+      width: 100%;
+      margin-top: 100px; /* Space for fixed header */
+      margin-bottom: 2rem;
       padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 12px 20px rgba(0,0,0,0.2);
-      transform: perspective(1000px) rotateX(1deg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow-medium);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
     .form-group {
       margin-bottom: 1.2rem;
@@ -45,40 +137,216 @@
       font-weight: 600;
       display: block;
       margin-bottom: 0.4rem;
+      color: var(--dark-text);
+      font-size: 0.95em;
     }
     .form-group input,
     .form-group textarea {
-      width: 100%;
-      padding: 0.7rem;
+      width: calc(100% - 24px); /* Adjust for padding */
+      padding: 0.7rem 12px;
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 1rem;
       background-color: #f9f9f9;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
     }
     .submit-btn {
-      background: navy;
-      color: white;
+      background: linear-gradient(145deg, var(--primary-blue), var(--secondary-darkblue));
+      color: var(--light-text);
       border: none;
       padding: 1rem;
-      font-size: 1rem;
-      border-radius: 12px;
+      font-size: 1.1rem;
+      border-radius: var(--border-radius);
       width: 100%;
       cursor: pointer;
+      font-weight: 600;
+      box-shadow: var(--box-shadow-medium);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
     .submit-btn:hover {
-      background: goldenrod;
+      background: linear-gradient(145deg, var(--secondary-darkblue), var(--primary-blue));
+      transform: translateY(-3px);
+      box-shadow: var(--box-shadow-hover);
     }
+    .submit-btn:active {
+      transform: translateY(0);
+      box-shadow: var(--box-shadow-light);
+    }
+
     .toggle {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.8rem;
       margin-top: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .toggle label {
+      margin-bottom: 0;
+    }
+    .toggle input[type="checkbox"] {
+      width: auto;
+      height: 20px;
+      transform: scale(1.2);
+      cursor: pointer;
+      accent-color: var(--primary-blue); /* Style checkbox */
+    }
+
+    /* Custom Modal for Alerts */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000; /* On top of everything */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: var(--light-text);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow-medium);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.visible .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+
+    .modal-icon.success { color: #28a745; }
+    .modal-icon.error { color: #dc3545; }
+    .modal-icon.warning { color: #FF7043; }
+
+    .modal-message {
+      font-size: 1.1em;
+      margin-bottom: 25px;
+      font-weight: 500;
+    }
+
+    .modal-button {
+      background: var(--primary-blue);
+      color: var(--light-text);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    .modal-button:hover {
+      background: var(--secondary-darkblue);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid var(--light-text);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: none; /* Hidden by default */
+    }
+
+    .submit-btn.loading .spinner {
+      display: block;
+    }
+
+    .submit-btn.loading span {
+      display: none; /* Hide text when loading */
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .header {
+        padding: 0.8rem 15px;
+      }
+      .header h2 {
+        font-size: 1.5em;
+      }
+      .dashboard-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9em;
+      }
+      .card {
+        margin-top: 80px;
+        padding: 1.5rem;
+      }
+      .form-group label {
+        font-size: 0.9em;
+      }
+      .form-group input,
+      .form-group textarea {
+        padding: 0.6rem 10px;
+        font-size: 0.9em;
+      }
+      .submit-btn {
+        padding: 0.8rem;
+        font-size: 1em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 5px;
+      }
+      .header h2 {
+        font-size: 1.3em;
+      }
+      .dashboard-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8em;
+      }
+      .card {
+        margin-top: 70px;
+        padding: 1rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2>📘 Monthly Lesson Plan</h2>
+    <h2><span class="icon">📘</span> Monthly Lesson Plan</h2>
     <button class="dashboard-btn" onclick="goToDashboard()">Dashboard</button>
   </div>
 
@@ -90,11 +358,11 @@
       </div>
       <div class="form-group">
         <label for="teacherName">👩‍🏫 Teacher</label>
-        <input type="text" id="teacherName" required />
+        <input type="text" id="teacherName" placeholder="Enter Teacher Name" required />
       </div>
       <div class="form-group">
         <label for="staffId">🆔 Staff ID</label>
-        <input type="text" id="staffId" required />
+        <input type="text" id="staffId" placeholder="Enter Staff ID" required />
       </div>
       <div class="form-group">
         <label for="student">👦👧 Student Name</label>
@@ -102,7 +370,7 @@
       </div>
       <div class="form-group">
         <label for="subject">📚 Subject</label>
-        <input type="text" id="subject" required />
+        <input type="text" id="subject" placeholder="e.g., Mathematics, English" required />
       </div>
       <div class="form-group">
         <label for="goal">🎯 Goal of the Month</label>
@@ -110,69 +378,147 @@
       </div>
       <div class="form-group">
         <label for="points">📌 Key Topics</label>
-        <textarea id="points" rows="2" placeholder="Short bullet points of what to cover"></textarea>
+        <textarea id="points" rows="3" placeholder="Short bullet points of what to cover"></textarea>
       </div>
       <div class="form-group">
         <label for="method">🧠 Teaching Method / Tools</label>
-        <textarea id="method" rows="2" placeholder="How will you teach the student this month?"></textarea>
+        <textarea id="method" rows="3" placeholder="How will you teach the student this month?"></textarea>
       </div>
       <div class="form-group">
         <label for="homework">📝 Homework Plan / Notes</label>
-        <textarea id="homework" rows="2" placeholder="Give any homework strategy or documents planned"></textarea>
+        <textarea id="homework" rows="3" placeholder="Give any homework strategy or documents planned"></textarea>
       </div>
       <div class="form-group toggle">
         <label for="revision">🔁 Includes Revision Classes?</label>
         <input type="checkbox" id="revision" />
       </div>
-      <button type="submit" class="submit-btn">💾 Save Lesson Plan</button>
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="spinner"></span>
+        <span>💾 Save Lesson Plan</span>
+      </button>
     </form>
   </div>
 
+  <!-- Custom Alert Modal -->
+  <div id="customModal" class="modal-overlay">
+    <div class="modal-content">
+      <div id="modalIcon" class="modal-icon"></div>
+      <p id="modalMessage" class="modal-message"></p>
+      <button class="modal-button" onclick="hideCustomModal()">OK</button>
+    </div>
+  </div>
+
   <script>
+    const submitBtn = document.getElementById('submitBtn');
+    const customModal = document.getElementById('customModal');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalMessage = document.getElementById('modalMessage');
+
+    // IMPORTANT: Replace with your Google Apps Script Web App URL for SUBMITTING data
+    const SUBMIT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx0Q9zgxmmAxJxO4WWk4o7t44I2vRKIK8xYfRq1GottkjvQJ3TUFNYmkv2gDBfnemOo/exec";
+
     function goToDashboard() {
-      window.location.href = "teacher-dashboard.html";
+      // In a real application, you would replace this with your actual dashboard link.
+      showCustomModal("Redirecting to Dashboard (This is a placeholder link).", 'info');
+      // window.location.href = "teacher-dashboard.html"; // Uncomment for actual navigation
     }
 
-    // Auto-fill today's date
-    document.getElementById("date").value = new Date().toISOString().split('T')[0];
+    // Function to show custom modal
+    function showCustomModal(message, type = 'info') {
+      modalMessage.textContent = message;
+      modalIcon.className = 'modal-icon'; // Reset classes
+      if (type === 'success') {
+        modalIcon.textContent = '🎉';
+        modalIcon.classList.add('success');
+      } else if (type === 'error') {
+        modalIcon.textContent = '❌';
+        modalIcon.classList.add('error');
+      } else if (type === 'warning') {
+        modalIcon.textContent = '⚠️';
+        modalIcon.classList.add('warning');
+      } else { // Default info
+        modalIcon.textContent = 'ℹ️';
+      }
+      customModal.classList.add('visible');
+    }
 
-    document.getElementById("lessonForm").addEventListener("submit", function (e) {
+    // Function to hide custom modal
+    function hideCustomModal() {
+      customModal.classList.remove('visible');
+    }
+
+    // Auto-fill today's date on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("date").value = new Date().toISOString().split('T')[0];
+    });
+
+    document.getElementById("lessonForm").addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
       const selectedDate = new Date(document.getElementById("date").value);
       const month = selectedDate.toLocaleString("default", { month: "long", year: "numeric" });
 
       const data = {
         date: document.getElementById("date").value,
         month: month,
-        teacherName: document.getElementById("teacherName").value,
-        staffId: document.getElementById("staffId").value,
-        student: document.getElementById("student").value,
-        subject: document.getElementById("subject").value,
-        goal: document.getElementById("goal").value,
-        points: document.getElementById("points").value,
-        method: document.getElementById("method").value,
-        homework: document.getElementById("homework").value,
+        teacherName: document.getElementById("teacherName").value.trim(),
+        staffId: document.getElementById("staffId").value.trim(),
+        student: document.getElementById("student").value.trim(),
+        subject: document.getElementById("subject").value.trim(),
+        goal: document.getElementById("goal").value.trim(),
+        points: document.getElementById("points").value.trim(),
+        method: document.getElementById("method").value.trim(),
+        homework: document.getElementById("homework").value.trim(),
         revision: document.getElementById("revision").checked ? "Yes" : "No",
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbx0Q9zgxmmAxJxO4WWk4o7t44I2vRKIK8xYfRq1GottkjvQJ3TUFNYmkv2gDBfnemOo/exec", {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-      .then(response => {
-        if (response.ok) {
-          alert("✅ Monthly lesson plan saved!");
-          document.getElementById("lessonForm").reset();
-          document.getElementById("date").value = new Date().toISOString().split('T')[0];
-        } else {
-          throw new Error("Server error.");
+      // Basic validation
+      for (const key in data) {
+        if (typeof data[key] === 'string' && data[key] === '' && key !== 'points' && key !== 'method' && key !== 'homework') {
+          showCustomModal(`⚠️ Please fill in the '${key}' field.`, 'warning');
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+          return;
         }
-      })
-      .catch(err => alert("❌ Error saving: " + err));
+      }
+
+      console.log("Submitting data:", data);
+
+      try {
+        const response = await fetch(SUBMIT_WEB_APP_URL, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json(); // Assuming Apps Script returns JSON
+        console.log("Response from Apps Script:", result);
+
+        if (result.status === 'success') {
+          showCustomModal("✅ Monthly lesson plan saved!", 'success');
+          document.getElementById("lessonForm").reset();
+          document.getElementById("date").value = new Date().toISOString().split('T')[0]; // Reset date to today
+        } else {
+          showCustomModal(`❌ Error saving: ${result.message || 'Unknown error'}`, 'error');
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        showCustomModal("❌ Error saving: " + err.message, 'error');
+      } finally {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
     });
   </script>
 </body>
