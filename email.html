@@ -236,10 +236,29 @@
             width: 90%;
             transform: scale(0.9);
             transition: transform 0.3s ease;
+            position: relative; /* For close button positioning */
         }
 
         .modal-overlay.visible .modal-content {
             transform: scale(1);
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #999;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close-button:hover {
+            color: #333;
         }
 
         .modal-icon {
@@ -332,6 +351,7 @@
     <!-- Custom Modal for Alerts -->
     <div id="customModal" class="modal-overlay">
         <div class="modal-content">
+            <button class="modal-close-button" onclick="hideModal()">&times;</button>
             <div id="modalIcon" class="modal-icon"></div>
             <p id="modalMessage" class="modal-message"></p>
             <button class="modal-button" onclick="hideModal()">OK</button>
@@ -845,7 +865,7 @@
                 leaveReasonTextarea.setAttribute('required', 'required');
                 // Set min date for leaveStartDate to today
                 leaveStartDateInput.min = formatDate(new Date());
-                updateLeaveDatesConstraints(); // Call to set initial end date constraint
+                updateLeaveDatesConstraints(); // Call to set initial end date constraint and check for warnings
             } else if (selectedRequestType === 'Weekly Report') {
                 weeklyReportSection.classList.remove('hidden');
                 // Determine which role's report fields to show
@@ -898,7 +918,7 @@
             }
         }
 
-        // Function to update end date constraints based on start date and emergency status (for Leave Letter)
+        // Function to update end date constraints and check for same-day leave warning
         function updateLeaveDatesConstraints() {
             if (requestTypeSelect.value === 'Leave Letter' && leaveStartDateInput.value) {
                 const startDate = new Date(leaveStartDateInput.value);
@@ -919,13 +939,32 @@
                     // For emergency, remove max constraint and make fully editable
                     leaveEndDateInput.removeAttribute('max');
                     leaveEndDateInput.readOnly = false; // Make end date fully editable
-                    emergencyLeaveWarning.classList.remove('hidden'); // Show warning
-                    showModal('Proof of emergency leave must be submitted via email to admin@mgmt.alifedu.org.', 'warning');
+                    emergencyLeaveWarning.classList.remove('hidden'); // Show warning for emergency proof
                     // If end date is not set or before start date, default to start date for emergency
                     if (!leaveEndDateInput.value || new Date(leaveEndDateInput.value) < startDate) {
                         leaveEndDateInput.value = formatDate(startDate);
                     }
                 }
+
+                // NEW: Check for same-day leave after 8:30 AM on date selection
+                const today = new Date();
+                const leaveStartsToday = (startDate.toDateString() === today.toDateString());
+                const currentTime = today.getHours() * 60 + today.getMinutes(); // Current time in minutes
+                const eightThirtyAM = 8 * 60 + 30; // 8:30 AM in minutes
+
+                if (leaveStartsToday && currentTime > eightThirtyAM && !isEmergency) {
+                    showModal(
+                        'Warning: For same-day leave requests after 8:30 AM, you must mark it as "Emergency Leave". Otherwise, this leave will not be considered.',
+                        'warning'
+                    );
+                } else if (leaveStartsToday && currentTime <= eightThirtyAM && !isEmergency) {
+                    // If it's today but before 8:30 AM, and not emergency, no warning needed
+                    // (The 2-day rule warning is handled in submit)
+                } else if (!leaveStartsToday) {
+                    // If it's not today's date, no 8:30 AM warning applies
+                    // The general emergency warning (proof) is controlled by the checkbox, not time
+                }
+
             } else {
                 // Reset when not in Leave Letter section or start date is cleared
                 leaveEndDateInput.removeAttribute('min');
@@ -1061,33 +1100,113 @@
                     return;
                 }
 
-                // Check submission time for leave letters
+                // Strict blocking logic for same-day leave after 8:30 AM without emergency flag
                 const now = new Date();
-                const submissionTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes from midnight
-                const cutoffTime = 8 * 60 + 30; // 8:30 AM in minutes from midnight
+                const leaveStartsToday = (startDate.toDateString() === now.toDateString());
+                const currentTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes from midnight
+                const eightThirtyAM = 8 * 60 + 30; // 8:30 AM in minutes from midnight
 
-                if (submissionTime > cutoffTime) {
-                    // Show warning and defer submission until OK is clicked
+                if (leaveStartsToday && currentTime > eightThirtyAM && !isEmergency) {
                     showModal(
-                        'Warning: This leave request is being submitted after 8:30 AM. It may be rejected or only considered after approval. Otherwise, you should take your class.',
-                        'warning',
-                        async () => { // This callback will be executed when the user clicks OK
-                            await proceedSubmission(formData);
-                        }
+                        'Submission Blocked: For same-day leave requests after 8:30 AM, you must mark it as "Emergency Leave". This leave will not be considered otherwise.',
+                        'error'
                     );
-                    // Do NOT proceed with submission here; it will be handled by the modal's callback
-                    return;
-                } else {
-                    // If no time warning, proceed with submission immediately
-                    if (!isEmergency) {
-                        showModal('Please note: The rule "only 2 leaves can be taken in a month" requires a backend system to track past leave requests. This client-side form cannot enforce that rule.', 'info');
-                    }
-                    await proceedSubmission(formData); // Proceed immediately
+                    submitButton.disabled = false; // Re-enable button
+                    submitButton.classList.remove('loading'); // Hide spinner
+                    return; // Crucially, stop the submission here
                 }
 
-            } else {
-                // For other request types, proceed directly without time check
-                await proceedSubmission(formData);
+                // If all validations pass, and it's not a blocked scenario, proceed
+                if (!isEmergency) {
+                    // This warning is for the 2-leaves-a-month rule, which is not enforced client-side.
+                    // It will only show if the 8:30 AM warning didn't block it.
+                    showModal('Please note: The rule "only 2 leaves can be taken in a month" requires a backend system to track past leave requests. This client-side form cannot enforce that rule.', 'info');
+                }
+                await proceedSubmission(formData); // Proceed with submission
+
+            } else if (selectedRequestType === 'Weekly Report') {
+                // Collect data based on selected role's report fields
+                if (selectedRole === 'Teacher') {
+                    if (!teacherReportWeekStartDateInput.value || !teacherClassesTaughtTextarea.value || !teacherTopicsCoveredTextarea.value ||
+                        !teacherStudentProgressTextarea.value || !teacherUpcomingActivitiesTextarea.value) {
+                        showModal('Please provide all required details for Teacher Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = teacherReportWeekStartDateInput.value;
+                    formData.teacherClassesTaught = teacherClassesTaughtTextarea.value;
+                    formData.topicsCovered = teacherTopicsCoveredTextarea.value;
+                    formData.studentProgress = teacherStudentProgressTextarea.value;
+                    formData.upcomingActivities = teacherUpcomingActivitiesTextarea.value;
+                    formData.reportIssuesFeedback = teacherIssuesFeedbackTextarea.value;
+                } else if (selectedRole === 'Principal') {
+                    if (!principalReportWeekStartDateInput.value || !principalKeyAchievementsTextarea.value || !principalOperationalChallengesTextarea.value ||
+                        !principalStaffingUpdatesTextarea.value || !principalStudentWelfareTextarea.value || !principalUpcomingEventsTextarea.value ||
+                        !principalBudgetNeedsTextarea.value) {
+                        showModal('Please provide all required details for Principal Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = principalReportWeekStartDateInput.value;
+                    formData.principalKeyAchievements = principalKeyAchievementsTextarea.value;
+                    formData.principalOperationalChallenges = principalOperationalChallengesTextarea.value;
+                    formData.principalStaffingUpdates = principalStaffingUpdatesTextarea.value;
+                    formData.principalStudentWelfare = principalStudentWelfareTextarea.value;
+                    formData.principalUpcomingEvents = principalUpcomingEventsTextarea.value;
+                    formData.principalBudgetNeeds = principalBudgetNeedsTextarea.value;
+                    formData.principalGeneralRemarks = principalGeneralRemarksTextarea.value;
+                } else if (selectedRole === 'CEO' || selectedRole === 'MD') {
+                    if (!ceoMdReportWeekStartDateInput.value || !ceoMdStrategicProgressTextarea.value || !ceoMdFinancialOverviewTextarea.value ||
+                        !ceoMdKeyDecisionsTextarea.value || !ceoMdMarketInsightsTextarea.value || !ceoMdChallengesRisksTextarea.value ||
+                        !ceoMdNextStepsTextarea.value) {
+                        showModal('Please provide all required details for CEO/MD Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = ceoMdReportWeekStartDateInput.value;
+                    formData.ceoMdStrategicProgress = ceoMdStrategicProgressTextarea.value;
+                    formData.ceoMdFinancialOverview = ceoMdFinancialOverviewTextarea.value;
+                    formData.ceoMdKeyDecisions = ceoMdKeyDecisionsTextarea.value;
+                    formData.ceoMdMarketInsights = ceoMdMarketInsightsTextarea.value;
+                    formData.ceoMdChallengesRisks = ceoMdChallengesRisksTextarea.value;
+                    formData.ceoMdNextSteps = ceoMdNextStepsTextarea.value;
+                    formData.ceoMdGeneralComments = ceoMdGeneralCommentsTextarea.value;
+                } else if (selectedRole === 'Clerk' || selectedRole === 'Coordinator') {
+                     if (!clerkReportWeekStartDateInput.value || !clerkAdminTasksTextarea.value || !clerkStudentRecordsTextarea.value ||
+                        !clerkCorrespondenceTextarea.value || !clerkInventoryStatusTextarea.value || !clerkOfficeIssuesTextarea.value) {
+                        showModal('Please provide all required details for Clerk/Coordinator Weekly Report.', 'warning');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('loading');
+                        return;
+                    }
+                    formData.reportWeekStartDate = clerkReportWeekStartDateInput.value;
+                    formData.clerkAdminTasks = clerkAdminTasksTextarea.value;
+                    formData.clerkStudentRecords = clerkStudentRecordsTextarea.value;
+                    formData.clerkCorrespondence = clerkCorrespondenceTextarea.value;
+                    formData.clerkInventoryStatus = clerkInventoryStatusTextarea.value;
+                    formData.clerkOfficeIssues = clerkOfficeIssuesTextarea.value;
+                    formData.clerkGeneralNotes = clerkGeneralNotesTextarea.value;
+                } else {
+                    showModal('Please select a specific role (Teacher, Principal, CEO, MD, Clerk, Coordinator) for Weekly Report, or choose "General Message".', 'warning');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    return;
+                }
+                await proceedSubmission(formData); // Proceed with submission for weekly reports
+            } else if (selectedRequestType === 'General Message' || selectedRequestType === 'Event Announcement' ||
+                       selectedRequestType === 'Resource Request' || selectedRequestType === 'IT Support Request' ||
+                       selectedRequestType === 'Feedback/Suggestion' || selectedRequestType === 'Other') {
+                if (!generalMessageDetailsTextarea.value) {
+                    showModal('Please provide your message details.', 'warning');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    return;
+                }
+                formData.generalMessageDetails = generalMessageDetailsTextarea.value;
+                await proceedSubmission(formData); // Proceed with submission for general messages
             }
         });
 
