@@ -793,14 +793,16 @@
         }
 
         // Function to show log detail modal (consolidated view)
-        function showLogDetailModal(clickedDate) {
+        function showLogDetailModal(clickedDate, clickedSubmitterType) {
             detailSectionsContainer.innerHTML = ''; // Clear previous details
 
-            // Filter all logs for the same date
-            const dailyLogs = allHandoverLogs.filter(log => log['Date'] === clickedDate);
+            // Filter all logs for the same date AND the specific submitter type
+            const relevantLogs = allHandoverLogs.filter(log =>
+                log['Date'] === clickedDate && log['Submitted By'] === clickedSubmitterType
+            );
 
             // Set title for the modal
-            document.getElementById('detailModalTitle').textContent = `Handover Details for ${formatDate(clickedDate)}`;
+            document.getElementById('detailModalTitle').textContent = `${clickedSubmitterType} Handover Details for ${formatDate(clickedDate)}`;
 
             // Sections configuration
             const sectionsConfig = {
@@ -816,8 +818,8 @@
                 const { icon, field, keys, isFreeText } = sectionsConfig[key];
                 let combinedSectionEntries = [];
 
-                // Collect all entries for this field from all logs for the clicked date
-                dailyLogs.forEach(log => {
+                // Collect all entries for this field from the RELEVANT logs (filtered by date AND submitter)
+                relevantLogs.forEach(log => {
                     if (log[field] && log[field].trim() !== '') {
                         if (!isFreeText) {
                             // For structured text, split by newline and add each item
@@ -1131,7 +1133,7 @@
                             </p>
                         `;
                         mdCard.addEventListener('click', () => {
-                            showLogDetailModal(date); // Pass the date to the modal
+                            showLogDetailModal(date, 'MD'); // Pass 'MD' as submitterType
                         });
                         logsContainer.appendChild(mdCard);
                     }
@@ -1150,7 +1152,7 @@
                             </p>
                         `;
                         principalCard.addEventListener('click', () => {
-                            showLogDetailModal(date); // Pass the date to the modal
+                            showLogDetailModal(date, 'Principal'); // Pass 'Principal' as submitterType
                         });
                         logsContainer.appendChild(principalCard);
                     }
